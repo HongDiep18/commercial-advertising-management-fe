@@ -1,18 +1,20 @@
+'use client'
+
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import Button from "../ui/Button"
 
 const magazines = [
-  { id: 1, title: "越南華商採購名錄 2025", image: "/src/assets/images/magazines/2025.png", year: 2025 },
-  { id: 2, title: "越南華商採購名錄 2024", image: "/src/assets/images/magazines/2024.png", year: 2024 },
-  { id: 3, title: "越南華商採購名錄 2023", image: "/src/assets/images/magazines/2023.png", year: 2023 },
-  { id: 4, title: "越南華商採購名錄 2022", image: "/src/assets/images/magazines/2022.png", year: 2022 },
-  { id: 5, title: "越南華商採購名錄 2021", image: "/src/assets/images/magazines/2021.png", year: 2021 },
-  { id: 6, title: "越南華商採購名錄 2020", image: "/src/assets/images/magazines/2020.png", year: 2020 },
-  { id: 7, title: "越南華商採購名錄 2019", image: "/src/assets/images/magazines/2019.png", year: 2019 },
-  { id: 8, title: "越南華商採購名錄 2018", image: "/src/assets/images/magazines/2018.png", year: 2018 },
-  { id: 9, title: "越南華商採購名錄 2017", image: "/src/assets/images/magazines/2017.png", year: 2017 },
-  { id: 10, title: "越南華商採購名錄 2016", image: "/src/assets/images/magazines/2016.png", year: 2016 },
+  { id: 1, title: "越南華商採購名錄 2025", image: "/assets/images/magazines/2025.png", year: 2025 },
+  { id: 2, title: "越南華商採購名錄 2024", image: "/assets/images/magazines/2024.png", year: 2024 },
+  { id: 3, title: "越南華商採購名錄 2023", image: "/assets/images/magazines/2023.png", year: 2023 },
+  { id: 4, title: "越南華商採購名錄 2022", image: "/assets/images/magazines/2022.png", year: 2022 },
+  { id: 5, title: "越南華商採購名錄 2021", image: "/assets/images/magazines/2021.png", year: 2021 },
+  { id: 6, title: "越南華商採購名錄 2020", image: "/assets/images/magazines/2020.png", year: 2020 },
+  { id: 7, title: "越南華商採購名錄 2019", image: "/assets/images/magazines/2019.png", year: 2019 },
+  { id: 8, title: "越南華商採購名錄 2018", image: "/assets/images/magazines/2018.png", year: 2018 },
+  { id: 9, title: "越南華商採購名錄 2017", image: "/assets/images/magazines/2017.png", year: 2017 },
+  { id: 10, title: "越南華商採購名錄 2016", image: "/assets/images/magazines/2016.png", year: 2016 },
 ]
 
 export default function MagazineCarousel() {
@@ -62,9 +64,8 @@ export default function MagazineCarousel() {
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === currentIndex ? "w-8 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground"
-              }`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? "w-8 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground"
+                }`}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}

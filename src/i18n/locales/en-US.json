@@ -2,7 +2,6 @@
   "common": {
     "login": "Login",
     "register": "Register",
-    "freeRegister": "Free Register",
     "search": "Search",
     "about": "About",
     "contact": "Contact"

@@ -1,3 +1,5 @@
+'use client'
+
 import type React from "react"
 import { ArrowRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -18,7 +20,7 @@ export default function HeroSection() {
     <section className="relative h-[450px] overflow-hidden lg:h-[550px]">
       <div className="absolute inset-0">
         <img
-          src="/src/assets/images/taiwanese-vietnamese-business-meeting.jpg"
+          src="/assets/images/taiwanese-vietnamese-business-meeting.jpg"
           alt="Taiwanese and Vietnamese Business Meeting"
           className="h-full w-full object-cover"
         />

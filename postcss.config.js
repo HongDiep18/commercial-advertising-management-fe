@@ -1,7 +1,7 @@
-export default {
+module.exports = {
   plugins: {
     '@tailwindcss/postcss': {
-      content: ['./index.html', './src/**/*.{ts,tsx}'],
+      content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
     },
     autoprefixer: {},
   },

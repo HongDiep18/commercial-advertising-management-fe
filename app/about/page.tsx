@@ -1,7 +1,9 @@
-import Header from "../components/layout/Header"
-import Footer from "../components/layout/Footer"
-import AboutHero from "../components/about/AboutHero"
-import AboutBody from "../components/about/AboutBody"
+'use client'
+
+import Header from '../../src/components/layout/Header'
+import Footer from '../../src/components/layout/Footer'
+import AboutHero from '../../src/components/about/AboutHero'
+import AboutBody from '../../src/components/about/AboutBody'
 
 export default function AboutPage() {
     return (

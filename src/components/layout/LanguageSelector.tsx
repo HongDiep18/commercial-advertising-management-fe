@@ -1,12 +1,14 @@
+'use client'
+
 import { useState, useRef, useEffect } from 'react'
 import { Globe, ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-type Language = 'en-US' | 'zh-CN' | 'vi-VN'
+type Language = 'en-US' | 'zh-TW' | 'vi-VN'
 
 const languages: Record<Language, string> = {
   'en-US': 'English',
-  'zh-CN': '简体中文',
+  'zh-TW': '繁體中文',
   'vi-VN': 'Tiếng Việt',
 }
 
@@ -20,10 +22,10 @@ export default function LanguageSelector({
   const { i18n } = useTranslation()
   const getInitialLanguage = (): Language => {
     const lang = i18n.language
-    if (lang === 'en-US' || lang === 'zh-CN' || lang === 'vi-VN') {
+    if (lang === 'en-US' || lang === 'zh-TW' || lang === 'vi-VN') {
       return lang as Language
     }
-    return 'zh-CN'
+    return 'zh-TW'
   }
   const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage())
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
@@ -31,7 +33,7 @@ export default function LanguageSelector({
 
   useEffect(() => {
     const handleLanguageChanged = (lng: string) => {
-      if (lng === 'en-US' || lng === 'zh-CN' || lng === 'vi-VN') {
+      if (lng === 'en-US' || lng === 'zh-TW' || lng === 'vi-VN') {
         setCurrentLanguage(lng as Language)
       }
     }
@@ -83,10 +85,10 @@ export default function LanguageSelector({
         {isLanguageDropdownOpen && (
           <div className="mt-2 w-full rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
             <button
-              onClick={() => handleLanguageChange('zh-CN')}
+              onClick={() => handleLanguageChange('zh-TW')}
               className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
             >
-              简体中文
+              繁體中文
             </button>
             <button
               onClick={() => handleLanguageChange('en-US')}
@@ -122,10 +124,10 @@ export default function LanguageSelector({
       {isLanguageDropdownOpen && (
         <div className="absolute right-0 z-50 mt-2 w-40 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
           <button
-            onClick={() => handleLanguageChange('zh-CN')}
+            onClick={() => handleLanguageChange('zh-TW')}
             className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
           >
-            简体中文
+            繁體中文
           </button>
           <button
             onClick={() => handleLanguageChange('en-US')}

@@ -1,3 +1,5 @@
+'use client'
+
 import { MapPin, Phone, Award } from "lucide-react"
 import { useMemo } from "react"
 import Card from "../ui/Card"
@@ -10,17 +12,17 @@ const companyData = {
   "textile-1": {
     phone: "0274-3553278",
     verified: true,
-    image: "/src/assets/images/companies/TNHH-LI-SHIN.png",
+    image: "/assets/images/companies/TNHH-LI-SHIN.png",
   },
   "finance-1": {
     phone: "+84 (90) 8489826",
     verified: true,
-    image: "/src/assets/images/companies/DBS.jpg",
+    image: "/assets/images/companies/DBS.jpg",
   },
   "machinery-1": {
     phone: "028-37153233",
     verified: true,
-    image: "/src/assets/images/companies/tsaihsiung-construction.jpg",
+    image: "/assets/images/companies/tsaihsiung-construction.jpg",
   },
 }
 

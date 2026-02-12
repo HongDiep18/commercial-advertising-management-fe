@@ -11,14 +11,14 @@ services:
     
     # Access app at http://localhost:3000
     ports:
-      - "3000:80"
+      - "3000:3000"
     
     # Restart policy: always restart if container crashes
     restart: unless-stopped
     
     # Health check 
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       timeout: 10s
       retries: 3

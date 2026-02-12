@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { ChevronDown, ChevronUp, Building2, Newspaper, ArrowRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -17,7 +19,7 @@ const bannerConfig = [
   {
     id: 1,
     type: "company" as const,
-    image: "/src/assets/images/sticky-bottom/modern-manufacturing-facility.png",
+    image: "/assets/images/sticky-bottom/modern-manufacturing-facility.png",
     link: "/directory",
     tagKey: "featuredCompany",
     titleKey: "1",
@@ -32,7 +34,7 @@ const bannerConfig = [
   {
     id: 3,
     type: "company" as const,
-    image: "/src/assets/images/sticky-bottom/solar-panels-green-energy.jpg",
+    image: "/assets/images/sticky-bottom/solar-panels-green-energy.jpg",
     link: "/directory",
     tagKey: "featuredCompany",
     titleKey: "3",

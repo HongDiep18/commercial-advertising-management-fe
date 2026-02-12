@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useState, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import HorizontalTimeline from "./HorizontalTimeline"
@@ -115,9 +117,9 @@ export default function AboutBody() {
                                 {/* Image Gallery */}
                                 <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
                                     {[
-                                        { src: "/src/assets/images/companies/modern-tech-office.png", altKey: "manufacturing" },
-                                        { src: "/src/assets/images/companies/modern-manufacturing-facility.png", altKey: "office" },
-                                        { src: "/src/assets/images/taiwanese-vietnamese-business-meeting.jpg", altKey: "meeting" },
+                                        { src: "/assets/images/companies/modern-tech-office.png", altKey: "manufacturing" },
+                                        { src: "/assets/images/companies/modern-manufacturing-facility.png", altKey: "office" },
+                                        { src: "/assets/images/taiwanese-vietnamese-business-meeting.jpg", altKey: "meeting" },
                                     ].map((img, i) => (
                                         <div key={i} className="group relative aspect-[4/3] overflow-hidden rounded-xl">
                                             <img

@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom"
+'use client'
+
+import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
@@ -10,7 +12,7 @@ export default function AboutHero() {
         <section className="relative h-[500px] lg:h-[550px] w-full overflow-hidden">
             <div className="absolute inset-0">
                 <img
-                    src="/src/assets/images/hero-banner.png"
+                    src="/assets/images/hero-banner.png"
                     alt={t("about.hero.imageAlt")}
                     className="h-full w-full object-cover"
                 />
@@ -29,7 +31,7 @@ export default function AboutHero() {
                     </p>
                     <div className="flex flex-wrap gap-4">
                         <Button asChild size="lg" variant="primary" className="font-semibold">
-                            <Link to="/directory">
+                            <Link href="/directory">
                                 {t("about.hero.goToDirectory")}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>

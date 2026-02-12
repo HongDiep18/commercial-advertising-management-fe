@@ -2,17 +2,16 @@
   "common": {
     "login": "Đăng nhập",
     "register": "Đăng ký",
-    "freeRegister": "Đăng ký miễn phí",
     "search": "Tìm kiếm",
     "about": "Về chúng tôi",
     "contact": "Liên hệ"
   },
   "header": {
     "aboutUs": "Về chúng tôi",
-    "directory": "Danh mục doanh nghiệp",
+    "directory": "Danh mục DN",
     "store": "Cửa hàng trực tuyến",
     "news": "Tin tức mới nhất",
-    "adContact": "Liên hệ quảng cáo"
+    "adContact": "Liên hệ QC"
   },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
@@ -163,7 +162,7 @@
     "title": "Liên hệ chúng tôi",
     "description": "Nếu bạn có bất kỳ câu hỏi nào về dịch vụ của chúng tôi, hoặc muốn thêm công ty của bạn vào Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam, vui lòng liên hệ với chúng tôi. Để biết thêm thông tin liên hệ, vui lòng tham khảo phần chân trang.",
     "sendEmail": "Gửi Email",
-    "adContact": "Liên hệ Quảng cáo"
+    "adContact": "Liên hệ QC"
   },
   "stickyBanner": {
     "expandText": "Mở rộng thông tin nổi bật",

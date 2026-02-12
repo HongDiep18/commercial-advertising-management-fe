@@ -35,11 +35,6 @@
     --color-muted-foreground: #6b7280;
     --color-foreground: #111827;
   }
-}
-@layer base {
-  :root {
-    color-scheme: light;
-  }
   
   html {
     scroll-behavior: smooth;

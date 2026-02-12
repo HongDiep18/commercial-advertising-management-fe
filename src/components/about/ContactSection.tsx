@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom"
+'use client'
+
+import Link from "next/link"
 import { Mail, ArrowRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
@@ -24,7 +26,7 @@ export default function ContactSection() {
                     </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="!border-primary/30 !bg-transparent font-semibold !text-header-red-dark hover:!text-white hover:!bg-primary/5">
-                    <Link to="/contact">
+                    <Link href="/contact">
                         {t("contact.adContact")}
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

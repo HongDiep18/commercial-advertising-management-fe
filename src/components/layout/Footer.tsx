@@ -1,3 +1,5 @@
+'use client'
+
 import { MapPin, Phone, Mail } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -12,7 +14,7 @@ export default function Footer() {
             <a href="/" className="mb-3 inline-flex items-center gap-2">
               <div className="flex flex-col">
                 <img
-                  src="/src/assets/images/logo.webp"
+                  src="/assets/images/logo.webp"
                   alt="Vietnam Buyer's Guide"
                   width={150}
                   height={80}
@@ -29,7 +31,7 @@ export default function Footer() {
             {/* Government Registration Badge */}
             <div className="mt-4">
               <img
-                src="/src/assets/images/gov-badge.png"
+                src="/assets/images/gov-badge.png"
                 alt="ĐÃ ĐĂNG KÝ BỘ CÔNG THƯƠNG"
                 width={150}
                 height={60}
