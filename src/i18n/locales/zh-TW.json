@@ -204,5 +204,90 @@
     "mapTitle": "公司位置地圖",
     "copyright": "© 2025 vnbuyerguide.com 版權所有",
     "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
+  },
+  "register": {
+    "title": "會員註冊",
+    "backToHome": "返回首頁",
+    "submit": "會員註冊",
+    "processing": "處理中...",
+    "success": "註冊成功！",
+    "hasAccount": "已經有帳號？",
+    "loginLink": "立即登入",
+    "captchaRefresh": "刷新驗證碼",
+    "countries": {
+      "vietnam": "越南",
+      "taiwan": "台灣",
+      "china": "中國",
+      "singapore": "新加坡",
+      "other": "其他"
+    },
+    "regions": {
+      "hcm": "胡志明市",
+      "hanoi": "河內",
+      "binhduong": "平陽",
+      "dongnai": "同奈",
+      "danang": "峴港",
+      "haiphong": "海防",
+      "taipei": "台北",
+      "taichung": "台中",
+      "kaohsiung": "高雄",
+      "beijing": "北京",
+      "shanghai": "上海",
+      "guangzhou": "廣州",
+      "singapore": "新加坡",
+      "other": "其他"
+    },
+    "placeholders": {
+      "companyNameVi": "公司名稱（越文）",
+      "companyNameCn": "公司名稱（中文）",
+      "phone": "電話",
+      "taxId": "稅號",
+      "contactPerson": "聯絡人",
+      "contactPhone": "聯絡人電話號碼",
+      "companyAddress": "公司地址",
+      "email": "電子郵件",
+      "country": "選擇國家 *",
+      "region": "選擇地區 *",
+      "industry": "選擇產業類別 *",
+      "website": "網站 *",
+      "introduction": "簡單介紹 *",
+      "captcha": "請輸入驗證碼",
+      "selectCountryFirst": "請先選擇國家"
+    },
+    "noRegions": "無可用地區",
+    "errors": {
+      "captcha": "驗證碼錯誤，請重新輸入",
+      "submit": "註冊失敗，請稍後再試"
+    }
+  },
+  "login": {
+    "title": "登入帳號",
+    "email": "電子郵件",
+    "password": "密碼",
+    "submit": "登入",
+    "processing": "登入中...",
+    "success": "登入成功！",
+    "noAccount": "還沒有帳號？",
+    "registerLink": "免費註冊",
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "••••••••"
+    },
+    "demo": {
+      "bronze": "銅牌會員",
+      "silver": "銀牌會員",
+      "gold": "金牌會員",
+      "diamond": "鑽石會員",
+      "admin": "管理員"
+    },
+    "terms": {
+      "text": "登入即表示您同意我們的",
+      "service": "服務條款",
+      "and": "和",
+      "privacy": "隱私政策"
+    },
+    "errors": {
+      "failed": "登入失敗，請檢查您的帳號密碼"
+    }
   }
 }

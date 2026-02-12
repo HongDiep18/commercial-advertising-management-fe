@@ -204,5 +204,90 @@
     "mapTitle": "Company Location Map",
     "copyright": "© 2025 vnbuyerguide.com All rights reserved.",
     "companyFullName": "KIEN HAO TRADING AND SERVICE CO., LTD."
+  },
+  "register": {
+    "title": "Member Registration",
+    "backToHome": "Back to Home",
+    "submit": "Register",
+    "processing": "Processing...",
+    "success": "Registration successful!",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Login Now",
+    "captchaRefresh": "Refresh Captcha",
+    "countries": {
+      "vietnam": "Vietnam",
+      "taiwan": "Taiwan",
+      "china": "China",
+      "singapore": "Singapore",
+      "other": "Other"
+    },
+    "regions": {
+      "hcm": "Ho Chi Minh City",
+      "hanoi": "Hanoi",
+      "binhduong": "Binh Duong",
+      "dongnai": "Dong Nai",
+      "danang": "Da Nang",
+      "haiphong": "Hai Phong",
+      "taipei": "Taipei",
+      "taichung": "Taichung",
+      "kaohsiung": "Kaohsiung",
+      "beijing": "Beijing",
+      "shanghai": "Shanghai",
+      "guangzhou": "Guangzhou",
+      "singapore": "Singapore",
+      "other": "Other"
+    },
+    "placeholders": {
+      "companyNameVi": "Company Name (Vietnamese)",
+      "companyNameCn": "Company Name (Chinese)",
+      "phone": "Phone",
+      "taxId": "Tax ID",
+      "contactPerson": "Contact Person",
+      "contactPhone": "Contact Phone",
+      "companyAddress": "Company Address",
+      "email": "E-Mail",
+      "country": "Select Country *",
+      "region": "Select Region *",
+      "industry": "Select Industry Category *",
+      "website": "Website *",
+      "introduction": "Brief Introduction *",
+      "captcha": "Enter Captcha",
+      "selectCountryFirst": "Please select country first"
+    },
+    "noRegions": "No regions available",
+    "errors": {
+      "captcha": "Invalid captcha, please try again",
+      "submit": "Registration failed, please try again later"
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Login",
+    "processing": "Logging in...",
+    "success": "Login successful!",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Free Register",
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "••••••••"
+    },
+    "demo": {
+      "bronze": "Bronze Member",
+      "silver": "Silver Member",
+      "gold": "Gold Member",
+      "diamond": "Diamond Member",
+      "admin": "Administrator"
+    },
+    "terms": {
+      "text": "By logging in, you agree to our",
+      "service": "Terms of Service",
+      "and": "and",
+      "privacy": "Privacy Policy"
+    },
+    "errors": {
+      "failed": "Login failed, please check your email and password"
+    }
   }
 }

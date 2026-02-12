@@ -55,7 +55,7 @@ export default function Header() {
             </Link>
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex lg:gap-4">
+          <div className="hidden items-center gap-1 md:flex lg:gap-1">
             <LanguageSelector variant="desktop" />
 
             <a

@@ -27,7 +27,6 @@ export default function SearchSection() {
   const industryDropdownRef = useRef<HTMLDivElement | null>(null)
   const locationDropdownRef = useRef<HTMLDivElement | null>(null)
 
-  // Get translated categories and locations
   const categories = useMemo(() => {
     return categoryIds.map((id) => ({
       id,
@@ -66,7 +65,6 @@ export default function SearchSection() {
     return allLocations.filter((loc) => loc.name.toLowerCase().includes(term))
   }, [locationSearch, allLocations])
 
-  // Compute active filters from selections and translations
   const activeFilters = useMemo(() => {
     const tags: FilterTag[] = []
     selectedIndustries.forEach((id) => {

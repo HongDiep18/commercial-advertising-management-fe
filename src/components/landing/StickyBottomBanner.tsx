@@ -69,24 +69,21 @@ export default function StickyBottomBanner() {
     }))
   }, [t])
 
-  // Check if banner was closed today
   useEffect(() => {
     const hiddenDate = localStorage.getItem(STORAGE_KEY)
     const today = new Date().toDateString()
 
     if (hiddenDate !== today) {
-      // Show banner after a short delay for better UX
       const timer = setTimeout(() => setIsVisible(true), 1000)
       return () => clearTimeout(timer)
     }
   }, [])
 
-  // Auto-carousel
   useEffect(() => {
     if (!isPaused && isExpanded && isVisible) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % bannerItems.length)
-      }, 7000) // 7 seconds
+      }, 7000)
       return () => clearInterval(interval)
     }
   }, [isPaused, isExpanded, isVisible, bannerItems.length])

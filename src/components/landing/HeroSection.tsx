@@ -17,7 +17,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative h-[450px] overflow-hidden lg:h-[550px]">
+    <section className="relative h-[450px] overflow-hidden lg:h-[650px]">
       <div className="absolute inset-0">
         <img
           src="/assets/images/taiwanese-vietnamese-business-meeting.jpg"

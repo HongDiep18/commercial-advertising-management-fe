@@ -63,9 +63,13 @@ export default function LanguageSelector({
   }, [isLanguageDropdownOpen])
 
   const handleLanguageChange = (lang: Language) => {
-    i18n.changeLanguage(lang)
-    setCurrentLanguage(lang)
-    setIsLanguageDropdownOpen(false)
+    i18n.changeLanguage(lang).then(() => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('i18nextLng', lang)
+      }
+      setCurrentLanguage(lang)
+      setIsLanguageDropdownOpen(false)
+    })
   }
 
   if (variant === 'mobile') {

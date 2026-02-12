@@ -9,7 +9,7 @@ export default function AboutHero() {
     const { t } = useTranslation()
 
     return (
-        <section className="relative h-[500px] lg:h-[550px] w-full overflow-hidden">
+        <section className="relative h-[500px] lg:h-[600px] w-full overflow-hidden">
             <div className="absolute inset-0">
                 <img
                     src="/assets/images/hero-banner.png"

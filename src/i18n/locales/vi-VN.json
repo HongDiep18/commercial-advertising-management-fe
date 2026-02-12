@@ -204,5 +204,90 @@
     "mapTitle": "Bản đồ Vị trí Công ty",
     "copyright": "© 2025 vnbuyerguide.com Bảo lưu mọi quyền.",
     "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
+  },
+  "register": {
+    "title": "Đăng ký Thành viên",
+    "backToHome": "Về Trang chủ",
+    "submit": "Đăng ký",
+    "processing": "Đang xử lý...",
+    "success": "Đăng ký thành công!",
+    "hasAccount": "Đã có tài khoản?",
+    "loginLink": "Đăng nhập ngay",
+    "captchaRefresh": "Làm mới Mã xác minh",
+    "countries": {
+      "vietnam": "Việt Nam",
+      "taiwan": "Đài Loan",
+      "china": "Trung Quốc",
+      "singapore": "Singapore",
+      "other": "Khác"
+    },
+    "regions": {
+      "hcm": "Thành phố Hồ Chí Minh",
+      "hanoi": "Hà Nội",
+      "binhduong": "Bình Dương",
+      "dongnai": "Đồng Nai",
+      "danang": "Đà Nẵng",
+      "haiphong": "Hải Phòng",
+      "taipei": "Đài Bắc",
+      "taichung": "Đài Trung",
+      "kaohsiung": "Cao Hùng",
+      "beijing": "Bắc Kinh",
+      "shanghai": "Thượng Hải",
+      "guangzhou": "Quảng Châu",
+      "singapore": "Singapore",
+      "other": "Khác"
+    },
+    "placeholders": {
+      "companyNameVi": "Tên Công ty (Tiếng Việt)",
+      "companyNameCn": "Tên Công ty (Tiếng Trung)",
+      "phone": "Điện thoại",
+      "taxId": "Mã số thuế",
+      "contactPerson": "Người liên hệ",
+      "contactPhone": "Số điện thoại người liên hệ",
+      "companyAddress": "Địa chỉ Công ty",
+      "email": "E-Mail",
+      "country": "Chọn Quốc gia *",
+      "region": "Chọn Khu vực *",
+      "industry": "Chọn ngành nghề *",
+      "website": "Trang web *",
+      "introduction": "Giới thiệu ngắn *",
+      "captcha": "Nhập mã xác minh",
+      "selectCountryFirst": "Vui lòng chọn quốc gia trước"
+    },
+    "noRegions": "Không có khu vực nào",
+    "errors": {
+      "captcha": "Mã xác minh không đúng, vui lòng thử lại",
+      "submit": "Đăng ký thất bại, vui lòng thử lại sau"
+    }
+  },
+  "login": {
+    "title": "Đăng nhập",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "submit": "Đăng nhập",
+    "processing": "Đang đăng nhập...",
+    "success": "Đăng nhập thành công!",
+    "noAccount": "Chưa có tài khoản?",
+    "registerLink": "Đăng ký miễn phí",
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "••••••••"
+    },
+    "demo": {
+      "bronze": "Thành viên Đồng",
+      "silver": "Thành viên Bạc",
+      "gold": "Thành viên Vàng",
+      "diamond": "Thành viên Kim cương",
+      "admin": "Quản trị viên"
+    },
+    "terms": {
+      "text": "Bằng cách đăng nhập, bạn đồng ý với",
+      "service": "Điều khoản Dịch vụ",
+      "and": "và",
+      "privacy": "Chính sách Bảo mật"
+    },
+    "errors": {
+      "failed": "Đăng nhập thất bại, vui lòng kiểm tra email và mật khẩu"
+    }
   }
 }

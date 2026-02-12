@@ -17,6 +17,12 @@
   --color-foreground: #111827;
 }
 
+.registration-form input,
+.registration-form textarea,
+.registration-form [data-radix-select-trigger] {
+    background-color: var(--body-bg-light) !important; 
+}
+
 @layer base {
   :root {
     color-scheme: light;
