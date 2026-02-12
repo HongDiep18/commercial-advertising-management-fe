@@ -1,18 +1,55 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Custom colors for Tailwind v4 - defined as CSS variables for use in config */
+  --color-header-red-dark: #a20519;
+  --color-header-red-light: #d10a22;
+  --color-body-bg-dark: #f5f1ea;
+  --color-body-bg-light: #faf8f5;
+  --color-body-bg-dark-foreground: #e7e4dd;
+  --color-primary: #a20519;
+  --color-primary-foreground: #ffffff;
+  --color-background: #f8fafc;
+  --color-card: #ffffff;
+  --color-border: #e5e7eb;
+  --color-secondary: #f3f4f6;
+  --color-muted-foreground: #6b7280;
+  --color-foreground: #111827;
+}
 
 @layer base {
   :root {
     color-scheme: light;
+    /* Ensure CSS variables are available globally */
+    --color-header-red-dark: #a20519;
+    --color-header-red-light: #d10a22;
+    --color-body-bg-dark: #f5f1ea;
+    --color-body-bg-light: #faf8f5;
+    --color-body-bg-dark-foreground: #e7e4dd;
+    --color-primary: #a20519;
+    --color-primary-foreground: #ffffff;
+    --color-background: #f8fafc;
+    --color-card: #ffffff;
+    --color-border: #e5e7eb;
+    --color-secondary: #f3f4f6;
+    --color-muted-foreground: #6b7280;
+    --color-foreground: #111827;
   }
+}
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  
   html {
     scroll-behavior: smooth;
   }
+  
   html,
   body {
     height: 100%;
   }
+  
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
   }
