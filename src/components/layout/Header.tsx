@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import LanguageSelector from './LanguageSelector'
 
 export default function Header() {
+  const { t } = useTranslation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
@@ -23,31 +25,31 @@ export default function Header() {
               to="/about"
               className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
             >
-              關於我們
+              {t('header.aboutUs')}
             </Link>
             <Link
               to="/directory"
               className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
             >
-              企業名錄
+              {t('header.directory')}
             </Link>
             <Link
               to="/store"
               className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
             >
-              網路商店
+              {t('header.store')}
             </Link>
             <Link
               to="/news"
               className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
             >
-              最新消息
+              {t('header.news')}
             </Link>
             <Link
               to="/contact"
               className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
             >
-              廣告聯繫
+              {t('header.adContact')}
             </Link>
           </nav>
 
@@ -58,14 +60,14 @@ export default function Header() {
               href="/login"
               className="whitespace-nowrap rounded px-4 py-1.5 text-sm font-medium transition-colors hover:bg-header-red-dark"
             >
-              登入
+              {t('common.login')}
             </a>
 
             <a
               href="/register"
               className="whitespace-nowrap rounded bg-white px-4 py-1.5 text-sm font-semibold text-header-red-dark transition-colors hover:bg-white/90"
             >
-              免費註冊
+              {t('common.freeRegister')}
             </a>
           </div>
 
@@ -90,35 +92,35 @@ export default function Header() {
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                 onClick={() => setIsMenuOpen(false)}
               >
-                關於我們
+                {t('header.aboutUs')}
               </Link>
               <Link
                 to="/directory"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                 onClick={() => setIsMenuOpen(false)}
               >
-                企業名錄
+                {t('header.directory')}
               </Link>
               <Link
                 to="/store"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                 onClick={() => setIsMenuOpen(false)}
               >
-                網路商店
+                {t('header.store')}
               </Link>
               <Link
                 to="/news"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                 onClick={() => setIsMenuOpen(false)}
               >
-                最新消息
+                {t('header.news')}
               </Link>
               <Link
                 to="/contact"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                 onClick={() => setIsMenuOpen(false)}
               >
-                廣告聯繫
+                {t('header.adContact')}
               </Link>
               <div className="flex flex-col gap-2 border-t border-white/20 pt-4">
                 <LanguageSelector variant="mobile" />
@@ -127,14 +129,14 @@ export default function Header() {
                   className="rounded px-4 py-2 text-center text-sm font-medium transition-colors hover:bg-header-red-dark"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  登入
+                  {t('common.login')}
                 </a>
                 <a
                   href="/register"
                   className="rounded bg-white px-4 py-2 text-center text-sm font-semibold text-header-red-dark transition-colors hover:bg-white/90"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  免費註冊
+                  {t('common.freeRegister')}
                 </a>
               </div>
             </nav>

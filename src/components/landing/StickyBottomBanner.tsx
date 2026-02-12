@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { ChevronDown, ChevronUp, Building2, Newspaper, ArrowRight } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
 
 interface BannerItem {
@@ -12,50 +13,59 @@ interface BannerItem {
   tag: string
 }
 
-const bannerItems: BannerItem[] = [
+const bannerConfig = [
   {
     id: 1,
-    type: "company",
-    title: "台灣精密工業股份有限公司",
-    subtitle: "專業CNC加工、精密零件製造，40年經驗",
+    type: "company" as const,
     image: "/src/assets/images/sticky-bottom/modern-manufacturing-facility.png",
     link: "/directory",
-    tag: "精選企業",
+    tagKey: "featuredCompany",
+    titleKey: "1",
   },
   {
     id: 2,
-    type: "news",
-    title: "2026年越南投資優惠政策更新",
-    subtitle: "最新稅務減免措施與產業園區優惠一覽",
+    type: "news" as const,
     link: "/about",
-    tag: "最新消息",
+    tagKey: "latestNews",
+    titleKey: "2",
   },
   {
     id: 3,
-    type: "company",
-    title: "綠能科技有限公司",
-    subtitle: "太陽能設備、儲能系統領導品牌",
+    type: "company" as const,
     image: "/src/assets/images/sticky-bottom/solar-panels-green-energy.jpg",
     link: "/directory",
-    tag: "精選企業",
+    tagKey: "featuredCompany",
+    titleKey: "3",
   },
   {
     id: 4,
-    type: "news",
-    title: "台越商會2026年度會員大會",
-    subtitle: "3月15日於胡志明市舉行，歡迎報名參加",
+    type: "news" as const,
     link: "/about",
-    tag: "活動公告",
+    tagKey: "eventAnnouncement",
+    titleKey: "4",
   },
 ]
 
 const STORAGE_KEY = "sticky-banner-hidden-date"
 
 export default function StickyBottomBanner() {
+  const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
   const [isExpanded, setIsExpanded] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+
+  const bannerItems = useMemo<BannerItem[]>(() => {
+    return bannerConfig.map((config) => ({
+      id: config.id,
+      type: config.type,
+      title: t(`stickyBanner.items.${config.titleKey}.title`),
+      subtitle: t(`stickyBanner.items.${config.titleKey}.subtitle`),
+      image: config.image,
+      link: config.link,
+      tag: t(`stickyBanner.tags.${config.tagKey}`),
+    }))
+  }, [t])
 
   // Check if banner was closed today
   useEffect(() => {
@@ -77,7 +87,7 @@ export default function StickyBottomBanner() {
       }, 7000) // 7 seconds
       return () => clearInterval(interval)
     }
-  }, [isPaused, isExpanded, isVisible])
+  }, [isPaused, isExpanded, isVisible, bannerItems.length])
 
   const handleToggleExpand = useCallback(() => {
     setIsExpanded((prev) => !prev)
@@ -95,7 +105,7 @@ export default function StickyBottomBanner() {
           onClick={handleToggleExpand}
           className="group flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary/90"
         >
-          <span className="text-sm font-medium">展開精選資訊</span>
+          <span className="text-sm font-medium">{t("stickyBanner.expandText")}</span>
           <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
         </button>
       )}
@@ -111,7 +121,7 @@ export default function StickyBottomBanner() {
           <button
             onClick={handleToggleExpand}
             className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border bg-card p-1.5 shadow-md transition-colors hover:bg-secondary"
-            aria-label="收合"
+            aria-label={t("stickyBanner.collapseLabel")}
           >
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -157,7 +167,7 @@ export default function StickyBottomBanner() {
               <div className="flex-shrink-0 ">
                 <Button asChild size="sm" variant="primary" className="gap-1 text-white hover:bg-header-red-light/100">
                   <a href={currentItem.link}>
-                    查看詳情
+                    {t("stickyBanner.viewDetails")}
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </Button>
@@ -174,7 +184,7 @@ export default function StickyBottomBanner() {
                     ? "w-6 bg-header-red-dark"
                     : "w-1.5 bg-border hover:bg-muted-foreground"
                     }`}
-                  aria-label={`前往第 ${index + 1} 則資訊`}
+                  aria-label={t("stickyBanner.goToItem", { index: index + 1 })}
                 />
               ))}
             </div>

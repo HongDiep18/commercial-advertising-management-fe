@@ -1,0 +1,209 @@
+{
+  "common": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "freeRegister": "Đăng ký miễn phí",
+    "search": "Tìm kiếm",
+    "about": "Về chúng tôi",
+    "contact": "Liên hệ"
+  },
+  "header": {
+    "aboutUs": "Về chúng tôi",
+    "directory": "Danh mục doanh nghiệp",
+    "store": "Cửa hàng trực tuyến",
+    "news": "Tin tức mới nhất",
+    "adContact": "Liên hệ quảng cáo"
+  },
+  "hero": {
+    "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
+    "subtitle": "Tập hợp hơn 3,980 doanh nghiệp Đài Loan chất lượng tại Việt Nam, cung cấp phân loại ngành công nghiệp và thông tin doanh nghiệp đầy đủ nhất để giúp bạn nhanh chóng tìm thấy đối tác lý tưởng và tạo ra nhiều cơ hội kinh doanh hơn",
+    "joinUs": "Tham gia cùng chúng tôi",
+    "findPartners": "Tìm đối tác kinh doanh"
+  },
+  "search": {
+    "title": "Tìm kiếm doanh nghiệp",
+    "subtitle": "Nhập từ khóa, danh mục ngành công nghiệp hoặc địa điểm để tìm đối tác kinh doanh lý tưởng của bạn",
+    "industry": "Ngành công nghiệp",
+    "location": "Địa điểm",
+    "searchButton": "Tìm kiếm",
+    "selectIndustry": "Chọn ngành công nghiệp",
+    "selectLocation": "Chọn địa điểm",
+    "industryCategory": "Danh mục Ngành công nghiệp",
+    "searchCategory": "Tìm kiếm danh mục...",
+    "searchLocation": "Tìm kiếm địa điểm...",
+    "filterConditions": "Điều kiện Lọc",
+    "clearAll": "Xóa tất cả",
+    "byCompany": "Theo Công ty",
+    "byProduct": "Theo Sản phẩm",
+    "all": "Tất cả",
+    "popularSearches": "Tìm kiếm Phổ biến:",
+    "placeholders": {
+      "company": "Nhập tên công ty, thương hiệu hoặc từ khóa...",
+      "product": "Nhập sản phẩm, dịch vụ hoặc từ khóa...",
+      "all": "Nhập từ khóa công ty hoặc sản phẩm..."
+    },
+    "categories": {
+      "semi": "Bán dẫn",
+      "elec": "Sản xuất điện tử",
+      "textile": "Dệt may",
+      "food": "Chế biến thực phẩm",
+      "machine": "Máy móc & Thiết bị",
+      "plastic": "Sản phẩm nhựa"
+    },
+    "locations": {
+      "hcm": "Thành phố Hồ Chí Minh",
+      "hanoi": "Hà Nội",
+      "binhduong": "Bình Dương",
+      "dongnai": "Đồng Nai",
+      "danang": "Đà Nẵng",
+      "haiphong": "Hải Phòng"
+    }
+  },
+  "stats": {
+    "title": "Sức mạnh nền tảng",
+    "subtitle": "Chứng kiến sự chuyên nghiệp và tận tâm của chúng tôi qua dữ liệu",
+    "companies": "Doanh nghiệp",
+    "companiesDesc": "Bao phủ các ngành công nghiệp khác nhau",
+    "views": "Lượt xem",
+    "viewsDesc": "Lượt xem trang hàng năm",
+    "products": "Sản phẩm",
+    "productsDesc": "Đa dạng sản phẩm",
+    "experience": "Năm Kinh nghiệm Dịch vụ",
+    "experienceDesc": "Nền tảng đáng tin cậy",
+    "years": "Năm"
+  },
+  "featuredCompanies": {
+    "title": "Doanh nghiệp nổi bật",
+    "subtitle": "Doanh nghiệp chất lượng được lựa chọn kỹ lưỡng, đối tác đáng tin cậy",
+    "viewMore": "Xem thêm →",
+    "verified": "Đã xác minh",
+    "companies": {
+      "textile-1": {
+        "name": "Công ty TNHH Công nghiệp Li Xin",
+        "industry": "Dệt may, Quần áo & Phụ kiện",
+        "location": "Đài Loan",
+        "description": "Nhà máy sản xuất sợi bọc chuyên nghiệp và nhà cung cấp nguyên liệu dệt may, cung cấp chế biến và bán sợi đàn hồi LATEX tự nhiên và SPANDEX hóa học."
+      },
+      "finance-1": {
+        "name": "Ngân hàng DBS (Việt Nam) Ltd.",
+        "industry": "Tài chính & Bảo hiểm",
+        "location": "Singapore",
+        "description": "Ngân hàng DBS có trụ sở tại Singapore với chi nhánh tại Việt Nam, cung cấp dịch vụ tiền gửi và ngoại hối, dịch vụ quản lý tiền mặt, thư tín dụng và dịch vụ tài trợ thương mại."
+      },
+      "machinery-1": {
+        "name": "Công ty Thương mại Tsai Hsiung",
+        "industry": "Máy móc, Điện cơ & Sản phẩm Công nghiệp",
+        "location": "Việt Nam",
+        "description": "Công ty Thương mại Tsai Hsiung là một công ty chuyên cung cấp máy móc và thiết bị sản xuất giày dép."
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "badge": "Về chúng tôi",
+      "title": "Hướng dẫn mua hàng Việt Nam",
+      "description": "Hướng dẫn mua hàng Việt Nam cam kết trở thành đối tác kinh doanh tốt nhất cho các doanh nghiệp Hoa Việt Nam, cung cấp thông tin doanh nghiệp toàn diện và dịch vụ kết nối kinh doanh, thúc đẩy giao lưu và hợp tác giữa các doanh nghiệp Hoa Việt Nam.",
+      "goToDirectory": "Đi tới danh mục doanh nghiệp",
+      "contactUs": "Liên hệ chúng tôi",
+      "imageAlt": "Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam"
+    },
+    "body": {
+      "nav": {
+        "about": "Hướng dẫn mua hàng Việt Nam",
+        "history": "Lịch sử Phát triển",
+        "directory": "Khám phá Danh mục Mua sắm",
+        "contact": "Liên hệ chúng tôi"
+      },
+      "sections": {
+        "about": {
+          "title": "Về Hướng dẫn mua hàng Việt Nam",
+          "paragraph1": "Hướng dẫn mua hàng Việt Nam là phần mở rộng và nâng cấp kỹ thuật số của Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam, kết hợp sự tiện lợi và tính thời gian thực của Internet để cung cấp nền tảng trao đổi kinh doanh 24/7 cho các doanh nghiệp Hoa toàn cầu. Dù bạn sử dụng máy tính, laptop, máy tính bảng hay điện thoại thông minh, bạn đều có thể đăng nhập vào nền tảng bất cứ lúc nào, duyệt thông tin ngành công nghiệp đầy đủ và chính xác nhất, nắm bắt các cơ hội kinh doanh và động thái thị trường mới nhất ở Việt Nam và khu vực ASEAN.",
+          "paragraph2": "Chúng tôi tin rằng tính minh bạch thông tin và kết nối chặt chẽ là chìa khóa thành công của doanh nghiệp Hoa. Thông qua Hướng dẫn mua hàng Việt Nam, các doanh nghiệp không còn bị giới hạn bởi chu kỳ cập nhật của danh mục in, mà có thể cập nhật cung và cầu theo thời gian thực, mở rộng mạng lưới và tăng cường hợp tác, thực sự đạt được \"bất cứ lúc nào, bất cứ đâu, cơ hội kinh doanh không ngừng\".",
+          "paragraph3": "Thông qua nhiều năm nỗ lực, chúng tôi đã xây dựng một cơ sở dữ liệu doanh nghiệp hoàn chỉnh bao gồm tất cả các ngành công nghiệp, bao gồm dệt may, giày dép, xe cộ, đồ nội thất, vật liệu xây dựng, điện tử, máy móc, nhựa, nông nghiệp, kim loại và nhiều lĩnh vực công nghiệp khác. Mỗi năm chúng tôi cập nhật và xuất bản danh mục mua sắm mới nhất để đảm bảo tính kịp thời và chính xác của thông tin."
+        },
+        "history": {
+          "title": "Lịch sử Phát triển",
+          "description": "Kể từ khi ra mắt vào năm 2016, Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam đã tiếp tục đào sâu sự hiện diện trong thị trường kinh doanh Hoa Việt Nam, dần dần phát triển thành nền tảng thông tin kinh doanh có ảnh hưởng nhất."
+        },
+        "directory": {
+          "title": "Khám phá Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam",
+          "description": "Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam mà chúng tôi xuất bản hàng năm chứa thông tin chi tiết về hàng nghìn doanh nghiệp Hoa chất lượng. Từ năm 2016 đến nay, chúng tôi đã xuất bản nhiều phiên bản, mỗi phiên bản đều được xem xét và cập nhật nghiêm ngặt."
+        }
+      },
+      "timeline": {
+        "2016": {
+          "title": "Năm Thành lập",
+          "description": "Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam chính thức ra mắt, lần đầu tiên thiết lập nền tảng thông tin doanh nghiệp hoàn chỉnh cho các doanh nghiệp Hoa Việt Nam."
+        },
+        "2018": {
+          "title": "Mở rộng Ngành công nghiệp",
+          "description": "Phạm vi bao phủ mở rộng từ dệt may và giày dép ban đầu sang các lĩnh vực đa dạng bao gồm điện tử, máy móc, nhựa và nhiều hơn nữa."
+        },
+        "2020": {
+          "title": "Chuyển đổi Số",
+          "description": "Ra mắt nền tảng trực tuyến Hướng dẫn mua hàng Việt Nam, vượt qua các hạn chế của bản in để cung cấp dịch vụ kinh doanh 24/7."
+        },
+        "2022": {
+          "title": "Kết nối Quốc tế",
+          "description": "Thiết lập quan hệ đối tác với các phòng thương mại ở Đài Loan, Trung Quốc và Đông Nam Á, mở rộng mạng lưới kinh doanh."
+        },
+        "2024": {
+          "title": "Nâng cấp Thông minh",
+          "description": "Giới thiệu tính năng tìm kiếm thông minh và kết nối kinh doanh, nâng cao trải nghiệm người dùng nền tảng và tỷ lệ chuyển đổi kinh doanh."
+        }
+      },
+      "images": {
+        "manufacturing": "Nhà máy Sản xuất",
+        "office": "Môi trường Văn phòng Hiện đại",
+        "meeting": "Cuộc họp Kinh doanh"
+      }
+    }
+  },
+  "contact": {
+    "title": "Liên hệ chúng tôi",
+    "description": "Nếu bạn có bất kỳ câu hỏi nào về dịch vụ của chúng tôi, hoặc muốn thêm công ty của bạn vào Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam, vui lòng liên hệ với chúng tôi. Để biết thêm thông tin liên hệ, vui lòng tham khảo phần chân trang.",
+    "sendEmail": "Gửi Email",
+    "adContact": "Liên hệ Quảng cáo"
+  },
+  "stickyBanner": {
+    "expandText": "Mở rộng thông tin nổi bật",
+    "collapseLabel": "Thu gọn",
+    "viewDetails": "Xem chi tiết",
+    "goToItem": "Đi tới mục {{index}}",
+    "tags": {
+      "featuredCompany": "Doanh nghiệp nổi bật",
+      "latestNews": "Tin tức mới nhất",
+      "eventAnnouncement": "Thông báo sự kiện"
+    },
+    "items": {
+      "1": {
+        "title": "Công ty TNHH Công nghiệp chính xác Đài Loan",
+        "subtitle": "Gia công CNC chuyên nghiệp, sản xuất linh kiện chính xác, 40 năm kinh nghiệm"
+      },
+      "2": {
+        "title": "Cập nhật Chính sách Ưu đãi Đầu tư Việt Nam 2026",
+        "subtitle": "Tổng quan các biện pháp giảm thuế mới nhất và ưu đãi khu công nghiệp"
+      },
+      "3": {
+        "title": "Công ty Công nghệ Năng lượng Xanh",
+        "subtitle": "Thiết bị năng lượng mặt trời, hệ thống lưu trữ năng lượng thương hiệu hàng đầu"
+      },
+      "4": {
+        "title": "Đại hội Thường niên 2026 Phòng Thương mại Đài Loan-Việt Nam",
+        "subtitle": "Ngày 15 tháng 3 tại Thành phố Hồ Chí Minh, chào mừng đăng ký"
+      }
+    }
+  },
+  "footer": {
+    "description": "Hướng dẫn mua hàng Việt Nam là phần mở rộng và nâng cấp kỹ thuật số của Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam, kết hợp sự tiện lợi và tính thời gian thực của Internet để cung cấp nền tảng trao đổi kinh doanh 24/7 cho các doanh nghiệp Hoa toàn cầu.",
+    "companyName": "Công ty TNHH Kiến Hào (Việt Nam)",
+    "companyDescription": "Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam - Cung cấp tất cả thông tin danh mục mua sắm doanh nghiệp Hoa cho độc giả tiếng Hoa",
+    "contactInfo": "Thông tin Liên hệ",
+    "companyLocation": "Vị trí Công ty",
+    "address": "81/11 Hồ Văn Huê, P.9, Q.Phú Nhuận, TP.HCM, Việt Nam",
+    "phoneDirectory": "(Mua danh mục)",
+    "mapTitle": "Bản đồ Vị trí Công ty",
+    "copyright": "© 2025 vnbuyerguide.com Bảo lưu mọi quyền.",
+    "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
+  }
+}

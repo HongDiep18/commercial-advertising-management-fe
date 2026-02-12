@@ -1,8 +1,11 @@
 import type React from "react"
 import { ArrowRight } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
 
 export default function HeroSection() {
+  const { t } = useTranslation()
+
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault()
     const element = document.getElementById(targetId)
@@ -25,12 +28,11 @@ export default function HeroSection() {
       <div className="relative h-full container mx-auto px-4 lg:px-8">
         <div className="flex h-full max-w-3xl flex-col justify-center">
           <h1 className="mb-6 text-balance text-4xl font-bold leading-tight text-white lg:text-5xl">
-            華商採購網－連結優質商業夥伴
+            {t('hero.title')}
           </h1>
 
           <p className="mb-6 max-w-2xl text-pretty text-base leading-relaxed text-white lg:text-lg">
-            匯集超過 3,980
-            家在越南的優質台灣企業，提供最完整的產業分類與企業資料，協助您快速找到理想的合作夥伴，開創更多商業機會
+            {t('hero.subtitle')}
           </p>
 
           <div className="flex flex-wrap gap-4">
@@ -40,11 +42,11 @@ export default function HeroSection() {
               className="border-white bg-white/10 font-semibold text-white backdrop-blur-sm hover:bg-white/20"
               asChild
             >
-              <a href="/register">加入我們</a>
+              <a href="/register">{t('hero.joinUs')}</a>
             </Button>
             <Button size="lg" variant="primary" className="font-semibold" asChild>
               <a href="#directory" onClick={(e) => handleScroll(e, "directory")}>
-                尋找商業夥伴
+                {t('hero.findPartners')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
             </Button>

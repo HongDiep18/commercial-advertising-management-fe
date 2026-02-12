@@ -1,0 +1,209 @@
+{
+  "common": {
+    "login": "Login",
+    "register": "Register",
+    "freeRegister": "Free Register",
+    "search": "Search",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "header": {
+    "aboutUs": "About Us",
+    "directory": "Company Directory",
+    "store": "Online Store",
+    "news": "Latest News",
+    "adContact": "Advertising Contact"
+  },
+  "hero": {
+    "title": "Vietnam Buyer Guide - Connect Quality Business Partners",
+    "subtitle": "Gathering over 3,980 quality Taiwanese enterprises in Vietnam, providing the most complete industry classification and company information to help you quickly find ideal partners and create more business opportunities",
+    "joinUs": "Join Us",
+    "findPartners": "Find Business Partners"
+  },
+  "search": {
+    "title": "Search Companies",
+    "subtitle": "Enter keywords, industry category or location to find your ideal business partners",
+    "industry": "Industry",
+    "location": "Location",
+    "searchButton": "Search",
+    "selectIndustry": "Select Industry",
+    "selectLocation": "Select Location",
+    "industryCategory": "Industry Category",
+    "searchCategory": "Search category...",
+    "searchLocation": "Search location...",
+    "filterConditions": "Filter Conditions",
+    "clearAll": "Clear All",
+    "byCompany": "By Company",
+    "byProduct": "By Product",
+    "all": "All",
+    "popularSearches": "Popular Searches:",
+    "placeholders": {
+      "company": "Enter company name, brand or keywords...",
+      "product": "Enter product, service or keywords...",
+      "all": "Enter company or product keywords..."
+    },
+    "categories": {
+      "semi": "Semiconductor",
+      "elec": "Electronics Manufacturing",
+      "textile": "Textile & Apparel",
+      "food": "Food Processing",
+      "machine": "Machinery & Equipment",
+      "plastic": "Plastic Products"
+    },
+    "locations": {
+      "hcm": "Ho Chi Minh City",
+      "hanoi": "Hanoi",
+      "binhduong": "Binh Duong",
+      "dongnai": "Dong Nai",
+      "danang": "Da Nang",
+      "haiphong": "Hai Phong"
+    }
+  },
+  "stats": {
+    "title": "Platform Strength",
+    "subtitle": "Witness our professionalism and dedication with data",
+    "companies": "Companies",
+    "companiesDesc": "Covering various industries",
+    "views": "Views",
+    "viewsDesc": "Annual page views",
+    "products": "Products",
+    "productsDesc": "Diverse product range",
+    "experience": "Years of Service",
+    "experienceDesc": "Trusted platform",
+    "years": "Years"
+  },
+  "featuredCompanies": {
+    "title": "Featured Companies",
+    "subtitle": "Carefully selected quality companies, trusted partners",
+    "viewMore": "View More →",
+    "verified": "Verified",
+    "companies": {
+      "textile-1": {
+        "name": "Li Xin Industrial Co., Ltd.",
+        "industry": "Textile, Apparel & Accessories",
+        "location": "Taiwan",
+        "description": "Professional covered yarn production factory and textile raw material supplier, providing natural LATEX and chemical SPANDEX elastic yarn processing and sales."
+      },
+      "finance-1": {
+        "name": "DBS Bank (Vietnam) Ltd.",
+        "industry": "Finance & Insurance",
+        "location": "Singapore",
+        "description": "DBS Bank is headquartered in Singapore with branches in Vietnam, providing deposit and foreign exchange services, cash management services, letters of credit and trade finance services."
+      },
+      "machinery-1": {
+        "name": "Tsai Hsiung Commercial Co., Ltd.",
+        "industry": "Machinery, Electromechanical & Industrial Products",
+        "location": "Vietnam",
+        "description": "Tsai Hsiung Commercial Co., Ltd. is a company specializing in providing shoe manufacturing machinery and equipment."
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "badge": "About Us",
+      "title": "Vietnam Buyer Guide",
+      "description": "Vietnam Buyer Guide is committed to becoming the best business partner for Vietnamese Chinese enterprises, providing comprehensive company information and business matching services, promoting communication and cooperation among Vietnamese Chinese enterprises.",
+      "goToDirectory": "Go to Company Directory",
+      "contactUs": "Contact Us",
+      "imageAlt": "Vietnam Chinese Business Procurement Directory"
+    },
+    "body": {
+      "nav": {
+        "about": "About Vietnam Buyer Guide",
+        "history": "Development History",
+        "directory": "Explore Procurement Directory",
+        "contact": "Contact Us"
+      },
+      "sections": {
+        "about": {
+          "title": "About Vietnam Buyer Guide",
+          "paragraph1": "Vietnam Buyer Guide is the digital extension and upgrade of the Vietnam Chinese Business Procurement Directory, combining the convenience and real-time nature of the Internet to provide a 24/7 business exchange platform for global Chinese enterprises. Whether you use a computer, laptop, tablet or smartphone, you can log in to the platform at any time, browse the most complete and accurate industry information, and grasp the latest business opportunities and market dynamics in Vietnam and ASEAN regions.",
+          "paragraph2": "We believe that information transparency and close connections are the keys to Chinese business success. Through Vietnam Buyer Guide, companies are no longer limited by the update cycle of printed directories, but can update supply and demand in real time, expand networks, and deepen cooperation, truly achieving \"anytime, anywhere, endless business opportunities\".",
+          "paragraph3": "Through years of efforts, we have established a complete corporate database covering all industries, including textiles, footwear, vehicles, furniture, building materials, electronics, machinery, plastics, agriculture, metals and many other industrial fields. Every year we update and publish the latest procurement directory to ensure the timeliness and accuracy of information."
+        },
+        "history": {
+          "title": "Development History",
+          "description": "Since its launch in 2016, the Vietnam Chinese Business Procurement Directory has continued to deepen its presence in the Vietnamese Chinese business market, gradually developing into the most influential business information platform."
+        },
+        "directory": {
+          "title": "Explore Vietnam Chinese Business Procurement Directory",
+          "description": "The Vietnam Chinese Business Procurement Directory we publish annually contains detailed information on thousands of quality Chinese enterprises. From 2016 to the present, we have published multiple editions, each of which has been strictly reviewed and updated."
+        }
+      },
+      "timeline": {
+        "2016": {
+          "title": "Foundation Year",
+          "description": "The Vietnam Chinese Business Procurement Directory was officially launched, establishing a complete enterprise information platform for Vietnamese Chinese businesses for the first time."
+        },
+        "2018": {
+          "title": "Industry Expansion",
+          "description": "Coverage expanded from the original textiles and footwear to diverse fields including electronics, machinery, plastics, and more."
+        },
+        "2020": {
+          "title": "Digital Transformation",
+          "description": "Launched the Vietnam Buyer Guide online platform, breaking through print limitations to provide 24/7 business services."
+        },
+        "2022": {
+          "title": "International Connections",
+          "description": "Established partnerships with chambers of commerce in Taiwan, China, and Southeast Asia, expanding the business network."
+        },
+        "2024": {
+          "title": "Smart Upgrade",
+          "description": "Introduced intelligent search and business matching features, enhancing platform user experience and business conversion rates."
+        }
+      },
+      "images": {
+        "manufacturing": "Manufacturing Factory",
+        "office": "Modern Office Environment",
+        "meeting": "Business Meeting"
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "If you have any questions about our services, or would like to add your company to the Vietnam Chinese Business Procurement Directory, please feel free to contact us. For more contact information, please refer to the footer.",
+    "sendEmail": "Send Email",
+    "adContact": "Advertising Contact"
+  },
+  "stickyBanner": {
+    "expandText": "Expand Featured Info",
+    "collapseLabel": "Collapse",
+    "viewDetails": "View Details",
+    "goToItem": "Go to item {{index}}",
+    "tags": {
+      "featuredCompany": "Featured Company",
+      "latestNews": "Latest News",
+      "eventAnnouncement": "Event Announcement"
+    },
+    "items": {
+      "1": {
+        "title": "Taiwan Precision Industry Co., Ltd.",
+        "subtitle": "Professional CNC machining, precision parts manufacturing, 40 years of experience"
+      },
+      "2": {
+        "title": "2026 Vietnam Investment Incentive Policy Update",
+        "subtitle": "Latest tax reduction measures and industrial park incentives overview"
+      },
+      "3": {
+        "title": "Green Energy Technology Co., Ltd.",
+        "subtitle": "Solar equipment, energy storage systems leading brand"
+      },
+      "4": {
+        "title": "Taiwan-Vietnam Chamber of Commerce 2026 Annual General Meeting",
+        "subtitle": "March 15 in Ho Chi Minh City, welcome to register"
+      }
+    }
+  },
+  "footer": {
+    "description": "Vietnam Buyer Guide is the digital extension and upgrade of the Vietnam Chinese Business Procurement Directory, combining the convenience and real-time nature of the Internet to provide a 24/7 business exchange platform for global Chinese enterprises.",
+    "companyName": "Kien Hao (Vietnam) Co., Ltd.",
+    "companyDescription": "Vietnam Chinese Business Procurement Directory - Providing all Chinese business procurement directory information for Chinese readers",
+    "contactInfo": "Contact Information",
+    "companyLocation": "Company Location",
+    "address": "81/11 Ho Van Hue, Ward 9, Phu Nhuan District, Ho Chi Minh City, Vietnam",
+    "phoneDirectory": "(Directory Purchase)",
+    "mapTitle": "Company Location Map",
+    "copyright": "© 2025 vnbuyerguide.com All rights reserved.",
+    "companyFullName": "KIEN HAO TRADING AND SERVICE CO., LTD."
+  }
+}

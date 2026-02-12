@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { Globe, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-type Language = 'zh-TW' | 'vi' | 'en'
+type Language = 'en-US' | 'zh-CN' | 'vi-VN'
 
 const languages: Record<Language, string> = {
-  'zh-TW': '繁體中文',
-  vi: 'Tiếng Việt',
-  en: 'English',
+  'en-US': 'English',
+  'zh-CN': '简体中文',
+  'vi-VN': 'Tiếng Việt',
 }
 
 interface LanguageSelectorProps {
@@ -16,9 +17,29 @@ interface LanguageSelectorProps {
 export default function LanguageSelector({
   variant = 'desktop',
 }: LanguageSelectorProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('zh-TW')
+  const { i18n } = useTranslation()
+  const getInitialLanguage = (): Language => {
+    const lang = i18n.language
+    if (lang === 'en-US' || lang === 'zh-CN' || lang === 'vi-VN') {
+      return lang as Language
+    }
+    return 'zh-CN'
+  }
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(getInitialLanguage())
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleLanguageChanged = (lng: string) => {
+      if (lng === 'en-US' || lng === 'zh-CN' || lng === 'vi-VN') {
+        setCurrentLanguage(lng as Language)
+      }
+    }
+    i18n.on('languageChanged', handleLanguageChanged)
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged)
+    }
+  }, [i18n])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,6 +61,7 @@ export default function LanguageSelector({
   }, [isLanguageDropdownOpen])
 
   const handleLanguageChange = (lang: Language) => {
+    i18n.changeLanguage(lang)
     setCurrentLanguage(lang)
     setIsLanguageDropdownOpen(false)
   }
@@ -61,22 +83,22 @@ export default function LanguageSelector({
         {isLanguageDropdownOpen && (
           <div className="mt-2 w-full rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
             <button
-              onClick={() => handleLanguageChange('zh-TW')}
+              onClick={() => handleLanguageChange('zh-CN')}
               className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
             >
-              繁體中文
+              简体中文
             </button>
             <button
-              onClick={() => handleLanguageChange('vi')}
-              className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
-            >
-              Tiếng Việt
-            </button>
-            <button
-              onClick={() => handleLanguageChange('en')}
+              onClick={() => handleLanguageChange('en-US')}
               className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
             >
               English
+            </button>
+            <button
+              onClick={() => handleLanguageChange('vi-VN')}
+              className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              Tiếng Việt
             </button>
           </div>
         )}
@@ -100,22 +122,22 @@ export default function LanguageSelector({
       {isLanguageDropdownOpen && (
         <div className="absolute right-0 z-50 mt-2 w-40 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
           <button
-            onClick={() => handleLanguageChange('zh-TW')}
+            onClick={() => handleLanguageChange('zh-CN')}
             className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
           >
-            繁體中文
+            简体中文
           </button>
           <button
-            onClick={() => handleLanguageChange('vi')}
-            className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
-          >
-            Tiếng Việt
-          </button>
-          <button
-            onClick={() => handleLanguageChange('en')}
+            onClick={() => handleLanguageChange('en-US')}
             className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
           >
             English
+          </button>
+          <button
+            onClick={() => handleLanguageChange('vi-VN')}
+            className="w-full px-4 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100"
+          >
+            Tiếng Việt
           </button>
         </div>
       )}

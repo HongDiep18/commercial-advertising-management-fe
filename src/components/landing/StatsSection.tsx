@@ -1,29 +1,30 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 
-const stats = [
+const statsConfig = [
   {
     value: 3980,
     suffix: "+",
-    label: "企業",
-    description: "涵蓋各產業領域",
+    labelKey: "companies",
+    descriptionKey: "companiesDesc",
   },
   {
     value: 13937000,
     suffix: "+",
-    label: "曝光數",
-    description: "單年度瀏覽人次",
+    labelKey: "views",
+    descriptionKey: "viewsDesc",
   },
   {
     value: 9000,
     suffix: "+",
-    label: "商品",
-    description: "多元品項",
+    labelKey: "products",
+    descriptionKey: "productsDesc",
   },
   {
     value: 20,
-    suffix: "年",
-    label: "服務經驗",
-    description: "值得信賴的平台",
+    suffixKey: "years",
+    labelKey: "experience",
+    descriptionKey: "experienceDesc",
   },
 ]
 
@@ -88,13 +89,26 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
 }
 
 export default function StatsSection() {
+  const { t } = useTranslation()
+
+  const stats = useMemo(() => {
+    return statsConfig.map((stat) => ({
+      value: stat.value,
+      suffix: (stat.suffixKey ? (t(`stats.${stat.suffixKey}`) || stat.suffix) : stat.suffix) as string,
+      label: (t(`stats.${stat.labelKey}`) || "") as string,
+      description: (t(`stats.${stat.descriptionKey}`) || "") as string,
+    }))
+  }, [t])
+
   return (
     <section className="relative bg-body-bg-dark-foreground py-20">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">平台實力</h2>
-          <p className="text-muted-foreground">用數據見證我們的專業與用心</p>
+          <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+            {t("stats.title")}
+          </h2>
+          <p className="text-muted-foreground">{t("stats.subtitle")}</p>
         </div>
 
         {/* Stats Grid */}

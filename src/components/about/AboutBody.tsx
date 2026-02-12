@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo } from "react"
+import { useTranslation } from "react-i18next"
 import HorizontalTimeline from "./HorizontalTimeline"
 import MagazineCarousel from "./MagazineCarousel"
 import ContactSection from "./ContactSection"
 
 export default function AboutBody() {
+    const { t } = useTranslation()
     const aboutRef = useRef<HTMLDivElement>(null)
     const historyRef = useRef<HTMLDivElement>(null)
     const directoryRef = useRef<HTMLDivElement>(null)
@@ -57,12 +59,12 @@ export default function AboutBody() {
         }
     }
 
-    const navItems = [
-        { href: "#about", label: "關於華商採購網" },
-        { href: "#history", label: "發展歷程" },
-        { href: "#directory", label: "探索採購名錄" },
-        { href: "#contact", label: "聯絡我們" },
-    ]
+    const navItems = useMemo(() => [
+        { href: "#about", label: t("about.body.nav.about") },
+        { href: "#history", label: t("about.body.nav.history") },
+        { href: "#directory", label: t("about.body.nav.directory") },
+        { href: "#contact", label: t("about.body.nav.contact") },
+    ], [t])
 
     return (
         <div className="w-full bg-body-bg-dark ">
@@ -96,31 +98,31 @@ export default function AboutBody() {
                             >
                                 <div className="mb-6 flex items-center gap-3">
                                     <div className="h-8 w-1 rounded-full bg-primary" />
-                                    <h2 className="text-2xl font-bold md:text-3xl">關於華商採購網</h2>
+                                    <h2 className="text-2xl font-bold md:text-3xl">{t("about.body.sections.about.title")}</h2>
                                 </div>
                                 <div className="prose prose-lg max-w-none">
                                     <p className="mb-4 leading-relaxed text-muted-foreground">
-                                        華商採購網是《越南華商採購名錄》的電子化延伸與升級，結合網際網路的便利與即時性，為全球華人企業提供全年無休的商務交流平台。不論您使用的是電腦、筆電、平板或智慧型手機，都能隨時登入平台，瀏覽最完整、最準確的產業資訊，掌握越南與東協地區最新的商機與市場動態。
+                                        {t("about.body.sections.about.paragraph1")}
                                     </p>
                                     <p className="mb-4 leading-relaxed text-muted-foreground">
-                                        我們相信，資訊透明與聯繫緊密是華商成功的關鍵。透過華商採購網，企業不再受限於紙本名錄的更新周期，而能即時更新供應與需求、拓展人脈、深化合作，真正實現「隨時隨地、商機不斷」。
+                                        {t("about.body.sections.about.paragraph2")}
                                     </p>
                                     <p className="leading-relaxed text-muted-foreground">
-                                        透過多年的努力，我們已經建立了涵蓋各行各業的完整企業資料庫，包括紡織、鞋類、車輛、家具、建材、電子、機械、塑膠、農業、金屬等多個產業領域。每年我們都會更新出版最新的採購名錄，確保資訊的時效性與準確性。
+                                        {t("about.body.sections.about.paragraph3")}
                                     </p>
                                 </div>
 
                                 {/* Image Gallery */}
                                 <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
                                     {[
-                                        { src: "/src/assets/images/companies/modern-tech-office.png", alt: "製造工廠" },
-                                        { src: "/src/assets/images/companies/modern-manufacturing-facility.png", alt: "現代辦公環境" },
-                                        { src: "/src/assets/images/taiwanese-vietnamese-business-meeting.jpg", alt: "商業會議" },
+                                        { src: "/src/assets/images/companies/modern-tech-office.png", altKey: "manufacturing" },
+                                        { src: "/src/assets/images/companies/modern-manufacturing-facility.png", altKey: "office" },
+                                        { src: "/src/assets/images/taiwanese-vietnamese-business-meeting.jpg", altKey: "meeting" },
                                     ].map((img, i) => (
                                         <div key={i} className="group relative aspect-[4/3] overflow-hidden rounded-xl">
                                             <img
                                                 src={img.src || "/placeholder.svg"}
-                                                alt={img.alt}
+                                                alt={t(`about.body.images.${img.altKey}`)}
                                                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             />
                                         </div>
@@ -137,10 +139,10 @@ export default function AboutBody() {
                             >
                                 <div className="mb-6 flex items-center gap-3">
                                     <div className="h-8 w-1 rounded-full bg-primary" />
-                                    <h2 className="text-2xl font-bold md:text-3xl">發展歷程</h2>
+                                    <h2 className="text-2xl font-bold md:text-3xl">{t("about.body.sections.history.title")}</h2>
                                 </div>
                                 <p className="mb-8 text-muted-foreground">
-                                    越南華商採購名錄自2016年創刊以來，持續深耕越南華商市場，逐步發展成為最具影響力的商業資訊平台。
+                                    {t("about.body.sections.history.description")}
                                 </p>
                                 <HorizontalTimeline />
                             </div>
@@ -154,10 +156,10 @@ export default function AboutBody() {
                             >
                                 <div className="mb-6 flex items-center gap-3">
                                     <div className="h-8 w-1 rounded-full bg-primary" />
-                                    <h2 className="text-2xl font-bold md:text-3xl">探索越南華商採購名錄</h2>
+                                    <h2 className="text-2xl font-bold md:text-3xl">{t("about.body.sections.directory.title")}</h2>
                                 </div>
                                 <p className="mb-8 text-muted-foreground">
-                                    我們每年出版的越南華商採購名錄，收錄了數千家優質華商企業的詳細資訊。從2016年至今，我們已經出版了多個版本，每一版都經過嚴格的審核與更新。
+                                    {t("about.body.sections.directory.description")}
                                 </p>
                                 <MagazineCarousel />
                             </div>

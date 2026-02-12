@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { ChevronDown, Search, X } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
 
 interface FilterTag {
@@ -7,20 +8,12 @@ interface FilterTag {
   label: string
 }
 
-const categories = [
-  { id: "semi", name: "半導體" },
-  { id: "elec", name: "電子製造" },
-  { id: "textile", name: "紡織成衣" },
-  { id: "food", name: "食品加工" },
-  { id: "machine", name: "機械設備" },
-  { id: "plastic", name: "塑膠製品" },
-]
-
-const allLocations = ["胡志明市", "河內", "平陽", "同奈", "峴港", "海防"]
+const categoryIds = ["semi", "elec", "textile", "food", "machine", "plastic"]
+const locationIds = ["hcm", "hanoi", "binhduong", "dongnai", "danang", "haiphong"]
 
 export default function SearchSection() {
+  const { t } = useTranslation()
   const [searchMode, setSearchMode] = useState<"company" | "product" | "all">("company")
-  const [activeFilters, setActiveFilters] = useState<FilterTag[]>([])
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
 
@@ -31,6 +24,21 @@ export default function SearchSection() {
 
   const industryDropdownRef = useRef<HTMLDivElement | null>(null)
   const locationDropdownRef = useRef<HTMLDivElement | null>(null)
+
+  // Get translated categories and locations
+  const categories = useMemo(() => {
+    return categoryIds.map((id) => ({
+      id,
+      name: t(`search.categories.${id}`),
+    }))
+  }, [t])
+
+  const allLocations = useMemo(() => {
+    return locationIds.map((id) => ({
+      id,
+      name: t(`search.locations.${id}`),
+    }))
+  }, [t])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,57 +61,57 @@ export default function SearchSection() {
   const filteredLocations = useMemo(() => {
     if (!locationSearch.trim()) return allLocations
     const term = locationSearch.trim().toLowerCase()
-    return allLocations.filter((loc) => loc.toLowerCase().includes(term))
-  }, [locationSearch])
+    return allLocations.filter((loc) => loc.name.toLowerCase().includes(term))
+  }, [locationSearch, allLocations])
 
-  const updateFiltersFromSelection = (industries: string[], locations: string[]) => {
+  // Compute active filters from selections and translations
+  const activeFilters = useMemo(() => {
     const tags: FilterTag[] = []
-    industries.forEach((name) => tags.push({ id: `ind-${name}`, label: name }))
-    locations.forEach((name) => tags.push({ id: `loc-${name}`, label: name }))
-    setActiveFilters(tags)
-  }
+    selectedIndustries.forEach((id) => {
+      const category = categories.find((c) => c.id === id)
+      if (category) tags.push({ id: `ind-${id}`, label: category.name })
+    })
+    selectedLocations.forEach((id) => {
+      const location = allLocations.find((l) => l.id === id)
+      if (location) tags.push({ id: `loc-${id}`, label: location.name })
+    })
+    return tags
+  }, [selectedIndustries, selectedLocations, categories, allLocations])
 
-  const toggleIndustry = (name: string) => {
-    const exists = selectedIndustries.includes(name)
-    const next = exists ? selectedIndustries.filter((i) => i !== name) : [...selectedIndustries, name]
+  const toggleIndustry = (id: string) => {
+    const exists = selectedIndustries.includes(id)
+    const next = exists ? selectedIndustries.filter((i) => i !== id) : [...selectedIndustries, id]
     setSelectedIndustries(next)
-    updateFiltersFromSelection(next, selectedLocations)
   }
 
-  const toggleLocation = (name: string) => {
-    const exists = selectedLocations.includes(name)
-    const next = exists ? selectedLocations.filter((l) => l !== name) : [...selectedLocations, name]
+  const toggleLocation = (id: string) => {
+    const exists = selectedLocations.includes(id)
+    const next = exists ? selectedLocations.filter((l) => l !== id) : [...selectedLocations, id]
     setSelectedLocations(next)
-    updateFiltersFromSelection(selectedIndustries, next)
   }
 
-  const isIndustrySelected = (name: string) => selectedIndustries.includes(name)
-  const isLocationSelected = (name: string) => selectedLocations.includes(name)
+  const isIndustrySelected = (id: string) => selectedIndustries.includes(id)
+  const isLocationSelected = (id: string) => selectedLocations.includes(id)
 
-  const removeFilter = (id: string) => {
-    if (id.startsWith("ind-")) {
-      const name = id.replace("ind-", "")
-      const next = selectedIndustries.filter((i) => i !== name)
-      setSelectedIndustries(next)
-      updateFiltersFromSelection(next, selectedLocations)
-    } else if (id.startsWith("loc-")) {
-      const name = id.replace("loc-", "")
-      const next = selectedLocations.filter((l) => l !== name)
-      setSelectedLocations(next)
-      updateFiltersFromSelection(selectedIndustries, next)
+  const removeFilter = (filterId: string) => {
+    if (filterId.startsWith("ind-")) {
+      const id = filterId.replace("ind-", "")
+      setSelectedIndustries((prev) => prev.filter((i) => i !== id))
+    } else if (filterId.startsWith("loc-")) {
+      const id = filterId.replace("loc-", "")
+      setSelectedLocations((prev) => prev.filter((l) => l !== id))
     }
   }
 
   const clearAllFilters = () => {
     setSelectedIndustries([])
     setSelectedLocations([])
-    setActiveFilters([])
   }
 
   const getPlaceholder = () => {
-    if (searchMode === "company") return "輸入公司名稱、品牌或關鍵字..."
-    if (searchMode === "product") return "輸入產品、服務或關鍵字..."
-    return "輸入公司或產品關鍵字..."
+    if (searchMode === "company") return t("search.placeholders.company")
+    if (searchMode === "product") return t("search.placeholders.product")
+    return t("search.placeholders.all")
   }
 
   const handlePopularTagClick = (tag: string) => {
@@ -115,16 +123,18 @@ export default function SearchSection() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="mb-10 text-center">
-            <h2 className="mb-4 text-3xl font-bold">搜尋企業</h2>
+            <h2 className="mb-4 text-3xl font-bold">{t("search.title")}</h2>
             <p className="text-base text-muted-foreground">
-              輸入關鍵字、產業類別或地區，立即找到適合您的商業夥伴
+              {t("search.subtitle")}
             </p>
           </div>
 
           <div className="rounded-lg border border-border/50 bg-card p-6 shadow-sm">
             {activeFilters.length > 0 && (
               <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-border/50 pb-6">
-                <span className="text-sm font-medium">篩選條件 ({activeFilters.length})</span>
+                <span className="text-sm font-medium">
+                  {t("search.filterConditions")} ({activeFilters.length})
+                </span>
                 {activeFilters.map((filter) => (
                   <button
                     key={filter.id}
@@ -139,7 +149,7 @@ export default function SearchSection() {
                   onClick={clearAllFilters}
                   className="text-sm text-muted-foreground underline hover:text-foreground"
                 >
-                  清除全部
+                  {t("search.clearAll")}
                 </button>
               </div>
             )}
@@ -153,7 +163,7 @@ export default function SearchSection() {
                     : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
-                  依公司
+                  {t("search.byCompany")}
                 </button>
                 <button
                   onClick={() => setSearchMode("product")}
@@ -162,7 +172,7 @@ export default function SearchSection() {
                     : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
-                  依產品
+                  {t("search.byProduct")}
                 </button>
                 <button
                   onClick={() => setSearchMode("all")}
@@ -171,7 +181,7 @@ export default function SearchSection() {
                     : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
-                  全選
+                  {t("search.all")}
                 </button>
               </div>
 
@@ -183,7 +193,7 @@ export default function SearchSection() {
                   }}
                   className="inline-flex items-center gap-2 rounded-md border border-border/50 bg-background px-4 py-1.5 text-sm font-medium transition-colors hover:bg-secondary/30"
                 >
-                  產業類別
+                  {t("search.industryCategory")}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
 
@@ -191,15 +201,15 @@ export default function SearchSection() {
                   <div className="absolute top-full left-0 z-10 mt-2 max-h-96 w-72 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
                     <div className="p-3">
                       <input
-                        placeholder="搜尋類別..."
+                        placeholder={t("search.searchCategory")}
                         className="mb-3 h-9 w-full rounded-md border border-border/60 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/40"
                       />
                       <div className="space-y-1">
                         {categories.map((category) => (
                           <button
                             key={category.id}
-                            onClick={() => toggleIndustry(category.name)}
-                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${isIndustrySelected(category.name)
+                            onClick={() => toggleIndustry(category.id)}
+                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${isIndustrySelected(category.id)
                               ? "bg-primary/10 text-primary font-medium"
                               : "hover:bg-secondary/50"
                               }`}
@@ -221,7 +231,7 @@ export default function SearchSection() {
                   }}
                   className="inline-flex items-center gap-2 rounded-md border border-border/50 bg-background px-4 py-1.5 text-sm font-medium transition-colors hover:bg-secondary/30"
                 >
-                  地區
+                  {t("search.location")}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
 
@@ -229,7 +239,7 @@ export default function SearchSection() {
                   <div className="absolute top-full left-0 z-10 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg">
                     <div className="p-3">
                       <input
-                        placeholder="搜尋地區..."
+                        placeholder={t("search.searchLocation")}
                         value={locationSearch}
                         onChange={(e) => setLocationSearch(e.target.value)}
                         className="mb-3 h-9 w-full rounded-md border border-border/60 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/40"
@@ -237,14 +247,14 @@ export default function SearchSection() {
                       <div className="space-y-1">
                         {filteredLocations.map((location) => (
                           <button
-                            key={location}
-                            onClick={() => toggleLocation(location)}
-                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${isLocationSelected(location)
+                            key={location.id}
+                            onClick={() => toggleLocation(location.id)}
+                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${isLocationSelected(location.id)
                               ? "bg-primary/10 text-primary font-medium"
                               : "hover:bg-secondary/50"
                               }`}
                           >
-                            {location}
+                            {location.name}
                           </button>
                         ))}
                       </div>
@@ -269,20 +279,20 @@ export default function SearchSection() {
               className="flex h-10 w-full items-center justify-center text-sm font-medium"
             >
               <Search className="mr-2 h-4 w-4" />
-              搜尋
+              {t("search.searchButton")}
             </Button>
           </div>
 
           <div className="mt-6 text-center">
-            <span className="mr-3 text-sm text-muted-foreground">熱門搜尋：</span>
+            <span className="mr-3 text-sm text-muted-foreground">{t("search.popularSearches")}</span>
             <div className="mt-2 inline-flex flex-wrap gap-2">
-              {["半導體", "電子製造", "紡織成衣", "食品加工", "機械設備", "塑膠製品"].map((tag) => (
+              {categories.map((category) => (
                 <button
-                  key={tag}
-                  onClick={() => handlePopularTagClick(tag)}
+                  key={category.id}
+                  onClick={() => handlePopularTagClick(category.name)}
                   className="rounded-md border border-border bg-white px-3 py-1 text-xs font-normal text-foreground transition-colors hover:border-primary hover:text-primary"
                 >
-                  {tag}
+                  {category.name}
                 </button>
               ))}
             </div>

@@ -1,6 +1,6 @@
-# React + TypeScript + Vite
+# VN Buyer Guide - React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite
+This is a React application built with TypeScript and Vite for the Vietnam Buyer Guide platform.
 
 Currently, two official plugins are available:
 
@@ -105,3 +105,25 @@ vn-buyer-guide/
 │   └── main.tsx                  # Entry point
 │
 └── package.json
+
+## Docker Setup
+
+This project includes Docker configuration for containerized deployment. Here's how to use it:
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/get-started) installed (version 20.10+)
+- [Docker Compose](https://docs.docker.com/compose/install/) (optional, but recommended)
+
+### Quick Start with Docker Compose (Easiest)
+
+```bash
+# Build and start the container
+docker-compose up --build
+
+# Or run in detached mode (background)
+docker-compose up -d --build
+
+# Stop the container
+docker-compose down
+```

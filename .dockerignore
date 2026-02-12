@@ -1,0 +1,45 @@
+# Dependencies (we'll install fresh in container)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output (we'll build fresh in container)
+dist
+build
+
+# Development files
+.env.local
+.env.development
+.env.test
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker files (don't copy Docker files into Docker image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Documentation
+README.md
+*.md
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.log
+.cache

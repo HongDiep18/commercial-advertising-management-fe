@@ -1,0 +1,209 @@
+{
+  "common": {
+    "login": "登入",
+    "register": "註冊",
+    "freeRegister": "免費註冊",
+    "search": "搜尋",
+    "about": "關於",
+    "contact": "聯絡"
+  },
+  "header": {
+    "aboutUs": "關於我們",
+    "directory": "企業名錄",
+    "store": "網路商店",
+    "news": "最新消息",
+    "adContact": "廣告聯繫"
+  },
+  "hero": {
+    "title": "華商採購網－連結優質商業夥伴",
+    "subtitle": "匯集超過 3,980 家在越南的優質台灣企業，提供最完整的產業分類與企業資料，協助您快速找到理想的合作夥伴，開創更多商業機會",
+    "joinUs": "加入我們",
+    "findPartners": "尋找商業夥伴"
+  },
+  "search": {
+    "title": "搜尋企業",
+    "subtitle": "輸入關鍵字、產業類別或地區，立即找到適合您的商業夥伴",
+    "industry": "產業",
+    "location": "地區",
+    "searchButton": "搜尋",
+    "selectIndustry": "選擇產業",
+    "selectLocation": "選擇地區",
+    "industryCategory": "產業類別",
+    "searchCategory": "搜尋類別...",
+    "searchLocation": "搜尋地區...",
+    "filterConditions": "篩選條件",
+    "clearAll": "清除全部",
+    "byCompany": "依公司",
+    "byProduct": "依產品",
+    "all": "全選",
+    "popularSearches": "熱門搜尋：",
+    "placeholders": {
+      "company": "輸入公司名稱、品牌或關鍵字...",
+      "product": "輸入產品、服務或關鍵字...",
+      "all": "輸入公司或產品關鍵字..."
+    },
+    "categories": {
+      "semi": "半導體",
+      "elec": "電子製造",
+      "textile": "紡織成衣",
+      "food": "食品加工",
+      "machine": "機械設備",
+      "plastic": "塑膠製品"
+    },
+    "locations": {
+      "hcm": "胡志明市",
+      "hanoi": "河內",
+      "binhduong": "平陽",
+      "dongnai": "同奈",
+      "danang": "峴港",
+      "haiphong": "海防"
+    }
+  },
+  "stats": {
+    "title": "平台實力",
+    "subtitle": "用數據見證我們的專業與用心",
+    "companies": "企業",
+    "companiesDesc": "涵蓋各產業領域",
+    "views": "曝光數",
+    "viewsDesc": "單年度瀏覽人次",
+    "products": "商品",
+    "productsDesc": "多元品項",
+    "experience": "服務經驗",
+    "experienceDesc": "值得信賴的平台",
+    "years": "年"
+  },
+  "featuredCompanies": {
+    "title": "精選企業",
+    "subtitle": "嚴選優質企業，值得信賴的合作夥伴",
+    "viewMore": "查看更多 →",
+    "verified": "已認證",
+    "companies": {
+      "textile-1": {
+        "name": "力鑫工業責任有限公司",
+        "industry": "紡織、成衣及配件",
+        "location": "寶島台灣",
+        "description": "專業的包覆紗生產廠及紡織原料供應商，提供天然LATEX及化學SPANDEX彈性絲包紗加工銷售。"
+      },
+      "finance-1": {
+        "name": "星展銀行（越南）有限公司",
+        "industry": "金融及保險",
+        "location": "新加坡",
+        "description": "星展銀行總部設於新加坡，在越南設有分行，提供存放款及外匯業務、現金管理業務、信用狀及貿易融資業務。"
+      },
+      "machinery-1": {
+        "name": "蔡雄商業有限公司",
+        "industry": "機械、機電及工業用相關產品",
+        "location": "越南",
+        "description": "蔡雄商業有限公司是一家專門提供製鞋機械設備的公司。"
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "badge": "關於我們",
+      "title": "華商採購網",
+      "description": "華商採購網致力於成為越南華商企業的最佳商業夥伴，提供全面的企業資訊與商業媒合服務，促進越南華商企業之間的交流與合作。",
+      "goToDirectory": "前往企業名錄",
+      "contactUs": "聯絡我們",
+      "imageAlt": "越南華商採購名錄"
+    },
+    "body": {
+      "nav": {
+        "about": "關於華商採購網",
+        "history": "發展歷程",
+        "directory": "探索採購名錄",
+        "contact": "聯絡我們"
+      },
+      "sections": {
+        "about": {
+          "title": "關於華商採購網",
+          "paragraph1": "華商採購網是《越南華商採購名錄》的電子化延伸與升級，結合網際網路的便利與即時性，為全球華人企業提供全年無休的商務交流平台。不論您使用的是電腦、筆電、平板或智慧型手機，都能隨時登入平台，瀏覽最完整、最準確的產業資訊，掌握越南與東協地區最新的商機與市場動態。",
+          "paragraph2": "我們相信，資訊透明與聯繫緊密是華商成功的關鍵。透過華商採購網，企業不再受限於紙本名錄的更新周期，而能即時更新供應與需求、拓展人脈、深化合作，真正實現「隨時隨地、商機不斷」。",
+          "paragraph3": "透過多年的努力，我們已經建立了涵蓋各行各業的完整企業資料庫，包括紡織、鞋類、車輛、家具、建材、電子、機械、塑膠、農業、金屬等多個產業領域。每年我們都會更新出版最新的採購名錄，確保資訊的時效性與準確性。"
+        },
+        "history": {
+          "title": "發展歷程",
+          "description": "越南華商採購名錄自2016年創刊以來，持續深耕越南華商市場，逐步發展成為最具影響力的商業資訊平台。"
+        },
+        "directory": {
+          "title": "探索越南華商採購名錄",
+          "description": "我們每年出版的越南華商採購名錄，收錄了數千家優質華商企業的詳細資訊。從2016年至今，我們已經出版了多個版本，每一版都經過嚴格的審核與更新。"
+        }
+      },
+      "timeline": {
+        "2016": {
+          "title": "創立元年",
+          "description": "《越南華商採購名錄》正式創刊，首度為越南華商建立完整的企業資訊平台。"
+        },
+        "2018": {
+          "title": "擴展產業",
+          "description": "涵蓋產業從原有的紡織、鞋類擴展至電子、機械、塑膠等多元領域。"
+        },
+        "2020": {
+          "title": "數位轉型",
+          "description": "推出華商採購網線上平台，突破紙本限制，提供全年無休的商務服務。"
+        },
+        "2022": {
+          "title": "國際連結",
+          "description": "與台灣、中國、東南亞各地商會建立合作關係，擴大商業網絡。"
+        },
+        "2024": {
+          "title": "智慧升級",
+          "description": "導入智慧搜尋與企業媒合功能，提升平台使用體驗與商機轉換率。"
+        }
+      },
+      "images": {
+        "manufacturing": "製造工廠",
+        "office": "現代辦公環境",
+        "meeting": "商業會議"
+      }
+    }
+  },
+  "contact": {
+    "title": "聯絡我們",
+    "description": "如果您對我們的服務有任何疑問，或希望將您的企業加入越南華商採購名錄，歡迎隨時與我們聯繫。更多聯絡資訊請參考頁尾。",
+    "sendEmail": "寄送郵件",
+    "adContact": "廣告聯繫"
+  },
+  "stickyBanner": {
+    "expandText": "展開精選資訊",
+    "collapseLabel": "收合",
+    "viewDetails": "查看詳情",
+    "goToItem": "前往第 {{index}} 則資訊",
+    "tags": {
+      "featuredCompany": "精選企業",
+      "latestNews": "最新消息",
+      "eventAnnouncement": "活動公告"
+    },
+    "items": {
+      "1": {
+        "title": "台灣精密工業股份有限公司",
+        "subtitle": "專業CNC加工、精密零件製造，40年經驗"
+      },
+      "2": {
+        "title": "2026年越南投資優惠政策更新",
+        "subtitle": "最新稅務減免措施與產業園區優惠一覽"
+      },
+      "3": {
+        "title": "綠能科技有限公司",
+        "subtitle": "太陽能設備、儲能系統領導品牌"
+      },
+      "4": {
+        "title": "台越商會2026年度會員大會",
+        "subtitle": "3月15日於胡志明市舉行，歡迎報名參加"
+      }
+    }
+  },
+  "footer": {
+    "description": "華商採購網是《越南華商採購名錄》的電子化延伸與升級，結合網際網路的便利與即時性，為全球華人企業提供全年無休的商務交流平台。",
+    "companyName": "建豪(越南)責任有限公司",
+    "companyDescription": "越南華商採購名錄 - 提供所有華商採購名錄的資訊給華語閱讀者",
+    "contactInfo": "聯絡資訊",
+    "companyLocation": "公司位置",
+    "address": "越南胡志明市富潤郡第9坊胡文慧路81/11號",
+    "phoneDirectory": "(購買名錄)",
+    "mapTitle": "公司位置地圖",
+    "copyright": "© 2025 vnbuyerguide.com 版權所有",
+    "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
+  }
+}

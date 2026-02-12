@@ -1,32 +1,18 @@
-const timelineEvents = [
-    {
-        year: "2016",
-        title: "創立元年",
-        description: "《越南華商採購名錄》正式創刊，首度為越南華商建立完整的企業資訊平台。",
-    },
-    {
-        year: "2018",
-        title: "擴展產業",
-        description: "涵蓋產業從原有的紡織、鞋類擴展至電子、機械、塑膠等多元領域。",
-    },
-    {
-        year: "2020",
-        title: "數位轉型",
-        description: "推出華商採購網線上平台，突破紙本限制，提供全年無休的商務服務。",
-    },
-    {
-        year: "2022",
-        title: "國際連結",
-        description: "與台灣、中國、東南亞各地商會建立合作關係，擴大商業網絡。",
-    },
-    {
-        year: "2024",
-        title: "智慧升級",
-        description: "導入智慧搜尋與企業媒合功能，提升平台使用體驗與商機轉換率。",
-    },
-]
+import { useMemo } from "react"
+import { useTranslation } from "react-i18next"
+
+const timelineYears = ["2016", "2018", "2020", "2022", "2024"]
 
 export default function HorizontalTimeline() {
+    const { t } = useTranslation()
+
+    const timelineEvents = useMemo(() => {
+        return timelineYears.map((year) => ({
+            year,
+            title: t(`about.body.timeline.${year}.title`),
+            description: t(`about.body.timeline.${year}.description`),
+        }))
+    }, [t])
     return (
         <div className="relative">
             {/* Horizontal line */}
