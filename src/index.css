@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 @theme {
-  /* Custom colors for Tailwind v4 - defined as CSS variables for use in config */
   --color-header-red-dark: #a20519;
   --color-header-red-light: #d10a22;
   --color-body-bg-dark: #f5f1ea;
@@ -27,11 +26,11 @@
 @layer base {
   :root {
     color-scheme: light;
-    /* Ensure CSS variables are available globally */
     --color-header-red-dark: #a20519;
     --color-header-red-light: #d10a22;
     --color-body-bg-dark: #f5f1ea;
     --color-body-bg-light: #faf8f5;
+    --color-body-bg-dark-button: #e0dcd6;
     --color-body-bg-dark-foreground: #e7e4dd;
     --color-primary: #a20519;
     --color-primary-foreground: #ffffff;

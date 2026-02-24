@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: ['./index.html', './src/**/*.{ts,tsx}', './app/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -9,6 +9,7 @@ export default {
         'body-bg-dark': 'var(--color-body-bg-dark)',
         'body-bg-light': 'var(--color-body-bg-light)',
         'body-bg-dark-foreground': 'var(--color-body-bg-dark-foreground)',
+        'body-bg-dark-button': 'var(--color-body-bg-dark-button)',
         primary: 'var(--color-primary)',
         'primary-foreground': 'var(--color-primary-foreground)',
         background: 'var(--color-background)',
