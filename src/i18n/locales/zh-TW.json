@@ -164,6 +164,87 @@
     "sendEmail": "寄送郵件",
     "adContact": "廣告聯繫"
   },
+  "adContact": {
+    "heroTitle": "廣告聯繫",
+    "heroDescription": "多元廣告方案，助您拓展越南華商市場。選擇適合您的廣告類型，立即下單或與我們聯繫。",
+    "inquiryCustom": "諮詢客製化方案",
+    "unit": "單位：VND",
+    "select": "選擇",
+    "adItem": "廣告項目",
+    "duration": "時長",
+    "price": "金額",
+    "discount": "折扣",
+    "pagePosition": "頁次 / 版位",
+    "item": "項目",
+    "description": "說明",
+    "selectedItems": "已選擇 {{count}} 個廣告項目",
+    "clickToOrder": "點擊右側按鈕填寫訂單資訊",
+    "orderNow": "立即下單",
+    "orderTitle": "廣告下單",
+    "companyInfo": "公司資訊",
+    "companyName": "公司名稱",
+    "contactPerson": "聯絡人",
+    "phone": "電話",
+    "email": "Email",
+    "adItemSettings": "廣告項目設定",
+    "startDate": "起始日期",
+    "endDate": "結束日期",
+    "selectStartDate": "請選擇起始日期",
+    "autoCalculated": "系統自動計算",
+    "bookedDatesNote": "灰色日期為已預約，無法選擇",
+    "adLink": "廣告連結網址",
+    "needDesign": "需要設計服務（另計設計費）",
+    "uploadAdMaterial": "上傳廣告素材",
+    "clickToUpload": "點擊上傳檔案",
+    "notes": "備註說明",
+    "notesPlaceholder": "如有其他需求或說明，請在此填寫",
+    "cancel": "取消",
+    "submitOrder": "送出訂單",
+    "inquiryTitle": "線上諮詢",
+    "inquiryContent": "諮詢內容",
+    "inquiryPlaceholder": "請輸入您想諮詢的問題...",
+    "submitInquiry": "送出諮詢",
+    "tabs": {
+      "platform": {
+        "title": "平台廣告刊登",
+        "description": "網站首頁彈窗、精選企業、企業名錄等高曝光廣告版位"
+      },
+      "directory": {
+        "title": "越南華商採購名錄",
+        "description": "2025年紙本名錄廣告，涵蓋越南、新加坡、香港、中國及台灣華商"
+      },
+      "product": {
+        "title": "商品銷售刊登",
+        "description": "在商品銷售專區刊登您的產品，拓展越南市場"
+      }
+    },
+    "pricing": {
+      "popup": {
+        "title": "首頁彈窗廣告"
+      },
+      "featured": {
+        "title": "精選企業曝光"
+      },
+      "listing": {
+        "title": "企業名錄廣告"
+      },
+      "directory": {
+        "title": "廣告價目表"
+      },
+      "product": {
+        "title": "商品刊登價目表"
+      }
+    },
+    "note": "備註：彈窗廣告建議尺寸為 800x600 像素，精選企業需提供公司 Logo 及簡介。如需設計服務，請在下單時勾選。",
+    "directoryNotes": {
+      "note1": "以上費用不包括稅金、稿件設計、完稿。",
+      "note2": "設計費用 1,200,000 VND。",
+      "note3": "尺寸：全頁為高 26cm x 寬 19cm。",
+      "note4": "截稿日期為 2024 年 10 月 31 日。"
+    },
+    "orderSuccess": "感謝您的訂單！\n\n已選擇 {{count}} 個廣告項目\n我們將盡快與您聯繫確認詳情。",
+    "inquirySuccess": "感謝您的諮詢，我們將盡快回覆您！"
+  },
   "stickyBanner": {
     "expandText": "展開精選資訊",
     "collapseLabel": "收合",

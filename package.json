@@ -11,6 +11,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\" \"app/**/*.{ts,tsx}\""
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
     "i18next": "^25.8.5",
     "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.563.0",

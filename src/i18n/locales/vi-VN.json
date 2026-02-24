@@ -164,6 +164,87 @@
     "sendEmail": "Gửi Email",
     "adContact": "Liên hệ QC"
   },
+  "adContact": {
+    "heroTitle": "Liên hệ Quảng cáo",
+    "heroDescription": "Nhiều giải pháp quảng cáo giúp bạn mở rộng thị trường kinh doanh Hoa kiều Việt Nam. Chọn loại quảng cáo phù hợp với bạn, đặt hàng ngay hoặc liên hệ với chúng tôi.",
+    "inquiryCustom": "Tư vấn Giải pháp",
+    "unit": "Đơn vị: VND",
+    "select": "Chọn",
+    "adItem": "Mục Quảng cáo",
+    "duration": "Thời lượng",
+    "price": "Giá",
+    "discount": "Giảm giá",
+    "pagePosition": "Trang / Vị trí",
+    "item": "Mục",
+    "description": "Mô tả",
+    "selectedItems": "Đã chọn {{count}} mục quảng cáo",
+    "clickToOrder": "Nhấp vào nút bên phải để điền thông tin đặt hàng",
+    "orderNow": "Đặt hàng ngay",
+    "orderTitle": "Đặt Quảng cáo",
+    "companyInfo": "Thông tin Công ty",
+    "companyName": "Tên Công ty",
+    "contactPerson": "Người liên hệ",
+    "phone": "Điện thoại",
+    "email": "Email",
+    "adItemSettings": "Cài đặt Mục Quảng cáo",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "selectStartDate": "Vui lòng chọn ngày bắt đầu",
+    "autoCalculated": "Tự động tính toán bởi hệ thống",
+    "bookedDatesNote": "Ngày màu xám đã được đặt trước và không thể chọn",
+    "adLink": "URL Liên kết Quảng cáo",
+    "needDesign": "Cần dịch vụ thiết kế (phí thiết kế tính riêng)",
+    "uploadAdMaterial": "Tải lên Tài liệu Quảng cáo",
+    "clickToUpload": "Nhấp để tải lên tệp",
+    "notes": "Ghi chú",
+    "notesPlaceholder": "Nếu bạn có yêu cầu hoặc ghi chú khác, vui lòng điền vào đây",
+    "cancel": "Hủy",
+    "submitOrder": "Gửi Đơn hàng",
+    "inquiryTitle": "Tư vấn Trực tuyến",
+    "inquiryContent": "Nội dung Tư vấn",
+    "inquiryPlaceholder": "Vui lòng nhập câu hỏi của bạn...",
+    "submitInquiry": "Gửi Tư vấn",
+    "tabs": {
+      "platform": {
+        "title": "Quảng cáo nền tảng",
+        "description": "Vị trí quảng cáo có độ phơi sáng cao bao gồm cửa sổ bật lên trang chủ, công ty nổi bật và danh sách thư mục công ty"
+      },
+      "directory": {
+        "title": "Danh sách doanh nhân Trung Quốc mua hàng tại Việt Nam",
+        "description": "Quảng cáo danh mục in 2025, bao gồm các doanh nghiệp Hoa kiều Việt Nam, Singapore, Hồng Kông, Trung Quốc và Đài Loan"
+      },
+      "product": {
+        "title": "Đăng Bán Sản phẩm",
+        "description": "Đăng sản phẩm của bạn trong phần bán sản phẩm để mở rộng thị trường Việt Nam"
+      }
+    },
+    "pricing": {
+      "popup": {
+        "title": "Quảng cáo Cửa sổ bật lên Trang chủ"
+      },
+      "featured": {
+        "title": "Phơi sáng Công ty Nổi bật"
+      },
+      "listing": {
+        "title": "Quảng cáo Thư mục Công ty"
+      },
+      "directory": {
+        "title": "Bảng Giá Quảng cáo"
+      },
+      "product": {
+        "title": "Bảng Giá Đăng Sản phẩm"
+      }
+    },
+    "note": "Lưu ý: Kích thước quảng cáo cửa sổ bật lên được khuyến nghị là 800x600 pixel. Các công ty nổi bật cần cung cấp logo công ty và giới thiệu. Nếu cần dịch vụ thiết kế, vui lòng đánh dấu khi đặt hàng.",
+    "directoryNotes": {
+      "note1": "Các chi phí trên không bao gồm thuế, thiết kế bản thảo và hoàn thiện.",
+      "note2": "Phí thiết kế: 1,200,000 VND.",
+      "note3": "Kích thước: Trang đầy đủ là cao 26cm x rộng 19cm.",
+      "note4": "Hạn chót: 31 tháng 10 năm 2024."
+    },
+    "orderSuccess": "Cảm ơn bạn đã đặt hàng!\n\nĐã chọn {{count}} mục quảng cáo\nChúng tôi sẽ liên hệ với bạn sớm để xác nhận chi tiết.",
+    "inquirySuccess": "Cảm ơn bạn đã tư vấn, chúng tôi sẽ trả lời bạn sớm nhất có thể!"
+  },
   "stickyBanner": {
     "expandText": "Mở rộng thông tin nổi bật",
     "collapseLabel": "Thu gọn",

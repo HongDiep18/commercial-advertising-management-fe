@@ -164,6 +164,87 @@
     "sendEmail": "Send Email",
     "adContact": "Advertising Contact"
   },
+  "adContact": {
+    "heroTitle": "Advertising Contact",
+    "heroDescription": "Multiple advertising solutions to help you expand your Vietnamese Chinese business market. Choose the advertising type that suits you, place an order immediately or contact us.",
+    "inquiryCustom": "Custom Solutions",
+    "unit": "Unit: VND",
+    "select": "Select",
+    "adItem": "Advertising Item",
+    "duration": "Duration",
+    "price": "Price",
+    "discount": "Discount",
+    "pagePosition": "Page / Position",
+    "item": "Item",
+    "description": "Description",
+    "selectedItems": "{{count}} advertising items selected",
+    "clickToOrder": "Click the button on the right to fill in order information",
+    "orderNow": "Order Now",
+    "orderTitle": "Place Advertising Order",
+    "companyInfo": "Company Information",
+    "companyName": "Company Name",
+    "contactPerson": "Contact Person",
+    "phone": "Phone",
+    "email": "Email",
+    "adItemSettings": "Advertising Item Settings",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "selectStartDate": "Please select start date",
+    "autoCalculated": "Auto-calculated by system",
+    "bookedDatesNote": "Gray dates are already booked and cannot be selected",
+    "adLink": "Advertising Link URL",
+    "needDesign": "Need design service (design fee charged separately)",
+    "uploadAdMaterial": "Upload Advertising Material",
+    "clickToUpload": "Click to upload file",
+    "notes": "Notes",
+    "notesPlaceholder": "If you have other requirements or notes, please fill them in here",
+    "cancel": "Cancel",
+    "submitOrder": "Submit Order",
+    "inquiryTitle": "Online Inquiry",
+    "inquiryContent": "Inquiry Content",
+    "inquiryPlaceholder": "Please enter your inquiry...",
+    "submitInquiry": "Submit Inquiry",
+    "tabs": {
+      "platform": {
+        "title": "Platform Advertising",
+        "description": "High-exposure advertising placements including homepage popups, featured companies, and company directory listings"
+      },
+      "directory": {
+        "title": "Vietnam Chinese Business Procurement Directory",
+        "description": "2025 print directory advertising, covering Vietnamese, Singaporean, Hong Kong, Chinese, and Taiwanese Chinese businesses"
+      },
+      "product": {
+        "title": "Product Sales Listing",
+        "description": "List your products in the product sales section to expand your Vietnamese market"
+      }
+    },
+    "pricing": {
+      "popup": {
+        "title": "Homepage Popup Advertising"
+      },
+      "featured": {
+        "title": "Featured Company Exposure"
+      },
+      "listing": {
+        "title": "Company Directory Advertising"
+      },
+      "directory": {
+        "title": "Advertising Price List"
+      },
+      "product": {
+        "title": "Product Listing Price List"
+      }
+    },
+    "note": "Note: Popup ads recommended size is 800x600 pixels. Featured companies need to provide company logo and introduction. If design service is needed, please check the box when placing an order.",
+    "directoryNotes": {
+      "note1": "The above fees do not include taxes, design, and finalization.",
+      "note2": "Design fee: 1,200,000 VND.",
+      "note3": "Size: Full page is 26cm high x 19cm wide.",
+      "note4": "Deadline: October 31, 2024."
+    },
+    "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details.",
+    "inquirySuccess": "Thank you for your inquiry, we will reply to you as soon as possible!"
+  },
   "stickyBanner": {
     "expandText": "Expand Featured Info",
     "collapseLabel": "Collapse",
