@@ -8,16 +8,9 @@ import zhTW from './locales/zh-TW.json'
 import viVN from './locales/vi-VN.json'
 
 if (!i18n.isInitialized) {
-  const isBrowser = typeof window !== 'undefined'
+  const defaultLanguage = 'zh-TW'
   
-  // Get saved language from localStorage if available
-  let savedLanguage: string | undefined
-  if (isBrowser) {
-    savedLanguage = localStorage.getItem('i18nextLng') || undefined
-  }
-
   i18n
-    .use(LanguageDetector)
     .use(initReactI18next)
     .init({
       resources: {
@@ -31,14 +24,9 @@ if (!i18n.isInitialized) {
           translation: viVN,
         },
       },
-      lng: savedLanguage || (isBrowser ? undefined : 'zh-TW'),
-      fallbackLng: 'zh-TW',
+      lng: defaultLanguage,
+      fallbackLng: defaultLanguage,
       supportedLngs: ['en-US', 'zh-TW', 'vi-VN'],
-      detection: {
-        order: ['localStorage', 'navigator', 'htmlTag'],
-        caches: ['localStorage'],
-        lookupLocalStorage: 'i18nextLng',
-      },
       interpolation: {
         escapeValue: false,
       },
@@ -46,6 +34,10 @@ if (!i18n.isInitialized) {
         useSuspense: false,
       },
     })
+
+  if (typeof window !== 'undefined') {
+    i18n.use(LanguageDetector)
+  }
 }
 
 export default i18n

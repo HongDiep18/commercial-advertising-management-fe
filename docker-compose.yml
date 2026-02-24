@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: vn-buyer-guide-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432" 
+    environment:
+      POSTGRES_USER:  ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   vn-buyer-guide:
     build:
       context: .
@@ -11,8 +24,13 @@ services:
     
     ports:
       - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_DATABASE}
     
     restart: unless-stopped
+
+    depends_on:
+      - db
     
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
@@ -20,3 +38,5 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+volumes:
+  postgres_data:

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link"
 import { MapPin, Phone, Award } from "lucide-react"
 import { useMemo } from "react"
 import Card from "../ui/Card"
@@ -42,10 +43,6 @@ export default function FeaturedCompanies() {
     }))
   }, [t])
 
-  const handleCompanyClick = (companyId: string) => {
-    console.log("Navigate to:", `/directory/${companyId}`)
-  }
-
   return (
     <section id="featured" className="bg-body-bg-light py-20">
       <div className="container mx-auto px-4 lg:px-8">
@@ -54,66 +51,66 @@ export default function FeaturedCompanies() {
             <h2 className="mb-4 text-3xl font-bold">{t("featuredCompanies.title")}</h2>
             <p className="text-base text-muted-foreground">{t("featuredCompanies.subtitle")}</p>
           </div>
-          <a
+          <Link
             href="/directory"
             className="hidden font-normal text-primary hover:underline md:block"
           >
             {t("featuredCompanies.viewMore")}
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {companies.map((company) => (
-            <Card
-              key={company.id}
-              className="group cursor-pointer overflow-hidden border-border pt-12 transition-all duration-300 hover:shadow-xl"
-              onClick={() => handleCompanyClick(company.id)}
-            >
-              <div className="aspect-video overflow-hidden bg-muted">
-                <img
-                  src={company.image || "/placeholder.svg"}
-                  alt={company.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-6 bg-body-bg-light">
-                <div className="mb-3 flex items-start justify-between ">
-                  <Badge variant="body-bg-light" className="text-xs ">
-                    {company.industry}
-                  </Badge>
-                  {company.verified && (
-                    <div className="flex items-center gap-1 text-primary ">
-                      <Award className="h-4 w-4" />
-                      <span className="text-xs font-normal ">{t("featuredCompanies.verified")}</span>
+            <Link key={company.id} href={`/directory/${company.id}`}>
+              <Card
+                className="group cursor-pointer overflow-hidden border-border pt-12 transition-all duration-300 hover:shadow-xl"
+              >
+                <div className="aspect-video overflow-hidden bg-muted">
+                  <img
+                    src={company.image || "/placeholder.svg"}
+                    alt={company.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-6 bg-body-bg-light">
+                  <div className="mb-3 flex items-start justify-between ">
+                    <Badge variant="body-bg-light" className="text-xs ">
+                      {company.industry}
+                    </Badge>
+                    {company.verified && (
+                      <div className="flex items-center gap-1 text-primary ">
+                        <Award className="h-4 w-4" />
+                        <span className="text-xs font-normal ">{t("featuredCompanies.verified")}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="mb-2 line-clamp-1 text-base font-semibold transition-colors group-hover:text-primary">
+                    {company.name}
+                  </h3>
+
+                  <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{company.description}</p>
+
+                  <div className="flex flex-col gap-2 text-sm text-muted-foreground ">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      <span>{company.location}</span>
                     </div>
-                  )}
-                </div>
-
-                <h3 className="mb-2 line-clamp-1 text-base font-semibold transition-colors group-hover:text-primary">
-                  {company.name}
-                </h3>
-
-                <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{company.description}</p>
-
-                <div className="flex flex-col gap-2 text-sm text-muted-foreground ">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    <span>{company.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    <span>{company.phone}</span>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      <span>{company.phone}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
 
         <div className="mt-8 text-center md:hidden">
-          <a href="/directory" className="font-normal text-primary hover:underline">
+          <Link href="/directory" className="font-normal text-primary hover:underline">
             {t("featuredCompanies.viewMore")}
-          </a>
+          </Link>
         </div>
       </div>
     </section>

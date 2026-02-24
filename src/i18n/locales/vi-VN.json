@@ -289,5 +289,128 @@
     "errors": {
       "failed": "Đăng nhập thất bại, vui lòng kiểm tra email và mật khẩu"
     }
+  },
+  "companyDetail": {
+    "upgradeBanner": {
+      "guest": "Bạn hiện đang là khách và chỉ có thể xem tên công ty và khu vực một phần",
+      "bronze": "Bạn hiện là thành viên Đồng. Nâng cấp để xem thông tin đầy đủ bao gồm trang web, điện thoại và địa chỉ",
+      "register": "Đăng ký Thành viên",
+      "upgrade": "Nâng cấp để Mở khóa Thông tin Đầy đủ"
+    },
+    "breadcrumb": "Quay lại Danh mục Doanh nghiệp",
+    "address": "Địa chỉ",
+    "phone": "Điện thoại",
+    "website": "Trang web",
+    "contactPerson": "Người liên hệ",
+    "region": "Khu vực",
+    "taxId": "Mã số thuế",
+    "contactCompany": "Liên hệ Công ty",
+    "favorited": "Đã yêu thích",
+    "addToFavorites": "Thêm vào yêu thích",
+    "share": "Chia sẻ",
+    "introduction": "Giới thiệu công ty",
+    "relatedCompanies": "Doanh nghiệp liên quan",
+    "viewMore": "Xem thêm",
+    "regions": {
+      "寶島台灣": "Đài Loan",
+      "台灣": "Đài Loan",
+      "新加坡": "Singapore",
+      "越南": "Việt Nam",
+      "胡志明市": "Thành phố Hồ Chí Minh",
+      "河內": "Hà Nội",
+      "平陽": "Bình Dương",
+      "同奈": "Đồng Nai"
+    },
+    "productsLabel": "Sản phẩm",
+    "products": {
+      "製鞋機械設備": "Máy móc & Thiết bị Sản xuất Giày",
+      "標準產品": "Sản phẩm Tiêu chuẩn",
+      "定制產品": "Sản phẩm Tùy chỉnh",
+      "高端系列": "Dòng Cao cấp",
+      "經濟系列": "Dòng Kinh tế",
+      "環保系列": "Dòng Thân thiện Môi trường"
+    },
+    "services": {
+      "存放款及外匯業務": "Dịch vụ Tiền gửi & Ngoại hối",
+      "現金管理業務": "Dịch vụ Quản lý Tiền mặt",
+      "信用狀及貿易融資業務": "Dịch vụ Thư tín dụng & Tài trợ Thương mại",
+      "數位轉型業務": "Dịch vụ Chuyển đổi Số",
+      "製鞋機械設備銷售": "Bán Máy móc & Thiết bị Sản xuất Giày",
+      "設備維修服務": "Dịch vụ Bảo trì Thiết bị",
+      "OEM代工": "Sản xuất OEM",
+      "ODM設計": "Thiết kế ODM",
+      "產品開發": "Phát triển Sản phẩm",
+      "品質檢測": "Kiểm tra Chất lượng",
+      "物流配送": "Hậu cần & Phân phối"
+    },
+    "servicesLabel": "Dịch vụ",
+    "companies": {
+      "textile-1": {
+        "nameCn": "力鑫工業責任有限公司",
+        "nameEn": "CÔNG TY TNHH LI SHIN",
+        "nameVn": "CÔNG TY TNHH LI SHIN"
+      },
+      "textile-2": {
+        "nameCn": "越南立春責任有限公司",
+        "nameEn": "CÔNG TY TNHH LẬP XUÂN VIỆT NAM",
+        "nameVn": "CÔNG TY TNHH LẬP XUÂN VIỆT NAM"
+      },
+      "finance-1": {
+        "nameCn": "星展銀行（越南）有限公司",
+        "nameEn": "DBS Bank (Vietnam) Limited",
+        "nameVn": "Ngân hàng DBS (Việt Nam)"
+      },
+      "machinery-1": {
+        "nameCn": "蔡雄商業有限公司",
+        "nameEn": "CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI THÁI HÙNG",
+        "nameVn": "CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI THÁI HÙNG"
+      }
+    },
+    "introductions": {
+      "textile-1": "Công ty TNHH Công nghiệp Quan Li được thành lập bởi ông Trương Tân Kiến vào năm 1995, bắt đầu với 5 máy bọc sợi LATEX để gia công OEM. Sau hơn ba mươi năm nỗ lực, công ty đã mở rộng sang Việt Nam, lần lượt thành lập các nhà máy Li Tân, Li Long và Đài Loan Giai đoạn 3.\n\nCông ty TNHH Công nghiệp Li Tân được thành lập tại Khu công nghiệp Mỹ Phước, Thị xã Bến Cát, Tỉnh Bình Dương, Việt Nam. Đây là nhà máy sản xuất sợi bọc chuyên nghiệp và nhà cung cấp nguyên liệu dệt may.\n\nSản phẩm & Dịch vụ\n▶ Chế biến và bán sợi đàn hồi LATEX tự nhiên hình tròn và sợi cao su bọc.\n▶ Chế biến và bán sợi đàn hồi SPANDEX hóa học và sợi đàn hồi bọc.\n▶ Sợi bọc không khí cho vải denim.\n▶ Chế biến và bán sợi xoắn.\n\nSản phẩm Ứng dụng\nDây đai, giày dép, quần áo, đồ lót, vải dệt, vải đan, hàng thể thao, vật tư y tế, vải nội thất, vải rèm và sợi công nghiệp... và các sản phẩm khác.",
+      "finance-1": "Ngân hàng DBS có trụ sở tại Singapore với chi nhánh tại Việt Nam.\n\nDịch vụ Chính: Dịch vụ tiền gửi và ngoại hối, dịch vụ quản lý tiền mặt, dịch vụ thư tín dụng và tài trợ thương mại, và dịch vụ chuyển đổi số",
+      "machinery-1": "Công ty Thương mại Thái Hùng là một công ty chuyên cung cấp máy móc và thiết bị sản xuất giày dép.",
+      "defaultTemplate": "Công ty {{categoryName}} {{number}} là nhà sản xuất sản phẩm {{categoryName}} nổi tiếng tại Việt Nam, tập trung vào nghiên cứu, phát triển và sản xuất các sản phẩm chất lượng cao. Kể từ khi thành lập nhiều năm trước, công ty luôn tuân thủ triết lý kinh doanh chất lượng hàng đầu, cung cấp cho khách hàng các sản phẩm và dịch vụ chất lượng cao. Chúng tôi có thiết bị sản xuất tiên tiến và đội ngũ kỹ thuật chuyên nghiệp có thể đáp ứng các nhu cầu khác nhau của khách hàng."
+    }
+  },
+  "directory": {
+    "searchPlaceholder": "Tìm kiếm tên công ty, từ khóa...",
+    "clear": "Xóa",
+    "selectCategory": "Vui lòng Chọn Danh mục",
+    "selectCategoryDescription": "Vui lòng chọn một danh mục công ty từ bên trái, hoặc sử dụng hộp tìm kiếm ở trên để tìm các công ty cụ thể.",
+    "results": "kết quả",
+    "noResults": "Không tìm thấy công ty nào phù hợp với tiêu chí",
+    "industryCategory": "Danh mục Ngành công nghiệp",
+    "categories": {
+      "textile": "Dệt may, Quần áo & Phụ kiện",
+      "shoes": "Giày dép, Nguyên liệu giày, Da & Hành lý",
+      "vehicle": "Ô tô, Xe máy, Xe đạp & Phụ tùng",
+      "furniture": "Gỗ, Tre, Mây, Đồ nội thất & Công cụ",
+      "construction": "Kỹ thuật Xây dựng & Vật liệu Xây dựng (Bao gồm Môi trường)",
+      "electronics": "Điện tử, Điện & Thiết bị Truyền thông",
+      "machinery": "Máy móc, Điện cơ & Sản phẩm Công nghiệp",
+      "plastic": "Nhựa, Chế biến Cao su & Công nghiệp Hóa chất",
+      "agriculture": "Nông nghiệp, Lâm nghiệp, Ngư nghiệp & Chăn nuôi",
+      "metal": "Kim loại, Sản phẩm Phụ tùng, Mạ điện & Khuôn",
+      "paper": "Bao bì Giấy, In ấn & Sản phẩm Liên quan",
+      "logistics": "Vận tải Biển, Hàng không, Hàng hóa & Môi giới Hải quan",
+      "finance": "Tài chính, Bảo hiểm & Chứng khoán",
+      "gifts": "Quà tặng, Phụ kiện, Thủ công & Đồ dùng Hàng ngày",
+      "tourism": "Du lịch, Nhà hàng, Giải trí, Thể thao & Thiết bị Giải trí",
+      "food": "Thực phẩm, Đồ uống & Sản phẩm Chế biến",
+      "education": "Giáo dục, Y tế & Tư vấn",
+      "other": "Các Ngành Dịch vụ Khác"
+    },
+    "categoryTags": {
+      "紡織": "Dệt may",
+      "銀行": "Ngân hàng",
+      "金融": "Tài chính",
+      "貿易融資": "Tài trợ Thương mại",
+      "機械": "Máy móc",
+      "製鞋設備": "Thiết bị Sản xuất Giày",
+      "工業設備": "Thiết bị Công nghiệp",
+      "製造": "Sản xuất",
+      "出口": "Xuất khẩu"
+    }
   }
 }

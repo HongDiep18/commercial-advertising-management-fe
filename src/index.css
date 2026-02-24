@@ -15,6 +15,7 @@
   --color-secondary: #f3f4f6;
   --color-muted-foreground: #6b7280;
   --color-foreground: #111827;
+  --color-amber-600: oklch(66.6% 0.179 58.318);
 }
 
 .registration-form input,

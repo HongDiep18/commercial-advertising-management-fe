@@ -289,5 +289,128 @@
     "errors": {
       "failed": "登入失敗，請檢查您的帳號密碼"
     }
+  },
+  "companyDetail": {
+    "upgradeBanner": {
+      "guest": "您目前為訪客，僅可查看部分公司名稱與地區",
+      "bronze": "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊",
+      "register": "註冊成為會員",
+      "upgrade": "升級解鎖完整資訊"
+    },
+    "breadcrumb": "返回企業名錄",
+    "address": "地址",
+    "phone": "電話",
+    "website": "官網",
+    "contactPerson": "聯絡人",
+    "region": "地區",
+    "taxId": "稅號",
+    "contactCompany": "聯絡公司",
+    "favorited": "已收藏",
+    "addToFavorites": "加入收藏",
+    "share": "分享",
+    "introduction": "公司簡介",
+    "relatedCompanies": "相關企業",
+    "viewMore": "查看更多",
+    "regions": {
+      "寶島台灣": "寶島台灣",
+      "台灣": "台灣",
+      "新加坡": "新加坡",
+      "越南": "越南",
+      "胡志明市": "胡志明市",
+      "河內": "河內",
+      "平陽": "平陽",
+      "同奈": "同奈"
+    },
+    "productsLabel": "產品",
+    "products": {
+      "製鞋機械設備": "製鞋機械設備",
+      "標準產品": "標準產品",
+      "定制產品": "定制產品",
+      "高端系列": "高端系列",
+      "經濟系列": "經濟系列",
+      "環保系列": "環保系列"
+    },
+    "services": {
+      "存放款及外匯業務": "存放款及外匯業務",
+      "現金管理業務": "現金管理業務",
+      "信用狀及貿易融資業務": "信用狀及貿易融資業務",
+      "數位轉型業務": "數位轉型業務",
+      "製鞋機械設備銷售": "製鞋機械設備銷售",
+      "設備維修服務": "設備維修服務",
+      "OEM代工": "OEM代工",
+      "ODM設計": "ODM設計",
+      "產品開發": "產品開發",
+      "品質檢測": "品質檢測",
+      "物流配送": "物流配送"
+    },
+    "servicesLabel": "服務",
+    "companies": {
+      "textile-1": {
+        "nameCn": "力鑫工業責任有限公司",
+        "nameEn": "CÔNG TY TNHH LI SHIN",
+        "nameVn": "CÔNG TY TNHH LI SHIN"
+      },
+      "textile-2": {
+        "nameCn": "越南立春責任有限公司",
+        "nameEn": "CÔNG TY TNHH LẬP XUÂN VIỆT NAM",
+        "nameVn": "CÔNG TY TNHH LẬP XUÂN VIỆT NAM"
+      },
+      "finance-1": {
+        "nameCn": "星展銀行（越南）有限公司",
+        "nameEn": "DBS Bank (Vietnam) Limited",
+        "nameVn": "Ngân hàng DBS (Việt Nam)"
+      },
+      "machinery-1": {
+        "nameCn": "蔡雄商業有限公司",
+        "nameEn": "CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI THÁI HÙNG",
+        "nameVn": "CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI THÁI HÙNG"
+      }
+    },
+    "introductions": {
+      "textile-1": "「冠荔實業股份有限公司」由「張新建」先生於1995年創辦成立，由5台包紗機LATEX包紗代工開始，歷經三十多年的努力，前進越南陸續增設力鑫、力隆及台灣三期廠房。\n\n力鑫工業責任有限公司成立於越南平陽省檳吉市美福工業區，是一家專業的包覆紗生產廠及紡織原料供應商。\n\n產品與服務\n▶ 天然 LATEX 圓型膠絲及橡膠絲包紗加工銷售。\n▶ 化學 SPANDEX 彈性絲及彈性絲包紗加工銷售。\n▶ 牛仔布專用的空氣包覆紗。\n▶ 撚紗加工銷售。\n\n適用產品\n織帶、鞋類、成衣、貼身用品、平織布、針織布、運動用品、醫療用品、家飾布、窗簾布及工業用紗... 等其他產品。",
+      "finance-1": "星展銀行總部設於新加坡，在越南設有分行。\n\n主要服務：存放款及外匯業務，現金管理業務，信用狀及貿易融資業務及數位轉型業務",
+      "machinery-1": "蔡雄商業有限公司是一家專門提供製鞋機械設備的公司。",
+      "defaultTemplate": "{{categoryName}}公司 {{number}} 是越南知名的{{categoryName}}產品製造商，專注於高品質產品的研發與生產。公司成立多年以來，始終秉持品質至上的經營理念，為客戶提供優質的產品和服務。我們擁有先進的生產設備和專業的技術團隊，能夠滿足客戶的各種需求。"
+    }
+  },
+  "directory": {
+    "searchPlaceholder": "搜尋企業名稱、關鍵字...",
+    "clear": "清除",
+    "selectCategory": "請選擇分類",
+    "selectCategoryDescription": "請從左側選擇一個企業分類，或使用上方搜尋框查找特定企業。",
+    "results": "筆結果",
+    "noResults": "沒有找到符合條件的企業",
+    "industryCategory": "產業類別",
+    "categories": {
+      "textile": "紡織、成衣及配件",
+      "shoes": "鞋業、鞋材、皮革類、行李袋",
+      "vehicle": "汽、機、自行車及零配件",
+      "furniture": "木、竹、藤、家具及工具",
+      "construction": "建築工程及建材（含環保）",
+      "electronics": "電子、電器及通訊器材",
+      "machinery": "機械、機電及工業用相關產品",
+      "plastic": "塑膠、橡膠加工製品及化工業",
+      "agriculture": "農、林、漁、牧業",
+      "metal": "金屬、五金製品、電鍍及模具",
+      "paper": "紙器包裝、印刷及相關製品",
+      "logistics": "海、空、貨運運輸類及報關行",
+      "finance": "金融、保險、證券業",
+      "gifts": "禮品、飾品、工藝品、日用品",
+      "tourism": "旅遊、餐廳、娛樂、運動休閒及器材",
+      "food": "食品、飲料及加工產品",
+      "education": "教育、醫療、顧問",
+      "other": "其他服務業"
+    },
+    "categoryTags": {
+      "紡織": "紡織",
+      "銀行": "銀行",
+      "金融": "金融",
+      "貿易融資": "貿易融資",
+      "機械": "機械",
+      "製鞋設備": "製鞋設備",
+      "工業設備": "工業設備",
+      "製造": "製造",
+      "出口": "出口"
+    }
   }
 }

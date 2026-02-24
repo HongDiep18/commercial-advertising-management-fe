@@ -289,5 +289,128 @@
     "errors": {
       "failed": "Login failed, please check your email and password"
     }
+  },
+  "companyDetail": {
+    "upgradeBanner": {
+      "guest": "You are currently a guest and can only view partial company names and regions",
+      "bronze": "You are currently a Bronze member. Upgrade to view complete information including website, phone, and address",
+      "register": "Register as Member",
+      "upgrade": "Upgrade to Unlock Complete Information"
+    },
+    "breadcrumb": "Back to Company Directory",
+    "address": "Address",
+    "phone": "Phone",
+    "website": "Website",
+    "contactPerson": "Contact Person",
+    "region": "Region",
+    "taxId": "Tax ID",
+    "contactCompany": "Contact Company",
+    "favorited": "Favorited",
+    "addToFavorites": "Add to Favorites",
+    "share": "Share",
+    "introduction": "Company Introduction",
+    "relatedCompanies": "Related Companies",
+    "viewMore": "View More",
+    "regions": {
+      "寶島台灣": "Taiwan",
+      "台灣": "Taiwan",
+      "新加坡": "Singapore",
+      "越南": "Vietnam",
+      "胡志明市": "Ho Chi Minh City",
+      "河內": "Hanoi",
+      "平陽": "Binh Duong",
+      "同奈": "Dong Nai"
+    },
+    "productsLabel": "Products",
+    "products": {
+      "製鞋機械設備": "Shoe Manufacturing Machinery & Equipment",
+      "標準產品": "Standard Products",
+      "定制產品": "Custom Products",
+      "高端系列": "Premium Series",
+      "經濟系列": "Economy Series",
+      "環保系列": "Eco-Friendly Series"
+    },
+    "services": {
+      "存放款及外匯業務": "Deposit & Foreign Exchange Services",
+      "現金管理業務": "Cash Management Services",
+      "信用狀及貿易融資業務": "Letter of Credit & Trade Finance Services",
+      "數位轉型業務": "Digital Transformation Services",
+      "製鞋機械設備銷售": "Shoe Manufacturing Machinery & Equipment Sales",
+      "設備維修服務": "Equipment Maintenance Services",
+      "OEM代工": "OEM Manufacturing",
+      "ODM設計": "ODM Design",
+      "產品開發": "Product Development",
+      "品質檢測": "Quality Testing",
+      "物流配送": "Logistics & Distribution"
+    },
+    "servicesLabel": "Services",
+    "companies": {
+      "textile-1": {
+        "nameCn": "力鑫工業責任有限公司",
+        "nameEn": "CÔNG TY TNHH LI SHIN",
+        "nameVn": "CÔNG TY TNHH LI SHIN"
+      },
+      "textile-2": {
+        "nameCn": "越南立春責任有限公司",
+        "nameEn": "CÔNG TY TNHH LẬP XUÂN VIỆT NAM",
+        "nameVn": "CÔNG TY TNHH LẬP XUÂN VIỆT NAM"
+      },
+      "finance-1": {
+        "nameCn": "星展銀行（越南）有限公司",
+        "nameEn": "DBS Bank (Vietnam) Limited",
+        "nameVn": "Ngân hàng DBS (Việt Nam)"
+      },
+      "machinery-1": {
+        "nameCn": "蔡雄商業有限公司",
+        "nameEn": "CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI THÁI HÙNG",
+        "nameVn": "CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI THÁI HÙNG"
+      }
+    },
+    "introductions": {
+      "textile-1": "Guan Li Industrial Co., Ltd. was founded by Mr. Zhang Xinjian in 1995, starting with 5 LATEX yarn wrapping machines for OEM processing. After more than thirty years of effort, the company has expanded to Vietnam, successively establishing Li Xin, Li Long, and Taiwan Phase 3 factories.\n\nLi Xin Industrial Co., Ltd. was established in My Phuoc Industrial Zone, Ben Cat Town, Binh Duong Province, Vietnam. It is a professional covered yarn production factory and textile raw material supplier.\n\nProducts & Services\n▶ Natural LATEX round elastic yarn and rubber yarn wrapping processing and sales.\n▶ Chemical SPANDEX elastic yarn and elastic yarn wrapping processing and sales.\n▶ Air covered yarn for denim fabric.\n▶ Yarn twisting processing and sales.\n\nApplicable Products\nWebbing, footwear, apparel, intimate apparel, woven fabric, knitted fabric, sports goods, medical supplies, home textiles, curtain fabric, and industrial yarn... and other products.",
+      "finance-1": "DBS Bank is headquartered in Singapore with branches in Vietnam.\n\nMain Services: Deposit and foreign exchange services, cash management services, letters of credit and trade finance services, and digital transformation services",
+      "machinery-1": "Tsai Hsiung Commercial Co., Ltd. is a company specializing in providing shoe manufacturing machinery and equipment.",
+      "defaultTemplate": "{{categoryName}} Company {{number}} is a well-known {{categoryName}} product manufacturer in Vietnam, focusing on the research, development and production of high-quality products. Since its establishment many years ago, the company has always adhered to the business philosophy of quality first, providing customers with high-quality products and services. We have advanced production equipment and a professional technical team that can meet various customer needs."
+    }
+  },
+  "directory": {
+    "searchPlaceholder": "Search company name, keywords...",
+    "clear": "Clear",
+    "selectCategory": "Please Select Category",
+    "selectCategoryDescription": "Please select a company category from the left, or use the search box above to find specific companies.",
+    "results": "results",
+    "noResults": "No companies found matching the criteria",
+    "industryCategory": "Industry Category",
+    "categories": {
+      "textile": "Textile, Apparel & Accessories",
+      "shoes": "Footwear, Shoe Materials, Leather & Luggage",
+      "vehicle": "Automotive, Motorcycle, Bicycle & Parts",
+      "furniture": "Wood, Bamboo, Rattan, Furniture & Tools",
+      "construction": "Construction Engineering & Building Materials (Including Environmental)",
+      "electronics": "Electronics, Electrical & Communication Equipment",
+      "machinery": "Machinery, Electromechanical & Industrial Products",
+      "plastic": "Plastic, Rubber Processing & Chemical Industry",
+      "agriculture": "Agriculture, Forestry, Fishing & Animal Husbandry",
+      "metal": "Metal, Hardware Products, Electroplating & Molds",
+      "paper": "Paper Packaging, Printing & Related Products",
+      "logistics": "Sea, Air, Freight Transportation & Customs Brokerage",
+      "finance": "Finance, Insurance & Securities",
+      "gifts": "Gifts, Accessories, Crafts & Daily Necessities",
+      "tourism": "Tourism, Restaurants, Entertainment, Sports & Leisure Equipment",
+      "food": "Food, Beverages & Processed Products",
+      "education": "Education, Medical & Consulting",
+      "other": "Other Service Industries"
+    },
+    "categoryTags": {
+      "紡織": "Textile",
+      "銀行": "Bank",
+      "金融": "Finance",
+      "貿易融資": "Trade Finance",
+      "機械": "Machinery",
+      "製鞋設備": "Shoe Manufacturing Equipment",
+      "工業設備": "Industrial Equipment",
+      "製造": "Manufacturing",
+      "出口": "Export"
+    }
   }
 }

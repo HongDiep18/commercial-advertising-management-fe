@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="bg-body-bg-light border-t border-slate-200">
       <div className="container mx-auto px-3 py-8 lg:px-4">
         <div className="mb-8 grid gap-8 md:grid-cols-3 lg:gap-12">
-          {/* Column 1: Company Info */}
+          {/* Company Info */}
           <div>
             <a href="/" className="mb-3 inline-flex items-center gap-2">
               <div className="flex flex-col">
@@ -40,7 +40,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Contact Info */}
+          {/* Contact Info */}
           <div>
             <h3 className="mb-4 text-base font-bold text-black">{t("footer.contactInfo")}</h3>
             <ul className="space-y-3 text-sm text-slate-700">
@@ -82,7 +82,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Company Location with Map */}
+          {/* Company Location with Map */}
           <div>
             <h3 className="mb-4 text-base font-bold text-black">{t("footer.companyLocation")}</h3>
             <div className="mb-2 h-48 w-full overflow-hidden rounded-lg border border-slate-300 shadow-sm">

@@ -9,5 +9,7 @@
   "endOfLine": "lf",
   "bracketSpacing": true,
   "jsxSingleQuote": false,
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "insertPragma": false,
+  "requirePragma": false
 }
