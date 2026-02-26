@@ -4,14 +4,18 @@
     "register": "Đăng ký",
     "search": "Tìm kiếm",
     "about": "Về chúng tôi",
-    "contact": "Liên hệ"
+    "contact": "Liên hệ",
+    "close": "Đóng"
   },
   "header": {
     "aboutUs": "Về chúng tôi",
     "directory": "Danh mục DN",
     "store": "Cửa hàng trực tuyến",
     "news": "Tin tức mới nhất",
-    "adContact": "Liên hệ QC"
+    "adContact": "Liên hệ QC",
+    "myAccount": "Tài khoản của tôi",
+    "adminPanel": "Quản trị",
+    "logout": "Đăng xuất"
   },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
@@ -371,6 +375,44 @@
       "failed": "Đăng nhập thất bại, vui lòng kiểm tra email và mật khẩu"
     }
   },
+  "account": {
+    "companyLogo": "Logo công ty",
+    "memberSince": "Thành viên từ",
+    "viewBenefits": "Xem quyền lợi hội viên",
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "goAdmin": "Vào quản trị",
+    "upgradeProgress": "Tiến độ nâng cấp",
+    "currentTier": "Hạng hiện tại",
+    "nextTier": "Hạng tiếp theo",
+    "points": "điểm",
+    "pointsToUpgrade": "Còn cần điểm để nâng cấp",
+    "howToUpgrade": "Cách nâng cấp",
+    "pointsHistory": "Lịch sử điểm",
+    "totalPoints": "Tổng điểm",
+    "viewAllRecords": "Xem tất cả",
+    "adHistory": "Lịch sử quảng cáo / chi tiêu",
+    "adHistoryDesc": "Lịch sử quảng cáo và chi tiêu của bạn",
+    "howToGetPoints": "Cách nhận điểm đóng góp",
+    "laborContribution": "Đóng góp lao động",
+    "registerAndFill": "Đăng ký và điền thông tin công ty",
+    "newbieBonus": "Quà tân binh (lên Đồng)",
+    "uploadLogoTask": "(Nhiệm vụ) Tải logo công ty",
+    "commercialSpending": "Chi tiêu thương mại",
+    "buyAd": "Mua quảng cáo",
+    "shopSpending": "Chi tiêu cửa hàng",
+    "goToAd": "Liên hệ quảng cáo",
+    "profileUpdated": "Đã cập nhật hồ sơ!",
+    "logoPoints": "Tải logo thành công! Bạn nhận {{count}} điểm",
+    "logoUpdated": "Đã cập nhật logo!",
+    "uploadLogo": "Tải logo",
+    "reupload": "Tải lại",
+    "uploadLogoPoints": "Tải logo để nhận {{count}} điểm",
+    "companyInfo": "Thông tin công ty",
+    "cancel": "Hủy",
+    "saveChanges": "Lưu thay đổi",
+    "membershipBenefits": "Hạng & quyền lợi hội viên",
+    "currentTierLabel": "Hạng hiện tại"
+  },
   "companyDetail": {
     "upgradeBanner": {
       "guest": "Bạn hiện đang là khách và chỉ có thể xem tên công ty và khu vực một phần",
@@ -503,10 +545,15 @@
       "travel": "Du lịch",
       "regulation": "Quy định"
     },
-    "industryFilter": "Lọc Ngành",
+    "filter": "Lọc",
+    "industryFilter": "Lọc",
     "industryCategory": "Phân loại Ngành",
+    "subcategoryFilter": "Danh mục con",
     "clearAll": "Xóa Tất cả",
     "noNews": "Không tìm thấy tin tức phù hợp với bộ lọc đã chọn",
+    "loading": "Đang tải...",
+    "errorLoad": "Không thể tải tin tức",
+    "loadMore": "Tải thêm",
     "readMore": "Đọc Thêm",
     "author": "Ban Biên tập Doanh nghiệp Hoa kiều Việt Nam",
     "authorRegulation": "Nghiên cứu Quy định Doanh nghiệp Hoa kiều Việt Nam",
@@ -517,38 +564,6 @@
     "linkCopied": "Đã Sao Chép Liên Kết",
     "share": "Chia Sẻ",
     "print": "In",
-    "relatedIndustries": "Phân Loại Ngành Liên Quan",
-    "items": {
-      "news-1": {
-        "title": "Báo cáo Chi phí Sinh hoạt Việt Nam 2025: Phân tích Chi tiêu Hàng tháng và Chiến lược Tiết kiệm cho Gia đình Đài Loan",
-        "excerpt": "Theo khảo sát mới nhất, chi phí sinh hoạt tại các thành phố lớn của Việt Nam đã tăng khoảng 8% trong năm qua. Báo cáo này cung cấp phân tích chi tiết về nhà ở, giao thông, ăn uống và các chi phí khác tại các khu vực tập trung doanh nghiệp Đài Loan như Thành phố Hồ Chí Minh, Hà Nội và Tỉnh Bình Dương, cùng với các khuyến nghị tiết kiệm thực tế.",
-        "readTime": "5 phút"
-      },
-      "news-2": {
-        "title": "Hệ thống Bảo hiểm Y tế Mới của Việt Nam: Hướng dẫn và Lưu ý Quan trọng cho Người nước ngoài",
-        "excerpt": "Cục Bảo hiểm Xã hội Việt Nam đã công bố quy định mới về bảo hiểm y tế cho người nước ngoài vào năm 2025, bao gồm những thay đổi lớn về điều kiện đủ tiêu chuẩn, phạm vi bảo hiểm và quy trình đăng ký. Bài viết này tổng hợp thông tin cần thiết mà doanh nghiệp Đài Loan và gia đình của họ cần biết để lập kế hoạch bảo hiểm sức khỏe đúng cách.",
-        "readTime": "6 phút"
-      },
-      "news-3": {
-        "title": "Hướng dẫn Du lịch Việt Nam Tết Nguyên đán 2025: Hướng dẫn Đầy đủ cho Doanh nghiệp Đài Loan Về Nhà hoặc Ăn Tết Tại Địa phương",
-        "excerpt": "Khi Tết Nguyên đán đến gần, dù bạn dự định trở về Đài Loan để đoàn tụ với gia đình hay chọn trải nghiệm không khí Tết địa phương tại Việt Nam, bài viết này cung cấp thông tin đặt vé máy bay mới nhất, giới thiệu phong tục Tết Việt Nam và đề xuất các hoạt động Tết tại Thành phố Hồ Chí Minh, Hà Nội và các địa điểm khác.",
-        "readTime": "7 phút"
-      },
-      "news-4": {
-        "title": "Tuyến Đường Khuyến nghị Tham quan Kinh doanh và Du lịch Nghỉ dưỡng Đà Nẵng và Hội An Miền Trung Việt Nam",
-        "excerpt": "Miền Trung Việt Nam đã trở thành điểm nóng đầu tư mới nổi trong những năm gần đây, với công viên công nghệ cao Đà Nẵng và ngành thủ công Hội An thu hút sự chú ý của nhiều doanh nghiệp Đài Loan. Bài viết này lập kế hoạch hành trình tham quan kinh doanh 3 ngày 2 đêm kết hợp các di sản thế giới và ẩm thực địa phương, cho phép các chuyến công tác cũng bao gồm nghỉ dưỡng.",
-        "readTime": "8 phút"
-      },
-      "news-5": {
-        "title": "Điều chỉnh Lương Tối thiểu Việt Nam 2025: Tiêu chuẩn Mới theo Vùng và Chiến lược Phản ứng của Doanh nghiệp",
-        "excerpt": "Chính phủ Việt Nam đã công bố điều chỉnh lương tối thiểu có hiệu lực từ ngày 1 tháng 7 năm 2025, với mức tăng trung bình 6% trên bốn vùng. Bài viết này chi tiết các tiêu chuẩn lương mới theo vùng, phân tích tác động đến chi phí sản xuất và các chiến lược điều chỉnh nhân lực mà các công ty có thể áp dụng.",
-        "readTime": "6 phút"
-      },
-      "news-6": {
-        "title": "Quy định Mới Xuất Nhập khẩu Việt Nam: Nâng cấp Hệ thống Khai báo Hải quan 2025 và Thay đổi Quy trình Thông quan",
-        "excerpt": "Hải quan Việt Nam đã ra mắt hệ thống khai báo điện tử thế hệ mới, được triển khai đầy đủ từ tháng 3 năm 2025. Hệ thống mới tích hợp các chức năng như giấy chứng nhận xuất xứ và kiểm tra hàng hóa. Bài viết này giải thích các thay đổi hoạt động chính và các mục chuẩn bị cho các công ty.",
-        "readTime": "7 phút"
-      }
-    }
+    "relatedIndustries": "Phân Loại Ngành Liên Quan"
   }
 }

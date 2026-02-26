@@ -4,14 +4,18 @@
     "register": "註冊",
     "search": "搜尋",
     "about": "關於",
-    "contact": "聯絡"
+    "contact": "聯絡",
+    "close": "關閉"
   },
   "header": {
     "aboutUs": "關於我們",
     "directory": "企業名錄",
     "store": "網路商店",
     "news": "最新消息",
-    "adContact": "廣告聯繫"
+    "adContact": "廣告聯繫",
+    "myAccount": "我的帳戶",
+    "adminPanel": "管理後台",
+    "logout": "登出"
   },
   "hero": {
     "title": "華商採購網－連結優質商業夥伴",
@@ -371,6 +375,44 @@
       "failed": "登入失敗，請檢查您的帳號密碼"
     }
   },
+  "account": {
+    "companyLogo": "公司 Logo",
+    "memberSince": "會員加入日期",
+    "viewBenefits": "查看會員權益",
+    "editProfile": "編輯會員資料",
+    "goAdmin": "進入管理後台",
+    "upgradeProgress": "升級進度",
+    "currentTier": "目前等級",
+    "nextTier": "下一等級",
+    "points": "點",
+    "pointsToUpgrade": "距離升級還需",
+    "howToUpgrade": "查看升級方式",
+    "pointsHistory": "點數紀錄",
+    "totalPoints": "累計獲得",
+    "viewAllRecords": "查看全部紀錄",
+    "adHistory": "廣告投放 / 消費紀錄",
+    "adHistoryDesc": "您的廣告投放與消費歷史",
+    "howToGetPoints": "如何獲得貢獻值",
+    "laborContribution": "勞力貢獻",
+    "registerAndFill": "註冊並填寫自家資料",
+    "newbieBonus": "新手禮包（直接升銅牌）",
+    "uploadLogoTask": "(任務) 上傳自家 Logo",
+    "commercialSpending": "商業消費",
+    "buyAd": "購買廣告",
+    "shopSpending": "商城消費",
+    "goToAd": "前往投放廣告",
+    "profileUpdated": "會員資料已更新！",
+    "logoPoints": "Logo 上傳成功！您獲得 {{count}} 點貢獻值",
+    "logoUpdated": "Logo 更新成功！",
+    "uploadLogo": "上傳 Logo",
+    "reupload": "重新上傳",
+    "uploadLogoPoints": "上傳 Logo 可獲得 {{count}} 點",
+    "companyInfo": "公司資料",
+    "cancel": "取消",
+    "saveChanges": "儲存變更",
+    "membershipBenefits": "會員等級與權益",
+    "currentTierLabel": "目前等級"
+  },
   "companyDetail": {
     "upgradeBanner": {
       "guest": "您目前為訪客，僅可查看部分公司名稱與地區",
@@ -503,10 +545,15 @@
       "travel": "旅遊",
       "regulation": "資訊法規"
     },
-    "industryFilter": "行業篩選",
+    "filter": "篩選",
+    "industryFilter": "篩選",
     "industryCategory": "行業分類",
+    "subcategoryFilter": "子分類",
     "clearAll": "清除全部",
     "noNews": "目前沒有符合篩選條件的新聞",
+    "loading": "載入中...",
+    "errorLoad": "無法載入最新消息",
+    "loadMore": "載入更多",
     "readMore": "閱讀更多",
     "author": "越南華商編輯部",
     "authorRegulation": "越南華商法規研究室",
@@ -517,38 +564,6 @@
     "linkCopied": "已複製連結",
     "share": "分享",
     "print": "列印",
-    "relatedIndustries": "相關行業分類",
-    "items": {
-      "news-1": {
-        "title": "2025年越南生活成本報告：台商家庭月支出分析與節省策略",
-        "excerpt": "根據最新調查，越南主要城市的生活成本在過去一年上漲約8%。本報告詳細分析胡志明市、河內及平陽省等台商聚集區的住房、交通、餐飲等各項支出，並提供實用的節省建議。",
-        "readTime": "5 分鐘"
-      },
-      "news-2": {
-        "title": "越南醫療保險新制上路：外籍人士投保指南與注意事項",
-        "excerpt": "越南社會保險局公布2025年外籍人士醫療保險新規定，包含投保資格、給付範圍及申請流程等重大變更。本文整理台商及其眷屬必知的投保須知，協助您做好健康保障規劃。",
-        "readTime": "6 分鐘"
-      },
-      "news-3": {
-        "title": "2025農曆新年越南旅遊攻略：台商返台與在地過節全指南",
-        "excerpt": "農曆新年將至，無論您計劃返台與家人團聚，或選擇在越南體驗當地年節氣氛，本篇提供最新機票預訂資訊、越南春節習俗介紹，以及胡志明市、河內等地的年節活動推薦。",
-        "readTime": "7 分鐘"
-      },
-      "news-4": {
-        "title": "越南中部峴港、會安商務考察兼休閒旅遊推薦路線",
-        "excerpt": "越南中部近年成為新興投資熱點，峴港高科技園區及會安手工藝產業吸引眾多台商關注。本文規劃3天2夜商務考察行程，結合世界遺產景點與在地美食，讓出差也能兼顧休閒。",
-        "readTime": "8 分鐘"
-      },
-      "news-5": {
-        "title": "越南2025年最低工資調整：各區域新標準與企業因應策略",
-        "excerpt": "越南政府宣布自2025年7月1日起調整最低工資，四個區域平均漲幅達6%。本文詳列各區域新工資標準、對製造業成本影響分析，以及企業可採取的人力資源調整策略。",
-        "readTime": "6 分鐘"
-      },
-      "news-6": {
-        "title": "越南進出口新規：2025年海關申報系統升級與通關流程變更",
-        "excerpt": "越南海關總署推出新一代電子申報系統，自2025年3月起全面實施。新系統整合原產地證明、商品檢驗等功能，本文說明系統操作變更重點及企業提前準備事項。",
-        "readTime": "7 分鐘"
-      }
-    }
+    "relatedIndustries": "相關行業分類"
   }
 }

@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import { MapPin, Phone, Mail } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { MapPin, Phone, Mail } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 export default function Footer() {
   const { t } = useTranslation()
@@ -9,7 +9,6 @@ export default function Footer() {
     <footer className="bg-body-bg-light border-t border-slate-200">
       <div className="container mx-auto px-3 py-8 lg:px-4">
         <div className="mb-8 grid gap-8 md:grid-cols-3 lg:gap-12">
-          {/* Company Info */}
           <div>
             <a href="/" className="mb-3 inline-flex items-center gap-2">
               <div className="flex flex-col">
@@ -22,13 +21,13 @@ export default function Footer() {
                 />
               </div>
             </a>
-            <p className="mb-2 text-base font-medium leading-relaxed text-black">
+            <p className="mb-2 text-base leading-relaxed font-medium text-black">
               {t("footer.companyName")}
             </p>
             <p className="mb-4 text-sm leading-relaxed text-slate-600">
               {t("footer.companyDescription")}
             </p>
-            {/* Government Registration Badge */}
+
             <div className="mt-4">
               <img
                 src="/assets/images/gov-badge.png"
@@ -40,20 +39,17 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h3 className="mb-4 text-base font-bold text-black">{t("footer.contactInfo")}</h3>
             <ul className="space-y-3 text-sm text-slate-700">
               <li className="flex items-start gap-2">
                 <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-600" />
-                <span className="leading-relaxed">
-                  {t("footer.address")}
-                </span>
+                <span className="leading-relaxed">{t("footer.address")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-600" />
                 <span>
-                  0909822101{' '}
+                  0909822101{" "}
                   <span className="text-xs text-slate-500">{t("footer.phoneDirectory")}</span>
                 </span>
               </li>
@@ -82,7 +78,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Company Location with Map */}
           <div>
             <h3 className="mb-4 text-base font-bold text-black">{t("footer.companyLocation")}</h3>
             <div className="mb-2 h-48 w-full overflow-hidden rounded-lg border border-slate-300 shadow-sm">
@@ -104,7 +99,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright Section */}
         <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-300 pt-8 text-sm text-slate-600 md:flex-row">
           <p>{t("footer.copyright")}</p>
           <p className="font-medium">{t("footer.companyFullName")}</p>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next"
 
 export const categories = [
   { id: "textile", name: "紡織、成衣及配件", count: 238 },
@@ -28,33 +28,35 @@ interface DirectorySidebarProps {
   setSelectedCategory: (category: string | null) => void
 }
 
-export function DirectorySidebar({ 
-  selectedCategory, 
-  setSelectedCategory
-}: DirectorySidebarProps) {
+export function DirectorySidebar({ selectedCategory, setSelectedCategory }: DirectorySidebarProps) {
   const { t } = useTranslation()
   return (
-    <aside className="hidden lg:block w-64 border-r border-border bg-card/30 sticky top-14 h-[calc(100vh-3.5rem)]">
+    <aside className="border-border bg-card/30 sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 border-r lg:block">
       <div className="bg-body-bg-dark pr-4 font-medium">
-        {/* Categories */}
         <div>
-          <h3 className="text-sm font-semibold text-foreground mb-4">{t('directory.industryCategory')}</h3>
-          <div className="space-y-0.5 max-h-[calc(100vh-10rem)] overflow-y-auto">
+          <h3 className="text-foreground mb-4 text-sm font-semibold">
+            {t("directory.industryCategory")}
+          </h3>
+          <div className="max-h-[calc(100vh-10rem)] space-y-0.5 overflow-y-auto">
             {categories.map((category) => {
               const isSelected = selectedCategory === category.id
-              
+
               return (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`w-full text-left px-3 py-2.5 transition-all duration-200 flex items-center justify-between group ${
+                  className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${
                     isSelected
-                      ? "bg-primary/10 text-primary border-l-2 border-primary font-medium"
+                      ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   }`}
                 >
-                  <span className="text-sm line-clamp-1">{t(`directory.categories.${category.id}`)}</span>
-                  <span className={`text-xs ml-2 flex-shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground/60"}`}>
+                  <span className="line-clamp-1 text-sm">
+                    {t(`directory.categories.${category.id}`)}
+                  </span>
+                  <span
+                    className={`ml-2 flex-shrink-0 text-xs ${isSelected ? "text-primary" : "text-muted-foreground/60"}`}
+                  >
                     {category.count.toLocaleString()}
                   </span>
                 </button>

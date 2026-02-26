@@ -1,17 +1,39 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import LanguageSelector from './LanguageSelector'
+import { useState, useRef, useEffect } from "react"
+import Link from "next/link"
+import { Menu, X, User, Shield, LogOut, ChevronDown } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import { useUser } from "@/contexts/user-context"
+import LanguageSelector from "./LanguageSelector"
+import Button from "@/components/ui/Button"
 
 export default function Header() {
   const { t } = useTranslation()
+  const { user, isLoggedIn, logout } = useUser()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const closeMobileMenu = () => setIsMenuOpen(false)
+  const handleLogout = () => {
+    logout()
+    setIsDropdownOpen(false)
+    closeMobileMenu()
+  }
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 bg-header-red-dark text-white shadow-md">
+    <header className="bg-header-red-dark fixed top-0 right-0 left-0 z-50 text-white shadow-md">
       <div className="container mx-auto px-2 lg:px-2">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
@@ -25,52 +47,99 @@ export default function Header() {
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex xl:gap-8">
             <Link
               href="/about"
-              className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
+              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
-              {t('header.aboutUs')}
+              {t("header.aboutUs")}
             </Link>
             <Link
               href="/directory"
-              className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
+              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
-              {t('header.directory')}
+              {t("header.directory")}
             </Link>
             <Link
               href="/store"
-              className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
+              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
-              {t('header.store')}
+              {t("header.store")}
             </Link>
             <Link
               href="/news"
-              className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
+              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
-              {t('header.news')}
+              {t("header.news")}
             </Link>
             <Link
               href="/contact"
-              className="whitespace-nowrap text-sm font-medium transition-colors hover:text-white/80"
+              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
-              {t('header.adContact')}
+              {t("header.adContact")}
             </Link>
           </nav>
 
           <div className="hidden items-center gap-1 md:flex lg:gap-1">
             <LanguageSelector variant="desktop" />
 
-            <a
-              href="/login"
-              className="whitespace-nowrap rounded px-4 py-1.5 text-sm font-medium transition-colors hover:bg-header-red-dark"
-            >
-              {t('common.login')}
-            </a>
-
-            <a
-              href="/register"
-              className="whitespace-nowrap rounded bg-white px-4 py-1.5 text-sm font-semibold text-header-red-dark transition-colors hover:bg-white/90"
-            >
-              {t('common.register')}
-            </a>
+            {isLoggedIn && user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                  className="flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  <span>{user.name}</span>
+                  <ChevronDown className="h-4 w-4 text-white/70" />
+                </button>
+                {isDropdownOpen && (
+                  <div className="bg-header-red-dark absolute top-full right-0 z-50 mt-1 w-48 rounded-lg border border-white/20 py-1 shadow-lg">
+                    <Link
+                      href="/account"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/10"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      {t("header.myAccount") || "我的帳戶"}
+                    </Link>
+                    {user.role === "admin" && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/10"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <Shield className="h-4 w-4" />
+                        {t("header.adminPanel") || "管理後台"}
+                      </Link>
+                    )}
+                    <div className="my-1 border-t border-white/20" />
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-200 transition-colors hover:bg-white/10 hover:text-red-100"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      {t("header.logout") || "登出"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:bg-white/10"
+                >
+                  {t("common.login")}
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-header-red-dark rounded bg-white px-4 py-1.5 text-sm font-semibold whitespace-nowrap transition-colors hover:bg-white/90"
+                >
+                  {t("common.register")}
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -78,11 +147,7 @@ export default function Header() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
@@ -92,54 +157,89 @@ export default function Header() {
               <Link
                 href="/about"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
-                {t('header.aboutUs')}
+                {t("header.aboutUs")}
               </Link>
               <Link
                 href="/directory"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
-                {t('header.directory')}
+                {t("header.directory")}
               </Link>
               <Link
                 href="/store"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
-                {t('header.store')}
+                {t("header.store")}
               </Link>
               <Link
                 href="/news"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
-                {t('header.news')}
+                {t("header.news")}
               </Link>
               <Link
                 href="/contact"
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={closeMobileMenu}
               >
-                {t('header.adContact')}
+                {t("header.adContact")}
               </Link>
               <div className="flex flex-col gap-2 border-t border-white/20 pt-4">
                 <LanguageSelector variant="mobile" />
-                <a
-                  href="/login"
-                  className="rounded px-4 py-2 text-center text-sm font-medium transition-colors hover:bg-header-red-dark"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('common.login')}
-                </a>
-                <a
-                  href="/register"
-                  className="rounded bg-white px-4 py-2 text-center text-sm font-semibold text-header-red-dark transition-colors hover:bg-white/90"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('common.register')}
-                </a>
+                {isLoggedIn && user ? (
+                  <>
+                    <div className="py-2 text-sm font-medium text-white/90">{user.name}</div>
+                    <Link
+                      href="/account"
+                      className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"
+                      onClick={closeMobileMenu}
+                    >
+                      <User className="h-4 w-4" />
+                      {t("header.myAccount") || "我的帳戶"}
+                    </Link>
+                    {user.role === "admin" && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"
+                        onClick={closeMobileMenu}
+                      >
+                        <Shield className="h-4 w-4" />
+                        {t("header.adminPanel") || "管理後台"}
+                      </Link>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogout}
+                      className="justify-start text-red-200 hover:bg-white/10 hover:text-red-100"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t("header.logout") || "登出"}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="rounded px-4 py-2 text-center text-sm font-medium transition-colors hover:bg-white/10"
+                      onClick={closeMobileMenu}
+                    >
+                      {t("common.login")}
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="text-header-red-dark rounded bg-white px-4 py-2 text-center text-sm font-semibold transition-colors hover:bg-white/90"
+                      onClick={closeMobileMenu}
+                    >
+                      {t("common.register")}
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>
