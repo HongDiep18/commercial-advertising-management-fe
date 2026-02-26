@@ -16,10 +16,10 @@ export default function NewsPage() {
     error,
     categoryList,
     subcategoryList,
-    selectedCategorySlug,
+    selectedCategorySlugs,
     selectedSubcategorySlugs,
     showSubcategoryFilter,
-    setSelectedCategorySlug,
+    setSelectedCategorySlugs,
     setShowSubcategoryFilter,
     toggleSubcategory,
     loadMore,
@@ -53,11 +53,11 @@ export default function NewsPage() {
         <NewsFilters
           categoryList={categoryList}
           subcategoryList={subcategoryList}
-          selectedCategorySlug={selectedCategorySlug}
+          selectedCategorySlugs={selectedCategorySlugs}
           selectedSubcategorySlugs={selectedSubcategorySlugs}
           showSubcategoryFilter={showSubcategoryFilter}
           lang={i18n.language}
-          onCategoryChange={setSelectedCategorySlug}
+          onCategoryChange={setSelectedCategorySlugs}
           onSubcategoryToggle={toggleSubcategory}
           onToggleFilterPanel={() => setShowSubcategoryFilter((v) => !v)}
           onClearSubcategories={clearSubcategories}

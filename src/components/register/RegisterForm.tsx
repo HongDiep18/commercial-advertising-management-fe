@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Input from '../ui/Input'
@@ -9,7 +10,8 @@ import Select from '../ui/Select'
 import Textarea from '../ui/Textarea'
 import Button from '../ui/Button'
 import { register, formDataToRegisterPayload } from '@/api/auth'
-import { INITIAL_REGISTER_FORM, type RegisterFormData } from './registerConstants'
+import { useUser } from '@/contexts/user-context'
+import { INITIAL_REGISTER_FORM, type RegisterFormData, type RegisterMembershipTier } from './registerConstants'
 import { useCaptcha } from './useCaptcha'
 
 function getErrorMessage(err: unknown): string {
@@ -20,8 +22,17 @@ function getErrorMessage(err: unknown): string {
   return ''
 }
 
+const MEMBERSHIP_TIER_OPTIONS: { value: RegisterMembershipTier; labelKey: string }[] = [
+  { value: 'bronze', labelKey: 'register.tiers.bronze' },
+  { value: 'silver', labelKey: 'register.tiers.silver' },
+  { value: 'gold', labelKey: 'register.tiers.gold' },
+  { value: 'diamond', labelKey: 'register.tiers.diamond' },
+]
+
 export default function RegisterForm() {
   const { t } = useTranslation()
+  const router = useRouter()
+  const { loginWithRegisteredUser } = useUser()
   const [formData, setFormData] = useState<RegisterFormData>(INITIAL_REGISTER_FORM)
   const [isLoading, setIsLoading] = useState(false)
   const { input: captchaInput, setInput: setCaptchaInput, canvasRef, refresh: refreshCaptcha, isValid: isCaptchaValid } = useCaptcha()
@@ -84,11 +95,17 @@ export default function RegisterForm() {
 
     setIsLoading(true)
     try {
-      const payload = formDataToRegisterPayload(formData)
+      const payload = formDataToRegisterPayload({ ...formData, captcha: captchaInput })
       await register(payload)
+      loginWithRegisteredUser(
+        formData.email,
+        formData.contactPerson || formData.companyNameCn || formData.email.split('@')[0],
+        formData.membershipTier
+      )
       alert(t('register.success') || '註冊成功！')
       setFormData({ ...INITIAL_REGISTER_FORM })
       refreshCaptcha()
+      router.push('/account')
     } catch (err) {
       const msg = getErrorMessage(err)
       alert(msg || t('register.errors.submit') || '註冊失敗，請稍後再試')
@@ -249,6 +266,30 @@ export default function RegisterForm() {
                 onChange={(e) => handleInputChange('website', e.target.value)}
                 required
               />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  {t('register.membershipTierLabel') || '會員等級'}
+                </label>
+                <Select
+                  value={formData.membershipTier}
+                  onValueChange={(value) => handleInputChange('membershipTier', value as RegisterMembershipTier)}
+                >
+                  <Select.Trigger className="w-full">
+                    <Select.Value placeholder={t('register.placeholders.membershipTier') || '選擇會員等級'} />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {MEMBERSHIP_TIER_OPTIONS.map((opt) => (
+                      <Select.Item key={opt.value} value={opt.value}>
+                        {t(opt.labelKey)}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select>
+                <p className="text-muted-foreground text-xs">
+                  {t('register.membershipTierHint') || '註冊後將以此等級權限自動登入，可於會員中心查看權益。'}
+                </p>
+              </div>
 
               <Textarea
                 placeholder={t('register.placeholders.introduction') || '簡單介紹 *'}

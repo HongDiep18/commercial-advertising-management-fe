@@ -160,11 +160,11 @@ export default function AccountPage() {
   const progressInTier = nextTierInfo ? (totalPoints / nextThreshold) * 100 : 100
 
   return (
-    <main className="bg-background min-h-screen">
+    <main className="bg-body-bg-dark min-h-screen">
       <Header />
 
       <div className="pt-14">
-        <section className="from-primary/5 via-background to-primary/5 bg-gradient-to-br py-8 sm:py-12">
+        <section className="from-primary/5 via-background to-primary/5 bg-body-bg-dark py-8 sm:py-12">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <Card className="bg-card/80 border-0 shadow-lg">
               <Card.Content className="p-6 sm:p-8">
@@ -189,7 +189,9 @@ export default function AccountPage() {
                       <span
                         className={`rounded-full px-3 py-1 text-sm font-medium ${tierConfig.bgColor} ${tierConfig.color}`}
                       >
-                        {tierConfig.label}
+                        {user.role === "admin"
+                          ? t("account.tiers.admin") || "管理員"
+                          : t("account.tiers." + memberTier) || tierConfig.label}
                       </span>
                     </div>
                     <p className="text-muted-foreground">{user.email}</p>
@@ -201,7 +203,7 @@ export default function AccountPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-transparent"
+                        className="hover:!bg-header-red-dark bg-transparent hover:text-white"
                         onClick={() => setShowBenefitsModal(true)}
                       >
                         <Shield className="mr-1.5 h-4 w-4" />
@@ -210,7 +212,7 @@ export default function AccountPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="relative bg-transparent"
+                        className="hover:!bg-header-red-dark relative bg-transparent hover:text-white"
                         onClick={() => setShowProfileModal(true)}
                       >
                         <Edit3 className="mr-1.5 h-4 w-4" />
@@ -222,7 +224,11 @@ export default function AccountPage() {
                         )}
                       </Button>
                       {user.role === "admin" && (
-                        <Button size="sm" asChild>
+                        <Button
+                          size="sm"
+                          asChild
+                          className="hover:!bg-header-red-dark/80 !bg-header-red-dark border !border-gray-400"
+                        >
                           <Link href="/admin">
                             <Shield className="mr-1.5 h-4 w-4" />
                             {t("account.goAdmin") || "進入管理後台"}
@@ -247,8 +253,11 @@ export default function AccountPage() {
                     {t("account.upgradeProgress") || "升級進度"}
                   </Card.Title>
                   <p className="text-muted-foreground mt-1 text-sm">
-                    {t("account.currentTier") || "目前等級"}：{tierConfig.label} |{" "}
-                    {t("account.nextTier") || "下一等級"}：
+                    {t("account.currentTier") || "目前等級"}：
+                    {user.role === "admin"
+                      ? t("account.tiers.admin")
+                      : t("account.tiers." + memberTier) || tierConfig.label}{" "}
+                    | {t("account.nextTier") || "下一等級"}：
                     {MEMBERSHIP_CONFIG[nextTierInfo.nextTier as MembershipTier].label}
                   </p>
                 </Card.Header>
@@ -266,7 +275,7 @@ export default function AccountPage() {
                         {Math.min(100, Math.max(0, progressInTier)).toFixed(1)}%
                       </span>
                     </div>
-                    <div className="bg-muted h-4 w-full overflow-hidden rounded-full">
+                    <div className="bg-body-bg-dark-foreground h-4 w-full overflow-hidden rounded-full">
                       <div
                         className="bg-primary h-full rounded-full transition-all duration-300"
                         style={{
@@ -284,7 +293,10 @@ export default function AccountPage() {
                         {nextTierInfo.pointsNeeded.toLocaleString()} {t("account.points") || "點"}
                       </p>
                     </div>
-                    <Button onClick={() => setShowUpgradeModal(true)}>
+                    <Button
+                      className="!bg-header-red-dark hover:!bg-header-red-dark/80 hover:!text-white"
+                      onClick={() => setShowUpgradeModal(true)}
+                    >
                       {t("account.howToUpgrade") || "查看升級方式"}
                       <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
@@ -313,7 +325,7 @@ export default function AccountPage() {
                       return (
                         <div
                           key={item.id}
-                          className="bg-muted/30 flex items-center gap-4 rounded-xl p-4"
+                          className="bg-body-bg-dark flex items-center gap-4 rounded-xl p-4"
                         >
                           <div
                             className={`flex h-12 w-12 items-center justify-center rounded-xl ${typeConfig.color}`}
@@ -333,7 +345,10 @@ export default function AccountPage() {
                       )
                     })}
                   </div>
-                  <Button variant="ghost" className="mt-4 w-full">
+                  <Button
+                    variant="ghost"
+                    className="hover:!bg-header-red-dark mt-4 w-full border !border-gray-400 bg-transparent hover:!text-white"
+                  >
                     {t("account.viewAllRecords") || "查看全部紀錄"}
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
@@ -357,7 +372,7 @@ export default function AccountPage() {
                     {mockCommercialHistory.map((item) => (
                       <div
                         key={item.id}
-                        className="bg-muted/30 flex items-center gap-4 rounded-xl p-4"
+                        className="bg-body-bg-light flex items-center gap-4 rounded-xl p-4"
                       >
                         <div
                           className={`flex h-12 w-12 items-center justify-center rounded-xl ${
@@ -387,7 +402,10 @@ export default function AccountPage() {
                       </div>
                     ))}
                   </div>
-                  <Button variant="ghost" className="mt-4 w-full">
+                  <Button
+                    variant="ghost"
+                    className="hover:!bg-header-red-dark mt-4 w-full border !border-gray-400 bg-transparent hover:!text-white"
+                  >
                     {t("account.viewAllRecords") || "查看全部紀錄"}
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
@@ -402,8 +420,8 @@ export default function AccountPage() {
 
       {showUpgradeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-background max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg">
-            <div className="bg-background border-border sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
+          <div className="bg-body-bg-dark max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg">
+            <div className="bg-body-bg-dark sticky top-0 z-10 flex items-center justify-between border-b border-gray-400 px-6 py-4">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <Info className="text-primary h-5 w-5" />
                 {t("account.howToGetPoints") || "如何獲得貢獻值"}
@@ -423,7 +441,7 @@ export default function AccountPage() {
                   1. {t("account.laborContribution") || "勞力貢獻"}
                 </h3>
                 <div className="space-y-3">
-                  <div className="bg-muted/30 flex items-center justify-between rounded-lg p-3 text-sm">
+                  <div className="bg-body-bg-dark-foreground flex items-center justify-between rounded-lg p-3 text-sm">
                     <span className="flex items-center gap-2">
                       <Gift className="text-primary h-4 w-4" />
                       {t("account.registerAndFill") || "註冊並填寫自家資料"}
@@ -435,7 +453,7 @@ export default function AccountPage() {
                   <p className="text-muted-foreground ml-2 text-xs">
                     {t("account.newbieBonus") || "新手禮包（直接升銅牌）"}
                   </p>
-                  <div className="bg-muted/30 flex items-center justify-between rounded-lg p-3 text-sm">
+                  <div className="bg-body-bg-dark-foreground flex items-center justify-between rounded-lg p-3 text-sm">
                     <span className="flex items-center gap-2">
                       <ImageIcon className="text-primary h-4 w-4" />
                       {t("account.uploadLogoTask") || "(任務) 上傳自家 Logo"}
@@ -444,6 +462,9 @@ export default function AccountPage() {
                       +{CONTRIBUTION_VALUES.logo.toLocaleString()}
                     </span>
                   </div>
+                  <p className="text-muted-foreground ml-2 text-xs">
+                    {t("account.uploadLogoHint") || "鼓勵完善門面"}
+                  </p>
                 </div>
               </div>
               <div className="space-y-4 border-t pt-4">
@@ -451,24 +472,34 @@ export default function AccountPage() {
                   2. {t("account.commercialSpending") || "商業消費"}
                 </h3>
                 <div className="space-y-3">
-                  <div className="bg-muted/30 flex items-center justify-between rounded-lg p-3 text-sm">
+                  <div className="bg-body-bg-dark-foreground flex items-center justify-between rounded-lg p-3 text-sm">
                     <span className="flex items-center gap-2">
                       <Megaphone className="text-primary h-4 w-4" />
                       {t("account.buyAd") || "購買廣告"}
                     </span>
                     <span className="text-primary font-semibold">1 VND = 1 點</span>
                   </div>
-                  <div className="bg-muted/30 flex items-center justify-between rounded-lg p-3 text-sm">
+                  <p className="text-muted-foreground ml-2 text-xs">
+                    {t("account.buyAdDiamondHint") || "花 55 萬買廣告，直接送鑽石會員"}
+                  </p>
+
+                  <div className="bg-body-bg-dark-foreground flex items-center justify-between rounded-lg p-3 text-sm">
                     <span className="flex items-center gap-2">
                       <ShoppingCart className="text-primary h-4 w-4" />
                       {t("account.shopSpending") || "商城消費"}
                     </span>
                     <span className="text-primary font-semibold">1 VND = 1 點</span>
                   </div>
+                  <p className="text-muted-foreground ml-2 text-xs">
+                    {t("account.shopSpendingHint") || "買茶葉送名錄，升級看全站資料"}
+                  </p>
                 </div>
               </div>
               <div className="space-y-3 border-t pt-4">
-                <Button className="w-full" asChild>
+                <Button
+                  className="!bg-header-red-dark hover:!bg-header-red-dark/80 w-full hover:!text-white"
+                  asChild
+                >
                   <Link href="/contact">
                     <Megaphone className="mr-2 h-4 w-4" />
                     {t("account.goToAd") || "前往投放廣告"}
@@ -476,7 +507,7 @@ export default function AccountPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full bg-transparent"
+                  className="hover:!bg-header-red-dark w-full border !border-gray-400 bg-transparent hover:!text-white"
                   onClick={() => setShowUpgradeModal(false)}
                 >
                   {t("common.close") || "關閉"}
@@ -489,8 +520,8 @@ export default function AccountPage() {
 
       {showProfileModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-background max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg">
-            <div className="bg-background border-border sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
+          <div className="bg-body-bg-dark max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg">
+            <div className="bg-body-bg-dark border-border sticky top-0 z-10 flex items-center justify-between border-b border-gray-300 px-6 py-4">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <Edit3 className="text-primary h-5 w-5" />
                 {t("account.editProfile") || "編輯會員資料"}
@@ -518,7 +549,7 @@ export default function AccountPage() {
                     className="hidden"
                   />
                   <div
-                    className={`border-border flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed ${!companyLogo ? "bg-muted/30" : ""}`}
+                    className={`border-border !bg-body-bg-dark-foreground flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-400 ${!companyLogo ? "bg-muted/60" : ""}`}
                   >
                     {companyLogo ? (
                       <img
@@ -534,7 +565,7 @@ export default function AccountPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="bg-transparent"
+                      className="hover:!bg-header-red-dark border !border-gray-400 bg-transparent hover:!text-white"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <Upload className="mr-2 h-4 w-4" />
@@ -605,7 +636,7 @@ export default function AccountPage() {
                     onChange={(e) => handleProfileChange("email", e.target.value)}
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Select
                     value={profileData.country}
                     onValueChange={(value) => handleProfileChange("country", value)}
@@ -623,6 +654,7 @@ export default function AccountPage() {
                       ))}
                     </Select.Content>
                   </Select>
+
                   <Select
                     value={profileData.region}
                     onValueChange={(value) => handleProfileChange("region", value)}
@@ -639,11 +671,14 @@ export default function AccountPage() {
                       ))}
                     </Select.Content>
                   </Select>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
                   <Select
                     value={profileData.industry}
                     onValueChange={(value) => handleProfileChange("industry", value)}
                   >
-                    <Select.Trigger className="w-full">
+                    <Select.Trigger className="w-full min-w-0">
                       <Select.Value
                         placeholder={t("register.placeholders.industry") || "選擇產業類別"}
                       />
@@ -657,6 +692,7 @@ export default function AccountPage() {
                     </Select.Content>
                   </Select>
                 </div>
+
                 <Input
                   placeholder="Website"
                   value={profileData.website}
@@ -669,15 +705,18 @@ export default function AccountPage() {
                   rows={3}
                 />
               </div>
-              <div className="flex gap-3 border-t pt-4">
+              <div className="flex gap-3 border-t border-gray-400 pt-4">
                 <Button
                   variant="outline"
-                  className="flex-1 bg-transparent"
+                  className="hover:!bg-header-red-dark flex-1 border !border-gray-400 bg-transparent hover:!text-white"
                   onClick={() => setShowProfileModal(false)}
                 >
                   {t("account.cancel") || "取消"}
                 </Button>
-                <Button className="flex-1" onClick={handleSaveProfile}>
+                <Button
+                  className="!bg-header-red-dark hover:!bg-header-red-dark/80 flex-1 text-white hover:!text-white"
+                  onClick={handleSaveProfile}
+                >
                   <Save className="mr-2 h-4 w-4" />
                   {t("account.saveChanges") || "儲存變更"}
                 </Button>
@@ -689,8 +728,8 @@ export default function AccountPage() {
 
       {showBenefitsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-background max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg">
-            <div className="bg-background border-border sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
+          <div className="bg-body-bg-dark max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg">
+            <div className="bg-body-bg-dark border-border sticky top-0 z-10 flex items-center justify-between border-b border-gray-300 px-6 py-4">
               <h2 className="flex items-center gap-2 text-lg font-semibold">
                 <Shield className="text-primary h-5 w-5" />
                 {t("account.membershipBenefits") || "會員等級與權益"}
@@ -712,7 +751,9 @@ export default function AccountPage() {
                   <div
                     key={tier}
                     className={`rounded-lg border-2 p-4 ${
-                      isCurrentTier ? "border-primary bg-primary/5" : "border-border"
+                      isCurrentTier
+                        ? "border-primary bg-primary/5"
+                        : "border-border border-gray-300"
                     }`}
                   >
                     <div className="mb-3 flex items-center justify-between">
@@ -720,7 +761,7 @@ export default function AccountPage() {
                         <span
                           className={`rounded-full px-3 py-1 text-sm font-medium ${config.bgColor} ${config.color}`}
                         >
-                          {config.label}
+                          {t(`account.tiers.${tier}`) || config.label}
                         </span>
                         {isCurrentTier && (
                           <span className="text-primary text-xs font-medium">
@@ -732,14 +773,18 @@ export default function AccountPage() {
                         <p className="font-medium">
                           {MEMBERSHIP_THRESHOLDS[tier].toLocaleString()} 點
                         </p>
-                        <p className="text-muted-foreground text-xs">{config.spendingRequired}</p>
+                        <p className="text-muted-foreground text-xs">
+                          {t(`account.tierSpending.${tier}`) || config.spendingRequired}
+                        </p>
                       </div>
                     </div>
                     <div className="space-y-1">
                       {config.benefits.map((benefit, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm">
                           <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-600" />
-                          <span>{benefit}</span>
+                          <span>
+                            {t(`account.tierBenefits.${tier}.${i}`, { defaultValue: benefit })}
+                          </span>
                         </div>
                       ))}
                       {config.restrictions.length > 0 &&
@@ -749,7 +794,11 @@ export default function AccountPage() {
                             className="text-muted-foreground flex items-center gap-2 text-sm"
                           >
                             <X className="h-4 w-4 flex-shrink-0 text-red-500" />
-                            <span>{restriction}</span>
+                            <span>
+                              {t(`account.tierRestrictions.${tier}.${i}`, {
+                                defaultValue: restriction,
+                              })}
+                            </span>
                           </div>
                         ))}
                     </div>
@@ -757,7 +806,10 @@ export default function AccountPage() {
                 )
               })}
               <div className="border-t pt-4">
-                <Button className="w-full" onClick={() => setShowBenefitsModal(false)}>
+                <Button
+                  className="!bg-header-red-dark hover:!bg-header-red-dark/80 w-full"
+                  onClick={() => setShowBenefitsModal(false)}
+                >
                   {t("common.close") || "關閉"}
                 </Button>
               </div>

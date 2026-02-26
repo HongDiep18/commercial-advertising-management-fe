@@ -1,3 +1,6 @@
+/** Membership tier chosen at registration; must match account page tiers. */
+export type RegisterMembershipTier = 'bronze' | 'silver' | 'gold' | 'diamond'
+
 export interface RegisterFormData {
   companyNameVi: string
   companyNameCn: string
@@ -12,6 +15,7 @@ export interface RegisterFormData {
   industry: string
   website: string
   introduction: string
+  membershipTier: RegisterMembershipTier
 }
 
 export const INITIAL_REGISTER_FORM: RegisterFormData = {
@@ -28,4 +32,5 @@ export const INITIAL_REGISTER_FORM: RegisterFormData = {
   industry: '',
   website: '',
   introduction: '',
+  membershipTier: 'bronze',
 }

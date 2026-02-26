@@ -299,6 +299,14 @@
     "hasAccount": "已經有帳號？",
     "loginLink": "立即登入",
     "captchaRefresh": "刷新驗證碼",
+    "membershipTierLabel": "會員等級",
+    "membershipTierHint": "註冊後將以此等級權限自動登入，可於會員中心查看權益。",
+    "tiers": {
+      "bronze": "銅牌會員",
+      "silver": "銀牌會員",
+      "gold": "金牌會員",
+      "diamond": "鑽石會員"
+    },
     "countries": {
       "vietnam": "越南",
       "taiwan": "台灣",
@@ -337,7 +345,8 @@
       "website": "網站 *",
       "introduction": "簡單介紹 *",
       "captcha": "請輸入驗證碼",
-      "selectCountryFirst": "請先選擇國家"
+      "selectCountryFirst": "請先選擇國家",
+      "membershipTier": "選擇會員等級"
     },
     "noRegions": "無可用地區",
     "errors": {
@@ -397,6 +406,9 @@
     "registerAndFill": "註冊並填寫自家資料",
     "newbieBonus": "新手禮包（直接升銅牌）",
     "uploadLogoTask": "(任務) 上傳自家 Logo",
+    "uploadLogoHint": "鼓勵完善門面",
+    "buyAdDiamondHint": "花 55 萬買廣告，直接送鑽石會員",
+    "shopSpendingHint": "買茶葉送名錄，升級看全站資料",
     "commercialSpending": "商業消費",
     "buyAd": "購買廣告",
     "shopSpending": "商城消費",
@@ -411,7 +423,67 @@
     "cancel": "取消",
     "saveChanges": "儲存變更",
     "membershipBenefits": "會員等級與權益",
-    "currentTierLabel": "目前等級"
+    "currentTierLabel": "目前等級",
+    "tiers": {
+      "guest": "訪客",
+      "bronze": "銅牌會員",
+      "silver": "銀牌會員",
+      "gold": "金牌會員",
+      "diamond": "鑽石會員",
+      "admin": "管理員"
+    },
+    "tierSpending": {
+      "bronze": "免費（註冊即享）",
+      "silver": "消費 15 萬 VND",
+      "gold": "消費 30 萬 VND",
+      "diamond": "消費 55 萬 VND"
+    },
+    "tierBenefits": {
+      "bronze": ["本業 - 基礎版", "公司名、稅號、地區"],
+      "silver": ["本業 - 完整版", "解鎖官網、電話、地址、Email"],
+      "gold": ["本業 + 跨 3 產業 - 完整版", "解鎖自家產業 + 自選 3 個上下游產業"],
+      "diamond": ["全站所有產業 - 完整版", "取代紙本名錄", "解鎖所有產業、所有欄位（含手機）"]
+    },
+    "tierRestrictions": {
+      "bronze": ["無官網、無電話、無地址"],
+      "silver": [],
+      "gold": [],
+      "diamond": []
+    }
+  },
+  "admin": {
+    "title": "管理後台",
+    "subtitle": "廣告聯繫表單管理",
+    "allCases": "全部案件",
+    "statusNew": "新案件",
+    "statusContacted": "已聯絡",
+    "statusClosed": "已結案",
+    "searchPlaceholder": "搜尋公司名稱、聯絡人、Email...",
+    "clearFilter": "清除篩選",
+    "formTitle": "廣告聯繫表單",
+    "countResults": "共 {{count}} 筆資料",
+    "tableStatus": "狀態",
+    "tableCompany": "公司名稱",
+    "tableAdType": "廣告類型",
+    "tableContact": "聯絡人",
+    "tableSubmittedAt": "提交時間",
+    "tableAction": "操作",
+    "view": "查看",
+    "noResults": "沒有找到符合條件的資料",
+    "close": "關閉",
+    "submittedAt": "提交於 {{date}}",
+    "contactPerson": "聯絡人",
+    "email": "Email",
+    "phone": "電話",
+    "adType": "廣告類型",
+    "selectedItems": "選擇項目",
+    "estimatedAmount": "預估金額",
+    "notes": "處理備註",
+    "sendEmail": "發送郵件",
+    "callPhone": "撥打電話",
+    "adTypePopup": "平台廣告",
+    "adTypeDirectory": "採購名錄",
+    "adTypeProduct": "商品銷售"
   },
   "companyDetail": {
     "upgradeBanner": {

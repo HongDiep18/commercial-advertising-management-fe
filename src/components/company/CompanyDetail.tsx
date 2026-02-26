@@ -395,14 +395,22 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     <Button
                       variant="outline"
                       onClick={() => setIsFavorite(!isFavorite)}
-                      className={isFavorite ? "border-primary text-primary" : ""}
+                      className={
+                        isFavorite
+                          ? "text-primary !bg-body-bg-dark hover:!bg-header-red-dark/80 border-primary hover:!text-white"
+                          : "hover:!bg-header-red-dark border !border-gray-400 bg-transparent hover:!text-white"
+                      }
                     >
                       <Heart className={`mr-2 h-4 w-4 ${isFavorite ? "fill-primary" : ""}`} />
                       {isFavorite
                         ? t("companyDetail.favorited") || "已收藏"
                         : t("companyDetail.addToFavorites") || "加入收藏"}
                     </Button>
-                    <Button variant="outline" onClick={handleShare}>
+                    <Button
+                      variant="outline"
+                      onClick={handleShare}
+                      className="hover:!bg-header-red-dark !bg-body-bg-dark border hover:!text-white"
+                    >
                       <Share2 className="mr-2 h-4 w-4" />
                       {t("companyDetail.share") || "分享"}
                     </Button>

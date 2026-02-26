@@ -93,10 +93,10 @@ export default function Header() {
                   <ChevronDown className="h-4 w-4 text-white/70" />
                 </button>
                 {isDropdownOpen && (
-                  <div className="bg-header-red-dark absolute top-full right-0 z-50 mt-1 w-48 rounded-lg border border-white/20 py-1 shadow-lg">
+                  <div className="absolute top-full right-0 z-50 mt-1 w-48 rounded-lg border border-white/20 bg-white py-1 shadow-lg">
                     <Link
                       href="/account"
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/10"
+                      className="hover:bg-header-red-dark mx-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm text-black transition-colors hover:text-white"
                       onClick={() => setIsDropdownOpen(false)}
                     >
                       <User className="h-4 w-4" />
@@ -105,18 +105,18 @@ export default function Header() {
                     {user.role === "admin" && (
                       <Link
                         href="/admin"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-white transition-colors hover:bg-white/10"
+                        className="hover:!bg-header-red-dark mx-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm text-black transition-colors hover:bg-white/10 hover:text-white"
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         <Shield className="h-4 w-4" />
                         {t("header.adminPanel") || "管理後台"}
                       </Link>
                     )}
-                    <div className="my-1 border-t border-white/20" />
+                    <div className="my-1 border-t border-black/20" />
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-red-200 transition-colors hover:bg-white/10 hover:text-red-100"
+                      className="hover:!bg-header-red-dark !text-header-red-light mx-1 flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-red-200 transition-colors hover:!text-white"
                     >
                       <LogOut className="h-4 w-4" />
                       {t("header.logout") || "登出"}

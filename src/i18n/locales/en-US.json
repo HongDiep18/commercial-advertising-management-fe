@@ -299,6 +299,14 @@
     "hasAccount": "Already have an account?",
     "loginLink": "Login Now",
     "captchaRefresh": "Refresh Captcha",
+    "membershipTierLabel": "Membership level",
+    "membershipTierHint": "You will be logged in automatically with this level after registration; view benefits in Account.",
+    "tiers": {
+      "bronze": "Bronze Member",
+      "silver": "Silver Member",
+      "gold": "Gold Member",
+      "diamond": "Diamond Member"
+    },
     "countries": {
       "vietnam": "Vietnam",
       "taiwan": "Taiwan",
@@ -337,7 +345,8 @@
       "website": "Website *",
       "introduction": "Brief Introduction *",
       "captcha": "Enter Captcha",
-      "selectCountryFirst": "Please select country first"
+      "selectCountryFirst": "Please select country first",
+      "membershipTier": "Select membership level"
     },
     "noRegions": "No regions available",
     "errors": {
@@ -397,6 +406,9 @@
     "registerAndFill": "Register and fill company info",
     "newbieBonus": "Newbie bonus (Bronze tier)",
     "uploadLogoTask": "(Task) Upload company logo",
+    "uploadLogoHint": "Encourages a complete company profile",
+    "buyAdDiamondHint": "Spend 550K on ads to get Diamond membership",
+    "shopSpendingHint": "Buy catalog with purchase; upgrade to view full site data",
     "commercialSpending": "Commercial spending",
     "buyAd": "Buy ads",
     "shopSpending": "Shop spending",
@@ -411,7 +423,74 @@
     "cancel": "Cancel",
     "saveChanges": "Save changes",
     "membershipBenefits": "Membership tiers & benefits",
-    "currentTierLabel": "Current tier"
+    "currentTierLabel": "Current tier",
+    "tiers": {
+      "guest": "Guest",
+      "bronze": "Bronze Member",
+      "silver": "Silver Member",
+      "gold": "Gold Member",
+      "diamond": "Diamond Member",
+      "admin": "Administrator"
+    },
+    "tierSpending": {
+      "bronze": "Free (registration)",
+      "silver": "Spend 150,000 VND",
+      "gold": "Spend 300,000 VND",
+      "diamond": "Spend 550,000 VND"
+    },
+    "tierBenefits": {
+      "bronze": ["Base industry info", "Company name, tax ID, region"],
+      "silver": ["Full industry info", "Unlock website, phone, address, email"],
+      "gold": [
+        "Own industry + 3 cross-industries (full)",
+        "Unlock own industry + 3 upstream/downstream industries"
+      ],
+      "diamond": [
+        "All industries (full)",
+        "Replaces print directory",
+        "Unlock all industries and fields (incl. mobile)"
+      ]
+    },
+    "tierRestrictions": {
+      "bronze": ["No website, phone, or address"],
+      "silver": [],
+      "gold": [],
+      "diamond": []
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Ad contact form management",
+    "allCases": "All",
+    "statusNew": "New",
+    "statusContacted": "Contacted",
+    "statusClosed": "Closed",
+    "searchPlaceholder": "Search company name, contact, Email...",
+    "clearFilter": "Clear filter",
+    "formTitle": "Ad contact forms",
+    "countResults": "{{count}} results",
+    "tableStatus": "Status",
+    "tableCompany": "Company",
+    "tableAdType": "Ad type",
+    "tableContact": "Contact",
+    "tableSubmittedAt": "Submitted",
+    "tableAction": "Action",
+    "view": "View",
+    "noResults": "No matching data",
+    "close": "Close",
+    "submittedAt": "Submitted {{date}}",
+    "contactPerson": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "adType": "Ad type",
+    "selectedItems": "Selected items",
+    "estimatedAmount": "Estimated amount",
+    "notes": "Notes",
+    "sendEmail": "Send email",
+    "callPhone": "Call",
+    "adTypePopup": "Platform ad",
+    "adTypeDirectory": "Directory",
+    "adTypeProduct": "Product"
   },
   "companyDetail": {
     "upgradeBanner": {

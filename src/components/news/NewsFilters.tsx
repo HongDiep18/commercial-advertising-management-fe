@@ -9,11 +9,11 @@ import type { CategoryOption } from "./useNewsList"
 type Props = {
   categoryList: CategoryOption[]
   subcategoryList: CategoryOption[]
-  selectedCategorySlug: string | null
+  selectedCategorySlugs: string[]
   selectedSubcategorySlugs: string[]
   showSubcategoryFilter: boolean
   lang: string
-  onCategoryChange: (slug: string | null) => void
+  onCategoryChange: (slugs: string[]) => void
   onSubcategoryToggle: (slug: string) => void
   onToggleFilterPanel: () => void
   onClearSubcategories: () => void
@@ -22,7 +22,7 @@ type Props = {
 export function NewsFilters({
   categoryList,
   subcategoryList,
-  selectedCategorySlug,
+  selectedCategorySlugs,
   selectedSubcategorySlugs,
   showSubcategoryFilter,
   lang,
@@ -39,14 +39,14 @@ export function NewsFilters({
         <div className="flex items-center justify-between py-4">
           <div className="bg-body-bg-dark-button flex items-center gap-2 overflow-x-auto">
             <button
-              onClick={() => onCategoryChange(null)}
+              onClick={() => onCategoryChange([])}
               className={`rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-                selectedCategorySlug === null
+                selectedCategorySlugs.length === 0
                   ? "bg-primary text-primary-foreground"
                   : "text-black hover:opacity-80"
               }`}
               style={
-                selectedCategorySlug !== null
+                selectedCategorySlugs.length !== 0
                   ? { backgroundColor: "var(--color-body-bg-dark-button)" }
                   : undefined
               }
@@ -54,11 +54,16 @@ export function NewsFilters({
               {t("news.categories.all", { defaultValue: "全部" })}
             </button>
             {categoryList.map((cat) => {
-              const isSelected = selectedCategorySlug === cat.slug
+              const isSelected = selectedCategorySlugs.includes(cat.slug)
               return (
                 <button
                   key={cat.slug}
-                  onClick={() => onCategoryChange(cat.slug)}
+                  onClick={() => {
+                    const next = isSelected
+                      ? selectedCategorySlugs.filter((s) => s !== cat.slug)
+                      : [...selectedCategorySlugs, cat.slug]
+                    onCategoryChange(next)
+                  }}
                   className={`rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                     isSelected
                       ? "bg-primary text-primary-foreground"
