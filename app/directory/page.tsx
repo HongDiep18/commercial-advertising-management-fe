@@ -1,33 +1,34 @@
-'use client'
+"use client"
 
-import { useState, Suspense, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
-import Header from '../../src/components/layout/Header'
-import Footer from '../../src/components/layout/Footer'
-import { DirectorySidebar } from '../../src/components/directory/DirectorySidebar'
-import { DirectoryResults } from '../../src/components/directory/DirectoryResults'
+import { useState, Suspense, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
+import Header from "../../src/components/layout/Header"
+import Footer from "../../src/components/layout/Footer"
+import { DirectorySidebar } from "../../src/components/directory/DirectorySidebar"
+import { DirectoryResults } from "../../src/components/directory/DirectoryResults"
 
 function DirectoryContent() {
   const searchParams = useSearchParams()
-  const categoryParam = searchParams.get('category')
+  const categoryParam = searchParams.get("category")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     setSelectedCategory(categoryParam)
   }, [categoryParam])
 
   return (
-    <div className="min-h-screen bg-body-bg-dark">
+    <div className="bg-body-bg-dark min-h-screen">
       <Header />
       <main className="pt-16">
-        <div className="w-full px-4 sm:px-6 lg:px-6 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar */}
-            <DirectorySidebar selectedCategory={selectedCategory || categoryParam} setSelectedCategory={setSelectedCategory} />
+        <div className="w-full px-4 py-8 sm:px-6 lg:px-6">
+          <div className="flex flex-col gap-8 lg:flex-row">
+            <DirectorySidebar
+              selectedCategory={selectedCategory || categoryParam}
+              setSelectedCategory={setSelectedCategory}
+            />
 
-            {/* Main Content */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <DirectoryResults
                 selectedCategory={selectedCategory || categoryParam}
                 searchTerm={searchTerm}

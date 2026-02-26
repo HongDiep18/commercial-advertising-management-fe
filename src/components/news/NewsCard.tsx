@@ -1,0 +1,88 @@
+"use client"
+
+import { Calendar, ChevronRight } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import type { NewsItem } from "@/api/news"
+import {
+  formatNewsDate,
+  getTitleByLang,
+  getSummaryByLang,
+  getCategoryNameByLang,
+  getLabelByLang,
+} from "@/utils/newsHelpers"
+
+type SubLike = { id?: string; slug: string; nameVi: string; nameZhTw: string; nameEn: string }
+
+function subList(item: NewsItem): SubLike[] {
+  if (Array.isArray(item.subcategory)) return item.subcategory as SubLike[]
+  if (item.subcategory) return [item.subcategory]
+  return []
+}
+
+export function NewsCard({ item, lang }: { item: NewsItem; lang: string }) {
+  const { t } = useTranslation()
+  const title = getTitleByLang(item, lang)
+  const excerpt = getSummaryByLang(item, lang)
+  const categoryTag = getCategoryNameByLang(item, lang)
+  const subs = subList(item)
+
+  const href = item.url || item.guid || "#"
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group border-border bg-card block overflow-hidden rounded-lg border transition-shadow hover:shadow-lg"
+    >
+      <div className="bg-muted relative aspect-[16/9] overflow-hidden">
+        <img
+          src={item.thumbnailUrl || "/placeholder.svg"}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute top-3 left-3">
+          <span className="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700">
+            {categoryTag || item.category?.slug}
+          </span>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-xs">
+          <Calendar className="h-3 w-3" />
+          <span>{formatNewsDate(item.publishedAt)}</span>
+          <span className="mx-1">|</span>
+          <span>{item.sourceSite}</span>
+        </div>
+
+        <h3 className="text-foreground group-hover:text-primary mb-2 line-clamp-2 font-bold transition-colors">
+          {title}
+        </h3>
+
+        <p className="text-muted-foreground mb-3 line-clamp-3 text-sm">{excerpt}</p>
+
+        <div className="flex flex-wrap gap-1.5">
+          {subs.slice(0, 3).map((sub) => (
+            <span
+              key={sub.id ?? sub.slug}
+              className="bg-body-bg-dark-foreground text-muted-foreground rounded px-2 py-0.5 text-xs"
+            >
+              {getLabelByLang(sub, lang)}
+            </span>
+          ))}
+          {subs.length > 3 && (
+            <span className="bg-muted text-muted-foreground rounded px-2 py-0.5 text-xs">
+              +{subs.length - 3}
+            </span>
+          )}
+        </div>
+
+        <div className="text-primary mt-3 flex items-center text-sm group-hover:underline">
+          {t("news.readMore")}
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </div>
+      </div>
+    </a>
+  )
+}

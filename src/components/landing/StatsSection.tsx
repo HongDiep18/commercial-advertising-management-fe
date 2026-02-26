@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -83,7 +83,10 @@ function AnimatedCounter({ value, suffix }: { value: number; suffix: string }) {
   }, [isVisible, value])
 
   return (
-    <div ref={ref} className="text-4xl font-bold tracking-tight text-primary md:text-5xl lg:text-6xl">
+    <div
+      ref={ref}
+      className="text-primary text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl"
+    >
       {formatNumber(count)}
       <span className="text-primary/70">{suffix}</span>
     </div>
@@ -96,32 +99,32 @@ export default function StatsSection() {
   const stats = useMemo(() => {
     return statsConfig.map((stat) => ({
       value: stat.value,
-      suffix: (stat.suffixKey ? (t(`stats.${stat.suffixKey}`) || stat.suffix) : stat.suffix) as string,
+      suffix: (stat.suffixKey
+        ? t(`stats.${stat.suffixKey}`) || stat.suffix
+        : stat.suffix) as string,
       label: (t(`stats.${stat.labelKey}`) || "") as string,
       description: (t(`stats.${stat.descriptionKey}`) || "") as string,
     }))
   }, [t])
 
   return (
-    <section className="relative bg-body-bg-dark-foreground py-20">
+    <section className="bg-body-bg-dark-foreground relative py-20">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Header */}
         <div className="mb-12 text-center">
-          <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">
+          <h2 className="text-foreground mb-2 text-2xl font-bold md:text-3xl">
             {t("stats.title")}
           </h2>
           <p className="text-muted-foreground">{t("stats.subtitle")}</p>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-8 md:gap-12 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <div key={index} className="flex flex-col items-center text-center">
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-              <div className="mt-3 text-base font-semibold text-foreground md:text-lg">
+              <div className="text-foreground mt-3 text-base font-semibold md:text-lg">
                 {stat.label}
               </div>
-              <div className="mt-1 text-sm text-muted-foreground">{stat.description}</div>
+              <div className="text-muted-foreground mt-1 text-sm">{stat.description}</div>
             </div>
           ))}
         </div>

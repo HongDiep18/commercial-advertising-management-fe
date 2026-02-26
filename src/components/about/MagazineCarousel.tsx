@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
@@ -14,7 +14,12 @@ const magazines = [
   { id: 7, title: "越南華商採購名錄 2019", image: "/assets/images/magazines/2019.png", year: 2019 },
   { id: 8, title: "越南華商採購名錄 2018", image: "/assets/images/magazines/2018.png", year: 2018 },
   { id: 9, title: "越南華商採購名錄 2017", image: "/assets/images/magazines/2017.png", year: 2017 },
-  { id: 10, title: "越南華商採購名錄 2016", image: "/assets/images/magazines/2016.png", year: 2016 },
+  {
+    id: 10,
+    title: "越南華商採購名錄 2016",
+    image: "/assets/images/magazines/2016.png",
+    year: 2016,
+  },
 ]
 
 export default function MagazineCarousel() {
@@ -40,14 +45,14 @@ export default function MagazineCarousel() {
           {magazines.map((magazine) => (
             <div key={magazine.id} className="w-[160px] flex-shrink-0">
               <div className="group cursor-pointer">
-                <div className="group relative aspect-[3/4] overflow-hidden rounded-lg bg-muted shadow-md transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl">
+                <div className="group bg-muted relative aspect-[3/4] overflow-hidden rounded-lg shadow-md transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl">
                   <img
                     src={magazine.image || "/placeholder.svg"}
                     alt={magazine.title}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <div className="absolute bottom-0 left-0 right-0 translate-y-full p-3 transition-transform duration-300 group-hover:translate-y-0">
+                  <div className="absolute right-0 bottom-0 left-0 translate-y-full p-3 transition-transform duration-300 group-hover:translate-y-0">
                     <p className="text-sm font-medium text-white">{magazine.year}</p>
                   </div>
                 </div>
@@ -57,15 +62,15 @@ export default function MagazineCarousel() {
         </div>
       </div>
 
-      {/* Navigation */}
       <div className="mt-6 flex items-center justify-between">
         <div className="flex gap-1">
           {Array.from({ length: maxIndex + 1 }).map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? "w-8 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground"
-                }`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === currentIndex ? "bg-primary w-8" : "bg-border hover:bg-muted-foreground w-1.5"
+              }`}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}

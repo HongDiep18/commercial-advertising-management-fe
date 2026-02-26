@@ -1,15 +1,15 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { X, Send } from 'lucide-react'
-import Button from '../ui/Button'
-import Input from '../ui/Input'
-import Textarea from '../ui/Textarea'
-import Label from '../ui/Label'
-import AdItemForm from './AdItemForm'
-import { getDurationMonths, addMonths } from '../../data/contactMockData'
-import { format } from 'date-fns'
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { X, Send } from "lucide-react"
+import Button from "../ui/Button"
+import Input from "../ui/Input"
+import Textarea from "../ui/Textarea"
+import Label from "../ui/Label"
+import AdItemForm from "./AdItemForm"
+import { getDurationMonths, addMonths } from "../../data/contactMockData"
+import { format } from "date-fns"
 
 interface OrderForm {
   company: string
@@ -45,11 +45,11 @@ interface OrderModalProps {
 export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }: OrderModalProps) {
   const { t, i18n } = useTranslation()
   const [orderForm, setOrderForm] = useState<OrderForm>({
-    company: '',
-    contact: '',
-    phone: '',
-    email: '',
-    notes: '',
+    company: "",
+    contact: "",
+    phone: "",
+    email: "",
+    notes: "",
   })
 
   const [itemDetails, setItemDetails] = useState<Record<string, ItemDetail>>({})
@@ -58,7 +58,7 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
   const handleStartDateChange = (itemId: string, date: Date | undefined, duration: string) => {
     if (!date) return
 
-    const startDate = format(date, 'yyyy-MM-dd')
+    const startDate = format(date, "yyyy-MM-dd")
     const months = getDurationMonths(duration)
     const endDate = months > 0 ? addMonths(startDate, months) : startDate
 
@@ -110,11 +110,11 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
     e.preventDefault()
     onSubmit(orderForm, itemDetails)
     setOrderForm({
-      company: '',
-      contact: '',
-      phone: '',
-      email: '',
-      notes: '',
+      company: "",
+      contact: "",
+      phone: "",
+      email: "",
+      notes: "",
     })
     setItemDetails({})
   }
@@ -122,24 +122,28 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-hidden">
-      <div className="bg-background rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden relative">
-        <div className="sticky top-0 bg-body-bg-light border-b border-border px-6 py-4 flex items-center justify-between z-10">
-          <h2 key={i18n.language} className="text-xl font-bold">{t('adContact.orderTitle')}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black/50 p-4">
+      <div className="bg-background relative max-h-[90vh] w-full max-w-2xl overflow-x-hidden overflow-y-auto rounded-lg">
+        <div className="bg-body-bg-light border-border sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
+          <h2 key={i18n.language} className="text-xl font-bold">
+            {t("adContact.orderTitle")}
+          </h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-body-bg-dark p-6 space-y-6 bg-muted/30">
-          {/* Company Info Section */}
+        <form onSubmit={handleSubmit} className="bg-body-bg-dark bg-muted/30 space-y-6 p-6">
           <div className="bg-card rounded-lg p-5 shadow-sm">
-            <h3 key={i18n.language} className="font-semibold mb-4 text-foreground border-b border-border pb-3">
-              {t('adContact.companyInfo')}
+            <h3
+              key={i18n.language}
+              className="text-foreground border-border mb-4 border-b pb-3 font-semibold"
+            >
+              {t("adContact.companyInfo")}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="order-company">{t('adContact.companyName')} *</Label>
+                <Label htmlFor="order-company">{t("adContact.companyName")} *</Label>
                 <Input
                   id="order-company"
                   required
@@ -149,7 +153,7 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="order-contact">{t('adContact.contactPerson')} *</Label>
+                <Label htmlFor="order-contact">{t("adContact.contactPerson")} *</Label>
                 <Input
                   id="order-contact"
                   required
@@ -159,7 +163,7 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="order-phone">{t('adContact.phone')} *</Label>
+                <Label htmlFor="order-phone">{t("adContact.phone")} *</Label>
                 <Input
                   id="order-phone"
                   required
@@ -182,18 +186,17 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
             </div>
           </div>
 
-          {/* Per-item Ad Details */}
           <div>
-            <h3 key={i18n.language} className="font-semibold mb-4 text-foreground">
-              {t('adContact.adItemSettings')}
+            <h3 key={i18n.language} className="text-foreground mb-4 font-semibold">
+              {t("adContact.adItemSettings")}
             </h3>
             <div className="space-y-4">
               {selectedItems.map((item) => {
                 const details = itemDetails[item.id] || {
-                  startDate: '',
-                  endDate: '',
+                  startDate: "",
+                  endDate: "",
                   needDesign: false,
-                  adLink: '',
+                  adLink: "",
                   files: [],
                 }
 
@@ -203,7 +206,9 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
                     item={item}
                     itemDetails={details}
                     openCalendar={openCalendar}
-                    onStartDateChange={(date) => handleStartDateChange(item.id, date, item.duration || '')}
+                    onStartDateChange={(date) =>
+                      handleStartDateChange(item.id, date, item.duration || "")
+                    }
                     onDetailChange={(field, value) => handleItemDetailChange(item.id, field, value)}
                     onFileChange={(e) => handleFileChange(item.id, e)}
                     onRemoveFile={(index) => removeFile(item.id, index)}
@@ -214,27 +219,35 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
             </div>
           </div>
 
-          {/* Notes */}
           <div className="bg-card rounded-lg p-5 shadow-sm">
-            <Label htmlFor="order-notes" className="font-semibold">{t('adContact.notes')}</Label>
+            <Label htmlFor="order-notes" className="font-semibold">
+              {t("adContact.notes")}
+            </Label>
             <Textarea
               id="order-notes"
               rows={3}
-              placeholder={t('adContact.notesPlaceholder')}
+              placeholder={t("adContact.notesPlaceholder")}
               value={orderForm.notes}
               onChange={(e) => setOrderForm((prev) => ({ ...prev, notes: e.target.value }))}
               className="mt-3"
             />
           </div>
 
-          {/* Submit */}
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" className="flex-1 bg-white hover:!bg-header-red-dark hover:!text-white" onClick={onClose}>
-              {t('adContact.cancel')}
+            <Button
+              type="button"
+              variant="outline"
+              className="hover:!bg-header-red-dark flex-1 bg-white hover:!text-white"
+              onClick={onClose}
+            >
+              {t("adContact.cancel")}
             </Button>
-            <Button type="submit" className="flex-1 !bg-header-red-dark text-primary-foreground hover:!bg-header-red-dark/80">
-              <Send className="w-4 h-4 mr-2" />
-              {t('adContact.submitOrder')}
+            <Button
+              type="submit"
+              className="!bg-header-red-dark text-primary-foreground hover:!bg-header-red-dark/80 flex-1"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {t("adContact.submitOrder")}
             </Button>
           </div>
         </form>
