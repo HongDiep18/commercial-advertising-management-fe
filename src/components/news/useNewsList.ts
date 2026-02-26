@@ -19,7 +19,7 @@ export function useNewsList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null)
+  const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<string[]>([])
   const [selectedSubcategorySlugs, setSelectedSubcategorySlugs] = useState<string[]>([])
   const [showSubcategoryFilter, setShowSubcategoryFilter] = useState(false)
 
@@ -35,8 +35,7 @@ export function useNewsList() {
         setNews((prev) => (page === 1 ? res.data : [...prev, ...res.data]))
       })
       .catch((err) => {
-        if (!cancelled)
-          setError(err?.message || t("news.errorLoad") || "無法載入最新消息")
+        if (!cancelled) setError(err?.message || t("news.errorLoad") || "無法載入最新消息")
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -81,18 +80,18 @@ export function useNewsList() {
 
   const filteredNews = useMemo(() => {
     let list = news
-    if (selectedCategorySlug) {
-      list = list.filter((item) => item.category?.slug === selectedCategorySlug)
+    if (selectedCategorySlugs.length > 0) {
+      list = list.filter(
+        (item) => item.category?.slug && selectedCategorySlugs.includes(item.category.slug)
+      )
     }
     if (selectedSubcategorySlugs.length > 0) {
       list = list.filter(
-        (item) =>
-          item.subcategory?.slug &&
-          selectedSubcategorySlugs.includes(item.subcategory.slug)
+        (item) => item.subcategory?.slug && selectedSubcategorySlugs.includes(item.subcategory.slug)
       )
     }
     return list
-  }, [news, selectedCategorySlug, selectedSubcategorySlugs])
+  }, [news, selectedCategorySlugs, selectedSubcategorySlugs])
 
   const toggleSubcategory = (slug: string) => {
     setSelectedSubcategorySlugs((prev) =>
@@ -106,10 +105,10 @@ export function useNewsList() {
     error,
     categoryList,
     subcategoryList,
-    selectedCategorySlug,
+    selectedCategorySlugs,
     selectedSubcategorySlugs,
     showSubcategoryFilter,
-    setSelectedCategorySlug,
+    setSelectedCategorySlugs,
     setShowSubcategoryFilter,
     toggleSubcategory,
     loadMore: () => setPage((p) => p + 1),

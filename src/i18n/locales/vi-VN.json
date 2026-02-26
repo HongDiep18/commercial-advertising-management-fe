@@ -299,6 +299,14 @@
     "hasAccount": "Đã có tài khoản?",
     "loginLink": "Đăng nhập ngay",
     "captchaRefresh": "Làm mới Mã xác minh",
+    "membershipTierLabel": "Hạng thành viên",
+    "membershipTierHint": "Sau khi đăng ký bạn sẽ được đăng nhập tự động với quyền tương ứng; xem quyền lợi tại Tài khoản.",
+    "tiers": {
+      "bronze": "Thành viên Đồng",
+      "silver": "Thành viên Bạc",
+      "gold": "Thành viên Vàng",
+      "diamond": "Thành viên Kim cương"
+    },
     "countries": {
       "vietnam": "Việt Nam",
       "taiwan": "Đài Loan",
@@ -337,7 +345,8 @@
       "website": "Trang web *",
       "introduction": "Giới thiệu ngắn *",
       "captcha": "Nhập mã xác minh",
-      "selectCountryFirst": "Vui lòng chọn quốc gia trước"
+      "selectCountryFirst": "Vui lòng chọn quốc gia trước",
+      "membershipTier": "Chọn hạng thành viên"
     },
     "noRegions": "Không có khu vực nào",
     "errors": {
@@ -397,6 +406,9 @@
     "registerAndFill": "Đăng ký và điền thông tin công ty",
     "newbieBonus": "Quà tân binh (lên Đồng)",
     "uploadLogoTask": "(Nhiệm vụ) Tải logo công ty",
+    "uploadLogoHint": "Khuyến khích hoàn thiện hồ sơ công ty",
+    "buyAdDiamondHint": "Chi 550K mua quảng cáo để nhận hạng Kim cương",
+    "shopSpendingHint": "Mua danh mục kèm đơn hàng; nâng cấp để xem toàn bộ dữ liệu",
     "commercialSpending": "Chi tiêu thương mại",
     "buyAd": "Mua quảng cáo",
     "shopSpending": "Chi tiêu cửa hàng",
@@ -411,7 +423,67 @@
     "cancel": "Hủy",
     "saveChanges": "Lưu thay đổi",
     "membershipBenefits": "Hạng & quyền lợi hội viên",
-    "currentTierLabel": "Hạng hiện tại"
+    "currentTierLabel": "Hạng hiện tại",
+    "tiers": {
+      "guest": "Khách",
+      "bronze": "Thành viên Đồng",
+      "silver": "Thành viên Bạc",
+      "gold": "Thành viên Vàng",
+      "diamond": "Thành viên Kim cương",
+      "admin": "Quản trị viên"
+    },
+    "tierSpending": {
+      "bronze": "Miễn phí (đăng ký)",
+      "silver": "Chi tiêu 150.000 VND",
+      "gold": "Chi tiêu 300.000 VND",
+      "diamond": "Chi tiêu 550.000 VND"
+    },
+    "tierBenefits": {
+      "bronze": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
+      "silver": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
+      "gold": ["Ngành của bạn + 3 ngành liên quan (đầy đủ)", "Mở khóa ngành của bạn + 3 ngành thượng/hạ nguồn"],
+      "diamond": ["Tất cả ngành (đầy đủ)", "Thay thế danh mục in", "Mở khóa tất cả ngành và trường (kể cả di động)"]
+    },
+    "tierRestrictions": {
+      "bronze": ["Không có trang web, điện thoại hoặc địa chỉ"],
+      "silver": [],
+      "gold": [],
+      "diamond": []
+    }
+  },
+  "admin": {
+    "title": "Quản trị",
+    "subtitle": "Quản lý biểu mẫu liên hệ quảng cáo",
+    "allCases": "Tất cả",
+    "statusNew": "Mới",
+    "statusContacted": "Đã liên hệ",
+    "statusClosed": "Đã đóng",
+    "searchPlaceholder": "Tìm tên công ty, người liên hệ, Email...",
+    "clearFilter": "Xóa bộ lọc",
+    "formTitle": "Biểu mẫu liên hệ quảng cáo",
+    "countResults": "{{count}} kết quả",
+    "tableStatus": "Trạng thái",
+    "tableCompany": "Công ty",
+    "tableAdType": "Loại quảng cáo",
+    "tableContact": "Liên hệ",
+    "tableSubmittedAt": "Gửi lúc",
+    "tableAction": "Thao tác",
+    "view": "Xem",
+    "noResults": "Không tìm thấy dữ liệu phù hợp",
+    "close": "Đóng",
+    "submittedAt": "Gửi lúc {{date}}",
+    "contactPerson": "Người liên hệ",
+    "email": "Email",
+    "phone": "Điện thoại",
+    "adType": "Loại quảng cáo",
+    "selectedItems": "Mục đã chọn",
+    "estimatedAmount": "Số tiền ước tính",
+    "notes": "Ghi chú xử lý",
+    "sendEmail": "Gửi email",
+    "callPhone": "Gọi điện",
+    "adTypePopup": "Quảng cáo nền tảng",
+    "adTypeDirectory": "Danh mục",
+    "adTypeProduct": "Sản phẩm"
   },
   "companyDetail": {
     "upgradeBanner": {

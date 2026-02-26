@@ -2,13 +2,15 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Card from "../ui/Card"
 import Input from "../ui/Input"
 import Label from "../ui/Label"
 import Button from "../ui/Button"
-import { login } from "@/api/auth"
+import { login as loginApi } from "@/api/auth"
+import { useUser } from "@/contexts/user-context"
 import {
   INITIAL_LOGIN_FORM,
   DEMO_ACCOUNTS,
@@ -26,13 +28,15 @@ function getErrorMessage(err: unknown): string {
 
 export default function LoginForm() {
   const { t } = useTranslation()
+  const router = useRouter()
+  const { login: loginDemo } = useUser()
   const [formData, setFormData] = useState<LoginFormData>(INITIAL_LOGIN_FORM)
   const [isLoading, setIsLoading] = useState(false)
 
   const doLogin = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      await login({ email, password })
+      await loginApi({ email, password })
       alert(t("login.success") || "登入成功！")
       setFormData({ ...INITIAL_LOGIN_FORM })
     } catch (err) {
@@ -48,11 +52,9 @@ export default function LoginForm() {
     await doLogin(formData.email, formData.password)
   }
 
-  const handleDemoLogin = async (tier: string) => {
-    const account = DEMO_ACCOUNTS.find((acc) => acc.tier === tier)
-    if (!account) return
-    setFormData({ email: account.email, password: account.password })
-    await doLogin(account.email, account.password)
+  const handleDemoLogin = (tier: string) => {
+    loginDemo(tier)
+    router.push(tier === "admin" ? "/admin" : "/account")
   }
 
   return (
