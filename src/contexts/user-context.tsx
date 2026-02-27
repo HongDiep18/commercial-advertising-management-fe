@@ -361,7 +361,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- password used by API in production
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const loginWithEmail = (email: string, password: string) => {
     const bronzeUser = { ...demoUsers.bronze, email, name: email.split("@")[0] }
     setUser(bronzeUser)

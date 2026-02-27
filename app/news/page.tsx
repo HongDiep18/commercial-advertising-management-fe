@@ -3,10 +3,9 @@
 import { useTranslation } from "react-i18next"
 import Header from "../../src/components/layout/Header"
 import Footer from "../../src/components/layout/Footer"
-import Button from "../../src/components/ui/Button"
 import { useNewsList } from "../../src/components/news/useNewsList"
 import { NewsFilters } from "../../src/components/news/NewsFilters"
-import { NewsCard } from "../../src/components/news/NewsCard"
+import { NewsCardList } from "../../src/components/news/NewsCard"
 
 export default function NewsPage() {
   const { t, i18n } = useTranslation()
@@ -22,9 +21,10 @@ export default function NewsPage() {
     setSelectedCategorySlugs,
     setShowSubcategoryFilter,
     toggleSubcategory,
-    loadMore,
     clearSubcategories,
   } = useNewsList()
+
+  const filterKey = JSON.stringify({ cat: selectedCategorySlugs, sub: selectedSubcategorySlugs })
 
   return (
     <main className="min-h-screen">
@@ -83,23 +83,7 @@ export default function NewsPage() {
               </div>
             )}
             {!loading && !error && filteredNews.length > 0 && (
-              <>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredNews.map((item) => (
-                    <NewsCard key={item.id} item={item} lang={i18n.language} />
-                  ))}
-                </div>
-                <div className="mt-8 flex justify-center">
-                  <Button
-                    variant="outline"
-                    onClick={loadMore}
-                    disabled={loading}
-                    className="!border-header-red-dark hover:!bg-header-red-dark/80 hover:!text-white"
-                  >
-                    {t("news.loadMore", { defaultValue: "載入更多" })}
-                  </Button>
-                </div>
-              </>
+              <NewsCardList items={filteredNews} lang={i18n.language} filterKey={filterKey} />
             )}
           </div>
         </section>

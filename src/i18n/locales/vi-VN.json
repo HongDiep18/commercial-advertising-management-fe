@@ -312,23 +312,30 @@
       "taiwan": "Đài Loan",
       "china": "Trung Quốc",
       "singapore": "Singapore",
+      "malaysia": "Malaysia",
+      "thailand": "Thái Lan",
       "other": "Khác"
     },
     "regions": {
-      "hcm": "Thành phố Hồ Chí Minh",
+      "hcm": "TP. Hồ Chí Minh",
       "hanoi": "Hà Nội",
       "binhduong": "Bình Dương",
       "dongnai": "Đồng Nai",
       "danang": "Đà Nẵng",
       "haiphong": "Hải Phòng",
+      "other-vn": "Khác",
       "taipei": "Đài Bắc",
       "taichung": "Đài Trung",
       "kaohsiung": "Cao Hùng",
+      "other-tw": "Khác",
       "beijing": "Bắc Kinh",
       "shanghai": "Thượng Hải",
+      "shenzhen": "Thâm Quyến",
       "guangzhou": "Quảng Châu",
+      "other-cn": "Khác",
       "singapore": "Singapore",
-      "other": "Khác"
+      "other": "Khác",
+      "other-region": "Khác"
     },
     "placeholders": {
       "companyNameVi": "Tên Công ty (Tiếng Việt)",
