@@ -312,6 +312,8 @@
       "taiwan": "Taiwan",
       "china": "China",
       "singapore": "Singapore",
+      "malaysia": "Malaysia",
+      "thailand": "Thailand",
       "other": "Other"
     },
     "regions": {
@@ -321,14 +323,19 @@
       "dongnai": "Dong Nai",
       "danang": "Da Nang",
       "haiphong": "Hai Phong",
+      "other-vn": "Other",
       "taipei": "Taipei",
       "taichung": "Taichung",
       "kaohsiung": "Kaohsiung",
+      "other-tw": "Other",
       "beijing": "Beijing",
       "shanghai": "Shanghai",
+      "shenzhen": "Shenzhen",
       "guangzhou": "Guangzhou",
+      "other-cn": "Other",
       "singapore": "Singapore",
-      "other": "Other"
+      "other": "Other",
+      "other-region": "Other"
     },
     "placeholders": {
       "companyNameVi": "Company Name (Vietnamese)",

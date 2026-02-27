@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -38,38 +38,21 @@ import {
 import { categories } from "@/components/directory/DirectorySidebar"
 import { useTranslation } from "react-i18next"
 
-const countries = [
-  { value: "vietnam", label: "越南" },
-  { value: "taiwan", label: "台灣" },
-  { value: "china", label: "中國" },
-  { value: "singapore", label: "新加坡" },
-  { value: "malaysia", label: "馬來西亞" },
-  { value: "thailand", label: "泰國" },
-  { value: "other", label: "其他" },
-]
+const COUNTRY_VALUES = [
+  "vietnam",
+  "taiwan",
+  "china",
+  "singapore",
+  "malaysia",
+  "thailand",
+  "other",
+] as const
 
-const regionsByCountry: Record<string, { value: string; label: string }[]> = {
-  vietnam: [
-    { value: "hcm", label: "胡志明市" },
-    { value: "hanoi", label: "河內" },
-    { value: "danang", label: "峴港" },
-    { value: "binhduong", label: "平陽省" },
-    { value: "dongnai", label: "同奈省" },
-    { value: "other-vn", label: "其他" },
-  ],
-  taiwan: [
-    { value: "taipei", label: "台北市" },
-    { value: "taichung", label: "台中市" },
-    { value: "kaohsiung", label: "高雄市" },
-    { value: "other-tw", label: "其他" },
-  ],
-  china: [
-    { value: "shanghai", label: "上海市" },
-    { value: "shenzhen", label: "深圳市" },
-    { value: "guangzhou", label: "廣州市" },
-    { value: "other-cn", label: "其他" },
-  ],
-  other: [{ value: "other-region", label: "其他地區" }],
+const REGION_KEYS_BY_COUNTRY: Record<string, readonly string[]> = {
+  vietnam: ["hcm", "hanoi", "danang", "binhduong", "dongnai", "other-vn"],
+  taiwan: ["taipei", "taichung", "kaohsiung", "other-tw"],
+  china: ["shanghai", "shenzhen", "guangzhou", "other-cn"],
+  other: ["other-region"],
 }
 
 const contributionTypeConfig: Record<string, { label: string; icon: typeof Gift; color: string }> =
@@ -105,9 +88,32 @@ export default function AccountPage() {
     introduction: "這是一家示範公司，專注於提供優質的產品和服務。",
   })
 
-  const availableRegions = profileData.country
+  const countries = useMemo(
+    () =>
+      COUNTRY_VALUES.map((value) => ({
+        value,
+        label: t(`register.countries.${value}`) || value,
+      })),
+    [t]
+  )
+
+  const regionsByCountry = useMemo(() => {
+    const result: Record<string, { value: string; label: string }[]> = {}
+    for (const [country, keys] of Object.entries(REGION_KEYS_BY_COUNTRY)) {
+      result[country] = keys.map((key) => ({
+        value: key,
+        label: t(`register.regions.${key}`) || key,
+      }))
+    }
+    return result
+  }, [t])
+
+  const hasCountry = Boolean(profileData.country?.trim())
+  const availableRegions = hasCountry
     ? regionsByCountry[profileData.country] || regionsByCountry.other
     : []
+  const regionInList = hasCountry && availableRegions.some((r) => r.value === profileData.region)
+  const regionValue = hasCountry && regionInList ? profileData.region : ""
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -115,10 +121,16 @@ export default function AccountPage() {
     }
   }, [isLoggedIn, router])
 
+  const COUNTRY_NONE = "__none__"
+
   const handleProfileChange = (field: string, value: string) => {
-    setProfileData((prev) =>
-      field === "country" ? { ...prev, [field]: value, region: "" } : { ...prev, [field]: value }
-    )
+    setProfileData((prev) => {
+      if (field === "country") {
+        const nextCountry = value === COUNTRY_NONE ? "" : value
+        return { ...prev, country: nextCountry, region: "" }
+      }
+      return { ...prev, [field]: value }
+    })
   }
 
   const handleSaveProfile = () => {
@@ -638,15 +650,25 @@ export default function AccountPage() {
                 </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Select
-                    value={profileData.country}
+                    value={profileData.country || COUNTRY_NONE}
                     onValueChange={(value) => handleProfileChange("country", value)}
+                    options={[
+                      {
+                        value: COUNTRY_NONE,
+                        label: t("register.placeholders.country") || "Select Country *",
+                      },
+                      ...countries,
+                    ]}
                   >
                     <Select.Trigger className="w-full">
                       <Select.Value
-                        placeholder={t("register.placeholders.country") || "選擇國家"}
+                        placeholder={t("register.placeholders.country") || "Select Country *"}
                       />
                     </Select.Trigger>
                     <Select.Content>
+                      <Select.Item value={COUNTRY_NONE} key="country-empty">
+                        {t("register.placeholders.country") || "Select Country *"}
+                      </Select.Item>
                       {countries.map((c) => (
                         <Select.Item key={c.value} value={c.value}>
                           {c.label}
@@ -656,19 +678,34 @@ export default function AccountPage() {
                   </Select>
 
                   <Select
-                    value={profileData.region}
+                    key={profileData.country || "__no_country__"}
+                    value={regionValue}
                     onValueChange={(value) => handleProfileChange("region", value)}
-                    disabled={!profileData.country}
+                    disabled={!hasCountry}
+                    options={availableRegions}
                   >
                     <Select.Trigger className="w-full">
-                      <Select.Value placeholder={t("register.placeholders.region") || "選擇地區"} />
+                      <Select.Value
+                        placeholder={
+                          !hasCountry
+                            ? t("register.placeholders.selectCountryFirst") ||
+                              "Please select country first"
+                            : t("register.placeholders.region") || "Select Region *"
+                        }
+                      />
                     </Select.Trigger>
                     <Select.Content>
-                      {availableRegions.map((r) => (
-                        <Select.Item key={r.value} value={r.value}>
-                          {r.label}
-                        </Select.Item>
-                      ))}
+                      {availableRegions.length > 0 ? (
+                        availableRegions.map((r) => (
+                          <Select.Item key={r.value} value={r.value}>
+                            {r.label}
+                          </Select.Item>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground px-2 py-1.5 text-sm">
+                          {t("register.noRegions") || "無可用地區"}
+                        </div>
+                      )}
                     </Select.Content>
                   </Select>
                 </div>

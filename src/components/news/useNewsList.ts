@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { getNewsList, type NewsItem } from "@/api/news"
 
-const NEWS_PAGE_LIMIT = 6
+const INITIAL_NEWS_FETCH_SIZE = 60
 
 export type CategoryOption = {
   slug: string
@@ -18,21 +18,20 @@ export function useNewsList() {
   const [news, setNews] = useState<NewsItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [page, setPage] = useState(1)
   const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<string[]>([])
   const [selectedSubcategorySlugs, setSelectedSubcategorySlugs] = useState<string[]>([])
   const [showSubcategoryFilter, setShowSubcategoryFilter] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    const tid = setTimeout(() => {
+    const rafId = requestAnimationFrame(() => {
       setLoading(true)
-      if (page === 1) setError(null)
-    }, 0)
-    getNewsList(page, NEWS_PAGE_LIMIT)
+      setError(null)
+    })
+    getNewsList(1, INITIAL_NEWS_FETCH_SIZE)
       .then((res) => {
         if (cancelled) return
-        setNews((prev) => (page === 1 ? res.data : [...prev, ...res.data]))
+        setNews(res.data ?? [])
       })
       .catch((err) => {
         if (!cancelled) setError(err?.message || t("news.errorLoad") || "無法載入最新消息")
@@ -42,9 +41,9 @@ export function useNewsList() {
       })
     return () => {
       cancelled = true
-      clearTimeout(tid)
+      cancelAnimationFrame(rafId)
     }
-  }, [page, t])
+  }, [t])
 
   const categoryList = useMemo(() => {
     const bySlug = new Map<string, CategoryOption>()
@@ -111,7 +110,6 @@ export function useNewsList() {
     setSelectedCategorySlugs,
     setShowSubcategoryFilter,
     toggleSubcategory,
-    loadMore: () => setPage((p) => p + 1),
     clearSubcategories: () => setSelectedSubcategorySlugs([]),
   }
 }

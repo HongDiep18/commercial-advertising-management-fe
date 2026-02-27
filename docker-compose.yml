@@ -1,22 +1,29 @@
-version: '3.8'
+version: "3.8"
 
 services:
   vn-buyer-guide:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production  
-    
+      target: production
+
     container_name: vn-buyer-guide-fe
-    
+
     ports:
       - "3000:3000"
-    
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+
     restart: unless-stopped
 
-    
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1))",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
