@@ -95,11 +95,12 @@ export function useNewsList() {
   }, [news, selectedCategorySlugs, selectedSubcategorySlugs])
 
   const totalPages = Math.max(1, Math.ceil(filteredNews.length / NEWS_PAGE_SIZE))
+  const safePage = Math.min(Math.max(1, currentPage), totalPages)
 
   const pagedNews = useMemo(() => {
-    const start = (currentPage - 1) * NEWS_PAGE_SIZE
+    const start = (safePage - 1) * NEWS_PAGE_SIZE
     return filteredNews.slice(start, start + NEWS_PAGE_SIZE)
-  }, [filteredNews, currentPage])
+  }, [filteredNews, safePage])
 
   const setPage = (page: number) => setCurrentPage(page)
 
@@ -107,6 +108,7 @@ export function useNewsList() {
     setSelectedSubcategorySlugs((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
     )
+    setCurrentPage(1)
   }
 
   const setSelectedCategorySlugsAndResetPage = (slugs: string[]) => {
@@ -118,7 +120,7 @@ export function useNewsList() {
     news: pagedNews,
     total: filteredNews.length,
     totalPages,
-    currentPage,
+    currentPage: safePage,
     setPage,
     loading,
     error,
@@ -130,6 +132,9 @@ export function useNewsList() {
     setSelectedCategorySlugs: setSelectedCategorySlugsAndResetPage,
     setShowSubcategoryFilter,
     toggleSubcategory,
-    clearSubcategories: () => setSelectedSubcategorySlugs([]),
+    clearSubcategories: () => {
+      setSelectedSubcategorySlugs([])
+      setCurrentPage(1)
+    },
   }
 }
