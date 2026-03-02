@@ -9,8 +9,12 @@ import { NewsCardList } from "../../src/components/news/NewsCard"
 
 export default function NewsPage() {
   const { t, i18n } = useTranslation()
+
   const {
     news: filteredNews,
+    totalPages,
+    currentPage,
+    setPage,
     loading,
     error,
     categoryList,
@@ -23,8 +27,6 @@ export default function NewsPage() {
     toggleSubcategory,
     clearSubcategories,
   } = useNewsList()
-
-  const filterKey = JSON.stringify({ cat: selectedCategorySlugs, sub: selectedSubcategorySlugs })
 
   return (
     <main className="min-h-screen">
@@ -83,7 +85,13 @@ export default function NewsPage() {
               </div>
             )}
             {!loading && !error && filteredNews.length > 0 && (
-              <NewsCardList items={filteredNews} lang={i18n.language} filterKey={filterKey} />
+              <NewsCardList
+                items={filteredNews}
+                lang={i18n.language}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setPage}
+              />
             )}
           </div>
         </section>

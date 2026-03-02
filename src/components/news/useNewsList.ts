@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { getNewsList, type NewsItem } from "@/api/news"
 
-const INITIAL_NEWS_FETCH_SIZE = 60
+const NEWS_PAGE_SIZE = 6
+const DEFAULT_LIMIT = 100
 
 export type CategoryOption = {
   slug: string
@@ -16,6 +17,7 @@ export type CategoryOption = {
 export function useNewsList() {
   const { t } = useTranslation()
   const [news, setNews] = useState<NewsItem[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<string[]>([])
@@ -28,7 +30,7 @@ export function useNewsList() {
       setLoading(true)
       setError(null)
     })
-    getNewsList(1, INITIAL_NEWS_FETCH_SIZE)
+    getNewsList(1, DEFAULT_LIMIT)
       .then((res) => {
         if (cancelled) return
         setNews(res.data ?? [])
@@ -92,14 +94,32 @@ export function useNewsList() {
     return list
   }, [news, selectedCategorySlugs, selectedSubcategorySlugs])
 
+  const totalPages = Math.max(1, Math.ceil(filteredNews.length / NEWS_PAGE_SIZE))
+
+  const pagedNews = useMemo(() => {
+    const start = (currentPage - 1) * NEWS_PAGE_SIZE
+    return filteredNews.slice(start, start + NEWS_PAGE_SIZE)
+  }, [filteredNews, currentPage])
+
+  const setPage = (page: number) => setCurrentPage(page)
+
   const toggleSubcategory = (slug: string) => {
     setSelectedSubcategorySlugs((prev) =>
       prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
     )
   }
 
+  const setSelectedCategorySlugsAndResetPage = (slugs: string[]) => {
+    setSelectedCategorySlugs(slugs)
+    setCurrentPage(1)
+  }
+
   return {
-    news: filteredNews,
+    news: pagedNews,
+    total: filteredNews.length,
+    totalPages,
+    currentPage,
+    setPage,
     loading,
     error,
     categoryList,
@@ -107,7 +127,7 @@ export function useNewsList() {
     selectedCategorySlugs,
     selectedSubcategorySlugs,
     showSubcategoryFilter,
-    setSelectedCategorySlugs,
+    setSelectedCategorySlugs: setSelectedCategorySlugsAndResetPage,
     setShowSubcategoryFilter,
     toggleSubcategory,
     clearSubcategories: () => setSelectedSubcategorySlugs([]),
