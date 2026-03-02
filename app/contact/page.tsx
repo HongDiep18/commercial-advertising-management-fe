@@ -88,14 +88,7 @@ export default function ContactPage() {
     return details
   }
 
-  const handleOrderSubmit = (
-    _form: { company: string; contact: string; phone: string; email: string; notes: string },
-
-    _itemDetails: Record<
-      string,
-      { startDate: string; endDate: string; needDesign: boolean; adLink: string; files: File[] }
-    >
-  ) => {
+  const handleOrderSubmit = () => {
     alert(t("adContact.orderSuccess", { count: selectedItems.length }))
     setShowOrderModal(false)
     setSelectedItems([])

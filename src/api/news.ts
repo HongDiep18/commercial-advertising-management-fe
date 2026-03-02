@@ -40,17 +40,36 @@ export interface NewsListResponse {
   total?: number
   page?: number
   limit?: number
+  meta?: { total?: number; page?: number; limit?: number }
+  totalCount?: number
 }
 
 const DEFAULT_LIMIT = 6
 
-export async function getNewsList(page = 1, limit = DEFAULT_LIMIT): Promise<NewsListResponse> {
-  const path = `/api/v1/news?page=${page}&limit=${limit}`
+export interface NewsListParams {
+  page?: number
+  limit?: number
+  categorySlug?: string
+  subcategorySlug?: string
+}
+
+export async function getNewsList(
+  page = 1,
+  limit = DEFAULT_LIMIT,
+  params?: Pick<NewsListParams, "categorySlug" | "subcategorySlug">
+): Promise<NewsListResponse> {
+  const search = new URLSearchParams()
+  search.set("page", String(page))
+  search.set("limit", String(limit))
+  if (params?.categorySlug) search.set("categorySlug", params.categorySlug)
+  if (params?.subcategorySlug) search.set("subcategorySlug", params.subcategorySlug)
+  const path = `/api/v1/news?${search.toString()}`
   const res = await api.request<NewsListResponse>(path, { method: "GET" })
+  const total = res.total ?? res.meta?.total ?? res.totalCount ?? undefined
   return {
     data: res.data ?? [],
-    total: res.total,
-    page: res.page ?? page,
-    limit: res.limit ?? limit,
+    total,
+    page: res.page ?? res.meta?.page ?? page,
+    limit: res.limit ?? res.meta?.limit ?? limit,
   }
 }

@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { Calendar, ChevronRight, ChevronLeft } from "lucide-react"
+import { Calendar, ChevronRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import type { NewsItem } from "@/api/news"
 import {
@@ -11,7 +10,7 @@ import {
   getCategoryNameByLang,
   getLabelByLang,
 } from "@/utils/newsHelpers"
-import Button from "@/components/ui/Button"
+import { Pagination } from "./Pagination"
 
 type SubLike = { id?: string; slug: string; nameVi: string; nameZhTw: string; nameEn: string }
 
@@ -89,104 +88,38 @@ export function NewsCard({ item, lang }: { item: NewsItem; lang: string }) {
   )
 }
 
-const CARDS_PER_PAGE = 6
-
 export interface NewsCardListProps {
   items: NewsItem[]
   lang: string
-  filterKey?: string
+  totalPages: number
+  currentPage: number
+  onPageChange: (page: number) => void
 }
 
-export function NewsCardList({ items, lang, filterKey = "" }: NewsCardListProps) {
-  const [pageState, setPageState] = useState<{ key: string; page: number }>({
-    key: filterKey,
-    page: 1,
-  })
-
-  if (pageState.key !== filterKey) {
-    setPageState({ key: filterKey, page: 1 })
-  }
-
-  const currentPage = pageState.page
-  const handlePageChange = (page: number) => {
-    setPageState((prev) => ({ ...prev, page }))
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
-
-  const totalPages = Math.ceil(items.length / CARDS_PER_PAGE)
-  const startIndex = (currentPage - 1) * CARDS_PER_PAGE
-  const displayedItems = items.slice(startIndex, startIndex + CARDS_PER_PAGE)
-
+export function NewsCardList({
+  items,
+  lang,
+  totalPages,
+  currentPage,
+  onPageChange,
+}: NewsCardListProps) {
   return (
     <>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {displayedItems.map((item) => (
+        {items.map((item) => (
           <NewsCard key={item.id} item={item} lang={lang} />
         ))}
       </div>
 
-      {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-end gap-2 border-t border-gray-300 pt-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="bg-background h-9 w-9 border border-gray-500 p-0"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum: number
-              if (totalPages <= 5) {
-                pageNum = i + 1
-              } else if (currentPage <= 3) {
-                pageNum = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i
-              } else {
-                pageNum = currentPage - 2 + i
-              }
-
-              return (
-                <Button
-                  key={pageNum}
-                  variant={currentPage === pageNum ? "primary" : "outline"}
-                  size="sm"
-                  onClick={() => handlePageChange(pageNum)}
-                  className={`h-9 w-9 p-0 ${currentPage === pageNum ? "bg-header-red-dark hover:bg-header-red-dark/100" : "bg-background hover:!bg-header-red-dark border border-gray-400 hover:!text-white"}`}
-                >
-                  {pageNum}
-                </Button>
-              )
-            })}
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="h-9 w-9 border border-gray-400 p-0"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-
-          <select
-            value={currentPage}
-            onChange={(e) => handlePageChange(Number(e.target.value))}
-            className="bg-body-bg-dark focus:ring-primary/20 h-9 rounded-md border border-gray-400 px-2 text-sm focus:ring-2 focus:outline-none"
-          >
-            {Array.from({ length: totalPages }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={(page) => {
+          onPageChange(page)
+          window.scrollTo({ top: 0, behavior: "smooth" })
+        }}
+        scrollOnChange={false}
+      />
     </>
   )
 }
