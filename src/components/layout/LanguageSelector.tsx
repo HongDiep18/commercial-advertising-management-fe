@@ -58,13 +58,12 @@ export default function LanguageSelector({ variant = "desktop" }: LanguageSelect
   }, [isLanguageDropdownOpen])
 
   const handleLanguageChange = (lang: Language) => {
-    i18n.changeLanguage(lang).then(() => {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("i18nextLng", lang)
-      }
-      setCurrentLanguage(lang)
-      setIsLanguageDropdownOpen(false)
-    })
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("i18nextLng", lang)
+    }
+    setCurrentLanguage(lang)
+    setIsLanguageDropdownOpen(false)
+    i18n.changeLanguage(lang)
   }
 
   if (variant === "mobile") {
