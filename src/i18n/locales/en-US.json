@@ -683,5 +683,43 @@
         "readTime": "7 min"
       }
     }
+  },
+  "store": {
+    "sidebar": {
+      "title": "Product Categories",
+      "categories": {
+        "all": "All Products",
+        "procurement": "Vietnam Chinese Business Procurement Directory",
+        "taiwanTea": "Taiwan Tea",
+        "teaGift": "Tea Gift Sets"
+      }
+    },
+    "grid": {
+      "searchPlaceholder": "Search product name, keywords...",
+      "clearButton": "Clear",
+      "selectCategory": "Please select category",
+      "selectCategoryDescription": "Please select a product category from the left, or use the search box above to find specific products.",
+      "noProducts": "No products found",
+      "noProductsDescription": "Please try other search keywords or select a different category",
+      "items": "products",
+      "viewDetails": "View Details"
+    },
+    "detail": {
+      "backToList": "Back to product list",
+      "productIntroduction": "Product Introduction",
+      "relatedProducts": "Related Products",
+      "viewMore": "View More",
+      "quantity": "Quantity",
+      "selectSize": "Please select size",
+      "price": "Price",
+      "addToCart": "Add to Cart",
+      "buyNow": "Buy Now",
+      "features": "Features",
+      "details": "Details",
+      "specifications": "Specifications",
+      "description": "Product Description",
+      "productCode": "Product Code",
+      "supplyStatus": "Supply Status"
+    }
   }
 }

@@ -82,7 +82,7 @@ export function Pagination({
             key={index}
             variant={currentPage === page ? "primary" : "outline"}
             size="sm"
-            onClick={() => typeof page === "number" && onPageChange(page)}
+            onClick={() => typeof page === "number" && handlePageChange(page)}
             disabled={page === "..."}
             className={`flex h-10 w-10 items-center justify-center text-sm transition-all ${page === "..." ? "cursor-default" : "hover:!bg-header-red-dark/60 rounded-full hover:!text-white"} ${currentPage === page ? "bg-gray-200 font-bold text-black" : "text-gray-500"} `}
           >

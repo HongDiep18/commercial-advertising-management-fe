@@ -676,5 +676,43 @@
         "readTime": "7 分鐘"
       }
     }
+  },
+  "store": {
+    "sidebar": {
+      "title": "商品分類",
+      "categories": {
+        "all": "全部商品",
+        "procurement": "越南華商採購名錄",
+        "taiwanTea": "台灣茶葉",
+        "teaGift": "茶葉禮品"
+      }
+    },
+    "grid": {
+      "searchPlaceholder": "搜尋商品名稱、關鍵字...",
+      "clearButton": "清除",
+      "selectCategory": "請選擇分類",
+      "selectCategoryDescription": "請從左側選擇一個商品分類，或使用上方搜尋框查找特定商品。",
+      "noProducts": "找不到商品",
+      "noProductsDescription": "請嘗試其他搜尋關鍵字或選擇不同分類",
+      "items": "件商品",
+      "viewDetails": "查看詳情"
+    },
+    "detail": {
+      "backToList": "返回商品列表",
+      "productIntroduction": "產品介紹",
+      "relatedProducts": "相關產品推薦",
+      "viewMore": "查看更多",
+      "quantity": "數量",
+      "selectSize": "請選擇規格",
+      "price": "價格",
+      "addToCart": "加入購物車",
+      "buyNow": "立即購買",
+      "features": "特色",
+      "details": "詳細資訊",
+      "specifications": "規格",
+      "description": "商品描述",
+      "productCode": "商品編號",
+      "supplyStatus": "供貨狀況"
+    }
   }
 }

@@ -676,5 +676,43 @@
         "readTime": "7 phút"
       }
     }
+  },
+  "store": {
+    "sidebar": {
+      "title": "Danh mục sản phẩm",
+      "categories": {
+        "all": "Tất cả sản phẩm",
+        "procurement": "Danh mục mua sắm nhà kinh doanh Việt-Hoa",
+        "taiwanTea": "Trà Đài Loan",
+        "teaGift": "Quà tặng trà"
+      }
+    },
+    "grid": {
+      "searchPlaceholder": "Tìm tên sản phẩm, từ khóa...",
+      "clearButton": "Xóa",
+      "selectCategory": "Vui lòng chọn danh mục",
+      "selectCategoryDescription": "Vui lòng chọn một danh mục sản phẩm từ bên trái hoặc sử dụng ô tìm kiếm ở trên để tìm sản phẩm cụ thể.",
+      "noProducts": "Không tìm thấy sản phẩm",
+      "noProductsDescription": "Vui lòng thử các từ khóa tìm kiếm khác hoặc chọn danh mục khác",
+      "items": "sản phẩm",
+      "viewDetails": "Xem chi tiết"
+    },
+    "detail": {
+      "backToList": "Quay lại danh sách sản phẩm",
+      "productIntroduction": "Giới thiệu sản phẩm",
+      "relatedProducts": "Sản phẩm liên quan được đề xuất",
+      "viewMore": "Xem thêm",
+      "quantity": "Số lượng",
+      "selectSize": "Vui lòng chọn kích thước",
+      "price": "Giá",
+      "addToCart": "Thêm vào giỏ hàng",
+      "buyNow": "Mua ngay",
+      "features": "Tính năng",
+      "details": "Chi tiết",
+      "specifications": "Thông số kỹ thuật",
+      "description": "Mô tả sản phẩm",
+      "productCode": "Mã sản phẩm",
+      "supplyStatus": "Tình trạng cung cấp"
+    }
   }
 }
