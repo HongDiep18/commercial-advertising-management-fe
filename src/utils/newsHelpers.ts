@@ -27,24 +27,39 @@ export function getSummaryByLang(item: NewsItem, lang: string): string {
   return item.summaryZhTw || item.summaryEn || item.summaryVi || ""
 }
 
+function getNameByLang(obj: Record<string, unknown> | null | undefined, lang: string): string {
+  if (!obj || typeof obj !== "object") return ""
+  const slug = (obj.slug as string) ?? ""
+  if (lang === "zh-TW") {
+    return (obj.nameZhTw as string) ?? (obj.name_zh_tw as string) ?? slug
+  }
+  if (lang === "en-US") {
+    return (obj.nameEn as string) ?? (obj.name_en as string) ?? slug
+  }
+  return (obj.nameVi as string) ?? (obj.name_vi as string) ?? slug
+}
+
 export function getCategoryNameByLang(item: NewsItem, lang: string): string {
-  const cat = item.category
+  const cat = item.category as Record<string, unknown> | null | undefined
   if (!cat) return ""
-  if (lang === "zh-TW") return cat.nameZhTw || cat.slug
-  if (lang === "en-US") return cat.nameEn || cat.slug
-  return cat.nameVi || cat.slug
+  return getNameByLang(cat, lang) || (cat.slug as string) || ""
 }
 
 export type NewsLabelItem = {
   slug: string
-  nameVi: string
-  nameZhTw: string
-  nameEn: string
+  nameVi?: string
+  nameZhTw?: string
+  nameEn?: string
+  name_vi?: string
+  name_zh_tw?: string
+  name_en?: string
 }
 
-export function getLabelByLang(item: NewsLabelItem, lang: string): string {
-  if (!item) return ""
-  if (lang === "zh-TW") return item.nameZhTw || item.slug
-  if (lang === "en-US") return item.nameEn || item.slug
-  return item.nameVi || item.slug
+export function getLabelByLang(
+  item: NewsLabelItem | Record<string, unknown> | null | undefined,
+  lang: string
+): string {
+  if (!item || typeof item !== "object") return ""
+  const slug = (item as { slug?: string }).slug ?? ""
+  return getNameByLang(item as Record<string, unknown>, lang) || slug
 }

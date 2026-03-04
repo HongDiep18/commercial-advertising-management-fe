@@ -1,57 +1,9 @@
 import { api } from "@/lib/api"
+import type { NewsListParams, NewsListResponse } from "@/types/news"
 
-export interface NewsCategory {
-  id: string
-  slug: string
-  nameVi: string
-  nameZhTw: string
-  nameEn: string
-}
-
-export interface NewsSubcategory {
-  id: string
-  slug: string
-  nameVi: string
-  nameZhTw: string
-  nameEn: string
-  categoryId: string
-}
-
-export interface NewsItem {
-  id: string
-  sourceSite: string
-  url: string
-  guid: string
-  title: string
-  titleZhTw: string
-  titleEn: string
-  publishedAt: string
-  thumbnailUrl: string
-  status: string
-  category: NewsCategory
-  subcategory: NewsSubcategory
-  summaryVi: string
-  summaryZhTw: string
-  summaryEn: string
-}
-
-export interface NewsListResponse {
-  data: NewsItem[]
-  total?: number
-  page?: number
-  limit?: number
-  meta?: { total?: number; page?: number; limit?: number }
-  totalCount?: number
-}
+export type { NewsItem, NewsCategory, NewsSubcategory, NewsListParams, NewsListResponse } from "@/types/news"
 
 const DEFAULT_LIMIT = 6
-
-export interface NewsListParams {
-  page?: number
-  limit?: number
-  categorySlug?: string
-  subcategorySlug?: string
-}
 
 export async function getNewsList(
   page = 1,

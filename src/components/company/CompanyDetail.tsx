@@ -23,7 +23,7 @@ import {
   Crown,
   FileText,
 } from "lucide-react"
-import { useUser, MEMBERSHIP_THRESHOLDS } from "../../contexts/user-context"
+import { useUser, MEMBERSHIP_THRESHOLDS, UserRole, MembershipTier } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
 import { getCompanyData } from "../../data/mockCompanies"
 import {
@@ -67,14 +67,14 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
 
   const totalPoints = getTotalPoints()
 
-  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS.bronze
+  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.Bronze]
   const isBronze =
     isLoggedIn &&
     user &&
-    totalPoints >= MEMBERSHIP_THRESHOLDS.bronze &&
-    totalPoints < MEMBERSHIP_THRESHOLDS.silver
+    totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Bronze] &&
+    totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.Silver]
   const isSilverOrAbove =
-    isLoggedIn && user && (totalPoints >= MEMBERSHIP_THRESHOLDS.silver || user.role === "admin")
+    isLoggedIn && user && (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Silver] || user.role === UserRole.Admin)
 
   const isFreeUser = !isSilverOrAbove
 
