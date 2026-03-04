@@ -1,18 +1,32 @@
-const API_BASE =
-  typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_BASE_URL
+const HOST =
+  typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_BASE_URL
     ? process.env.NEXT_PUBLIC_API_BASE_URL
-    : 'http://localhost:3001'
+    : "http://localhost:3001"
+const API_BASE =
+  typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_BASE
+    ? process.env.NEXT_PUBLIC_API_BASE
+    : "/api/v1"
+
+function getAuthHeader(): Record<string, string> {
+  if (typeof window === "undefined") return {}
+  const token = localStorage.getItem("token")
+  if (!token) return {}
+  return { Authorization: `Bearer ${token}` }
+}
+
+const base = `${HOST.replace(/\/$/, "")}${API_BASE.startsWith("/") ? API_BASE : `/${API_BASE}`}`
 
 export const api = {
-  base: API_BASE.replace(/\/$/, ''),
+  base,
   async request<T>(
     path: string,
-    options: Omit<RequestInit, 'body'> & { body?: object } = {}
+    options: Omit<RequestInit, "body"> & { body?: object } = {}
   ): Promise<T> {
     const { body, ...init } = options
-    const url = `${this.base}${path.startsWith('/') ? path : `/${path}`}`
+    const url = `${this.base}${path.startsWith("/") ? path : `/${path}`}`
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
       ...(init.headers as Record<string, string>),
     }
     const res = await fetch(url, {

@@ -18,8 +18,10 @@ export type LoginResponse = {
   data?: {
     user?: AuthUserFromApi
     token?: string
+    accessToken?: string
   }
   token?: string
+  accessToken?: string
   user?: AuthUserFromApi
 }
 
@@ -77,4 +79,26 @@ export function formDataToRegisterPayload(form: {
     introduction: form.introduction,
     captcha: form.captcha,
   }
+}
+
+export type UpdateProfilePayload = {
+  logo: string
+  company_name_vi: string
+  company_name_cn: string
+  phone: string
+  tax_id: string
+  contact_person: string
+  contact_phone: string
+  company_address: string
+  email: string
+  country: string
+  region: string
+  industry: string
+  website: string
+  introduction: string
+}
+
+export type UpdateProfileResponse = {
+  message?: string
+  data?: unknown
 }

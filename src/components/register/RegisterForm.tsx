@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, RefreshCw } from "lucide-react"
+import { ArrowLeft, RefreshCw, CheckCircle2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Input from "../ui/Input"
 import Select from "../ui/Select"
@@ -11,12 +11,12 @@ import Textarea from "../ui/Textarea"
 import Button from "../ui/Button"
 import { register } from "@/api/auth"
 import { formDataToRegisterPayload } from "@/types/auth"
-import { useUser } from "@/contexts/user-context"
 import {
   INITIAL_REGISTER_FORM,
   type RegisterFormData,
   type RegisterMembershipTier,
 } from "./registerConstants"
+import { MEMBERSHIP_TIER_OPTIONS, getCountryOptions, getRegionOptions } from "./registerOptions"
 import { useCaptcha } from "./useCaptcha"
 
 function getErrorMessage(err: unknown): string {
@@ -27,19 +27,12 @@ function getErrorMessage(err: unknown): string {
   return ""
 }
 
-const MEMBERSHIP_TIER_OPTIONS: { value: RegisterMembershipTier; labelKey: string }[] = [
-  { value: "bronze", labelKey: "register.tiers.bronze" },
-  { value: "silver", labelKey: "register.tiers.silver" },
-  { value: "gold", labelKey: "register.tiers.gold" },
-  { value: "diamond", labelKey: "register.tiers.diamond" },
-]
-
 export default function RegisterForm() {
   const { t } = useTranslation()
   const router = useRouter()
-  const { loginWithRegisteredUser } = useUser()
   const [formData, setFormData] = useState<RegisterFormData>(INITIAL_REGISTER_FORM)
   const [isLoading, setIsLoading] = useState(false)
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
   const {
     input: captchaInput,
     setInput: setCaptchaInput,
@@ -48,38 +41,8 @@ export default function RegisterForm() {
     isValid: isCaptchaValid,
   } = useCaptcha()
 
-  const countries = [
-    { value: "vietnam", label: t("register.countries.vietnam") || "越南" },
-    { value: "taiwan", label: t("register.countries.taiwan") || "台灣" },
-    { value: "china", label: t("register.countries.china") || "中國" },
-    { value: "singapore", label: t("register.countries.singapore") || "新加坡" },
-    { value: "other", label: t("register.countries.other") || "其他" },
-  ]
-
-  const regions: Record<string, Array<{ value: string; label: string }>> = {
-    vietnam: [
-      { value: "hcm", label: t("register.regions.hcm") || "胡志明市" },
-      { value: "hanoi", label: t("register.regions.hanoi") || "河內" },
-      { value: "binhduong", label: t("register.regions.binhduong") || "平陽" },
-      { value: "dongnai", label: t("register.regions.dongnai") || "同奈" },
-      { value: "danang", label: t("register.regions.danang") || "峴港" },
-      { value: "haiphong", label: t("register.regions.haiphong") || "海防" },
-    ],
-    taiwan: [
-      { value: "taipei", label: t("register.regions.taipei") || "台北" },
-      { value: "taichung", label: t("register.regions.taichung") || "台中" },
-      { value: "kaohsiung", label: t("register.regions.kaohsiung") || "高雄" },
-    ],
-    china: [
-      { value: "beijing", label: t("register.regions.beijing") || "北京" },
-      { value: "shanghai", label: t("register.regions.shanghai") || "上海" },
-      { value: "guangzhou", label: t("register.regions.guangzhou") || "廣州" },
-    ],
-    singapore: [{ value: "singapore", label: t("register.regions.singapore") || "新加坡" }],
-    other: [{ value: "other", label: t("register.regions.other") || "其他" }],
-  }
-
-  const availableRegions = formData.country ? (regions[formData.country] ?? []) : []
+  const countries = getCountryOptions(t)
+  const availableRegions = getRegionOptions(formData.country, t)
 
   const categories = [
     { id: "semi", name: t("search.categories.semi") },
@@ -108,15 +71,9 @@ export default function RegisterForm() {
     try {
       const payload = formDataToRegisterPayload({ ...formData, captcha: captchaInput })
       await register(payload)
-      loginWithRegisteredUser(
-        formData.email,
-        formData.contactPerson || formData.companyNameCn || formData.email.split("@")[0],
-        formData.membershipTier
-      )
-      alert(t("register.success") || "註冊成功！")
       setFormData({ ...INITIAL_REGISTER_FORM })
       refreshCaptcha()
-      router.push("/account")
+      setRegistrationSuccess(true)
     } catch (err) {
       const msg = getErrorMessage(err)
       alert(msg || t("register.errors.submit") || "註冊失敗，請稍後再試")
@@ -127,6 +84,29 @@ export default function RegisterForm() {
 
   const captchaPlaceholder = t("register.placeholders.captcha") || "請輸入驗證碼"
   const captchaRefreshTitle = t("register.captchaRefresh") || "點擊刷新驗證碼"
+
+  if (registrationSuccess) {
+    return (
+      <div className="bg-body-bg-dark pt-14">
+        <div className="container mx-auto max-w-2xl px-4 py-8">
+          <div className="bg-body-bg-light rounded-lg border border-gray-300 p-8 text-center">
+            <CheckCircle2 className="text-primary mx-auto mb-4 h-16 w-16" />
+            <h2 className="text-foreground mb-2 text-xl font-bold">
+              {t("register.successPending")}
+            </h2>
+            <p className="text-muted-foreground mb-6">{t("register.successPendingWait")}</p>
+            <ul className="text-muted-foreground mb-8 list-inside list-disc space-y-2 text-left text-sm">
+              <li>{t("register.successPendingIfApproved")}</li>
+              <li>{t("register.successPendingIfNotApproved")}</li>
+            </ul>
+            <Button type="button" variant="primary" onClick={() => router.push("/")}>
+              {t("register.successPendingBackHome")}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-body-bg-dark pt-14">
