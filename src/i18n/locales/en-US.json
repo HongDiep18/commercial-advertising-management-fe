@@ -650,6 +650,76 @@
     "linkCopied": "Link Copied",
     "share": "Share",
     "print": "Print",
-    "relatedIndustries": "Related Industry Categories"
+    "relatedIndustries": "Related Industry Categories",
+    "items": {
+      "news-1": {
+        "title": "2025 Vietnam Cost of Living Report: Monthly Expense Analysis and Savings Strategies for Taiwanese Families",
+        "excerpt": "According to the latest survey, the cost of living in major Vietnamese cities has increased by approximately 8% over the past year. This report provides a detailed analysis of housing, transportation, dining, and other expenses in areas where Taiwanese businesses are concentrated, such as Ho Chi Minh City, Hanoi, and Binh Duong Province, along with practical savings recommendations.",
+        "readTime": "5 min"
+      },
+      "news-2": {
+        "title": "Vietnam's New Health Insurance System: Guide and Important Notes for Foreign Nationals",
+        "excerpt": "Vietnam's Social Insurance Bureau has announced new regulations for foreign nationals' health insurance in 2025, including major changes to eligibility, coverage, and application procedures. This article compiles essential information that Taiwanese businesses and their families need to know to plan their health coverage properly.",
+        "readTime": "6 min"
+      },
+      "news-3": {
+        "title": "2025 Lunar New Year Vietnam Travel Guide: Complete Guide for Taiwanese Businesses Returning Home or Celebrating Locally",
+        "excerpt": "As the Lunar New Year approaches, whether you plan to return to Taiwan to reunite with family or choose to experience the local New Year atmosphere in Vietnam, this article provides the latest flight booking information, introduction to Vietnamese New Year customs, and recommendations for New Year activities in Ho Chi Minh City, Hanoi, and other locations.",
+        "readTime": "7 min"
+      },
+      "news-4": {
+        "title": "Central Vietnam Da Nang and Hoi An Business Inspection and Leisure Travel Recommended Routes",
+        "excerpt": "Central Vietnam has become an emerging investment hotspot in recent years, with Da Nang's high-tech park and Hoi An's handicraft industry attracting attention from many Taiwanese businesses. This article plans a 3-day, 2-night business inspection itinerary combining World Heritage sites and local cuisine, allowing business trips to also include leisure.",
+        "readTime": "8 min"
+      },
+      "news-5": {
+        "title": "Vietnam 2025 Minimum Wage Adjustment: New Standards by Region and Corporate Response Strategies",
+        "excerpt": "The Vietnamese government has announced minimum wage adjustments effective July 1, 2025, with an average increase of 6% across four regions. This article details the new wage standards by region, analysis of impact on manufacturing costs, and human resource adjustment strategies that companies can adopt.",
+        "readTime": "6 min"
+      },
+      "news-6": {
+        "title": "Vietnam Import-Export New Regulations: 2025 Customs Declaration System Upgrade and Clearance Process Changes",
+        "excerpt": "Vietnam Customs has launched a new generation electronic declaration system, fully implemented from March 2025. The new system integrates functions such as certificates of origin and commodity inspection. This article explains key operational changes and preparation items for companies.",
+        "readTime": "7 min"
+      }
+    }
+  },
+  "store": {
+    "sidebar": {
+      "title": "Product Categories",
+      "categories": {
+        "all": "All Products",
+        "procurement": "Vietnam Chinese Business Procurement Directory",
+        "taiwanTea": "Taiwan Tea",
+        "teaGift": "Tea Gift Sets"
+      }
+    },
+    "grid": {
+      "searchPlaceholder": "Search product name, keywords...",
+      "clearButton": "Clear",
+      "selectCategory": "Please select category",
+      "selectCategoryDescription": "Please select a product category from the left, or use the search box above to find specific products.",
+      "noProducts": "No products found",
+      "noProductsDescription": "Please try other search keywords or select a different category",
+      "items": "products",
+      "viewDetails": "View Details"
+    },
+    "detail": {
+      "backToList": "Back to product list",
+      "productIntroduction": "Product Introduction",
+      "relatedProducts": "Related Products",
+      "viewMore": "View More",
+      "quantity": "Quantity",
+      "selectSize": "Please select size",
+      "price": "Price",
+      "addToCart": "Add to Cart",
+      "buyNow": "Buy Now",
+      "features": "Features",
+      "details": "Details",
+      "specifications": "Specifications",
+      "description": "Product Description",
+      "productCode": "Product Code",
+      "supplyStatus": "Supply Status"
+    }
   }
 }
