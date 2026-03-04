@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { useTranslation } from "react-i18next"
-import Image from "next/image"
 import Link from "next/link"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
@@ -406,7 +405,7 @@ export function StoreDetail({ productId }: StoreDetailProps) {
                 </Button>
                 <Button
                   size="lg"
-                  className="flex-1 bg-foreground text-background hover:bg-foreground/90"
+                  className="flex-1 !bg-header-red-dark text-white hover:bg-header-red-dark/90"
                 >
                   {t('store.detail.buyNow')}
                 </Button>

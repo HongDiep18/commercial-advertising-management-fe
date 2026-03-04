@@ -1,13 +1,10 @@
 "use client"
 
-import { useCallback } from "react"
-import { useRef } from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useTranslation } from "react-i18next"
-import { storeCategories, categoryIdToName, categoryNameToKey } from "@/components/store/StoreSidebar"
-import { Search, Eye, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
-import Button from "@/components/ui/Button"
+import { categoryNameToKey } from "@/components/store/StoreSidebar"
+import { Search, Eye } from "lucide-react"
 import { Pagination } from "@/components/news/Pagination" 
 import { usePagination } from "@/components/news/usePagination"
 
@@ -100,19 +97,43 @@ interface Product {
   image: string
 }
 
+interface SearchBarProps {
+  searchTerm: string
+  setSearchTerm: (term: string) => void
+  placeholder: string
+  clearLabel: string
+}
+
+function SearchBar({ searchTerm, setSearchTerm, placeholder, clearLabel }: SearchBarProps) {
+  return (
+    <div className="mb-6">
+      <div className="relative max-w-xl">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-12 pr-4 py-3 border border-gray-400 rounded-lg bg-body-bg-dark focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-sm transition-all"
+        />
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm("")}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
+          >
+            {clearLabel}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: StoreGridProps) {
   const { t } = useTranslation()
-  const [isLoading, setIsLoading] = useState(false)
-  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE)
-  const loaderRef = useRef(null)
-  const [hasMore, setHasMore] = useState(false)
-
- 
 
   // Get current category data
-  const currentProducts = selectedCategory 
-    ? productsByCategory[selectedCategory] || []
-    : []
+  const currentProducts = productsByCategory[selectedCategory ?? ""] ?? []
 
   // Filter by search term if provided
   const filteredProducts = searchTerm
@@ -140,35 +161,16 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
   const displayedProducts = slicePage(filteredProducts)
 
 
-  // Search bar component
-  const SearchBar = () => (
-    <div className="mb-6">
-      <div className="relative max-w-xl">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder={t('store.grid.searchPlaceholder')}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 border border-gray-400 rounded-lg bg-body-bg-dark focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-sm transition-all"
-        />
-        {searchTerm && (
-          <button
-            onClick={() => setSearchTerm("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
-          >
-            {t('store.grid.clearButton')}
-          </button>
-        )}
-      </div>
-    </div>
-  )
-
   // Empty state - no category selected
   if (!selectedCategory) {
     return (
       <section>
-        <SearchBar />
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder={t('store.grid.searchPlaceholder')}
+          clearLabel={t('store.grid.clearButton')}
+        />
         <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <Search className="w-8 h-8 text-muted-foreground" />
@@ -186,7 +188,12 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
   if (filteredProducts.length === 0) {
     return (
       <section>
-        <SearchBar />
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder={t('store.grid.searchPlaceholder')}
+          clearLabel={t('store.grid.clearButton')}
+        />
         <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <Search className="w-8 h-8 text-muted-foreground" />
@@ -203,7 +210,12 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
   return (
     <section>
       {/* Search Bar */}
-      <SearchBar />
+      <SearchBar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        placeholder={t('store.grid.searchPlaceholder')}
+        clearLabel={t('store.grid.clearButton')}
+      />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
