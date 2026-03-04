@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import Link from "next/link"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { categories } from "./DirectorySidebar"
-import { useUser, MEMBERSHIP_THRESHOLDS } from "../../contexts/user-context"
+import { useUser, MEMBERSHIP_THRESHOLDS, MembershipTier } from "../../contexts/user-context"
 import Button from "../ui/Button"
 import { maskCompanyName } from "../../utils/companyHelpers"
 import { useTranslation } from "react-i18next"
@@ -145,7 +145,7 @@ export function DirectoryResults({
   const { user, isLoggedIn, getTotalPoints } = useUser()
 
   const totalPoints = getTotalPoints()
-  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS.bronze
+  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.Bronze]
 
   const companiesByCategory = useMemo(() => {
     const result: Record<string, ReturnType<typeof generateCompaniesForCategory>> = {}

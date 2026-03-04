@@ -28,12 +28,14 @@ import Textarea from "@/components/ui/Textarea"
 import Select from "@/components/ui/Select"
 import {
   useUser,
+  UserRole,
+  MembershipTier,
+  CommercialType,
   CONTRIBUTION_VALUES,
   MEMBERSHIP_CONFIG,
   MEMBERSHIP_THRESHOLDS,
   mockContributionHistory,
   mockCommercialHistory,
-  type MembershipTier,
 } from "@/contexts/user-context"
 import { categories } from "@/components/directory/DirectorySidebar"
 import { useTranslation } from "react-i18next"
@@ -166,9 +168,10 @@ export default function AccountPage() {
   const memberTier = getMemberTier()
   const nextTierInfo = getNextTier()
   const tierConfig = MEMBERSHIP_CONFIG[memberTier]
-  const nextThreshold = nextTierInfo
-    ? MEMBERSHIP_THRESHOLDS[nextTierInfo.nextTier as MembershipTier]
-    : MEMBERSHIP_THRESHOLDS.diamond
+  const nextThreshold =
+    nextTierInfo?.nextTier != null
+      ? MEMBERSHIP_THRESHOLDS[nextTierInfo.nextTier]
+      : MEMBERSHIP_THRESHOLDS[MembershipTier.Diamond]
   const progressInTier = nextTierInfo ? (totalPoints / nextThreshold) * 100 : 100
 
   return (
@@ -201,7 +204,7 @@ export default function AccountPage() {
                       <span
                         className={`rounded-full px-3 py-1 text-sm font-medium ${tierConfig.bgColor} ${tierConfig.color}`}
                       >
-                        {user.role === "admin"
+                        {user.role === UserRole.Admin
                           ? t("account.tiers.admin") || "管理員"
                           : t("account.tiers." + memberTier) || tierConfig.label}
                       </span>
@@ -235,7 +238,7 @@ export default function AccountPage() {
                           </span>
                         )}
                       </Button>
-                      {user.role === "admin" && (
+                      {user.role === UserRole.Admin && (
                         <Button
                           size="sm"
                           asChild
@@ -257,7 +260,7 @@ export default function AccountPage() {
 
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-2">
-            {memberTier !== "diamond" && nextTierInfo && (
+            {memberTier !== MembershipTier.Diamond && nextTierInfo && (
               <Card className="border-primary/20 from-primary/5 to-primary/10 h-fit bg-gradient-to-br">
                 <Card.Header className="pb-4">
                   <Card.Title className="text-primary flex items-center gap-2">
@@ -266,11 +269,13 @@ export default function AccountPage() {
                   </Card.Title>
                   <p className="text-muted-foreground mt-1 text-sm">
                     {t("account.currentTier") || "目前等級"}：
-                    {user.role === "admin"
+                    {user.role === UserRole.Admin
                       ? t("account.tiers.admin")
                       : t("account.tiers." + memberTier) || tierConfig.label}{" "}
                     | {t("account.nextTier") || "下一等級"}：
-                    {MEMBERSHIP_CONFIG[nextTierInfo.nextTier as MembershipTier].label}
+                    {nextTierInfo.nextTier != null
+                      ? MEMBERSHIP_CONFIG[nextTierInfo.nextTier].label
+                      : ""}
                   </p>
                 </Card.Header>
                 <Card.Content className="space-y-5">
@@ -278,9 +283,9 @@ export default function AccountPage() {
                     <div className="mb-3 flex justify-between text-sm">
                       <span className="text-foreground font-medium">
                         {totalPoints.toLocaleString()} /{" "}
-                        {MEMBERSHIP_THRESHOLDS[
-                          nextTierInfo.nextTier as MembershipTier
-                        ].toLocaleString()}{" "}
+                        {nextTierInfo.nextTier != null
+                          ? MEMBERSHIP_THRESHOLDS[nextTierInfo.nextTier].toLocaleString()
+                          : ""}{" "}
                         {t("account.points") || "點"}
                       </span>
                       <span className="text-primary font-semibold">
@@ -388,12 +393,12 @@ export default function AccountPage() {
                       >
                         <div
                           className={`flex h-12 w-12 items-center justify-center rounded-xl ${
-                            item.type === "ad"
+                            item.type === CommercialType.Advertising
                               ? "bg-purple-100 text-purple-600"
                               : "bg-blue-100 text-blue-600"
                           }`}
                         >
-                          {item.type === "ad" ? (
+                          {item.type === CommercialType.Advertising ? (
                             <Megaphone className="h-6 w-6" />
                           ) : (
                             <ShoppingCart className="h-6 w-6" />
@@ -781,7 +786,12 @@ export default function AccountPage() {
               </Button>
             </div>
             <div className="space-y-4 p-6">
-              {(["bronze", "silver", "gold", "diamond"] as MembershipTier[]).map((tier) => {
+              {[
+                MembershipTier.Bronze,
+                MembershipTier.Silver,
+                MembershipTier.Gold,
+                MembershipTier.Diamond,
+              ].map((tier) => {
                 const config = MEMBERSHIP_CONFIG[tier]
                 const isCurrentTier = memberTier === tier
                 return (

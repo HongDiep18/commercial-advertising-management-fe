@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X, User, Shield, LogOut, ChevronDown } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { useUser } from "@/contexts/user-context"
+import { useUser, UserRole } from "@/contexts/user-context"
 import LanguageSelector from "./LanguageSelector"
 import Button from "@/components/ui/Button"
 
@@ -102,7 +102,7 @@ export default function Header() {
                       <User className="h-4 w-4" />
                       {t("header.myAccount") || "我的帳戶"}
                     </Link>
-                    {user.role === "admin" && (
+                    {user.role === UserRole.Admin && (
                       <Link
                         href="/admin"
                         className="hover:!bg-header-red-dark mx-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm text-black transition-colors hover:bg-white/10 hover:text-white"
@@ -202,7 +202,7 @@ export default function Header() {
                       <User className="h-4 w-4" />
                       {t("header.myAccount") || "我的帳戶"}
                     </Link>
-                    {user.role === "admin" && (
+                    {user.role === UserRole.Admin && (
                       <Link
                         href="/admin"
                         className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"

@@ -1,10 +1,10 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect } from "react"
 
-const CAPTCHA_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+const CAPTCHA_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 const CAPTCHA_LENGTH = 5
 
 function generateCode(): string {
-  let code = ''
+  let code = ""
   for (let i = 0; i < CAPTCHA_LENGTH; i++) {
     code += CAPTCHA_CHARS.charAt(Math.floor(Math.random() * CAPTCHA_CHARS.length))
   }
@@ -13,10 +13,10 @@ function generateCode(): string {
 
 function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): void {
   if (!canvas) return
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext("2d")
   if (!ctx) return
 
-  ctx.fillStyle = '#f3f4f6'
+  ctx.fillStyle = "#f3f4f6"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   for (let i = 0; i < 5; i++) {
@@ -34,9 +34,9 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
     ctx.fill()
   }
 
-  ctx.font = 'bold 28px Arial'
-  ctx.fillStyle = '#333'
-  ctx.textBaseline = 'middle'
+  ctx.font = "bold 28px Arial"
+  ctx.fillStyle = "#333"
+  ctx.textBaseline = "middle"
 
   for (let i = 0; i < text.length; i++) {
     const x = 15 + i * 22
@@ -51,19 +51,22 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
 }
 
 export function useCaptcha() {
-  const [code, setCode] = useState('')
-  const [input, setInput] = useState('')
+  const [code, setCode] = useState("")
+  const [input, setInput] = useState("")
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const refresh = useCallback(() => {
     const newCode = generateCode()
     setCode(newCode)
-    setInput('')
+    setInput("")
     setTimeout(() => drawCaptchaOnCanvas(canvasRef.current, newCode), 0)
   }, [])
 
   useEffect(() => {
-    refresh()
+    const timer = setTimeout(() => {
+      refresh()
+    }, 0)
+    return () => clearTimeout(timer)
   }, [refresh])
 
   const isValid = input.toUpperCase() === code

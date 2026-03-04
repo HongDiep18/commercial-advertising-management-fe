@@ -1,44 +1,37 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import {
+  UserRole,
+  MembershipTier,
+  ContributionType,
+  CommercialType,
+  AdType,
+  AdStatus,
+} from "@/types"
+import type {
+  User,
+  UserContextType,
+  MembershipConfigEntry,
+  NextTierInfo,
+  ContributionHistory,
+  CommercialHistory,
+  AdSubmission,
+} from "@/types"
 
-export type UserRole = "guest" | "free" | "paid" | "admin"
-
-export type MembershipTier = "guest" | "bronze" | "silver" | "gold" | "diamond"
-
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: UserRole
-  contributionPoints: number
-  commercialPoints: number
-  createdAt: string
-}
+export { UserRole, MembershipTier } from "@/types"
+export type { User } from "@/types"
 
 export const MEMBERSHIP_THRESHOLDS: Record<MembershipTier, number> = {
-  guest: 0,
-  bronze: 50000,
-  silver: 150000,
-  gold: 300000,
-  diamond: 550000,
+  [MembershipTier.Guest]: 0,
+  [MembershipTier.Bronze]: 50000,
+  [MembershipTier.Silver]: 150000,
+  [MembershipTier.Gold]: 300000,
+  [MembershipTier.Diamond]: 550000,
 }
 
-export const MEMBERSHIP_CONFIG: Record<
-  MembershipTier,
-  {
-    label: string
-    labelEn: string
-    minPoints: number
-    maxPoints: number | null
-    spendingRequired: string
-    color: string
-    bgColor: string
-    benefits: string[]
-    restrictions: string[]
-  }
-> = {
-  guest: {
+export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = {
+  [MembershipTier.Guest]: {
     label: "訪客",
     labelEn: "Guest",
     minPoints: 0,
@@ -49,7 +42,7 @@ export const MEMBERSHIP_CONFIG: Record<
     benefits: ["公司名（部分）", "地區"],
     restrictions: ["無官網、無電話、無地址、無稅號"],
   },
-  bronze: {
+  [MembershipTier.Bronze]: {
     label: "銅牌會員",
     labelEn: "Bronze",
     minPoints: 50000,
@@ -60,7 +53,7 @@ export const MEMBERSHIP_CONFIG: Record<
     benefits: ["本業 - 基礎版", "公司名、稅號、地區"],
     restrictions: ["無官網、無電話、無地址"],
   },
-  silver: {
+  [MembershipTier.Silver]: {
     label: "銀牌會員",
     labelEn: "Silver",
     minPoints: 150000,
@@ -71,7 +64,7 @@ export const MEMBERSHIP_CONFIG: Record<
     benefits: ["本業 - 完整版", "解鎖官網、電話、地址、Email"],
     restrictions: [],
   },
-  gold: {
+  [MembershipTier.Gold]: {
     label: "金牌會員",
     labelEn: "Gold",
     minPoints: 300000,
@@ -82,7 +75,7 @@ export const MEMBERSHIP_CONFIG: Record<
     benefits: ["本業 + 跨 3 產業 - 完整版", "解鎖自家產業 + 自選 3 個上下游產業"],
     restrictions: [],
   },
-  diamond: {
+  [MembershipTier.Diamond]: {
     label: "鑽石會員",
     labelEn: "Diamond",
     minPoints: 550000,
@@ -96,18 +89,22 @@ export const MEMBERSHIP_CONFIG: Record<
 }
 
 export function getMembershipTier(totalPoints: number): MembershipTier {
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS.diamond) return "diamond"
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS.gold) return "gold"
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS.silver) return "silver"
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS.bronze) return "bronze"
-  return "guest"
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Diamond]) return MembershipTier.Diamond
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Gold]) return MembershipTier.Gold
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Silver]) return MembershipTier.Silver
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Bronze]) return MembershipTier.Bronze
+  return MembershipTier.Guest
 }
 
-export function getNextTierInfo(
-  totalPoints: number
-): { nextTier: MembershipTier | null; pointsNeeded: number } | null {
+export function getNextTierInfo(totalPoints: number): NextTierInfo | null {
   const currentTier = getMembershipTier(totalPoints)
-  const tiers: MembershipTier[] = ["guest", "bronze", "silver", "gold", "diamond"]
+  const tiers: MembershipTier[] = [
+    MembershipTier.Guest,
+    MembershipTier.Bronze,
+    MembershipTier.Silver,
+    MembershipTier.Gold,
+    MembershipTier.Diamond,
+  ]
   const currentIndex = tiers.indexOf(currentTier)
 
   if (currentIndex >= tiers.length - 1) return null
@@ -118,75 +115,13 @@ export function getNextTierInfo(
   return { nextTier, pointsNeeded }
 }
 
-export interface ContributionHistory {
-  id: string
-  type: "registration" | "logo"
-  description: string
-  points: number
-  date: string
-}
-
-export interface CommercialHistory {
-  id: string
-  type: "ad" | "purchase"
-  description: string
-  amount: number
-  points: number
-  date: string
-}
-
-const demoUsers: Record<string, User> = {
-  bronze: {
-    id: "user-bronze-001",
-    email: "bronze@demo.com",
-    name: "Demo 銅牌會員",
-    role: "free",
-    contributionPoints: 50000,
-    commercialPoints: 0,
-    createdAt: "2025-01-15",
-  },
-  silver: {
-    id: "user-silver-001",
-    email: "silver@demo.com",
-    name: "Demo 銀牌會員",
-    role: "paid",
-    contributionPoints: 50000,
-    commercialPoints: 100000,
-    createdAt: "2024-10-01",
-  },
-  gold: {
-    id: "user-gold-001",
-    email: "gold@demo.com",
-    name: "Demo 金牌會員",
-    role: "paid",
-    contributionPoints: 70000,
-    commercialPoints: 250000,
-    createdAt: "2024-06-15",
-  },
-  diamond: {
-    id: "user-diamond-001",
-    email: "diamond@demo.com",
-    name: "Demo 鑽石會員",
-    role: "paid",
-    contributionPoints: 70000,
-    commercialPoints: 550000,
-    createdAt: "2024-01-01",
-  },
-  admin: {
-    id: "user-admin-001",
-    email: "admin@demo.com",
-    name: "系統管理員",
-    role: "admin",
-    contributionPoints: 0,
-    commercialPoints: 0,
-    createdAt: "2023-01-01",
-  },
-}
+export { ContributionType, CommercialType } from "@/types"
+export type { ContributionHistory, CommercialHistory } from "@/types"
 
 export const mockContributionHistory: ContributionHistory[] = [
   {
     id: "c1",
-    type: "registration",
+    type: ContributionType.Registration,
     description: "註冊並填寫自家企業資料（新手禮包）",
     points: 50000,
     date: "2025-01-15",
@@ -196,7 +131,7 @@ export const mockContributionHistory: ContributionHistory[] = [
 export const mockCommercialHistory: CommercialHistory[] = [
   {
     id: "m1",
-    type: "ad",
+    type: CommercialType.Advertising,
     description: "首頁彈窗廣告 - 1個月",
     amount: 50000,
     points: 50000,
@@ -204,7 +139,7 @@ export const mockCommercialHistory: CommercialHistory[] = [
   },
   {
     id: "m2",
-    type: "ad",
+    type: CommercialType.Advertising,
     description: "精選企業曝光 - 3個月",
     amount: 80000,
     points: 80000,
@@ -212,7 +147,7 @@ export const mockCommercialHistory: CommercialHistory[] = [
   },
   {
     id: "m3",
-    type: "purchase",
+    type: CommercialType.Purchase,
     description: "購買廣告點數",
     amount: 30000,
     points: 30000,
@@ -220,7 +155,7 @@ export const mockCommercialHistory: CommercialHistory[] = [
   },
   {
     id: "m4",
-    type: "ad",
+    type: CommercialType.Advertising,
     description: "企業名錄廣告 - 封面裡",
     amount: 70000,
     points: 70000,
@@ -228,20 +163,8 @@ export const mockCommercialHistory: CommercialHistory[] = [
   },
 ]
 
-export interface AdSubmission {
-  id: string
-  companyName: string
-  contactName: string
-  email: string
-  phone: string
-  adType: "popup" | "directory" | "product"
-  adTypeName: string
-  selectedItems: string[]
-  totalAmount: string
-  status: "new" | "contacted" | "closed"
-  submittedAt: string
-  notes?: string
-}
+export { AdType, AdStatus } from "@/types"
+export type { AdSubmission } from "@/types"
 
 export const mockAdSubmissions: AdSubmission[] = [
   {
@@ -250,11 +173,11 @@ export const mockAdSubmissions: AdSubmission[] = [
     contactName: "王先生",
     email: "wang@vnTextile.com",
     phone: "+84-909-123-456",
-    adType: "popup",
+    adType: AdType.Popup,
     adTypeName: "平台廣告刊登",
     selectedItems: ["首頁彈窗廣告 - 優先顯示", "精選企業曝光 - 首位"],
     totalAmount: "洽談中",
-    status: "new",
+    status: AdStatus.New,
     submittedAt: "2025-01-26 14:30",
   },
   {
@@ -263,11 +186,11 @@ export const mockAdSubmissions: AdSubmission[] = [
     contactName: "李小姐",
     email: "li@abctech.com",
     phone: "+84-908-765-432",
-    adType: "directory",
+    adType: AdType.Directory,
     adTypeName: "越南華商採購名錄",
     selectedItems: ["封面", "內頁彩色"],
     totalAmount: "170,000,000 VND",
-    status: "contacted",
+    status: AdStatus.Contacted,
     submittedAt: "2025-01-25 10:15",
     notes: "已於1/26電話聯繫，客戶考慮中",
   },
@@ -277,11 +200,11 @@ export const mockAdSubmissions: AdSubmission[] = [
     contactName: "陳經理",
     email: "chen@xyz-trade.com",
     phone: "+84-907-111-222",
-    adType: "product",
+    adType: AdType.Product,
     adTypeName: "商品銷售刊登",
     selectedItems: ["進階刊登方案", "首頁推薦"],
     totalAmount: "8,000,000 VND",
-    status: "closed",
+    status: AdStatus.Closed,
     submittedAt: "2025-01-20 09:00",
     notes: "已完成簽約，廣告將於2/1上線",
   },
@@ -291,11 +214,11 @@ export const mockAdSubmissions: AdSubmission[] = [
     contactName: "張總",
     email: "zhang@defmachine.com",
     phone: "+84-906-333-444",
-    adType: "popup",
+    adType: AdType.Popup,
     adTypeName: "平台廣告刊登",
     selectedItems: ["企業名錄廣告 - 置頂3個月"],
     totalAmount: "15,000,000 VND",
-    status: "new",
+    status: AdStatus.New,
     submittedAt: "2025-01-27 08:45",
   },
 ]
@@ -309,39 +232,23 @@ export const COMMERCIAL_POINTS_RATE = 1
 
 export const DIAMOND_COMMERCIAL_THRESHOLD = 550000
 
-interface UserContextType {
-  user: User | null
-  isLoggedIn: boolean
-  isAuthReady: boolean
-  login: (tier: string) => void
-  loginWithEmail: (email: string, password: string) => void
-  loginWithRegisteredUser: (email: string, name: string, membershipTier: MembershipTier) => void
-  logout: () => void
-  getTotalPoints: () => number
-  getMemberTier: () => MembershipTier
-  getNextTier: () => { nextTier: MembershipTier | null; pointsNeeded: number } | null
-  canViewPhone: () => boolean
-  canViewWebsite: () => boolean
-  canViewEmail: () => boolean
-  canDownloadDirectory: () => boolean
-  getUpgradeProgress: () => number
-}
-
 const UserContext = createContext<UserContextType | undefined>(undefined)
+
+const STORAGE_KEY = "demo_user"
 
 function getStoredUser(): User | null {
   if (typeof window === "undefined") return null
   try {
-    const s = localStorage.getItem("demo_user")
+    const s = localStorage.getItem(STORAGE_KEY)
     return s ? (JSON.parse(s) as User) : null
   } catch {
-    localStorage.removeItem("demo_user")
+    localStorage.removeItem(STORAGE_KEY)
     return null
   }
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(getStoredUser)
+  const [user, setUserState] = useState<User | null>(getStoredUser)
   const [isAuthReady, setIsAuthReady] = useState(false)
 
   useEffect(() => {
@@ -349,28 +256,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return () => cancelAnimationFrame(id)
   }, [])
 
-  const login = (tier: string) => {
-    if (tier === "guest") {
-      logout()
-      return
-    }
-    const demoUser = demoUsers[tier]
-    if (demoUser) {
-      setUser(demoUser)
-      localStorage.setItem("demo_user", JSON.stringify(demoUser))
-    }
+  const setUser = (u: User | null) => {
+    setUserState(u)
+    if (typeof window === "undefined") return
+    if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))
+    else localStorage.removeItem(STORAGE_KEY)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const loginWithEmail = (email: string, password: string) => {
-    const bronzeUser = { ...demoUsers.bronze, email, name: email.split("@")[0] }
+    const bronzeUser: User = {
+      id: `user-email-${Date.now()}`,
+      email,
+      name: email.split("@")[0] ?? "User",
+      role: UserRole.Free,
+      contributionPoints: 50000,
+      commercialPoints: 0,
+      createdAt: new Date().toISOString().slice(0, 10),
+    }
     setUser(bronzeUser)
-    localStorage.setItem("demo_user", JSON.stringify(bronzeUser))
   }
 
   const loginWithRegisteredUser = (email: string, name: string, membershipTier: MembershipTier) => {
     const minPoints = MEMBERSHIP_THRESHOLDS[membershipTier]
-    const role: UserRole = membershipTier === "bronze" ? "free" : "paid"
+    const role: UserRole = membershipTier === MembershipTier.Bronze ? UserRole.Free : UserRole.Paid
     const newUser: User = {
       id: `user-reg-${Date.now()}`,
       email,
@@ -381,12 +290,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString().slice(0, 10),
     }
     setUser(newUser)
-    localStorage.setItem("demo_user", JSON.stringify(newUser))
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem("demo_user")
   }
 
   const getTotalPoints = () => {
@@ -395,35 +302,45 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const getMemberTier = (): MembershipTier => {
-    if (!user) return "guest"
-    if (user.role === "admin") return "diamond"
+    if (!user) return MembershipTier.Guest
+    if (user.role === UserRole.Admin) return MembershipTier.Diamond
     return getMembershipTier(getTotalPoints())
   }
 
   const getNextTier = () => {
     if (!user) return null
-    if (user.role === "admin") return null
+    if (user.role === UserRole.Admin) return null
     return getNextTierInfo(getTotalPoints())
   }
 
   const canViewPhone = (): boolean => {
     const tier = getMemberTier()
-    return ["bronze", "silver", "gold", "diamond"].includes(tier)
+    return [
+      MembershipTier.Bronze,
+      MembershipTier.Silver,
+      MembershipTier.Gold,
+      MembershipTier.Diamond,
+    ].includes(tier)
   }
 
   const canViewWebsite = (): boolean => {
     const tier = getMemberTier()
-    return ["bronze", "silver", "gold", "diamond"].includes(tier)
+    return [
+      MembershipTier.Bronze,
+      MembershipTier.Silver,
+      MembershipTier.Gold,
+      MembershipTier.Diamond,
+    ].includes(tier)
   }
 
   const canViewEmail = (): boolean => {
     const tier = getMemberTier()
-    return ["silver", "gold", "diamond"].includes(tier)
+    return [MembershipTier.Silver, MembershipTier.Gold, MembershipTier.Diamond].includes(tier)
   }
 
   const canDownloadDirectory = (): boolean => {
     const tier = getMemberTier()
-    return ["gold", "diamond"].includes(tier)
+    return [MembershipTier.Gold, MembershipTier.Diamond].includes(tier)
   }
 
   const getUpgradeProgress = (): number => {
@@ -441,7 +358,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         user,
         isLoggedIn: !!user,
         isAuthReady,
-        login,
+        setUser,
         loginWithEmail,
         loginWithRegisteredUser,
         logout,

@@ -10,13 +10,17 @@ import Input from "../ui/Input"
 import Label from "../ui/Label"
 import Button from "../ui/Button"
 import { login as loginApi } from "@/api/auth"
-import { useUser } from "@/contexts/user-context"
+import { useUser, UserRole } from "@/contexts/user-context"
+import { DemoLoginButtons } from "./demo"
 import {
-  INITIAL_LOGIN_FORM,
-  DEMO_ACCOUNTS,
-  DEMO_TITLE_FALLBACKS,
-  type LoginFormData,
-} from "./loginConstants"
+  type LoginResponse,
+  isLoginSuccess,
+  getLoginErrorMessage,
+  extractUserFromLoginResponse,
+  mapApiUserToUser,
+} from "@/types/login"
+import { LOGIN_TAGS, LOGIN_TAG_FALLBACKS } from "./LoginMessages"
+import { INITIAL_LOGIN_FORM, type LoginFormData } from "./loginConstants"
 
 function getErrorMessage(err: unknown): string {
   if (err && typeof err === "object" && "data" in err) {
@@ -29,19 +33,46 @@ function getErrorMessage(err: unknown): string {
 export default function LoginForm() {
   const { t } = useTranslation()
   const router = useRouter()
-  const { login: loginDemo } = useUser()
+  const { setUser } = useUser()
   const [formData, setFormData] = useState<LoginFormData>(INITIAL_LOGIN_FORM)
   const [isLoading, setIsLoading] = useState(false)
 
   const doLogin = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      await loginApi({ email, password })
-      alert(t("login.success") || "登入成功！")
+      const res = await loginApi({ email, password })
+      const resTyped: LoginResponse = res
+
+      if (!isLoginSuccess(resTyped)) {
+        const msg =
+          getLoginErrorMessage(resTyped) || t(LOGIN_TAGS.failed) || LOGIN_TAG_FALLBACKS.failed
+        alert(msg)
+        return
+      }
+
+      const payload = extractUserFromLoginResponse(resTyped, email)
+      let role: string | undefined
+      if (payload) {
+        setUser(mapApiUserToUser(payload, email))
+        role = payload.role
+      } else {
+        setUser({
+          id: `api-${Date.now()}`,
+          email,
+          name: email.split("@")[0] ?? "User",
+          role: UserRole.Free,
+          contributionPoints: 0,
+          commercialPoints: 0,
+          createdAt: new Date().toISOString().slice(0, 10),
+        })
+      }
+
+      alert(t(LOGIN_TAGS.success) || LOGIN_TAG_FALLBACKS.success)
       setFormData({ ...INITIAL_LOGIN_FORM })
+      router.push(role === UserRole.Admin ? "/account" : "/account")
     } catch (err) {
-      const msg = getErrorMessage(err)
-      alert(msg || t("login.errors.failed") || "登入失敗，請檢查您的帳號密碼")
+      const msg = getErrorMessage(err) || t(LOGIN_TAGS.failed) || LOGIN_TAG_FALLBACKS.failed
+      alert(msg)
     } finally {
       setIsLoading(false)
     }
@@ -50,11 +81,6 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await doLogin(formData.email, formData.password)
-  }
-
-  const handleDemoLogin = (tier: string) => {
-    loginDemo(tier)
-    router.push(tier === "admin" ? "/admin" : "/account")
   }
 
   return (
@@ -97,21 +123,7 @@ export default function LoginForm() {
                 </Button>
               </form>
 
-              <div className="flex flex-wrap justify-center gap-2 pt-2">
-                {DEMO_ACCOUNTS.map((account) => (
-                  <button
-                    key={account.tier}
-                    type="button"
-                    onClick={() => handleDemoLogin(account.tier)}
-                    disabled={isLoading}
-                    className="text-muted-foreground/60 hover:text-muted-foreground text-xs underline disabled:opacity-50"
-                  >
-                    {t(`login.demo.${account.tier}`) ||
-                      DEMO_TITLE_FALLBACKS[account.tier] ||
-                      account.tier}
-                  </button>
-                ))}
-              </div>
+              <DemoLoginButtons disabled={isLoading} />
 
               <div className="text-muted-foreground text-center text-sm">
                 {t("login.noAccount") || "還沒有帳號？"}{" "}

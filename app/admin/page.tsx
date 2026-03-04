@@ -20,39 +20,43 @@ import Footer from "@/components/layout/Footer"
 import Button from "@/components/ui/Button"
 import Card from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
-import { useUser, mockAdSubmissions, type AdSubmission } from "@/contexts/user-context"
+import {
+  useUser,
+  UserRole,
+  AdStatus,
+  AdType,
+  mockAdSubmissions,
+  type AdSubmission,
+} from "@/contexts/user-context"
 
-const statusConfig: Record<
-  "new" | "contacted" | "closed",
-  { labelKey: string; color: string; icon: typeof Clock }
-> = {
-  new: {
+const statusConfig: Record<AdStatus, { labelKey: string; color: string; icon: typeof Clock }> = {
+  [AdStatus.New]: {
     labelKey: "admin.statusNew",
     color: "bg-blue-100 text-blue-700 border-blue-200",
     icon: Clock,
   },
-  contacted: {
+  [AdStatus.Contacted]: {
     labelKey: "admin.statusContacted",
     color: "bg-amber-100 text-amber-700 border-amber-200",
     icon: Mail,
   },
-  closed: {
+  [AdStatus.Closed]: {
     labelKey: "admin.statusClosed",
     color: "bg-green-100 text-green-700 border-green-200",
     icon: CheckCircle2,
   },
 }
 
-const adTypeLabelKeys: Record<"popup" | "directory" | "product", string> = {
-  popup: "admin.adTypePopup",
-  directory: "admin.adTypeDirectory",
-  product: "admin.adTypeProduct",
+const adTypeLabelKeys: Record<AdType, string> = {
+  [AdType.Popup]: "admin.adTypePopup",
+  [AdType.Directory]: "admin.adTypeDirectory",
+  [AdType.Product]: "admin.adTypeProduct",
 }
 
-const adTypeColors: Record<"popup" | "directory" | "product", string> = {
-  popup: "bg-purple-100 text-purple-700",
-  directory: "bg-blue-100 text-blue-700",
-  product: "bg-green-100 text-green-700",
+const adTypeColors: Record<AdType, string> = {
+  [AdType.Popup]: "bg-purple-100 text-purple-700",
+  [AdType.Directory]: "bg-blue-100 text-blue-700",
+  [AdType.Product]: "bg-green-100 text-green-700",
 }
 
 export default function AdminPage() {
@@ -71,7 +75,7 @@ export default function AdminPage() {
     }
   }, [isAuthReady, isLoggedIn, user, router])
 
-  if (!isAuthReady || !isLoggedIn || !user || user.role !== "admin") {
+  if (!isAuthReady || !isLoggedIn || !user || user.role !== UserRole.Admin) {
     return null
   }
 
@@ -88,9 +92,9 @@ export default function AdminPage() {
 
   const statusCounts = {
     all: mockAdSubmissions.length,
-    new: mockAdSubmissions.filter((s) => s.status === "new").length,
-    contacted: mockAdSubmissions.filter((s) => s.status === "contacted").length,
-    closed: mockAdSubmissions.filter((s) => s.status === "closed").length,
+    new: mockAdSubmissions.filter((s) => s.status === AdStatus.New).length,
+    contacted: mockAdSubmissions.filter((s) => s.status === AdStatus.Contacted).length,
+    closed: mockAdSubmissions.filter((s) => s.status === AdStatus.Closed).length,
   }
 
   const handleViewDetail = (submission: AdSubmission) => {
