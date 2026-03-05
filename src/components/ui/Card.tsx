@@ -53,15 +53,32 @@ const CardContent = forwardRef<HTMLDivElement, CardContentProps>(({ className, .
 })
 CardContent.displayName = "CardContent"
 
+export type CardDescriptionProps = HTMLAttributes<HTMLParagraphElement>
+
+export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <p
+        ref={ref}
+        className={`text-muted-foreground text-sm ${className || ""}`}
+        {...props}
+      />
+    )
+  }
+)
+CardDescription.displayName = "CardDescription"
+
 const CardWithSubComponents = Card as typeof Card & {
   Header: typeof CardHeader
   Title: typeof CardTitle
   Content: typeof CardContent
+  Description: typeof CardDescription
 }
 
 CardWithSubComponents.Header = CardHeader
 CardWithSubComponents.Title = CardTitle
 CardWithSubComponents.Content = CardContent
+CardWithSubComponents.Description = CardDescription
 
 export default CardWithSubComponents
 export { CardHeader, CardTitle, CardContent }
