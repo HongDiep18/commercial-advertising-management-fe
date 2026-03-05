@@ -9,6 +9,7 @@ import Card from "../ui/Card"
 import Input from "../ui/Input"
 import Label from "../ui/Label"
 import Button from "../ui/Button"
+import { Toast, type ToastVariant } from "../ui/Toast"
 import { login as loginApi } from "@/api/auth"
 import { useUser, UserRole } from "@/contexts/user-context"
 import { DemoLoginButtons } from "./demo"
@@ -36,6 +37,15 @@ export default function LoginForm() {
   const { setUser } = useUser()
   const [formData, setFormData] = useState<LoginFormData>(INITIAL_LOGIN_FORM)
   const [isLoading, setIsLoading] = useState(false)
+  const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
+    message: "",
+    variant: "info",
+    visible: false,
+  })
+
+  const showToast = (message: string, variant: ToastVariant = "info") =>
+    setToast({ message, variant, visible: true })
+  const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
 
   const doLogin = async (email: string, password: string) => {
     setIsLoading(true)
@@ -46,7 +56,7 @@ export default function LoginForm() {
       if (!isLoginSuccess(resTyped)) {
         const msg =
           getLoginErrorMessage(resTyped) || t(LOGIN_TAGS.failed) || LOGIN_TAG_FALLBACKS.failed
-        alert(msg)
+        showToast(msg, "error")
         return
       }
 
@@ -67,12 +77,14 @@ export default function LoginForm() {
         })
       }
 
-      alert(t(LOGIN_TAGS.success) || LOGIN_TAG_FALLBACKS.success)
+      showToast(t(LOGIN_TAGS.success) || LOGIN_TAG_FALLBACKS.success, "success")
       setFormData({ ...INITIAL_LOGIN_FORM })
-      router.push(role === UserRole.Admin ? "/account" : "/account")
+      setTimeout(() => {
+        router.push(role === UserRole.Admin ? "/account" : "/account")
+      }, 1000)
     } catch (err) {
       const msg = getErrorMessage(err) || t(LOGIN_TAGS.failed) || LOGIN_TAG_FALLBACKS.failed
-      alert(msg)
+      showToast(msg, "error")
     } finally {
       setIsLoading(false)
     }
@@ -146,6 +158,14 @@ export default function LoginForm() {
           </p>
         </div>
       </div>
+
+      <Toast
+        message={toast.message}
+        variant={toast.variant}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={3500}
+      />
     </main>
   )
 }

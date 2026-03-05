@@ -296,6 +296,11 @@
     "submit": "Register",
     "processing": "Processing...",
     "success": "Registration successful!",
+    "successPending": "Registration successful! Please wait for admin approval.",
+    "successPendingWait": "Please wait for an administrator to review your registration.",
+    "successPendingIfApproved": "If approved, we will send an email to your address with a link to set your password and log in.",
+    "successPendingIfNotApproved": "If not approved, we will send you an email with the result and reason.",
+    "successPendingBackHome": "Back to Home",
     "hasAccount": "Already have an account?",
     "loginLink": "Login Now",
     "captchaRefresh": "Refresh Captcha",
@@ -357,6 +362,10 @@
     },
     "noRegions": "No regions available",
     "errors": {
+      "requiredField": "This field is required.",
+      "emailRequired": "Email is required.",
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidPhone": "Please enter a valid phone number (at least 8 digits).",
       "captcha": "Invalid captcha, please try again",
       "submit": "Registration failed, please try again later"
     }
@@ -421,6 +430,10 @@
     "shopSpending": "Shop spending",
     "goToAd": "Go to ad contact",
     "profileUpdated": "Profile updated!",
+    "profileUpdateError": "Profile update failed. Please try again.",
+    "demoProfileUpdated": "Demo account: profile updated locally (not saved).",
+    "profileRequiredFields": "Please fill in required fields (e.g. email).",
+    "profileRequiredCompanyName": "Please enter at least one company name (Vietnamese or Chinese).",
     "logoPoints": "Logo uploaded! You earned {{count}} contribution points",
     "logoUpdated": "Logo updated!",
     "uploadLogo": "Upload logo",

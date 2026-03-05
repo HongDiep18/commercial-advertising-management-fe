@@ -296,6 +296,11 @@
     "submit": "會員註冊",
     "processing": "處理中...",
     "success": "註冊成功！",
+    "successPending": "註冊成功！請等待管理員審核。",
+    "successPendingWait": "請等待管理員審核您的註冊申請。",
+    "successPendingIfApproved": "若審核通過，我們將寄送電子郵件至您填寫的信箱，您可依信件連結設定密碼並登入。",
+    "successPendingIfNotApproved": "若未通過審核，我們將以電子郵件通知您審核結果與說明。",
+    "successPendingBackHome": "返回首頁",
     "hasAccount": "已經有帳號？",
     "loginLink": "立即登入",
     "captchaRefresh": "刷新驗證碼",
@@ -357,6 +362,10 @@
     },
     "noRegions": "無可用地區",
     "errors": {
+      "requiredField": "此欄位為必填。",
+      "emailRequired": "電子郵件為必填。",
+      "invalidEmail": "請輸入有效的電子郵件地址。",
+      "invalidPhone": "請輸入有效的電話號碼（至少 8 位數字）。",
       "captcha": "驗證碼錯誤，請重新輸入",
       "submit": "註冊失敗，請稍後再試"
     }
@@ -421,6 +430,10 @@
     "shopSpending": "商城消費",
     "goToAd": "前往投放廣告",
     "profileUpdated": "會員資料已更新！",
+    "profileUpdateError": "會員資料更新失敗，請稍後再試。",
+    "demoProfileUpdated": "示範帳號：個人資料已於本機更新（未儲存）。",
+    "profileRequiredFields": "請填寫必填欄位（例如：E-Mail）。",
+    "profileRequiredCompanyName": "請至少填寫公司名稱（越文或中文）。",
     "logoPoints": "Logo 上傳成功！您獲得 {{count}} 點貢獻值",
     "logoUpdated": "Logo 更新成功！",
     "uploadLogo": "上傳 Logo",

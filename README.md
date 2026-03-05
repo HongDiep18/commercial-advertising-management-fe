@@ -1,17 +1,21 @@
 # VN Buyer Guide
 
-## Docker Setup
+Next.js app for the Vietnam Buyer Guide (directory, news, account, admin).  
+i18n: zh-TW, en-US, vi-VN. Stack: React 19, Next 16, TypeScript, Tailwind.
 
+## Scripts
 
-### Quick Start with Docker Compose (Easiest)
+| Command         | Description      |
+| --------------- | ---------------- |
+| `npm run dev`   | Start dev server |
+| `npm run build` | Production build |
+| `npm run start` | Run production   |
+| `npm run lint`  | Run ESLint       |
+
+## Docker
 
 ```bash
-# Build and start the container
-docker-compose up --build
-
-# Or run in detached mode (background)
-docker-compose up -d --build
-
-# Stop the container
-docker-compose down
+docker-compose up --build    # build and run
+docker-compose up -d --build # background
+docker-compose down          # stop
 ```
