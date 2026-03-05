@@ -19,7 +19,7 @@ import {
 } from "./registerConstants"
 import { MEMBERSHIP_TIER_OPTIONS, getCountryOptions, getRegionOptions } from "./registerOptions"
 import { useCaptcha } from "./useCaptcha"
-import { validateRegisterForm } from "./registerValidation"
+import { REGISTER_ERROR_KEYS, validateRegisterForm } from "./registerValidation"
 
 function getErrorMessage(err: unknown): string {
   if (err && typeof err === "object" && "data" in err) {
@@ -29,10 +29,22 @@ function getErrorMessage(err: unknown): string {
   return ""
 }
 
+function FieldWithError({ error, children }: { error?: string; children: React.ReactNode }) {
+  return (
+    <div data-field-error={error ? true : undefined}>
+      {children}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+    </div>
+  )
+}
+
 export default function RegisterForm() {
   const { t } = useTranslation()
   const router = useRouter()
   const [formData, setFormData] = useState<RegisterFormData>(INITIAL_REGISTER_FORM)
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>(
+    {}
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
@@ -71,26 +83,33 @@ export default function RegisterForm() {
     setFormData((prev: RegisterFormData) =>
       field === "country" ? { ...prev, [field]: value, region: "" } : { ...prev, [field]: value }
     )
+    if (fieldErrors[field])
+      setFieldErrors((prev: Partial<Record<keyof RegisterFormData, string>>) => ({
+        ...prev,
+        [field]: undefined,
+      }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const validation = validateRegisterForm(formData)
     if (!validation.valid) {
-      if ("invalidPhone" in validation && validation.invalidPhone) {
-        showToast(
-          t("register.errors.invalidPhone") ||
-            "Please enter a valid phone number (at least 8 digits).",
-          "warning"
-        )
-        return
-      }
-      const msg = (validation as { isEmail: boolean }).isEmail
-        ? t("register.errors.emailRequired") || "Email is required."
-        : t("register.errors.requiredField") || "This field is required."
-      showToast(msg, "warning")
+      const next: Partial<Record<keyof RegisterFormData, string>> = {}
+      validation.errors.forEach(({ field, kind }) => {
+        next[field] = t(REGISTER_ERROR_KEYS[kind])
+      })
+      setFieldErrors(next)
+      setTimeout(
+        () =>
+          document.querySelector("[data-field-error]")?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          }),
+        100
+      )
       return
     }
+    setFieldErrors({})
     if (!isCaptchaValid) {
       showToast(t("register.errors.captcha") || "驗證碼錯誤，請重新輸入", "warning")
       refreshCaptcha()
@@ -157,158 +176,182 @@ export default function RegisterForm() {
           <form onSubmit={handleSubmit} className="registration-form space-y-4">
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <Input
-                  placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
-                  value={formData.companyNameVi}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("companyNameVi", e.target.value)
-                  }
-                  required
-                />
-                <Input
-                  placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
-                  value={formData.companyNameCn}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("companyNameCn", e.target.value)
-                  }
-                  required
-                />
+                <FieldWithError error={fieldErrors.companyNameVi}>
+                  <Input
+                    placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
+                    value={formData.companyNameVi}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("companyNameVi", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
+                <FieldWithError error={fieldErrors.companyNameCn}>
+                  <Input
+                    placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
+                    value={formData.companyNameCn}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("companyNameCn", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Input
-                  placeholder={t("register.placeholders.phone") || "電話"}
-                  value={formData.phone}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("phone", e.target.value)
-                  }
-                  required
-                />
-                <Input
-                  placeholder={t("register.placeholders.taxId") || "稅號"}
-                  value={formData.taxId}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("taxId", e.target.value)
-                  }
-                  required
-                />
+                <FieldWithError error={fieldErrors.phone}>
+                  <Input
+                    placeholder={t("register.placeholders.phone") || "電話"}
+                    value={formData.phone}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("phone", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
+                <FieldWithError error={fieldErrors.taxId}>
+                  <Input
+                    placeholder={t("register.placeholders.taxId") || "稅號"}
+                    value={formData.taxId}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("taxId", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Input
-                  placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
-                  value={formData.contactPerson}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("contactPerson", e.target.value)
-                  }
-                  required
-                />
-                <Input
-                  placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
-                  value={formData.contactPhone}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("contactPhone", e.target.value)
-                  }
-                  required
-                />
+                <FieldWithError error={fieldErrors.contactPerson}>
+                  <Input
+                    placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
+                    value={formData.contactPerson}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("contactPerson", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
+                <FieldWithError error={fieldErrors.contactPhone}>
+                  <Input
+                    placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
+                    value={formData.contactPhone}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("contactPhone", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Input
-                  placeholder={t("register.placeholders.companyAddress") || "公司地址"}
-                  value={formData.companyAddress}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("companyAddress", e.target.value)
-                  }
-                  required
-                />
-                <Input
-                  type="email"
-                  placeholder={t("register.placeholders.email") || "電子郵件"}
-                  value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("email", e.target.value)
-                  }
-                  required
-                />
+                <FieldWithError error={fieldErrors.companyAddress}>
+                  <Input
+                    placeholder={t("register.placeholders.companyAddress") || "公司地址"}
+                    value={formData.companyAddress}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("companyAddress", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
+                <FieldWithError error={fieldErrors.email}>
+                  <Input
+                    type="email"
+                    placeholder={t("register.placeholders.email") || "電子郵件"}
+                    value={formData.email}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("email", e.target.value)
+                    }
+                    required
+                  />
+                </FieldWithError>
               </div>
 
               <div className="registration-form grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Select
-                  value={formData.country}
-                  onValueChange={(value) => handleInputChange("country", value)}
-                  required
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={t("register.placeholders.country") || "選擇國家 *"}
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {countries.map((c) => (
-                      <Select.Item key={c.value} value={c.value}>
-                        {c.label}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
-                <Select
-                  value={formData.region}
-                  onValueChange={(value) => handleInputChange("region", value)}
-                  disabled={!formData.country}
-                  required
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={
-                        !formData.country
-                          ? t("register.placeholders.selectCountryFirst") || "請先選擇國家"
-                          : t("register.placeholders.region") || "選擇地區 *"
-                      }
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {availableRegions.length > 0 ? (
-                      availableRegions.map((r) => (
-                        <Select.Item key={r.value} value={r.value}>
-                          {r.label}
+                <FieldWithError error={fieldErrors.country}>
+                  <Select
+                    value={formData.country}
+                    onValueChange={(v) => handleInputChange("country", v)}
+                    required
+                  >
+                    <Select.Trigger className="w-full">
+                      <Select.Value
+                        placeholder={t("register.placeholders.country") || "選擇國家 *"}
+                      />
+                    </Select.Trigger>
+                    <Select.Content>
+                      {countries.map((c) => (
+                        <Select.Item key={c.value} value={c.value}>
+                          {c.label}
                         </Select.Item>
-                      ))
-                    ) : (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">
-                        {t("register.noRegions") || "無可用地區"}
-                      </div>
-                    )}
-                  </Select.Content>
-                </Select>
-                <Select
-                  value={formData.industry}
-                  onValueChange={(value) => handleInputChange("industry", value)}
-                  required
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {categories.map((cat) => (
-                      <Select.Item key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
+                      ))}
+                    </Select.Content>
+                  </Select>
+                </FieldWithError>
+                <FieldWithError error={fieldErrors.region}>
+                  <Select
+                    value={formData.region}
+                    onValueChange={(v) => handleInputChange("region", v)}
+                    disabled={!formData.country}
+                    required
+                  >
+                    <Select.Trigger className="w-full">
+                      <Select.Value
+                        placeholder={
+                          !formData.country
+                            ? t("register.placeholders.selectCountryFirst") || "請先選擇國家"
+                            : t("register.placeholders.region") || "選擇地區 *"
+                        }
+                      />
+                    </Select.Trigger>
+                    <Select.Content>
+                      {availableRegions.length > 0 ? (
+                        availableRegions.map((r) => (
+                          <Select.Item key={r.value} value={r.value}>
+                            {r.label}
+                          </Select.Item>
+                        ))
+                      ) : (
+                        <div className="text-muted-foreground px-2 py-1.5 text-sm">
+                          {t("register.noRegions") || "無可用地區"}
+                        </div>
+                      )}
+                    </Select.Content>
+                  </Select>
+                </FieldWithError>
+                <FieldWithError error={fieldErrors.industry}>
+                  <Select
+                    value={formData.industry}
+                    onValueChange={(v) => handleInputChange("industry", v)}
+                    required
+                  >
+                    <Select.Trigger className="w-full">
+                      <Select.Value
+                        placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
+                      />
+                    </Select.Trigger>
+                    <Select.Content>
+                      {categories.map((cat) => (
+                        <Select.Item key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select>
+                </FieldWithError>
               </div>
 
-              <Input
-                placeholder={t("register.placeholders.website") || "網站 *"}
-                value={formData.website}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleInputChange("website", e.target.value)
-                }
-                required
-              />
+              <FieldWithError error={fieldErrors.website}>
+                <Input
+                  placeholder={t("register.placeholders.website") || "網站 *"}
+                  value={formData.website}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("website", e.target.value)
+                  }
+                  required
+                />
+              </FieldWithError>
 
               <div className="space-y-2">
                 <label className="text-foreground text-sm font-medium">
@@ -339,15 +382,17 @@ export default function RegisterForm() {
                 </p>
               </div>
 
-              <Textarea
-                placeholder={t("register.placeholders.introduction") || "簡單介紹 *"}
-                value={formData.introduction}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  handleInputChange("introduction", e.target.value)
-                }
-                rows={4}
-                required
-              />
+              <FieldWithError error={fieldErrors.introduction}>
+                <Textarea
+                  placeholder={t("register.placeholders.introduction") || "簡單介紹 *"}
+                  value={formData.introduction}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    handleInputChange("introduction", e.target.value)
+                  }
+                  rows={4}
+                  required
+                />
+              </FieldWithError>
             </div>
 
             <div className="flex items-center justify-center gap-4 pt-4">

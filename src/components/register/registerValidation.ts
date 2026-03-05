@@ -1,52 +1,112 @@
 import type { RegisterFormData } from "./registerConstants"
+import type { ProfileFormData } from "@/types/account"
+
+const PHONE_FIELDS = ["phone", "contactPhone"] as const
+const EMAIL_FIELD = "email" as const
+const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
+  "companyNameVi",
+  "companyNameCn",
+  "phone",
+  "taxId",
+  "contactPerson",
+  "contactPhone",
+  "companyAddress",
+  "email",
+  "country",
+  "region",
+  "industry",
+  "website",
+  "introduction",
+]
+const PROFILE_REQUIRED_KEYS: (keyof ProfileFormData)[] = [
+  "companyNameVi",
+  "companyNameCn",
+  "phone",
+  "taxId",
+  "contactPerson",
+  "contactPhone",
+  "companyAddress",
+  "email",
+  "country",
+  "region",
+  "industry",
+  "website",
+  "introduction",
+]
 
 const PHONE_REGEX = /^[\d\s\-+()]+$/
 const MIN_PHONE_DIGITS = 8
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const PHONE_FIELDS: (keyof RegisterFormData)[] = ["phone", "contactPhone"]
-
-function isPhoneNumber(value: string): boolean {
-  const trimmed = value.trim()
-  if (!trimmed.length) return false
-  if (!PHONE_REGEX.test(trimmed)) return false
-  const digitCount = (trimmed.match(/\d/g) ?? []).length
-  return digitCount >= MIN_PHONE_DIGITS
+function filled(v: unknown): boolean {
+  return typeof v === "string" && v.trim().length > 0
 }
 
-export const REGISTER_REQUIRED_FIELDS: { key: keyof RegisterFormData; isEmail: boolean }[] = [
-  { key: "companyNameVi", isEmail: false },
-  { key: "companyNameCn", isEmail: false },
-  { key: "phone", isEmail: false },
-  { key: "taxId", isEmail: false },
-  { key: "contactPerson", isEmail: false },
-  { key: "contactPhone", isEmail: false },
-  { key: "companyAddress", isEmail: false },
-  { key: "email", isEmail: true },
-  { key: "country", isEmail: false },
-  { key: "region", isEmail: false },
-  { key: "industry", isEmail: false },
-  { key: "website", isEmail: false },
-  { key: "introduction", isEmail: false },
-]
+function isPhone(value: string): boolean {
+  const t = value.trim()
+  return t.length > 0 && PHONE_REGEX.test(t) && (t.match(/\d/g) ?? []).length >= MIN_PHONE_DIGITS
+}
+
+function isEmail(value: string): boolean {
+  return EMAIL_REGEX.test(value.trim())
+}
+
+export type RegisterErrorKind = "required" | "invalidEmail" | "invalidPhone"
 
 export type RegisterValidationResult =
   | { valid: true }
-  | { valid: false; field: keyof RegisterFormData; isEmail: boolean }
-  | { valid: false; field: keyof RegisterFormData; invalidPhone: true }
+  | { valid: false; errors: Array<{ field: keyof RegisterFormData; kind: RegisterErrorKind }> }
 
-export function validateRegisterForm(data: RegisterFormData): RegisterValidationResult {
-  for (const { key, isEmail } of REGISTER_REQUIRED_FIELDS) {
-    const value = data[key]
-    const filled = typeof value === "string" ? value.trim().length > 0 : false
-    if (!filled) {
-      return { valid: false, field: key, isEmail }
-    }
+export type ProfileValidationResult =
+  | { valid: true }
+  | { valid: false; errors: Array<{ field: keyof ProfileFormData; kind: RegisterErrorKind }> }
+
+export const REGISTER_ERROR_KEYS: Record<RegisterErrorKind, string> = {
+  required: "register.errors.requiredField",
+  invalidEmail: "register.errors.invalidEmail",
+  invalidPhone: "register.errors.invalidPhone",
+}
+
+export const PROFILE_ERROR_KEYS = REGISTER_ERROR_KEYS
+
+function runValidation(
+  data: Record<string, unknown>,
+  requiredKeys: string[]
+): Array<{ field: string; kind: RegisterErrorKind }> {
+  const errors: Array<{ field: string; kind: RegisterErrorKind }> = []
+  for (const key of requiredKeys) {
+    if (!filled(data[key])) errors.push({ field: key, kind: "required" })
+  }
+  const emailVal = data[EMAIL_FIELD]
+  if (filled(emailVal) && !isEmail(String(emailVal))) {
+    errors.push({ field: EMAIL_FIELD, kind: "invalidEmail" })
   }
   for (const key of PHONE_FIELDS) {
-    const value = data[key]
-    if (typeof value === "string" && !isPhoneNumber(value)) {
-      return { valid: false, field: key, invalidPhone: true }
+    const val = data[key]
+    if (filled(val) && !isPhone(String(val))) {
+      errors.push({ field: key, kind: "invalidPhone" })
     }
   }
-  return { valid: true }
+  return errors
+}
+
+export function validateRegisterForm(data: RegisterFormData): RegisterValidationResult {
+  const errors = runValidation(data as unknown as Record<string, unknown>, REQUIRED_KEYS) as Array<{
+    field: keyof RegisterFormData
+    kind: RegisterErrorKind
+  }>
+  if (errors.length === 0) return { valid: true }
+  return { valid: false, errors }
+}
+
+export function validateProfileForm(data: ProfileFormData): ProfileValidationResult {
+  const errors = runValidation(
+    data as unknown as Record<string, unknown>,
+    PROFILE_REQUIRED_KEYS
+  ) as Array<{
+    field: keyof ProfileFormData
+    kind: RegisterErrorKind
+  }>
+  if (errors.length === 0) return { valid: true }
+  return { valid: false, errors }
 }

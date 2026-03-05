@@ -30,6 +30,8 @@ import { UpdateProfilePayload } from "@/types/auth"
 import { getProfile, type ProfileResponse } from "@/api/profile"
 import { updateProfile } from "@/api/auth"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
+import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
+import { getDemoProfileForUser } from "@/components/login/demo"
 
 const INITIAL_PROFILE_FORM: ProfileFormData = {
   companyNameVi: "",
@@ -90,6 +92,9 @@ export default function AccountPage() {
     data: { ...INITIAL_PROFILE_FORM, email: user?.email ?? "" },
     isSaving: false,
   })
+  const [profileFieldErrors, setProfileFieldErrors] = useState<
+    Partial<Record<keyof ProfileFormData, string>>
+  >({})
   const [toast, setToast] = useState<ToastState>({
     message: "",
     variant: "info",
@@ -152,6 +157,11 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (!isLoggedIn) return
+    const demoProfile = getDemoProfileForUser(user)
+    if (demoProfile) {
+      setProfile((p) => ({ ...p, data: demoProfile }))
+      return
+    }
     let cancelled = false
     ;(async () => {
       try {
@@ -165,10 +175,15 @@ export default function AccountPage() {
     return () => {
       cancelled = true
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, user])
 
   useEffect(() => {
     if (!modals.profile || !isLoggedIn) return
+    const demoProfile = getDemoProfileForUser(user)
+    if (demoProfile) {
+      applyApiProfile({ ...demoProfile, uploadLogo: undefined } as ProfileResponse, user?.email)
+      return
+    }
     let cancelled = false
     ;(async () => {
       try {
@@ -182,7 +197,7 @@ export default function AccountPage() {
     return () => {
       cancelled = true
     }
-  }, [modals.profile, isLoggedIn, user?.email])
+  }, [modals.profile, isLoggedIn, user])
 
   const handleProfileChange = (field: string, value: string) => {
     setProfileData((prev) => {
@@ -192,25 +207,42 @@ export default function AccountPage() {
       }
       return { ...prev, [field]: value }
     })
+    if (profileFieldErrors[field as keyof ProfileFormData]) {
+      setProfileFieldErrors((prev) => ({ ...prev, [field]: undefined }))
+    }
   }
 
   const handleSaveProfile = async () => {
-    const emailTrim = profileData.email?.trim() ?? ""
-    const companyNameViTrim = profileData.companyNameVi?.trim() ?? ""
-    const companyNameCnTrim = profileData.companyNameCn?.trim() ?? ""
-    if (!emailTrim) {
-      showToast(t("account.profileRequiredFields") || "請填寫必填欄位（例如：E-Mail）。", "warning")
-      return
-    }
-    if (!companyNameViTrim && !companyNameCnTrim) {
-      showToast(
-        t("account.profileRequiredCompanyName") || "請至少填寫公司名稱（越文或中文）。",
-        "warning"
+    const validation = validateProfileForm(profileData)
+    if (!validation.valid) {
+      const next: Partial<Record<keyof ProfileFormData, string>> = {}
+      validation.errors.forEach(({ field, kind }) => {
+        next[field] = t(PROFILE_ERROR_KEYS[kind])
+      })
+      setProfileFieldErrors(next)
+      setTimeout(
+        () =>
+          document.querySelector("[data-profile-field-error]")?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          }),
+        100
       )
       return
     }
+    setProfileFieldErrors({})
     try {
       setProfile((p) => ({ ...p, isSaving: true }))
+      if (getDemoProfileForUser(user)) {
+        setProfile((p) => ({ ...p, data: profileData, isSaving: false }))
+        setLogo((l) => ({ ...l, changed: false }))
+        showToast(
+          t("account.demoProfileUpdated") || "Demo account: profile updated locally (not saved).",
+          "info"
+        )
+        setModals((m) => ({ ...m, profile: false }))
+        return
+      }
       const payload: UpdateProfilePayload = {
         company_name_vi: profileData.companyNameVi,
         company_name_cn: profileData.companyNameCn,
@@ -344,6 +376,7 @@ export default function AccountPage() {
         onClose={() => setModals((m) => ({ ...m, profile: false }))}
         profileData={profileData}
         onProfileChange={handleProfileChange}
+        fieldErrors={profileFieldErrors}
         companyLogo={logo.url}
         onLogoUpload={handleLogoUpload}
         fileInputRef={fileInputRef}

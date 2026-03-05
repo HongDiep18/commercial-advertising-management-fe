@@ -15,11 +15,21 @@ import type { TFunction } from "i18next"
 type CountryOption = { value: string; label: string }
 type RegionOption = { value: string; label: string }
 
+function FieldWithError({ error, children }: { error?: string; children: React.ReactNode }) {
+  return (
+    <div data-profile-field-error={error ? true : undefined}>
+      {children}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+    </div>
+  )
+}
+
 type AccountProfileModalProps = {
   open: boolean
   onClose: () => void
   profileData: ProfileFormData
   onProfileChange: (field: string, value: string) => void
+  fieldErrors?: Partial<Record<keyof ProfileFormData, string>>
   companyLogo: string | null
   onLogoUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
   fileInputRef: RefObject<HTMLInputElement | null>
@@ -38,6 +48,7 @@ export function AccountProfileModal({
   onClose,
   profileData,
   onProfileChange,
+  fieldErrors = {},
   companyLogo,
   onLogoUpload,
   fileInputRef,
@@ -123,150 +134,176 @@ export function AccountProfileModal({
               {t("account.companyInfo") || "公司資料"}
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input
-                placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
-                value={profileData.companyNameVi}
-                onChange={(e) => onProfileChange("companyNameVi", e.target.value)}
-              />
-              <Input
-                placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
-                value={profileData.companyNameCn}
-                onChange={(e) => onProfileChange("companyNameCn", e.target.value)}
-              />
+              <FieldWithError error={fieldErrors.companyNameVi}>
+                <Input
+                  placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
+                  value={profileData.companyNameVi}
+                  onChange={(e) => onProfileChange("companyNameVi", e.target.value)}
+                />
+              </FieldWithError>
+              <FieldWithError error={fieldErrors.companyNameCn}>
+                <Input
+                  placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
+                  value={profileData.companyNameCn}
+                  onChange={(e) => onProfileChange("companyNameCn", e.target.value)}
+                />
+              </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input
-                placeholder={t("register.placeholders.phone") || "電話"}
-                value={profileData.phone}
-                onChange={(e) => onProfileChange("phone", e.target.value)}
-              />
-              <Input
-                placeholder={t("register.placeholders.taxId") || "稅號"}
-                value={profileData.taxId}
-                onChange={(e) => onProfileChange("taxId", e.target.value)}
-              />
+              <FieldWithError error={fieldErrors.phone}>
+                <Input
+                  placeholder={t("register.placeholders.phone") || "電話"}
+                  value={profileData.phone}
+                  onChange={(e) => onProfileChange("phone", e.target.value)}
+                />
+              </FieldWithError>
+              <FieldWithError error={fieldErrors.taxId}>
+                <Input
+                  placeholder={t("register.placeholders.taxId") || "稅號"}
+                  value={profileData.taxId}
+                  onChange={(e) => onProfileChange("taxId", e.target.value)}
+                />
+              </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input
-                placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
-                value={profileData.contactPerson}
-                onChange={(e) => onProfileChange("contactPerson", e.target.value)}
-              />
-              <Input
-                placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
-                value={profileData.contactPhone}
-                onChange={(e) => onProfileChange("contactPhone", e.target.value)}
-              />
+              <FieldWithError error={fieldErrors.contactPerson}>
+                <Input
+                  placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
+                  value={profileData.contactPerson}
+                  onChange={(e) => onProfileChange("contactPerson", e.target.value)}
+                />
+              </FieldWithError>
+              <FieldWithError error={fieldErrors.contactPhone}>
+                <Input
+                  placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
+                  value={profileData.contactPhone}
+                  onChange={(e) => onProfileChange("contactPhone", e.target.value)}
+                />
+              </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Input
-                placeholder={t("register.placeholders.companyAddress") || "公司地址"}
-                value={profileData.companyAddress}
-                onChange={(e) => onProfileChange("companyAddress", e.target.value)}
-              />
-              <Input
-                placeholder={t("register.placeholders.email") || "E-Mail"}
-                value={profileData.email}
-                onChange={(e) => onProfileChange("email", e.target.value)}
-              />
+              <FieldWithError error={fieldErrors.companyAddress}>
+                <Input
+                  placeholder={t("register.placeholders.companyAddress") || "公司地址"}
+                  value={profileData.companyAddress}
+                  onChange={(e) => onProfileChange("companyAddress", e.target.value)}
+                />
+              </FieldWithError>
+              <FieldWithError error={fieldErrors.email}>
+                <Input
+                  placeholder={t("register.placeholders.email") || "E-Mail"}
+                  value={profileData.email}
+                  onChange={(e) => onProfileChange("email", e.target.value)}
+                />
+              </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Select
-                value={profileData.country || COUNTRY_NONE}
-                onValueChange={(value) => onProfileChange("country", value)}
-                options={[
-                  {
-                    value: COUNTRY_NONE,
-                    label: t("register.placeholders.country") || "Select Country *",
-                  },
-                  ...countries,
-                ]}
-              >
-                <Select.Trigger className="w-full">
-                  <Select.Value
-                    placeholder={t("register.placeholders.country") || "Select Country *"}
-                  />
-                </Select.Trigger>
-                <Select.Content>
-                  <Select.Item value={COUNTRY_NONE} key="country-empty">
-                    {t("register.placeholders.country") || "Select Country *"}
-                  </Select.Item>
-                  {countries.map((c) => (
-                    <Select.Item key={c.value} value={c.value}>
-                      {c.label}
+              <FieldWithError error={fieldErrors.country}>
+                <Select
+                  value={profileData.country || COUNTRY_NONE}
+                  onValueChange={(value) => onProfileChange("country", value)}
+                  options={[
+                    {
+                      value: COUNTRY_NONE,
+                      label: t("register.placeholders.country") || "Select Country *",
+                    },
+                    ...countries,
+                  ]}
+                >
+                  <Select.Trigger className="w-full">
+                    <Select.Value
+                      placeholder={t("register.placeholders.country") || "Select Country *"}
+                    />
+                  </Select.Trigger>
+                  <Select.Content>
+                    <Select.Item value={COUNTRY_NONE} key="country-empty">
+                      {t("register.placeholders.country") || "Select Country *"}
                     </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select>
-
-              <Select
-                key={profileData.country || "__no_country__"}
-                value={regionValue}
-                onValueChange={(value) => onProfileChange("region", value)}
-                disabled={!hasCountry}
-                options={availableRegions}
-              >
-                <Select.Trigger className="w-full">
-                  <Select.Value
-                    placeholder={
-                      !hasCountry
-                        ? t("register.placeholders.selectCountryFirst") ||
-                          "Please select country first"
-                        : t("register.placeholders.region") || "Select Region *"
-                    }
-                  />
-                </Select.Trigger>
-                <Select.Content>
-                  {availableRegions.length > 0 ? (
-                    availableRegions.map((r) => (
-                      <Select.Item key={r.value} value={r.value}>
-                        {r.label}
+                    {countries.map((c) => (
+                      <Select.Item key={c.value} value={c.value}>
+                        {c.label}
                       </Select.Item>
-                    ))
-                  ) : (
-                    <div className="text-muted-foreground px-2 py-1.5 text-sm">
-                      {t("register.noRegions") || "無可用地區"}
-                    </div>
-                  )}
-                </Select.Content>
-              </Select>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </FieldWithError>
+
+              <FieldWithError error={fieldErrors.region}>
+                <Select
+                  key={profileData.country || "__no_country__"}
+                  value={regionValue}
+                  onValueChange={(value) => onProfileChange("region", value)}
+                  disabled={!hasCountry}
+                  options={availableRegions}
+                >
+                  <Select.Trigger className="w-full">
+                    <Select.Value
+                      placeholder={
+                        !hasCountry
+                          ? t("register.placeholders.selectCountryFirst") ||
+                            "Please select country first"
+                          : t("register.placeholders.region") || "Select Region *"
+                      }
+                    />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {availableRegions.length > 0 ? (
+                      availableRegions.map((r) => (
+                        <Select.Item key={r.value} value={r.value}>
+                          {r.label}
+                        </Select.Item>
+                      ))
+                    ) : (
+                      <div className="text-muted-foreground px-2 py-1.5 text-sm">
+                        {t("register.noRegions") || "無可用地區"}
+                      </div>
+                    )}
+                  </Select.Content>
+                </Select>
+              </FieldWithError>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <Select
-                value={profileData.industry}
-                onValueChange={(value) => onProfileChange("industry", value)}
-                options={categories.map((cat) => ({
-                  value: cat.id,
-                  label: t(`directory.categories.${cat.id}`) || cat.name,
-                }))}
-              >
-                <Select.Trigger className="w-full min-w-0">
-                  <Select.Value
-                    placeholder={t("register.placeholders.industry") || "選擇產業類別"}
-                  />
-                </Select.Trigger>
-                <Select.Content>
-                  {categories.map((cat) => (
-                    <Select.Item key={cat.id} value={cat.id}>
-                      {t(`directory.categories.${cat.id}`) || cat.name}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select>
+              <FieldWithError error={fieldErrors.industry}>
+                <Select
+                  value={profileData.industry}
+                  onValueChange={(value) => onProfileChange("industry", value)}
+                  options={categories.map((cat) => ({
+                    value: cat.id,
+                    label: t(`directory.categories.${cat.id}`) || cat.name,
+                  }))}
+                >
+                  <Select.Trigger className="w-full min-w-0">
+                    <Select.Value
+                      placeholder={t("register.placeholders.industry") || "選擇產業類別"}
+                    />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {categories.map((cat) => (
+                      <Select.Item key={cat.id} value={cat.id}>
+                        {t(`directory.categories.${cat.id}`) || cat.name}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </FieldWithError>
             </div>
 
-            <Input
-              placeholder="Website"
-              value={profileData.website}
-              onChange={(e) => onProfileChange("website", e.target.value)}
-            />
-            <Textarea
-              placeholder={t("register.placeholders.introduction") || "簡單介紹"}
-              value={profileData.introduction}
-              onChange={(e) => onProfileChange("introduction", e.target.value)}
-              rows={3}
-            />
+            <FieldWithError error={fieldErrors.website}>
+              <Input
+                placeholder="Website"
+                value={profileData.website}
+                onChange={(e) => onProfileChange("website", e.target.value)}
+              />
+            </FieldWithError>
+            <FieldWithError error={fieldErrors.introduction}>
+              <Textarea
+                placeholder={t("register.placeholders.introduction") || "簡單介紹"}
+                value={profileData.introduction}
+                onChange={(e) => onProfileChange("introduction", e.target.value)}
+                rows={3}
+              />
+            </FieldWithError>
           </div>
           <div className="flex gap-3 border-t border-gray-400 pt-4">
             <Button

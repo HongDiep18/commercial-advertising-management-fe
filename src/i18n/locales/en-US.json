@@ -364,6 +364,7 @@
     "errors": {
       "requiredField": "This field is required.",
       "emailRequired": "Email is required.",
+      "invalidEmail": "Please enter a valid email address.",
       "invalidPhone": "Please enter a valid phone number (at least 8 digits).",
       "captcha": "Invalid captcha, please try again",
       "submit": "Registration failed, please try again later"
@@ -430,6 +431,7 @@
     "goToAd": "Go to ad contact",
     "profileUpdated": "Profile updated!",
     "profileUpdateError": "Profile update failed. Please try again.",
+    "demoProfileUpdated": "Demo account: profile updated locally (not saved).",
     "profileRequiredFields": "Please fill in required fields (e.g. email).",
     "profileRequiredCompanyName": "Please enter at least one company name (Vietnamese or Chinese).",
     "logoPoints": "Logo uploaded! You earned {{count}} contribution points",
