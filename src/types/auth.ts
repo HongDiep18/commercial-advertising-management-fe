@@ -82,7 +82,7 @@ export function formDataToRegisterPayload(form: {
 }
 
 export type UpdateProfilePayload = {
-  logo: string
+  upload_logo?: string
   company_name_vi: string
   company_name_cn: string
   phone: string

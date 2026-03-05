@@ -236,6 +236,10 @@ export function AccountProfileModal({
               <Select
                 value={profileData.industry}
                 onValueChange={(value) => onProfileChange("industry", value)}
+                options={categories.map((cat) => ({
+                  value: cat.id,
+                  label: t(`directory.categories.${cat.id}`) || cat.name,
+                }))}
               >
                 <Select.Trigger className="w-full min-w-0">
                   <Select.Value

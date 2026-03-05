@@ -362,6 +362,9 @@
     },
     "noRegions": "No regions available",
     "errors": {
+      "requiredField": "This field is required.",
+      "emailRequired": "Email is required.",
+      "invalidPhone": "Please enter a valid phone number (at least 8 digits).",
       "captcha": "Invalid captcha, please try again",
       "submit": "Registration failed, please try again later"
     }
@@ -426,6 +429,9 @@
     "shopSpending": "Shop spending",
     "goToAd": "Go to ad contact",
     "profileUpdated": "Profile updated!",
+    "profileUpdateError": "Profile update failed. Please try again.",
+    "profileRequiredFields": "Please fill in required fields (e.g. email).",
+    "profileRequiredCompanyName": "Please enter at least one company name (Vietnamese or Chinese).",
     "logoPoints": "Logo uploaded! You earned {{count}} contribution points",
     "logoUpdated": "Logo updated!",
     "uploadLogo": "Upload logo",

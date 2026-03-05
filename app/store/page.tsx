@@ -13,22 +13,22 @@ function StoreContent() {
   const [selectedCategory, setSelectedCategory] = useState<string>("全部商品")
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Initialize category from URL on mount
   useEffect(() => {
     const categoryFromUrl = searchParams.get("category")
     if (categoryFromUrl) {
-      setSelectedCategory(decodeURIComponent(categoryFromUrl))
+      setTimeout(() => {
+        setSelectedCategory(decodeURIComponent(categoryFromUrl))
+      }, 0)
     }
   }, [searchParams])
 
-  // Update URL when category changes
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category)
     router.push(`/store?category=${encodeURIComponent(category)}`, { scroll: false })
   }
 
   return (
-    <div className="min-h-screen bg-body-bg-dark flex flex-col">
+    <div className="bg-body-bg-dark flex min-h-screen flex-col">
       <Header />
 
       <div className="flex-1 pt-14">
@@ -42,8 +42,8 @@ function StoreContent() {
           </Suspense>
 
           {/* Main Content */}
-          <main className="flex-1 p-6 lg:p-8 min-h-[calc(100vh-3.5rem)]">
-            <div className="max-w-6xl mx-auto">
+          <main className="min-h-[calc(100vh-3.5rem)] flex-1 p-6 lg:p-8">
+            <div className="mx-auto max-w-6xl">
               {/* Products Grid */}
               <StoreGrid
                 selectedCategory={selectedCategory}

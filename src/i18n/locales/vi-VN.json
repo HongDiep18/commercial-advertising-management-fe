@@ -362,6 +362,9 @@
     },
     "noRegions": "Không có khu vực nào",
     "errors": {
+      "requiredField": "Trường này là bắt buộc.",
+      "emailRequired": "Email là bắt buộc.",
+      "invalidPhone": "Vui lòng nhập số điện thoại hợp lệ (ít nhất 8 chữ số).",
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
       "submit": "Đăng ký thất bại, vui lòng thử lại sau"
     }
@@ -426,6 +429,9 @@
     "shopSpending": "Chi tiêu cửa hàng",
     "goToAd": "Liên hệ quảng cáo",
     "profileUpdated": "Đã cập nhật hồ sơ!",
+    "profileUpdateError": "Cập nhật hồ sơ thất bại. Vui lòng thử lại.",
+    "profileRequiredFields": "Vui lòng điền các trường bắt buộc (ví dụ: email).",
+    "profileRequiredCompanyName": "Vui lòng nhập ít nhất một tên công ty (tiếng Việt hoặc tiếng Trung).",
     "logoPoints": "Tải logo thành công! Bạn nhận {{count}} điểm",
     "logoUpdated": "Đã cập nhật logo!",
     "uploadLogo": "Tải logo",

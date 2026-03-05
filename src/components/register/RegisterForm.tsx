@@ -9,6 +9,7 @@ import Input from "../ui/Input"
 import Select from "../ui/Select"
 import Textarea from "../ui/Textarea"
 import Button from "../ui/Button"
+import { Toast, type ToastVariant } from "../ui/Toast"
 import { register } from "@/api/auth"
 import { formDataToRegisterPayload } from "@/types/auth"
 import {
@@ -18,6 +19,7 @@ import {
 } from "./registerConstants"
 import { MEMBERSHIP_TIER_OPTIONS, getCountryOptions, getRegionOptions } from "./registerOptions"
 import { useCaptcha } from "./useCaptcha"
+import { validateRegisterForm } from "./registerValidation"
 
 function getErrorMessage(err: unknown): string {
   if (err && typeof err === "object" && "data" in err) {
@@ -33,6 +35,18 @@ export default function RegisterForm() {
   const [formData, setFormData] = useState<RegisterFormData>(INITIAL_REGISTER_FORM)
   const [isLoading, setIsLoading] = useState(false)
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
+    message: "",
+    variant: "info",
+    visible: false,
+  })
+  const showToast = (message: string, variant: ToastVariant = "info") =>
+    setToast({ message, variant, visible: true })
+  const hideToast = () =>
+    setToast((prev: { message: string; variant: ToastVariant; visible: boolean }) => ({
+      ...prev,
+      visible: false,
+    }))
   const {
     input: captchaInput,
     setInput: setCaptchaInput,
@@ -54,15 +68,31 @@ export default function RegisterForm() {
   ]
 
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
-    setFormData((prev) =>
+    setFormData((prev: RegisterFormData) =>
       field === "country" ? { ...prev, [field]: value, region: "" } : { ...prev, [field]: value }
     )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const validation = validateRegisterForm(formData)
+    if (!validation.valid) {
+      if ("invalidPhone" in validation && validation.invalidPhone) {
+        showToast(
+          t("register.errors.invalidPhone") ||
+            "Please enter a valid phone number (at least 8 digits).",
+          "warning"
+        )
+        return
+      }
+      const msg = (validation as { isEmail: boolean }).isEmail
+        ? t("register.errors.emailRequired") || "Email is required."
+        : t("register.errors.requiredField") || "This field is required."
+      showToast(msg, "warning")
+      return
+    }
     if (!isCaptchaValid) {
-      alert(t("register.errors.captcha") || "驗證碼錯誤，請重新輸入")
+      showToast(t("register.errors.captcha") || "驗證碼錯誤，請重新輸入", "warning")
       refreshCaptcha()
       return
     }
@@ -76,7 +106,7 @@ export default function RegisterForm() {
       setRegistrationSuccess(true)
     } catch (err) {
       const msg = getErrorMessage(err)
-      alert(msg || t("register.errors.submit") || "註冊失敗，請稍後再試")
+      showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
     } finally {
       setIsLoading(false)
     }
@@ -130,13 +160,17 @@ export default function RegisterForm() {
                 <Input
                   placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
                   value={formData.companyNameVi}
-                  onChange={(e) => handleInputChange("companyNameVi", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("companyNameVi", e.target.value)
+                  }
                   required
                 />
                 <Input
                   placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
                   value={formData.companyNameCn}
-                  onChange={(e) => handleInputChange("companyNameCn", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("companyNameCn", e.target.value)
+                  }
                   required
                 />
               </div>
@@ -145,13 +179,17 @@ export default function RegisterForm() {
                 <Input
                   placeholder={t("register.placeholders.phone") || "電話"}
                   value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("phone", e.target.value)
+                  }
                   required
                 />
                 <Input
                   placeholder={t("register.placeholders.taxId") || "稅號"}
                   value={formData.taxId}
-                  onChange={(e) => handleInputChange("taxId", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("taxId", e.target.value)
+                  }
                   required
                 />
               </div>
@@ -160,13 +198,17 @@ export default function RegisterForm() {
                 <Input
                   placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
                   value={formData.contactPerson}
-                  onChange={(e) => handleInputChange("contactPerson", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("contactPerson", e.target.value)
+                  }
                   required
                 />
                 <Input
                   placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
                   value={formData.contactPhone}
-                  onChange={(e) => handleInputChange("contactPhone", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("contactPhone", e.target.value)
+                  }
                   required
                 />
               </div>
@@ -175,14 +217,18 @@ export default function RegisterForm() {
                 <Input
                   placeholder={t("register.placeholders.companyAddress") || "公司地址"}
                   value={formData.companyAddress}
-                  onChange={(e) => handleInputChange("companyAddress", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("companyAddress", e.target.value)
+                  }
                   required
                 />
                 <Input
                   type="email"
                   placeholder={t("register.placeholders.email") || "電子郵件"}
                   value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange("email", e.target.value)
+                  }
                   required
                 />
               </div>
@@ -258,7 +304,9 @@ export default function RegisterForm() {
               <Input
                 placeholder={t("register.placeholders.website") || "網站 *"}
                 value={formData.website}
-                onChange={(e) => handleInputChange("website", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleInputChange("website", e.target.value)
+                }
                 required
               />
 
@@ -294,7 +342,9 @@ export default function RegisterForm() {
               <Textarea
                 placeholder={t("register.placeholders.introduction") || "簡單介紹 *"}
                 value={formData.introduction}
-                onChange={(e) => handleInputChange("introduction", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  handleInputChange("introduction", e.target.value)
+                }
                 rows={4}
                 required
               />
@@ -304,7 +354,9 @@ export default function RegisterForm() {
               <Input
                 placeholder={captchaPlaceholder}
                 value={captchaInput}
-                onChange={(e) => setCaptchaInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setCaptchaInput(e.target.value)
+                }
                 required
                 className="w-[20%]"
               />
@@ -350,6 +402,14 @@ export default function RegisterForm() {
           </form>
         </div>
       </div>
+
+      <Toast
+        message={toast.message}
+        variant={toast.variant}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={3500}
+      />
     </div>
   )
 }

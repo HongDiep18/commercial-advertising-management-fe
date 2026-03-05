@@ -2,11 +2,7 @@
 
 import { Shield, X, CheckCircle2 } from "lucide-react"
 import Button from "@/components/ui/Button"
-import {
-  MembershipTier,
-  MEMBERSHIP_CONFIG,
-  MEMBERSHIP_THRESHOLDS,
-} from "@/contexts/user-context"
+import { MembershipTier, MEMBERSHIP_CONFIG, MEMBERSHIP_THRESHOLDS } from "@/contexts/user-context"
 import type { TFunction } from "i18next"
 
 type AccountBenefitsModalProps = {
@@ -23,12 +19,7 @@ const TIERS: MembershipTier[] = [
   MembershipTier.Diamond,
 ]
 
-export function AccountBenefitsModal({
-  open,
-  onClose,
-  memberTier,
-  t,
-}: AccountBenefitsModalProps) {
+export function AccountBenefitsModal({ open, onClose, memberTier, t }: AccountBenefitsModalProps) {
   if (!open) return null
 
   return (
@@ -56,9 +47,7 @@ export function AccountBenefitsModal({
               <div
                 key={tier}
                 className={`rounded-lg border-2 p-4 ${
-                  isCurrentTier
-                    ? "border-primary bg-primary/5"
-                    : "border-border border-gray-300"
+                  isCurrentTier ? "border-primary bg-primary/5" : "border-border border-gray-300"
                 }`}
               >
                 <div className="mb-3 flex items-center justify-between">
@@ -75,9 +64,7 @@ export function AccountBenefitsModal({
                     )}
                   </div>
                   <div className="text-right text-sm">
-                    <p className="font-medium">
-                      {MEMBERSHIP_THRESHOLDS[tier].toLocaleString()} 點
-                    </p>
+                    <p className="font-medium">{MEMBERSHIP_THRESHOLDS[tier].toLocaleString()} 點</p>
                     <p className="text-muted-foreground text-xs">
                       {t(`account.tierSpending.${tier}`) || config.spendingRequired}
                     </p>

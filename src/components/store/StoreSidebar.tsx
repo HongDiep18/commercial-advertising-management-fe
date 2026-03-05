@@ -9,20 +9,18 @@ export const storeCategories = [
   { id: "teaGift", count: 2 },
 ]
 
-// Map category Chinese name to translation key
 export const categoryNameToKey: Record<string, string> = {
-  "全部商品": "all",
-  "越南華商採購名錄": "procurement",
-  "台灣茶葉": "taiwanTea",
-  "茶葉禮品": "teaGift",
+  全部商品: "all",
+  越南華商採購名錄: "procurement",
+  台灣茶葉: "taiwanTea",
+  茶葉禮品: "teaGift",
 }
 
-// Map category ID to Chinese name
 export const categoryIdToName: Record<string, string> = {
-  "all": "全部商品",
-  "procurement": "越南華商採購名錄",
-  "taiwanTea": "台灣茶葉",
-  "teaGift": "茶葉禮品",
+  all: "全部商品",
+  procurement: "越南華商採購名錄",
+  taiwanTea: "台灣茶葉",
+  teaGift: "茶葉禮品",
 }
 
 interface StoreSidebarProps {
@@ -30,10 +28,7 @@ interface StoreSidebarProps {
   setSelectedCategory: (category: string) => void
 }
 
-export function StoreSidebar({
-  selectedCategory,
-  setSelectedCategory
-}: StoreSidebarProps) {
+export function StoreSidebar({ selectedCategory, setSelectedCategory }: StoreSidebarProps) {
   const { t } = useTranslation()
 
   const handleCategoryClick = (categoryId: string) => {
@@ -42,12 +37,12 @@ export function StoreSidebar({
   }
 
   return (
-    <aside className="hidden lg:block w-72 border-r border-border bg-body-bg-dark sticky top-14 h-[calc(100vh-3.5rem)]">
+    <aside className="border-border bg-body-bg-dark sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 border-r lg:block">
       <div className="p-5">
         {/* Categories */}
         <div>
-          <h3 className="text-sm font-semibold text-foreground mb-4">{t('store.sidebar.title')}</h3>
-          <div className="space-y-0.5 max-h-[calc(100vh-10rem)] overflow-y-auto">
+          <h3 className="text-foreground mb-4 text-sm font-semibold">{t("store.sidebar.title")}</h3>
+          <div className="max-h-[calc(100vh-10rem)] space-y-0.5 overflow-y-auto">
             {storeCategories.map((category) => {
               const categoryName = categoryIdToName[category.id]
               const isSelected = selectedCategory === categoryName
@@ -56,14 +51,18 @@ export function StoreSidebar({
                 <button
                   key={category.id}
                   onClick={() => handleCategoryClick(category.id)}
-                  className={`w-full text-left px-3 py-2.5 transition-all duration-200 flex items-center justify-between group ${
+                  className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${
                     isSelected
-                      ? "bg-primary/10 text-primary border-l-2 border-primary font-medium"
+                      ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   }`}
                 >
-                  <span className="text-sm line-clamp-1">{t(`store.sidebar.categories.${category.id}`)}</span>
-                  <span className={`text-xs ml-2 flex-shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground/60"}`}>
+                  <span className="line-clamp-1 text-sm">
+                    {t(`store.sidebar.categories.${category.id}`)}
+                  </span>
+                  <span
+                    className={`ml-2 flex-shrink-0 text-xs ${isSelected ? "text-primary" : "text-muted-foreground/60"}`}
+                  >
                     {category.count}
                   </span>
                 </button>
