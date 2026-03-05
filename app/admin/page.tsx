@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslation } from "react-i18next"
 import {
   Shield,
   Search,
@@ -48,13 +49,13 @@ import {
 
 // --- Tab definitions ---
 const adminTabs = [
-  { id: "dashboard", label: "總覽", icon: LayoutDashboard },
-  { id: "companies", label: "企業管理", icon: Building2 },
-  { id: "store", label: "網路商店", icon: ShoppingBag },
-  { id: "news", label: "新聞爬蟲", icon: Newspaper },
-  { id: "advertising", label: "廣告管理", icon: Megaphone },
-  { id: "property", label: "物業地產", icon: MapPin },
-  { id: "users", label: "用戶管理", icon: UserCog },
+  { id: "dashboard", icon: LayoutDashboard },
+  { id: "companies", icon: Building2 },
+  { id: "store", icon: ShoppingBag },
+  { id: "news", icon: Newspaper },
+  { id: "advertising", icon: Megaphone },
+  { id: "property", icon: MapPin },
+  { id: "users", icon: UserCog },
 ]
 
 // --- Mock data ---
@@ -68,6 +69,7 @@ import {
 
 // Status badge helper
 function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation()
   const config: Record<string, string> = {
     pending: "bg-amber-100 text-amber-700",
     approved: "bg-green-100 text-green-700",
@@ -82,57 +84,92 @@ function StatusBadge({ status }: { status: string }) {
     contacted: "bg-amber-100 text-amber-700",
     closed: "bg-green-100 text-green-700",
   }
-  const labels: Record<string, string> = {
-    pending: "待審核",
-    approved: "已通過",
-    rejected: "已拒絕",
-    active: "啟用",
-    draft: "草稿",
-    paused: "暫停",
-    published: "已發布",
-    sold: "已售出",
-    suspended: "已停權",
-    new: "新案件",
-    contacted: "已聯絡",
-    closed: "已結案",
-  }
+  const label = [
+    "pending",
+    "approved",
+    "rejected",
+    "active",
+    "draft",
+    "paused",
+    "published",
+    "sold",
+    "suspended",
+    "new",
+    "contacted",
+    "closed",
+  ].includes(status)
+    ? t(`admin.status.${status}`)
+    : status
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config[status] || "bg-muted text-muted-foreground"}`}
     >
-      {labels[status] || status}
+      {label}
     </span>
   )
 }
 
 // --- Tab Components ---
-
 function DashboardTab() {
+  const { t } = useTranslation()
   const stats = [
-    { label: "企業總數", value: "3,247", icon: Building2, trend: "+12%", color: "text-blue-600" },
     {
-      label: "待審核申請",
+      labelKey: "totalCompanies",
+      value: "3,247",
+      icon: Building2,
+      trend: "+12%",
+      color: "text-blue-600",
+    },
+    {
+      labelKey: "pendingApplications",
       value: String(mockCompanyRequests.filter((c) => c.status === "pending").length),
       icon: Clock,
       trend: "",
       color: "text-amber-600",
     },
-    { label: "新聞數量", value: "359", icon: Newspaper, trend: "+8 今日", color: "text-green-600" },
-    { label: "物業瀏覽", value: "1,302", icon: TrendingUp, trend: "+23%", color: "text-primary" },
+    {
+      labelKey: "newsCount",
+      value: "359",
+      icon: Newspaper,
+      trendKey: "trendToday",
+      color: "text-green-600",
+    },
+    {
+      labelKey: "propertyViews",
+      value: "1,302",
+      icon: TrendingUp,
+      trend: "+23%",
+      color: "text-primary",
+    },
   ]
 
   const recentActivities = [
     {
       time: "14:30",
-      action: "新企業申請",
-      detail: "富華塑膠工業 提交企業登錄申請",
+      actionKey: "activityNewCompany",
+      detailKey: "activityCompanyDetail",
       type: "company",
     },
-    { time: "13:15", action: "新聞爬蟲完成", detail: "VnExpress 已抓取 12 篇新文章", type: "news" },
-    { time: "12:00", action: "廣告訂單", detail: "台越物流 訂購首頁橫幅廣告", type: "ad" },
-    { time: "10:45", action: "物業更新", detail: "同奈省工業用地 價格更新", type: "property" },
-    { time: "09:30", action: "用戶註冊", detail: "新用戶 李先生 完成註冊", type: "user" },
-    { time: "08:00", action: "系統排程", detail: "每日新聞爬蟲排程已啟動", type: "system" },
+    {
+      time: "13:15",
+      actionKey: "activityNewsCrawl",
+      detailKey: "activityNewsDetail",
+      type: "news",
+    },
+    { time: "12:00", actionKey: "activityAdOrder", detailKey: "activityAdDetail", type: "ad" },
+    {
+      time: "10:45",
+      actionKey: "activityPropertyUpdate",
+      detailKey: "activityPropertyDetail",
+      type: "property",
+    },
+    { time: "09:30", actionKey: "activityUserReg", detailKey: "activityUserDetail", type: "user" },
+    {
+      time: "08:00",
+      actionKey: "activitySystem",
+      detailKey: "activitySystemDetail",
+      type: "system",
+    },
   ]
 
   return (
@@ -142,16 +179,21 @@ function DashboardTab() {
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.label}>
+            <Card key={stat.labelKey}>
               <CardContent className="p-4">
                 <div className="mb-2 flex items-center justify-between pt-7">
                   <Icon className={`h-5 w-5 ${stat.color}`} />
-                  {stat.trend && (
-                    <span className="text-xs font-medium text-green-600">{stat.trend}</span>
+                  {(stat.trend || (stat as { trendKey?: string }).trendKey) && (
+                    <span className="text-xs font-medium text-green-600">
+                      {stat.trend ||
+                        t(`admin.dashboard.${(stat as { trendKey: string }).trendKey}`)}
+                    </span>
                   )}
                 </div>
                 <p className="text-foreground text-2xl font-bold">{stat.value}</p>
-                <p className="text-muted-foreground text-sm">{stat.label}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t(`admin.dashboard.${stat.labelKey}`)}
+                </p>
               </CardContent>
             </Card>
           )
@@ -164,11 +206,11 @@ function DashboardTab() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
             <div>
-              <p className="font-medium text-amber-800">需要注意</p>
+              <p className="font-medium text-amber-800">{t("admin.dashboard.attentionRequired")}</p>
               <p className="mt-1 text-sm text-amber-700">
-                {"有 "}
-                {mockCompanyRequests.filter((c) => c.status === "pending").length}
-                {" 個企業申請待審核，1 個新聞來源已暫停爬蟲。"}
+                {t("admin.dashboard.pendingAlert", {
+                  count: mockCompanyRequests.filter((c) => c.status === "pending").length,
+                })}
               </p>
             </div>
           </div>
@@ -178,7 +220,7 @@ function DashboardTab() {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">近期活動</CardTitle>
+          <CardTitle className="text-lg">{t("admin.dashboard.recentActivity")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -189,8 +231,12 @@ function DashboardTab() {
                 </span>
                 <div className="bg-primary mt-1.5 h-2 w-2 shrink-0 rounded-full" />
                 <div>
-                  <p className="text-foreground text-sm font-medium">{activity.action}</p>
-                  <p className="text-muted-foreground text-xs">{activity.detail}</p>
+                  <p className="text-foreground text-sm font-medium">
+                    {t(`admin.dashboard.${activity.actionKey}`)}
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    {t(`admin.dashboard.${activity.detailKey}`)}
+                  </p>
                 </div>
               </div>
             ))}
@@ -202,22 +248,21 @@ function DashboardTab() {
 }
 
 function CompaniesTab() {
+  const { t } = useTranslation()
   const [filter, setFilter] = useState("all")
   const filtered =
     filter === "all" ? mockCompanyRequests : mockCompanyRequests.filter((c) => c.status === filter)
+  const pendingCount = mockCompanyRequests.filter((c) => c.status === "pending").length
 
   return (
     <div className="space-y-6">
       {/* Filter Tabs */}
       <div className="border-rounded-lg flex items-center gap-2">
         {[
-          { id: "all", label: "全部" },
-          {
-            id: "pending",
-            label: `待審核 (${mockCompanyRequests.filter((c) => c.status === "pending").length})`,
-          },
-          { id: "approved", label: "已通過" },
-          { id: "rejected", label: "已拒絕" },
+          { id: "all", label: t("admin.companies.all") },
+          { id: "pending", label: t("admin.companies.pendingCount", { count: pendingCount }) },
+          { id: "approved", label: t("admin.status.approved") },
+          { id: "rejected", label: t("admin.status.rejected") },
         ].map((f) => (
           <button
             key={f.id}
@@ -241,22 +286,22 @@ function CompaniesTab() {
               <thead>
                 <tr className="border-border bg-body-table-dark-hover border-b border-gray-300">
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    公司名稱
+                    {t("admin.companies.companyName")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    聯絡人
+                    {t("admin.companies.contact")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    行業
+                    {t("admin.companies.industry")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    提交日期
+                    {t("admin.companies.submittedDate")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    狀態
+                    {t("admin.companies.status")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    操作
+                    {t("admin.companies.actions")}
                   </th>
                 </tr>
               </thead>
@@ -315,17 +360,16 @@ function CompaniesTab() {
 }
 
 function StoreTab() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {"共 "}
-          {mockProducts.length}
-          {" 個商品"}
+          {t("admin.store.productsCount", { count: mockProducts.length })}
         </p>
         <Button size="sm" variant="primary">
           <Package className="mr-1.5 h-4 w-4" />
-          {"新增商品"}
+          {t("admin.store.addProduct")}
         </Button>
       </div>
 
@@ -336,22 +380,22 @@ function StoreTab() {
               <thead>
                 <tr className="border-border bg-body-table-dark-hover border-b border-gray-300">
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    商品名稱
+                    {t("admin.store.productName")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    分類
+                    {t("admin.store.category")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    價格
+                    {t("admin.store.price")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    Shopify 同步
+                    {t("admin.store.shopifySync")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    狀態
+                    {t("admin.store.status")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    操作
+                    {t("admin.store.actions")}
                   </th>
                 </tr>
               </thead>
@@ -370,12 +414,12 @@ function StoreTab() {
                       {product.shopifySync ? (
                         <span className="inline-flex items-center gap-1 text-xs text-green-600">
                           <CheckCircle2 className="h-3 w-3" />
-                          已同步
+                          {t("admin.store.synced")}
                         </span>
                       ) : (
                         <span className="text-muted-foreground inline-flex items-center gap-1 text-xs">
                           <XCircle className="h-3 w-3" />
-                          未同步
+                          {t("admin.store.notSynced")}
                         </span>
                       )}
                     </td>
@@ -412,6 +456,7 @@ function StoreTab() {
 }
 
 function NewsTab() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6">
       {/* Crawl Controls */}
@@ -419,12 +464,12 @@ function NewsTab() {
         <CardContent className="p-4 pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-foreground font-medium">新聞爬蟲控制</p>
-              <p className="text-muted-foreground text-sm">{"管理自動新聞來源及 AI 摘要產生"}</p>
+              <p className="text-foreground font-medium">{t("admin.news.crawlerControl")}</p>
+              <p className="text-muted-foreground text-sm">{t("admin.news.crawlerDesc")}</p>
             </div>
             <Button size="sm" variant="primary">
               <RefreshCw className="mr-1.5 h-4 w-4" />
-              手動執行爬蟲
+              {t("admin.news.runCrawler")}
             </Button>
           </div>
         </CardContent>
@@ -434,10 +479,10 @@ function NewsTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">新聞來源</CardTitle>
+            <CardTitle className="text-lg">{t("admin.news.newsSources")}</CardTitle>
             <Button size="sm" variant="primary">
               <Globe className="mr-1.5 h-4 w-4" />
-              {"新增來源"}
+              {t("admin.news.addSource")}
             </Button>
           </div>
         </CardHeader>
@@ -447,25 +492,25 @@ function NewsTab() {
               <thead>
                 <tr className="border-border bg-body-table-dark-hover border-b border-gray-300">
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    來源名稱
+                    {t("admin.news.sourceName")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    網域
+                    {t("admin.news.domain")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    爬蟲頻率
+                    {t("admin.news.crawlFrequency")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    最後爬蟲
+                    {t("admin.news.lastCrawl")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    文章數
+                    {t("admin.news.articlesCount")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    狀態
+                    {t("admin.news.status")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    操作
+                    {t("admin.news.actions")}
                   </th>
                 </tr>
               </thead>
@@ -489,7 +534,11 @@ function NewsTab() {
                           variant="ghost"
                           size="sm"
                           className="hover:!bg-header-red-dark h-8 hover:!text-white"
-                          title={source.status === "active" ? "暫停" : "啟用"}
+                          title={
+                            source.status === "active"
+                              ? t("admin.news.pause")
+                              : t("admin.news.enable")
+                          }
                         >
                           {source.status === "active" ? (
                             <ToggleRight className="h-4 w-4 text-green-600" />
@@ -526,20 +575,20 @@ function NewsTab() {
         <CardContent className="p-4 pt-5">
           <div className="bg-body- mb-3 flex items-center gap-3">
             <Bot className="text-primary h-5 w-5" />
-            <p className="text-foreground font-medium">AI 摘要統計</p>
+            <p className="text-foreground font-medium">{t("admin.news.aiSummaryStats")}</p>
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-body-table-dark-hover rounded-lg p-3 text-center">
               <p className="text-foreground text-xl font-bold">359</p>
-              <p className="text-muted-foreground text-xs">已產生摘要</p>
+              <p className="text-muted-foreground text-xs">{t("admin.news.summariesGenerated")}</p>
             </div>
             <div className="bg-body-table-dark-hover rounded-lg p-3 text-center">
               <p className="text-foreground text-xl font-bold">12</p>
-              <p className="text-muted-foreground text-xs">待審核摘要</p>
+              <p className="text-muted-foreground text-xs">{t("admin.news.pendingSummaries")}</p>
             </div>
             <div className="bg-body-table-dark-hover rounded-lg p-3 text-center">
               <p className="text-foreground text-xl font-bold">98.3%</p>
-              <p className="text-muted-foreground text-xs">品質通過率</p>
+              <p className="text-muted-foreground text-xs">{t("admin.news.qualityPassRate")}</p>
             </div>
           </div>
         </CardContent>
@@ -549,29 +598,30 @@ function NewsTab() {
 }
 
 function AdvertisingTab() {
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedSubmission, setSelectedSubmission] = useState<AdSubmission | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
 
   const statusConfig = {
-    new: { label: "新案件", color: "bg-blue-100 text-blue-700 border-blue-200", icon: Clock },
+    new: { labelKey: "new", color: "bg-blue-100 text-blue-700 border-blue-200", icon: Clock },
     contacted: {
-      label: "已聯絡",
+      labelKey: "contacted",
       color: "bg-amber-100 text-amber-700 border-amber-200",
       icon: Mail,
     },
     closed: {
-      label: "已結案",
+      labelKey: "closed",
       color: "bg-green-100 text-green-700 border-green-200",
       icon: CheckCircle2,
     },
   }
 
-  const adTypeConfig: Record<string, { label: string; color: string }> = {
-    popup: { label: "平台廣告", color: "bg-purple-100 text-purple-700" },
-    directory: { label: "採購名錄", color: "bg-blue-100 text-blue-700" },
-    product: { label: "商品銷售", color: "bg-green-100 text-green-700" },
+  const adTypeConfig: Record<string, { labelKey: string; color: string }> = {
+    popup: { labelKey: "adTypePopup", color: "bg-purple-100 text-purple-700" },
+    directory: { labelKey: "adTypeDirectory", color: "bg-blue-100 text-blue-700" },
+    product: { labelKey: "adTypeProduct", color: "bg-green-100 text-green-700" },
   }
 
   const filteredSubmissions = mockAdSubmissions.filter((s) => {
@@ -590,21 +640,21 @@ function AdvertisingTab() {
           <CardContent className="p-4 pt-6">
             <DollarSign className="mb-2 h-5 w-5 text-green-600" />
             <p className="text-xl font-bold">NT$2,450,000</p>
-            <p className="text-muted-foreground text-xs">本月營收</p>
+            <p className="text-muted-foreground text-xs">{t("admin.advertising.monthlyRevenue")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 pt-6">
             <Megaphone className="text-primary mb-2 h-5 w-5" />
             <p className="text-xl font-bold">{mockAdSubmissions.length}</p>
-            <p className="text-muted-foreground text-xs">廣告訂單</p>
+            <p className="text-muted-foreground text-xs">{t("admin.advertising.adOrders")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 pt-6">
             <TrendingUp className="mb-2 h-5 w-5 text-blue-600" />
             <p className="text-xl font-bold">+18%</p>
-            <p className="text-muted-foreground text-xs">月增長率</p>
+            <p className="text-muted-foreground text-xs">{t("admin.advertising.monthlyGrowth")}</p>
           </CardContent>
         </Card>
       </div>
@@ -614,7 +664,7 @@ function AdvertisingTab() {
         <div className="relative flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="搜尋公司名稱、聯絡人..."
+            placeholder={t("admin.advertising.searchPlaceholder")}
             value={searchQuery}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -627,7 +677,9 @@ function AdvertisingTab() {
               onClick={() => setStatusFilter(s)}
               className={`rounded-lg px-3 py-2 text-xs ${statusFilter === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
             >
-              {s === "all" ? "全部" : statusConfig[s].label}
+              {s === "all"
+                ? t("admin.companies.all")
+                : t(`admin.status.${statusConfig[s].labelKey}`)}
             </button>
           ))}
         </div>
@@ -641,25 +693,25 @@ function AdvertisingTab() {
               <thead>
                 <tr className="border-border bg-body-table-dark-hover border-b border-gray-300">
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    狀態
+                    {t("admin.advertising.status")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    公司名稱
+                    {t("admin.advertising.companyName")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    廣告類型
+                    {t("admin.advertising.adType")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    聯絡人
+                    {t("admin.advertising.contact")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    金額
+                    {t("admin.advertising.amount")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    提交時間
+                    {t("admin.advertising.submittedAt")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    操作
+                    {t("admin.advertising.actions")}
                   </th>
                 </tr>
               </thead>
@@ -681,7 +733,7 @@ function AdvertisingTab() {
                         <span
                           className={`rounded px-2 py-0.5 text-xs font-medium ${adType?.color || ""}`}
                         >
-                          {adType?.label || submission.adType}
+                          {adType ? t(`admin.advertising.${adType.labelKey}`) : submission.adType}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -731,7 +783,7 @@ function AdvertisingTab() {
             size="icon"
             className="text-muted-foreground hover:text-foreground absolute top-3 right-3 h-8 w-8"
             onClick={() => setIsDetailOpen(false)}
-            aria-label="關閉"
+            aria-label={t("admin.advertising.closeDialog")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -740,31 +792,35 @@ function AdvertisingTab() {
               <DialogHeader>
                 <DialogTitle>{selectedSubmission.companyName}</DialogTitle>
                 <DialogDescription>
-                  {"提交於 "}
+                  {t("admin.advertising.submittedOn")}
                   {selectedSubmission.submittedAt}
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-4 px-5">
                 <div className="border-border grid gap-3 border-b pb-4 sm:grid-cols-2">
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">聯絡人</p>
+                    <p className="text-muted-foreground text-xs">
+                      {t("admin.advertising.contact")}
+                    </p>
                     <p className="text-sm font-medium">{selectedSubmission.contactName}</p>
                   </div>
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">Email</p>
+                    <p className="text-muted-foreground text-xs">{t("admin.advertising.email")}</p>
                     <p className="text-sm font-medium">{selectedSubmission.email}</p>
                   </div>
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">電話</p>
+                    <p className="text-muted-foreground text-xs">{t("admin.advertising.phone")}</p>
                     <p className="text-sm font-medium">{selectedSubmission.phone}</p>
                   </div>
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">廣告類型</p>
+                    <p className="text-muted-foreground text-xs">{t("admin.advertising.adType")}</p>
                     <p className="text-sm font-medium">{selectedSubmission.adTypeName}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-muted-foreground mb-2 text-xs">選擇項目</p>
+                  <p className="text-muted-foreground mb-2 text-xs">
+                    {t("admin.advertising.selectedItems")}
+                  </p>
                   {selectedSubmission.selectedItems.map((item, i) => (
                     <div
                       key={i}
@@ -776,14 +832,16 @@ function AdvertisingTab() {
                   ))}
                 </div>
                 <div className="bg-primary/5 rounded-lg p-4">
-                  <p className="text-muted-foreground text-sm">預估金額</p>
+                  <p className="text-muted-foreground text-sm">
+                    {t("admin.advertising.estimatedAmount")}
+                  </p>
                   <p className="text-xl font-bold">{selectedSubmission.totalAmount}</p>
                 </div>
                 <div className="flex gap-3 border-t py-5">
                   <Button className="flex-1" variant="primary" asChild>
                     <a href={`mailto:${selectedSubmission.email}`}>
                       <Mail className="mr-2 h-4 w-4" />
-                      發送郵件
+                      {t("admin.advertising.sendEmail")}
                     </a>
                   </Button>
                   <Button
@@ -793,7 +851,7 @@ function AdvertisingTab() {
                   >
                     <a href={`tel:${selectedSubmission.phone}`}>
                       <Phone className="mr-2 h-4 w-4" />
-                      撥打電話
+                      {t("admin.advertising.call")}
                     </a>
                   </Button>
                 </div>
@@ -807,17 +865,16 @@ function AdvertisingTab() {
 }
 
 function PropertyTab() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {"共 "}
-          {mockPropertyListings.length}
-          {" 筆物業"}
+          {t("admin.property.listingsCount", { count: mockPropertyListings.length })}
         </p>
         <Button size="sm" variant="primary">
           <MapPin className="mr-1.5 h-4 w-4" />
-          {"新增物業"}
+          {t("admin.property.addProperty")}
         </Button>
       </div>
 
@@ -828,25 +885,25 @@ function PropertyTab() {
               <thead>
                 <tr className="border-border bg-body-table-dark-hover border-b border-gray-300">
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    物業名稱
+                    {t("admin.property.propertyName")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    類型
+                    {t("admin.property.type")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    地區
+                    {t("admin.property.region")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    價格
+                    {t("admin.property.price")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    瀏覽次數
+                    {t("admin.property.views")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    狀態
+                    {t("admin.property.status")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    操作
+                    {t("admin.property.actions")}
                   </th>
                 </tr>
               </thead>
@@ -879,7 +936,11 @@ function PropertyTab() {
                           variant="ghost"
                           size="sm"
                           className="hover:!bg-header-red-dark h-8 hover:!text-white"
-                          title={listing.status === "published" ? "下架" : "上架"}
+                          title={
+                            listing.status === "published"
+                              ? t("admin.property.unpublish")
+                              : t("admin.property.publish")
+                          }
                         >
                           {listing.status === "published" ? (
                             <ToggleRight className="h-4 w-4 text-green-600" />
@@ -925,13 +986,12 @@ function PropertyTab() {
 }
 
 function UsersTab() {
+  const { t } = useTranslation()
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {"共 "}
-          {mockUsers.length}
-          {" 位用戶"}
+          {t("admin.users.usersCount", { count: mockUsers.length })}
         </p>
       </div>
 
@@ -942,22 +1002,22 @@ function UsersTab() {
               <thead>
                 <tr className="border-border bg-body-table-dark-hover border-b border-gray-300">
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    姓名
+                    {t("admin.users.name")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    公司
+                    {t("admin.users.company")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    角色
+                    {t("admin.users.role")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    最後登入
+                    {t("admin.users.lastLogin")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    狀態
+                    {t("admin.users.status")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    操作
+                    {t("admin.users.actions")}
                   </th>
                 </tr>
               </thead>
@@ -983,10 +1043,10 @@ function UsersTab() {
                         }`}
                       >
                         {u.role === "admin"
-                          ? "管理員"
+                          ? t("admin.users.roleAdmin")
                           : u.role === "paid"
-                            ? "付費會員"
-                            : "免費會員"}
+                            ? t("admin.users.rolePaid")
+                            : t("admin.users.roleFree")}
                       </span>
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">{u.lastLogin}</td>
@@ -1061,6 +1121,7 @@ function UsersTab() {
 // --- Main Admin Page ---
 
 export default function AdminPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { user, isLoggedIn } = useUser()
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -1109,8 +1170,8 @@ export default function AdminPage() {
                 <Shield className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">管理後台</h1>
-                <p className="text-primary-foreground/80 text-sm">{"越南華商經貿總彙 管理系統"}</p>
+                <h1 className="text-2xl font-bold">{t("admin.title")}</h1>
+                <p className="text-primary-foreground/80 text-sm">{t("admin.subtitle")}</p>
               </div>
             </div>
           </div>
@@ -1134,7 +1195,7 @@ export default function AdminPage() {
                     }`}
                   >
                     <Icon className="h-4 w-4" />
-                    {tab.label}
+                    {t(`admin.tabs.${tab.id}`)}
                   </button>
                 )
               })}

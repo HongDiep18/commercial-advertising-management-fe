@@ -1,4 +1,4 @@
-export type RegisterMembershipTier = "bronze" | "silver" | "gold" | "diamond"
+export type RegisterMembershipTier = "none" | "bronze" | "silver" | "gold" | "diamond"
 
 export interface RegisterFormData {
   companyNameVi: string
@@ -31,5 +31,5 @@ export const INITIAL_REGISTER_FORM: RegisterFormData = {
   industry: "",
   website: "",
   introduction: "",
-  membershipTier: "bronze",
+  membershipTier: "none",
 }
