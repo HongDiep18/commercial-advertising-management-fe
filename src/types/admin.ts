@@ -1,3 +1,5 @@
+import { MembershipTier } from "./membership"
+
 export enum AdType {
   Popup = "popup",
   Directory = "directory",
@@ -5,16 +7,56 @@ export enum AdType {
 }
 
 export enum ProfileRequestStatus {
-  Pending = "pending",
-  Approved = "approved",
-  Rejected = "rejected",
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
-export enum MembershipTier {
-  None = "none",
-  Bronze = "bronze",
-  Silver = "silver",
-  Gold = "gold",
-  Diamond = "diamond",
+
+// export type ProfileRequestStatusUpdate = Exclude<
+//   ProfileRequestStatus.APPROVED,
+//   ProfileRequestStatus.REJECTED
+// >
+
+export type ProfileRequestStatusUpdate =
+  | ProfileRequestStatus.APPROVED
+  | ProfileRequestStatus.REJECTED
+
+export type ProfileRequestFilterId = "all" | ProfileRequestStatus
+
+export type ProfileRequestStatusCounts = { all: number } & Record<ProfileRequestStatus, number>
+
+const isProfileRequestStatus = (v: string): v is ProfileRequestStatus =>
+  v === ProfileRequestStatus.PENDING ||
+  v === ProfileRequestStatus.APPROVED ||
+  v === ProfileRequestStatus.REJECTED
+
+export function getProfileRequestFilterState<T extends { status: string }>(
+  requests: T[],
+  filter: ProfileRequestFilterId
+): { statusCounts: ProfileRequestStatusCounts; filtered: T[] } {
+  const statusCounts: ProfileRequestStatusCounts = {
+    all: requests.length,
+    [ProfileRequestStatus.PENDING]: 0,
+    [ProfileRequestStatus.APPROVED]: 0,
+    [ProfileRequestStatus.REJECTED]: 0,
+  }
+  const filtered: T[] = []
+  for (const r of requests) {
+    if (isProfileRequestStatus(r.status)) statusCounts[r.status]++
+    if (filter === "all" || r.status === filter) filtered.push(r)
+  }
+  return { statusCounts, filtered }
+}
+
+export type ProfileRequestRow = {
+  id: string
+  companyName: string
+  email: string
+  contactPerson: string
+  status: ProfileRequestStatus | string
+  submittedAt: string
+  industry: string
+  country: string
 }
 
 export enum AdStatus {
@@ -53,18 +95,6 @@ export type ProfileRequest = {
   industry: string
   website: string
   introduction: string
-  membershipTier: MembershipTier | MembershipTier.None
+  membershipTier: MembershipTier
   status: ProfileRequestStatus
-}
-
-/** Display shape for company requests in admin UI (same for API and demo data). */
-export type CompanyRequest = {
-  id: string
-  companyName: string
-  email: string
-  contactPerson: string
-  status: "pending" | "approved" | "rejected"
-  submittedAt: string
-  industry: string
-  country: string
 }

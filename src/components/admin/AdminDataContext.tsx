@@ -2,11 +2,11 @@
 
 import { createContext, useContext } from "react"
 import type { AdSubmission } from "@/contexts/user-context"
-import type { CompanyRequest } from "@/types/admin"
 import * as adminMockData from "@/data/adminMockData"
+import type { ProfileRequestRow, ProfileRequestStatusUpdate } from "@/types/admin"
 
 export type AdminData = {
-  companyRequests: CompanyRequest[]
+  companyRequests: ProfileRequestRow[]
   products: typeof adminMockData.mockProducts
   newsSources: typeof adminMockData.mockNewsSources
   propertyListings: typeof adminMockData.mockPropertyListings
@@ -14,6 +14,7 @@ export type AdminData = {
   adSubmissions: AdSubmission[]
   companyRequestsLoading?: boolean
   companyRequestsError?: string
+  updateCompanyRequestStatus?: (id: string, status: ProfileRequestStatusUpdate) => Promise<void>
 }
 
 export const AdminDataContext = createContext<AdminData | null>(null)

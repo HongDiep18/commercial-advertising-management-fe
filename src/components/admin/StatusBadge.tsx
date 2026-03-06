@@ -34,12 +34,13 @@ const STATUS_STYLES: Record<string, string> = {
 
 export function StatusBadge({ status }: { status: string }) {
   const { t } = useTranslation()
-  const label = STATUS_KEYS.includes(status as (typeof STATUS_KEYS)[number])
-    ? t(`admin.status.${status}`)
+  const key = status.toLowerCase()
+  const label = STATUS_KEYS.includes(key as (typeof STATUS_KEYS)[number])
+    ? t(`admin.status.${key}`)
     : status
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status] || "bg-muted text-muted-foreground"}`}
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[key] || "bg-muted text-muted-foreground"}`}
     >
       {label}
     </span>

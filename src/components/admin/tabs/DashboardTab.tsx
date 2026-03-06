@@ -4,10 +4,15 @@ import { useTranslation } from "react-i18next"
 import { Building2, Clock, Newspaper, TrendingUp, AlertTriangle } from "lucide-react"
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { useAdminData } from "../AdminDataContext"
+import { ProfileRequestStatus } from "@/types/admin"
 
 export function DashboardTab() {
   const { t } = useTranslation()
   const { companyRequests } = useAdminData()
+  const pendingCount = companyRequests.filter(
+    (c) => c.status === ProfileRequestStatus.PENDING
+  ).length
+
   const stats = [
     {
       labelKey: "totalCompanies",
@@ -18,7 +23,7 @@ export function DashboardTab() {
     },
     {
       labelKey: "pendingApplications",
-      value: String(companyRequests.filter((c) => c.status === "pending").length),
+      value: String(pendingCount),
       icon: Clock,
       trend: "",
       color: "text-amber-600",
@@ -87,7 +92,9 @@ export function DashboardTab() {
                   ) : null}
                 </div>
                 <p className="text-foreground text-2xl font-bold">{stat.value}</p>
-                <p className="text-muted-foreground text-sm">{t(`admin.dashboard.${stat.labelKey}`)}</p>
+                <p className="text-muted-foreground text-sm">
+                  {t(`admin.dashboard.${stat.labelKey}`)}
+                </p>
               </CardContent>
             </Card>
           )
@@ -101,9 +108,7 @@ export function DashboardTab() {
             <div>
               <p className="font-medium text-amber-800">{t("admin.dashboard.attentionRequired")}</p>
               <p className="mt-1 text-sm text-amber-700">
-                {t("admin.dashboard.pendingAlert", {
-                  count: companyRequests.filter((c) => c.status === "pending").length,
-                })}
+                {t("admin.dashboard.pendingAlert", { count: pendingCount })}
               </p>
             </div>
           </div>

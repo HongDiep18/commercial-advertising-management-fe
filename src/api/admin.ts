@@ -1,5 +1,10 @@
 import { api } from "@/lib/api"
-import type { CompanyRequest, ProfileRequest } from "@/types/admin"
+import {
+  type ProfileRequest,
+  type ProfileRequestRow,
+  ProfileRequestStatus,
+  type ProfileRequestStatusUpdate,
+} from "@/types/admin"
 
 type GetProfileRequestsResponse = { data: ProfileRequest[] } | ProfileRequest[]
 
@@ -12,8 +17,19 @@ export async function getAllProfileRequests(): Promise<ProfileRequest[]> {
   return []
 }
 
-/** Map API ProfileRequest to UI CompanyRequest. */
-export function mapProfileRequestToCompanyRequest(p: ProfileRequest & { submittedAt?: string; createdAt?: string }): CompanyRequest {
+export async function updateProfileRequestStatus(
+  id: string,
+  status: ProfileRequestStatusUpdate
+): Promise<void> {
+  await api.request(`/auth/profile-requests/${id}/status`, {
+    method: "PATCH",
+    body: { status },
+  })
+}
+
+export function mapProfileRequestToCompanyRequest(
+  p: ProfileRequest & { submittedAt?: string; createdAt?: string }
+): ProfileRequestRow {
   return {
     id: p.id,
     companyName: p.companyNameVi || p.companyNameCn || "",
@@ -21,7 +37,7 @@ export function mapProfileRequestToCompanyRequest(p: ProfileRequest & { submitte
     contactPerson: p.contactPerson,
     industry: p.industry,
     country: p.country,
-    status: p.status as "pending" | "approved" | "rejected",
+    status: p.status as ProfileRequestStatus,
     submittedAt: p.submittedAt ?? p.createdAt ?? "",
   }
 }

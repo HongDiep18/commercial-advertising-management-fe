@@ -1,43 +1,48 @@
 "use client"
 
-import { useEffect, useMemo, useState, type ReactNode } from "react"
-import { getAllProfileRequests, mapProfileRequestToCompanyRequest } from "@/api/admin"
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
+import {
+  getAllProfileRequests,
+  mapProfileRequestToCompanyRequest,
+  updateProfileRequestStatus,
+} from "@/api/admin"
 import { mockAdSubmissions } from "@/contexts/user-context"
 import * as fallbackData from "@/data/adminMockData"
 import { AdminDataContext, type AdminData } from "./AdminDataContext"
+import type { ProfileRequestStatusUpdate } from "@/types/admin"
 
-/**
- * Admin provider for the real app: company requests from API,
- * other data from fallback until those APIs exist.
- */
 export function AdminProvider({ children }: { children: ReactNode }) {
   const [companyRequests, setCompanyRequests] = useState<AdminData["companyRequests"]>([])
   const [companyRequestsLoading, setCompanyRequestsLoading] = useState(true)
   const [companyRequestsError, setCompanyRequestsError] = useState<string | undefined>(undefined)
 
-  useEffect(() => {
-    let cancelled = false
+  const refetchCompanyRequests = useCallback(() => {
     setCompanyRequestsLoading(true)
     setCompanyRequestsError(undefined)
     getAllProfileRequests()
       .then((list) => {
-        if (!cancelled) {
-          setCompanyRequests(list.map((p) => mapProfileRequestToCompanyRequest(p)))
-        }
+        setCompanyRequests(list.map((p) => mapProfileRequestToCompanyRequest(p)))
       })
       .catch((err) => {
-        if (!cancelled) {
-          setCompanyRequestsError(err?.message ?? "Failed to load company requests")
-          setCompanyRequests([])
-        }
+        setCompanyRequestsError(err?.message ?? "Failed to load company requests")
+        setCompanyRequests([])
       })
-      .finally(() => {
-        if (!cancelled) setCompanyRequestsLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
+      .finally(() => setCompanyRequestsLoading(false))
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      refetchCompanyRequests()
+    }, 1000)
+  }, [refetchCompanyRequests])
+
+  const updateCompanyRequestStatus = useCallback(
+    async (id: string, status: ProfileRequestStatusUpdate) => {
+      await updateProfileRequestStatus(id, status)
+      refetchCompanyRequests()
+    },
+    [refetchCompanyRequests]
+  )
 
   const value = useMemo<AdminData>(
     () => ({
@@ -49,8 +54,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       adSubmissions: mockAdSubmissions,
       companyRequestsLoading,
       companyRequestsError,
+      updateCompanyRequestStatus,
     }),
-    [companyRequests, companyRequestsLoading, companyRequestsError]
+    [companyRequests, companyRequestsLoading, companyRequestsError, updateCompanyRequestStatus]
   )
   return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>
 }

@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/contexts/user-context"
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
-import { AdminDemoDataProvider, AdminDashboardContent } from "@/components/admin"
+import { AdminDemoProvider, AdminDashboardContent } from "@/components/admin"
 
 export default function AdminDemoPage() {
   const router = useRouter()
@@ -25,8 +25,8 @@ export default function AdminDemoPage() {
   }
 
   return (
-    <AdminDemoDataProvider>
+    <AdminDemoProvider>
       <AdminDashboardContent />
-    </AdminDemoDataProvider>
+    </AdminDemoProvider>
   )
 }
