@@ -12,6 +12,7 @@
     "directory": "Danh mục DN",
     "store": "Cửa hàng trực tuyến",
     "news": "Tin tức mới nhất",
+    "property": "Bất động sản",
     "adContact": "Liên hệ QC",
     "myAccount": "Tài khoản của tôi",
     "adminPanel": "Quản trị",
@@ -713,6 +714,52 @@
       "description": "Mô tả sản phẩm",
       "productCode": "Mã sản phẩm",
       "supplyStatus": "Tình trạng cung cấp"
+    }
+  },
+  "property": {
+    "heroTitle": "Bất động sản",
+    "heroDescription": "Thông tin về đất công nghiệp, nhà máy, kho bãi, văn phòng và nhà ở tại Việt Nam. Hỗ trợ các doanh nghiệp Đài Loan tìm kiếm không gian đầu tư và sinh sống phù hợp.",
+    "searchPlaceholder": "Tìm tên bất động sản hoặc khu vực...",
+    "types": {
+      "all": "Tất cả loại",
+      "land": "Đất",
+      "factory": "Nhà xưởng",
+      "warehouse": "Kho",
+      "house": "Nhà ở",
+      "office": "Văn phòng"
+    },
+    "provinces": {
+      "all": "Tất cả khu vực",
+      "hcm": "TP Hồ Chí Minh",
+      "hanoi": "Hà Nội",
+      "binh-duong": "Bình Dương",
+      "dong-nai": "Đồng Nai",
+      "long-an": "Long An",
+      "ba-ria": "Bà Rịa - Vũng Tàu"
+    },
+     "grid": {
+      "total": "{{count}} bất động sản",
+      "emptyTitle": "Không tìm thấy bất động sản nào phù hợp với tiêu chí lọc",
+      "clearFilter": "Xóa bộ lọc",
+      "contactSeller": "Liên hệ người bán",
+      "detail": "Thông tin chi tiết",
+      "areaUnit": "m²"
+    },
+     "modals": {
+      "contactSeller": "Liên hệ người bán",
+      "contactPerson": "Người liên hệ",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "yourName": "Họ tên của bạn",
+      "yourEmail": "Email của bạn",
+      "message": "Nội dung lời nhắn (tùy chọn)",
+      "submit": "Gửi yêu cầu",
+      "submitSuccess": "Yêu cầu đã được gửi (minh họa)! Người bán sẽ liên hệ với bạn sớm nhất có thể.",
+      "area": "Diện tích",
+      "description": "Mô tả bất động sản",
+      "features": "Đặc điểm bất động sản",
+      "addressNotice": "Để bảo vệ thông tin bất động sản, địa chỉ chi tiết chỉ được cung cấp sau khi liên hệ với người bán.",
+      "contactForDetail": "Liên hệ người bán để nhận thông tin đầy đủ về địa chỉ và các chi tiết khác."
     }
   }
 }

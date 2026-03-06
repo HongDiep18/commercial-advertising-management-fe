@@ -12,6 +12,7 @@
     "directory": "Company Directory",
     "store": "Online Store",
     "news": "Latest News",
+    "property": "Property",
     "adContact": "Advertising Contact",
     "myAccount": "My Account",
     "adminPanel": "Admin Panel",
@@ -720,6 +721,52 @@
       "description": "Product Description",
       "productCode": "Product Code",
       "supplyStatus": "Supply Status"
+    }
+  },
+  "property": {
+    "heroTitle": "Property",
+    "heroDescription": "Information about industrial land, factories, warehouses, offices, and residential properties in Vietnam. Supporting Taiwanese businesses in finding suitable investment and living spaces.",
+    "searchPlaceholder": "Search property name or location...",
+    "types": {
+      "all": "All Types",
+      "land": "Land",
+      "factory": "Factory",
+      "warehouse": "Warehouse",
+      "house": "House",
+      "office": "Office"
+    },
+    "provinces": {
+      "all": "All Areas",
+      "hcm": "Ho Chi Minh City",
+      "hanoi": "Hanoi",
+      "binh-duong": "Binh Duong",
+      "dong-nai": "Dong Nai",
+      "long-an": "Long An",
+      "ba-ria": "Ba Ria - Vung Tau"
+    },
+    "grid": {
+      "total": "{{count}} properties found",
+      "emptyTitle": "No properties found matching your criteria",
+      "clearFilter": "Clear Filter",
+      "contactSeller": "Contact Seller",
+      "detail": "Details",
+      "areaUnit": "m²"
+    },
+    "modals": {
+      "contactSeller": "Contact Seller",
+      "contactPerson": "Contact Person",
+      "phone": "Phone",
+      "email": "Email",
+      "yourName": "Your Name",
+      "yourEmail": "Your Email",
+      "message": "Message (Optional)",
+      "submit": "Submit Inquiry",
+      "submitSuccess": "Inquiry submitted (Demo)! The seller will contact you as soon as possible.",
+      "area": "Area",
+      "description": "Description",
+      "features": "Features",
+      "addressNotice": "To protect property information, the detailed address will only be provided after contacting the seller.",
+      "contactForDetail": "Contact the seller for complete information"
     }
   }
 }

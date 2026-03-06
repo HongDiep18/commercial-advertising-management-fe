@@ -12,6 +12,7 @@
     "directory": "企業名錄",
     "store": "網路商店",
     "news": "最新消息",
+    "property": "物業地產",
     "adContact": "廣告聯繫",
     "myAccount": "我的帳戶",
     "adminPanel": "管理後台",
@@ -713,6 +714,53 @@
       "description": "商品描述",
       "productCode": "商品編號",
       "supplyStatus": "供貨狀況"
+    }
+  },
+  "property": {
+    "heroTitle": "物業地產",
+    "heroDescription": "越南工業用地、廠房、倉庫、辦公室及住宅物業資訊。協助台商尋找最適合的投資及生活空間。",
+    "searchPlaceholder": "搜尋物業名稱、地區...",
+    "types": {
+      "all": "全部類型",
+      "land": "土地",
+      "factory": "廠房",
+      "warehouse": "倉庫",
+      "house": "住宅",
+      "office": "辦公室"
+    },
+    "provinces": {
+      "all": "全部地區",
+      "hcm": "胡志明市",
+      "hanoi": "河內",
+      "binh-duong": "平陽省",
+      "dong-nai": "同奈省",
+      "long-an": "隆安省",
+      "ba-ria": "巴地頭頓省"
+    },
+    "grid": {
+      "total": "共 {{count}} 筆物業",
+      "emptyTitle": "目前沒有符合篩選條件的物業",
+      "clearFilter": "清除篩選條件",
+      "contactSeller": "聯繫賣家",
+      "detail": "詳細資訊",
+      "areaUnit": "m²"
+    },
+    "modals": {
+      "contactSeller": "聯繫賣家",
+      "contactPerson": "聯繫人",
+      "phone": "電話",
+      "email": "Email",
+      "yourName": "您的姓名",
+      "yourEmail": "您的 Email",
+      "message": "留言內容（選填）",
+      "submit": "送出詢問",
+      "submitSuccess": "詢問已送出（示範）",
+
+      "area": "面積",
+      "description": "物業描述",
+      "features": "物業特點",
+      "addressNotice": "為保護物業資訊安全，詳細地址僅在聯繫賣家後提供。",
+      "contactForDetail": "聯繫賣家取得完整資訊"
     }
   }
 }
