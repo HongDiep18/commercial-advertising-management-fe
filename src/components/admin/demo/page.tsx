@@ -4,9 +4,10 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/contexts/user-context"
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
-import { AdminProvider, AdminDashboardContent } from "@/components/admin"
+import { AdminDemoProvider } from "./AdminDataContext"
+import { AdminDashboardContent } from "@/components/admin/AdminDashboardContent"
 
-export default function AdminPage() {
+export default function AdminDemoPage() {
   const router = useRouter()
   const { user, isLoggedIn } = useUser()
 
@@ -15,22 +16,18 @@ export default function AdminPage() {
       router.push("/login")
       return
     }
-    if (isDemoAdminUser(user)) {
-      router.replace("/admin/demo")
-      return
-    }
-    if (user.role !== "admin") {
-      router.push("/login")
+    if (!isDemoAdminUser(user)) {
+      router.replace("/admin")
     }
   }, [isLoggedIn, user, router])
 
-  if (!isLoggedIn || !user || user.role !== "admin") {
+  if (!isLoggedIn || !user || !isDemoAdminUser(user)) {
     return null
   }
 
   return (
-    <AdminProvider>
+    <AdminDemoProvider>
       <AdminDashboardContent />
-    </AdminProvider>
+    </AdminDemoProvider>
   )
 }

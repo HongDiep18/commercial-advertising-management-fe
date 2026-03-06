@@ -1,0 +1,7 @@
+export { DashboardTab } from "./DashboardTab"
+export { CompaniesTab } from "./CompaniesTab"
+export { StoreTab } from "./StoreTab"
+export { NewsTab } from "./NewsTab"
+export { AdvertisingTab } from "./AdvertisingTab"
+export { PropertyTab } from "./PropertyTab"
+export { UsersTab } from "./UsersTab"

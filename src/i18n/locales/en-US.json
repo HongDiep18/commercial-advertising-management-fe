@@ -478,7 +478,7 @@
       "diamond": []
     }
   },
-  "admin": {
+  "adContactForm": {
     "title": "Admin Panel",
     "subtitle": "Ad contact form management",
     "allCases": "All",

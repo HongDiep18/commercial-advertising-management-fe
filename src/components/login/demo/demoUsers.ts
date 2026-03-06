@@ -1,6 +1,12 @@
 import { UserRole } from "@/contexts/user-context"
 import type { User } from "@/contexts/user-context"
 
+export const DEMO_ADMIN_EMAIL = "admin@demo.com"
+
+export function isDemoAdminUser(user: User | null): boolean {
+  return user?.role === UserRole.Admin && user?.email === DEMO_ADMIN_EMAIL
+}
+
 export const DEMO_USERS: Record<string, User> = {
   bronze: {
     id: "user-bronze-001",
@@ -40,7 +46,7 @@ export const DEMO_USERS: Record<string, User> = {
   },
   admin: {
     id: "user-admin-001",
-    email: "admin@demo.com",
+    email: DEMO_ADMIN_EMAIL,
     name: "系統管理員",
     role: UserRole.Admin,
     contributionPoints: 0,
