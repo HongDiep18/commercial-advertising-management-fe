@@ -5,15 +5,23 @@ import Link from "next/link"
 import { useTranslation } from "react-i18next"
 import { categoryNameToKey } from "@/components/store/StoreSidebar"
 import { Search, Eye } from "lucide-react"
-import { Pagination } from "@/components/news/Pagination" 
+import { Pagination } from "@/components/news/Pagination"
 import { usePagination } from "@/components/news/usePagination"
 
 const ITEMS_PER_PAGE = 12
 
-// Mock product data
-const productsByCategory: Record<string, Array<{ id: string; name: string; category: string; price: number; originalPrice?: number; image: string }>> = {}
+const productsByCategory: Record<
+  string,
+  Array<{
+    id: string
+    name: string
+    category: string
+    price: number
+    originalPrice?: number
+    image: string
+  }>
+> = {}
 
-// Vietnam Buyer's Guide
 productsByCategory["越南華商採購名錄"] = [
   {
     id: "vietnam-guide-2025",
@@ -33,7 +41,6 @@ productsByCategory["越南華商採購名錄"] = [
   },
 ]
 
-// Taiwan Tea
 productsByCategory["台灣茶葉"] = [
   {
     id: "taiwan-tea-1",
@@ -53,7 +60,6 @@ productsByCategory["台灣茶葉"] = [
   },
 ]
 
-// Tea Gift Sets
 productsByCategory["茶葉禮品"] = [
   {
     id: "tea-gift-1",
@@ -73,8 +79,6 @@ productsByCategory["茶葉禮品"] = [
   },
 ]
 
-
-// All products combined
 const allProducts = [
   ...productsByCategory["越南華商採購名錄"],
   ...productsByCategory["台灣茶葉"],
@@ -108,18 +112,18 @@ function SearchBar({ searchTerm, setSearchTerm, placeholder, clearLabel }: Searc
   return (
     <div className="mb-6">
       <div className="relative max-w-xl">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <Search className="text-muted-foreground absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
         <input
           type="text"
           placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 border border-gray-400 rounded-lg bg-body-bg-dark focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-sm transition-all"
+          className="bg-body-bg-dark focus:ring-primary/20 focus:border-primary/50 w-full rounded-lg border border-gray-400 py-3 pr-4 pl-12 text-sm transition-all focus:ring-2 focus:outline-none"
         />
         {searchTerm && (
           <button
             onClick={() => setSearchTerm("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 -translate-y-1/2 text-sm"
           >
             {clearLabel}
           </button>
@@ -132,24 +136,18 @@ function SearchBar({ searchTerm, setSearchTerm, placeholder, clearLabel }: Searc
 export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: StoreGridProps) {
   const { t } = useTranslation()
 
-  // Get current category data
   const currentProducts = productsByCategory[selectedCategory ?? ""] ?? []
 
-  // Filter by search term if provided
   const filteredProducts = searchTerm
-    ? currentProducts.filter(product => 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    ? currentProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : currentProducts
 
   const totalResults = filteredProducts.length
-  const {
-    currentPage,
-    setPage,
-    totalPages,
-    slicePage,
-  } = usePagination<Product>({
+  const { currentPage, setPage, totalPages, slicePage } = usePagination<Product>({
     totalItems: totalResults,
     pageSize: ITEMS_PER_PAGE,
   })
@@ -160,48 +158,43 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
 
   const displayedProducts = slicePage(filteredProducts)
 
-
-  // Empty state - no category selected
   if (!selectedCategory) {
     return (
       <section>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          placeholder={t('store.grid.searchPlaceholder')}
-          clearLabel={t('store.grid.clearButton')}
+          placeholder={t("store.grid.searchPlaceholder")}
+          clearLabel={t("store.grid.clearButton")}
         />
-        <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Search className="w-8 h-8 text-muted-foreground" />
+        <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
+          <div className="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <Search className="text-muted-foreground h-8 w-8" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">{t('store.grid.selectCategory')}</h2>
+          <h2 className="mb-2 text-xl font-semibold">{t("store.grid.selectCategory")}</h2>
           <p className="text-muted-foreground max-w-md">
-            {t('store.grid.selectCategoryDescription')}
+            {t("store.grid.selectCategoryDescription")}
           </p>
         </div>
       </section>
     )
   }
 
-  // Empty state - no results
   if (filteredProducts.length === 0) {
     return (
       <section>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          placeholder={t('store.grid.searchPlaceholder')}
-          clearLabel={t('store.grid.clearButton')}
+          placeholder={t("store.grid.searchPlaceholder")}
+          clearLabel={t("store.grid.clearButton")}
         />
-        <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Search className="w-8 h-8 text-muted-foreground" />
+        <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
+          <div className="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <Search className="text-muted-foreground h-8 w-8" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">{t('store.grid.noProducts')}</h2>
-          <p className="text-muted-foreground max-w-md">
-            {t('store.grid.noProductsDescription')}
-          </p>
+          <h2 className="mb-2 text-xl font-semibold">{t("store.grid.noProducts")}</h2>
+          <p className="text-muted-foreground max-w-md">{t("store.grid.noProductsDescription")}</p>
         </div>
       </section>
     )
@@ -213,48 +206,50 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
       <SearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        placeholder={t('store.grid.searchPlaceholder')}
-        clearLabel={t('store.grid.clearButton')}
+        placeholder={t("store.grid.searchPlaceholder")}
+        clearLabel={t("store.grid.clearButton")}
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+      <div className="border-border mb-6 flex items-center justify-between border-b pb-4">
         <h2 className="text-xl font-semibold">
           {selectedCategory && categoryNameToKey[selectedCategory]
             ? t(`store.sidebar.categories.${categoryNameToKey[selectedCategory]}`)
             : selectedCategory}
         </h2>
-        <span className="text-sm text-muted-foreground">{totalResults} {t('store.grid.items')}</span>
+        <span className="text-muted-foreground text-sm">
+          {totalResults} {t("store.grid.items")}
+        </span>
       </div>
 
       {/* Store Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {displayedProducts.map((product) => (
           <Link
             key={product.id}
             href={`/store/${product.id}${selectedCategory ? `?fromCategory=${encodeURIComponent(selectedCategory)}` : ""}`}
             className="group"
           >
-            <div className="bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-all duration-300">
+            <div className="bg-card border-border overflow-hidden rounded-lg border transition-all duration-300 hover:shadow-lg">
               {/* Product Image */}
-              <div className="relative aspect-square bg-white flex items-center justify-center overflow-hidden">
+              <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-white">
                 <img
                   src={product.image || "/placeholder.svg"}
                   alt={product.name}
-                  className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
                 />
-                
+
                 {/* Hover Actions */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <div className="w-12 h-12 bg-white rounded-md flex items-center justify-center hover:bg-gray-100 transition-colors">
-                    <Eye className="w-5 h-5 text-foreground" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-white transition-colors hover:bg-gray-100">
+                    <Eye className="text-foreground h-5 w-5" />
                   </div>
                 </div>
               </div>
 
               {/* Product Info */}
               <div className="p-4">
-                <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="text-foreground group-hover:text-primary mb-2 line-clamp-2 text-sm font-medium transition-colors">
                   {product.name}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -262,7 +257,7 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
                     NT${product.price.toLocaleString()}
                   </span>
                   {product.originalPrice && (
-                    <span className="text-xs text-muted-foreground line-through">
+                    <span className="text-muted-foreground text-xs line-through">
                       NT${product.originalPrice.toLocaleString()}
                     </span>
                   )}
