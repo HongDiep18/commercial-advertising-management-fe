@@ -36,7 +36,7 @@ export default function Header() {
   return (
     <header className="bg-header-red-dark fixed top-0 right-0 left-0 z-50 text-white shadow-md">
       <div className="container mx-auto px-2 lg:px-2">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center">
           <Link href="/" className="flex items-center gap-3">
             <img
               src="/assets/images/logo.webp"
@@ -45,7 +45,7 @@ export default function Header() {
             />
           </Link>
 
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex xl:gap-8">
+          <nav className="mx-auto hidden items-center gap-5 lg:flex xl:gap-6">
             <Link
               href="/about"
               className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
@@ -69,6 +69,12 @@ export default function Header() {
               className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
               {t("header.news")}
+            </Link>
+            <Link
+              href="/property"
+              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+            >
+              {t("header.property")}
             </Link>
             <Link
               href="/contact"
@@ -182,6 +188,13 @@ export default function Header() {
                 onClick={closeMobileMenu}
               >
                 {t("header.news")}
+              </Link>
+              <Link
+                href="/property"
+                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                onClick={closeMobileMenu}
+              >
+                {t("header.property")}
               </Link>
               <Link
                 href="/contact"
