@@ -40,13 +40,13 @@ const INITIAL_PROFILE_FORM: ProfileFormData = {
   taxId: "",
   contactPerson: "",
   contactPhone: "",
-  companyAddress: "",
+  address: "",
   email: "",
   country: "",
   region: "",
   industry: "",
   website: "",
-  introduction: "",
+  description: "",
 }
 
 function apiProfileToFormData(api: ProfileResponse, fallbackEmail?: string): ProfileFormData {
@@ -57,13 +57,13 @@ function apiProfileToFormData(api: ProfileResponse, fallbackEmail?: string): Pro
     taxId: api.taxId ?? "",
     contactPerson: api.contactPerson ?? "",
     contactPhone: api.contactPhone ?? "",
-    companyAddress: api.companyAddress ?? "",
+    address: api.address ?? "",
     email: api.email ?? fallbackEmail ?? "",
     country: api.country ?? "",
     region: api.region ?? "",
     industry: api.industry ?? "",
     website: api.website ?? "",
-    introduction: api.introduction ?? "",
+    description: api.description ?? "",
   }
 }
 
@@ -250,13 +250,13 @@ export default function AccountPage() {
         tax_id: profileData.taxId,
         contact_person: profileData.contactPerson,
         contact_phone: profileData.contactPhone,
-        company_address: profileData.companyAddress,
+        company_address: profileData.address,
         email: profileData.email,
         country: profileData.country,
         region: profileData.region,
         industry: profileData.industry,
         website: profileData.website,
-        introduction: profileData.introduction,
+        introduction: profileData.description,
       }
       if (logo.changed) {
         payload.upload_logo = logo.url ?? ""
