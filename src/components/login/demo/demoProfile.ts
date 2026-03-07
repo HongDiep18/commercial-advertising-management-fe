@@ -9,13 +9,13 @@ export const DEMO_PROFILE_DATA: ProfileFormData = {
   taxId: "0123456789",
   contactPerson: "Demo 聯絡人",
   contactPhone: "+84 912 345 678",
-  companyAddress: "123 Nguyen Hue, District 1, Ho Chi Minh City",
+  address: "123 Nguyen Hue, District 1, Ho Chi Minh City",
   email: "demo@company.com",
   country: "vietnam",
   region: "hcm",
   industry: "electronics",
   website: "https://demo-company.com",
-  introduction: "這是一家示範公司，專注於提供優質的產品和服務。",
+  description: "這是一家示範公司，專注於提供優質的產品和服務。",
 }
 
 const DEMO_USER_IDS = new Set(Object.values(DEMO_USERS).map((u) => u.id))

@@ -10,15 +10,32 @@ export type GetProfileResponse = {
   profile?: ProfileResponse
 }
 
+function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
+  const any = d as Record<string, unknown> & {
+    address?: string
+    description?: string
+    companyAddress?: string
+    introduction?: string
+    uploadLogo?: string | null
+    logoUrl?: string | null
+  }
+  return {
+    ...(d as ProfileResponse),
+    address: (any.address ?? any.companyAddress ?? "") as string,
+    description: (any.description ?? any.introduction ?? "") as string,
+  }
+}
+
 function pickProfile(raw: GetProfileResponse): ProfileResponse | null {
   if (!raw) return null
   const d = raw.data
   if (d && typeof d === "object" && !Array.isArray(d)) {
-    if ("companyNameVi" in d) return d as ProfileResponse
+    if ("companyNameVi" in d || "address" in d) return toProfileResponse(d as Record<string, unknown>)
     if ("profile" in d && d.profile && typeof d.profile === "object")
-      return d.profile as ProfileResponse
+      return toProfileResponse(d.profile as Record<string, unknown>)
   }
-  if ("companyNameVi" in raw) return raw as ProfileResponse
+  if ("companyNameVi" in raw || "address" in raw)
+    return toProfileResponse(raw as Record<string, unknown>)
   return null
 }
 

@@ -12,7 +12,7 @@ import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
 import { login as loginApi } from "@/api/auth"
 import { useUser, UserRole } from "@/contexts/user-context"
-import { DemoLoginButtons } from "./demo"
+import { DemoLoginButtons, DEMO_USERS, DEMO_ACCOUNTS } from "./demo"
 import {
   type LoginResponse,
   isLoginSuccess,
@@ -50,6 +50,20 @@ export default function LoginForm() {
   const doLogin = async (email: string, password: string) => {
     setIsLoading(true)
     try {
+      const demoAccount = DEMO_ACCOUNTS.find((a) => a.email === email && a.password === password)
+      if (demoAccount) {
+        const demoUser = DEMO_USERS[demoAccount.tier]
+        if (demoUser) {
+          setUser(demoUser)
+          showToast(t(LOGIN_TAGS.success) || LOGIN_TAG_FALLBACKS.success, "success")
+          setFormData({ ...INITIAL_LOGIN_FORM })
+          setTimeout(() => {
+            router.push(demoAccount.tier === UserRole.Admin ? "/admin/demo" : "/account")
+          }, 500)
+          return
+        }
+      }
+
       const res = await loginApi({ email, password })
       const resTyped: LoginResponse = res
 

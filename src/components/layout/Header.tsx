@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Menu, X, User, Shield, LogOut, ChevronDown } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { useUser, UserRole } from "@/contexts/user-context"
+import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
 import LanguageSelector from "./LanguageSelector"
 import Button from "@/components/ui/Button"
 
@@ -110,7 +111,7 @@ export default function Header() {
                     </Link>
                     {user.role === UserRole.Admin && (
                       <Link
-                        href="/admin"
+                        href={isDemoAdminUser(user) ? "/admin/demo" : "/admin"}
                         className="hover:!bg-header-red-dark mx-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm text-black transition-colors hover:bg-white/10 hover:text-white"
                         onClick={() => setIsDropdownOpen(false)}
                       >
@@ -217,7 +218,7 @@ export default function Header() {
                     </Link>
                     {user.role === UserRole.Admin && (
                       <Link
-                        href="/admin"
+                        href={isDemoAdminUser(user) ? "/admin/demo" : "/admin"}
                         className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"
                         onClick={closeMobileMenu}
                       >

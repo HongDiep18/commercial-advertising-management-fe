@@ -182,11 +182,11 @@ export function AccountProfileModal({
               </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldWithError error={fieldErrors.companyAddress}>
+              <FieldWithError error={fieldErrors.address}>
                 <Input
                   placeholder={t("register.placeholders.companyAddress") || "公司地址"}
-                  value={profileData.companyAddress}
-                  onChange={(e) => onProfileChange("companyAddress", e.target.value)}
+                  value={profileData.address}
+                  onChange={(e) => onProfileChange("address", e.target.value)}
                 />
               </FieldWithError>
               <FieldWithError error={fieldErrors.email}>
@@ -296,11 +296,11 @@ export function AccountProfileModal({
                 onChange={(e) => onProfileChange("website", e.target.value)}
               />
             </FieldWithError>
-            <FieldWithError error={fieldErrors.introduction}>
+            <FieldWithError error={fieldErrors.description}>
               <Textarea
                 placeholder={t("register.placeholders.introduction") || "簡單介紹"}
-                value={profileData.introduction}
-                onChange={(e) => onProfileChange("introduction", e.target.value)}
+                value={profileData.description}
+                onChange={(e) => onProfileChange("description", e.target.value)}
                 rows={3}
               />
             </FieldWithError>

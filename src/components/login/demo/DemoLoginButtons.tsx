@@ -19,7 +19,7 @@ export function DemoLoginButtons({ disabled = false }: DemoLoginButtonsProps) {
     const demoUser = DEMO_USERS[tier]
     if (demoUser) {
       setUser(demoUser)
-      router.push(tier === UserRole.Admin ? "/account" : "/account")
+      router.push(tier === UserRole.Admin ? "/admin/demo" : "/account")
     }
   }
 

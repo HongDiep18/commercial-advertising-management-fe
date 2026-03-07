@@ -25,13 +25,13 @@ const PROFILE_REQUIRED_KEYS: (keyof ProfileFormData)[] = [
   "taxId",
   "contactPerson",
   "contactPhone",
-  "companyAddress",
+  "address",
   "email",
   "country",
   "region",
   "industry",
   "website",
-  "introduction",
+  "description",
 ]
 
 const PHONE_REGEX = /^[\d\s\-+()]+$/
