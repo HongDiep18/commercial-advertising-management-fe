@@ -225,9 +225,9 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
       {/* Store Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {displayedProducts.map((product) => (
-          <Link
+          <div //Link
             key={product.id}
-            href={`/store/${product.id}${selectedCategory ? `?fromCategory=${encodeURIComponent(selectedCategory)}` : ""}`}
+            //href={`/store/${product.id}${selectedCategory ? `?fromCategory=${encodeURIComponent(selectedCategory)}` : ""}`}
             className="group"
           >
             <div className="bg-card border-border overflow-hidden rounded-lg border transition-all duration-300 hover:shadow-lg">
@@ -264,7 +264,7 @@ export function StoreGrid({ selectedCategory, searchTerm, setSearchTerm }: Store
                 </div>
               </div>
             </div>
-          </Link>
+          </div> //Link
         ))}
       </div>
 
