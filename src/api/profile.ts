@@ -22,6 +22,7 @@ function firstDefined<T>(record: Record<string, unknown>, keys: string[]): T | u
 function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
   return {
     ...(d as ProfileResponse),
+    contactName: (firstDefined<string>(d, ["contactName", "contactPerson", "contact_person"]) ?? "") as string,
     address: (firstDefined<string>(d, ["address", "companyAddress"]) ?? "") as string,
     description: (firstDefined<string>(d, ["description", "introduction"]) ?? "") as string,
     uploadLogo: firstDefined<string | null>(d, ["logoUrl", "uploadLogo"]) ?? undefined,

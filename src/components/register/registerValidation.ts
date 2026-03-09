@@ -23,7 +23,7 @@ const PROFILE_REQUIRED_KEYS: (keyof ProfileFormData)[] = [
   "companyNameCn",
   "phone",
   "taxId",
-  "contactPerson",
+  "contactName",
   "contactPhone",
   "address",
   "email",

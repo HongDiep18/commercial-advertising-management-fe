@@ -166,11 +166,11 @@ export function AccountProfileModal({
               </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FieldWithError error={fieldErrors.contactPerson}>
+              <FieldWithError error={fieldErrors.contactName}>
                 <Input
                   placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
-                  value={profileData.contactPerson}
-                  onChange={(e) => onProfileChange("contactPerson", e.target.value)}
+                  value={profileData.contactName}
+                  onChange={(e) => onProfileChange("contactName", e.target.value)}
                 />
               </FieldWithError>
               <FieldWithError error={fieldErrors.contactPhone}>
