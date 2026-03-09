@@ -20,9 +20,7 @@ export function getStoredToken(): string | null {
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const data = await api.request<LoginResponse>("/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: payload,
   })
 

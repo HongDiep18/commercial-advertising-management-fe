@@ -7,7 +7,7 @@ export const DEMO_PROFILE_DATA: ProfileFormData = {
   companyNameCn: "Demo 有限公司",
   phone: "+84 28 1234 5678",
   taxId: "0123456789",
-  contactPerson: "Demo 聯絡人",
+  contactName: "Demo 聯絡人",
   contactPhone: "+84 912 345 678",
   address: "123 Nguyen Hue, District 1, Ho Chi Minh City",
   email: "demo@company.com",

@@ -1,11 +1,4 @@
-const HOST =
-  typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_BASE_URL
-    ? process.env.NEXT_PUBLIC_API_BASE_URL
-    : "http://localhost:3001"
-const API_BASE =
-  typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_BASE
-    ? process.env.NEXT_PUBLIC_API_BASE
-    : "/api/v1"
+const PROXY_PREFIX = "/api/proxy"
 
 function getAuthHeader(): Record<string, string> {
   if (typeof window === "undefined") return {}
@@ -14,7 +7,7 @@ function getAuthHeader(): Record<string, string> {
   return { Authorization: `Bearer ${token}` }
 }
 
-const base = `${HOST.replace(/\/$/, "")}${API_BASE.startsWith("/") ? API_BASE : `/${API_BASE}`}`
+const base = PROXY_PREFIX
 
 export const api = {
   base,

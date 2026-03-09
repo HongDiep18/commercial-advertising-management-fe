@@ -3,7 +3,7 @@ export type ProfileFormData = {
   companyNameCn: string
   phone: string
   taxId: string
-  contactPerson: string
+  contactName: string
   contactPhone: string
   address: string
   email: string
