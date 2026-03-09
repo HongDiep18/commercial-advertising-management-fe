@@ -375,6 +375,7 @@
     "title": "Login",
     "email": "Email",
     "password": "Password",
+    "forgotPassword": "Forgot password?",
     "submit": "Login",
     "processing": "Logging in...",
     "success": "Login successful!",
@@ -400,6 +401,16 @@
     "errors": {
       "failed": "Login failed, please check your email and password"
     }
+  },
+  "forgotPassword": {
+    "title": "Forgot password",
+    "description": "Enter your email and we'll send you a link to reset your password.",
+    "email": "Email",
+    "submit": "Send reset link",
+    "processing": "Sending...",
+    "success": "If an account exists for this email, you will receive a reset link.",
+    "backToLogin": "Back to login",
+    "error": "Request failed. Please try again."
   },
   "setPassword": {
     "title": "Set your password",

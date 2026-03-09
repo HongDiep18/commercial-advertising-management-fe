@@ -134,7 +134,15 @@ export default function LoginForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">{t("login.password") || "密碼"}</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">{t("login.password") || "密碼"}</Label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-muted-foreground hover:text-primary text-sm hover:underline"
+                    >
+                      {t("login.forgotPassword") || "Forgot password?"}
+                    </Link>
+                  </div>
                   <div className="relative">
                     <Input
                       id="password"
