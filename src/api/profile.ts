@@ -1,6 +1,7 @@
 import { api } from "@/lib/api"
 import { getStoredToken } from "@/api/auth"
 import type { ProfileFormData } from "@/types/account"
+import type { UpdateProfileResponse } from "@/types/auth"
 
 export type ProfileResponse = ProfileFormData & { uploadLogo?: string | null }
 
@@ -10,32 +11,42 @@ export type GetProfileResponse = {
   profile?: ProfileResponse
 }
 
-function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
-  const any = d as Record<string, unknown> & {
-    address?: string
-    description?: string
-    companyAddress?: string
-    introduction?: string
-    uploadLogo?: string | null
-    logoUrl?: string | null
+function firstDefined<T>(record: Record<string, unknown>, keys: string[]): T | undefined {
+  for (const k of keys) {
+    const v = record[k]
+    if (v !== undefined && v !== null) return v as T
   }
+  return undefined
+}
+
+function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
   return {
     ...(d as ProfileResponse),
-    address: (any.address ?? any.companyAddress ?? "") as string,
-    description: (any.description ?? any.introduction ?? "") as string,
+    address: (firstDefined<string>(d, ["address", "companyAddress"]) ?? "") as string,
+    description: (firstDefined<string>(d, ["description", "introduction"]) ?? "") as string,
+    uploadLogo: firstDefined<string | null>(d, ["logoUrl", "uploadLogo"]) ?? undefined,
   }
+}
+
+export function getProfileAndLogoFromUpdateData(data: UpdateProfileResponse["data"]): {
+  profile: ProfileResponse | null
+  logoUrl: string | null
+} {
+  if (!data || typeof data !== "object") return { profile: null, logoUrl: null }
+
+  const d = data as Record<string, unknown>
+  const logoUrl =
+    (d.logoUrl as string | null | undefined) ?? (d.logo_url as string | null | undefined) ?? null
+  const profile = toProfileResponse(d)
+
+  return { profile, logoUrl: logoUrl ?? null }
 }
 
 function pickProfile(raw: GetProfileResponse): ProfileResponse | null {
   if (!raw) return null
-  const d = raw.data
-  if (d && typeof d === "object" && !Array.isArray(d)) {
-    if ("companyNameVi" in d || "address" in d) return toProfileResponse(d as Record<string, unknown>)
-    if ("profile" in d && d.profile && typeof d.profile === "object")
-      return toProfileResponse(d.profile as Record<string, unknown>)
-  }
-  if ("companyNameVi" in raw || "address" in raw)
-    return toProfileResponse(raw as Record<string, unknown>)
+  const candidate = (raw as { data?: unknown }).data ?? raw
+  if (candidate && typeof candidate === "object" && !Array.isArray(candidate))
+    return toProfileResponse(candidate as Record<string, unknown>)
   return null
 }
 

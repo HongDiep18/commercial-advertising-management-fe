@@ -4,9 +4,6 @@ import { useMemo, type ReactNode } from "react"
 import * as demoData from "@/data/adminDemoData"
 import { AdminDataContext, type AdminData } from "../AdminDataContext"
 
-/**
- * Admin provider for /admin/demo: all data from demo/sample data only. No API calls.
- */
 export function AdminDemoProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AdminData>(
     () => ({

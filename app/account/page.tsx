@@ -26,9 +26,8 @@ import {
   COUNTRY_NONE,
 } from "@/components/account"
 import type { ProfileFormData } from "@/types/account"
-import { UpdateProfilePayload } from "@/types/auth"
-import { getProfile, type ProfileResponse } from "@/api/profile"
-import { updateProfile } from "@/api/auth"
+import { getProfile, getProfileAndLogoFromUpdateData, type ProfileResponse } from "@/api/profile"
+import { updateProfile, updateProfileWithLogo } from "@/api/auth"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
 import { getDemoProfileForUser } from "@/components/login/demo"
@@ -68,7 +67,7 @@ function apiProfileToFormData(api: ProfileResponse, fallbackEmail?: string): Pro
 }
 
 type Modals = { upgrade: boolean; benefits: boolean; profile: boolean }
-type LogoState = { url: string | null; uploaded: boolean; changed: boolean }
+type LogoState = { url: string | null; file: File | null; uploaded: boolean; changed: boolean }
 type ProfileState = { data: ProfileFormData; isSaving: boolean }
 type ToastState = { message: string; variant: ToastVariant; visible: boolean }
 
@@ -85,6 +84,7 @@ export default function AccountPage() {
   })
   const [logo, setLogo] = useState<LogoState>({
     url: null,
+    file: null,
     uploaded: false,
     changed: false,
   })
@@ -142,7 +142,23 @@ export default function AccountPage() {
   }, [isLoggedIn, router])
 
   useEffect(() => {
-    if (modals.profile) setLogo((l) => ({ ...l, changed: false }))
+    if (modals.profile) {
+      setLogo((l) => ({ ...l, changed: false }))
+    } else {
+      setLogo((l) => {
+        if (l.url?.startsWith("blob:")) URL.revokeObjectURL(l.url)
+        const hadBlob = l.url?.startsWith("blob:")
+        return { ...l, file: null, ...(hadBlob ? { url: null } : {}) }
+      })
+      if (logo.changed && logo.file && !getDemoProfileForUser(user)) {
+        getProfile()
+          .then((apiProfile) => {
+            if (apiProfile?.uploadLogo)
+              setLogo((l) => ({ ...l, url: apiProfile.uploadLogo!, uploaded: true }))
+          })
+          .catch(() => {})
+      }
+    }
   }, [modals.profile])
 
   const applyApiProfile = (apiProfile: ProfileResponse, currentEmail?: string) => {
@@ -151,7 +167,10 @@ export default function AccountPage() {
       data: apiProfileToFormData(apiProfile, currentEmail ?? p.data.email),
     }))
     if (apiProfile.uploadLogo) {
-      setLogo((l) => ({ ...l, url: apiProfile.uploadLogo!, uploaded: true }))
+      setLogo((l) => {
+        if (l.url?.startsWith("blob:")) URL.revokeObjectURL(l.url)
+        return { ...l, url: apiProfile.uploadLogo!, file: null, uploaded: true }
+      })
     }
   }
 
@@ -243,7 +262,7 @@ export default function AccountPage() {
         setModals((m) => ({ ...m, profile: false }))
         return
       }
-      const payload: UpdateProfilePayload = {
+      const profilePayload = {
         company_name_vi: profileData.companyNameVi,
         company_name_cn: profileData.companyNameCn,
         phone: profileData.phone,
@@ -258,13 +277,24 @@ export default function AccountPage() {
         website: profileData.website,
         introduction: profileData.description,
       }
-      if (logo.changed) {
-        payload.upload_logo = logo.url ?? ""
+      const updateRes =
+        logo.changed && logo.file
+          ? await updateProfileWithLogo(profilePayload, logo.file)
+          : await updateProfile(profilePayload)
+      const { profile: profileFromUpdate, logoUrl: logoUrlFromUpdate } =
+        getProfileAndLogoFromUpdateData(updateRes?.data)
+      if (profileFromUpdate) {
+        applyApiProfile(profileFromUpdate, profileData.email)
+      } else {
+        const apiProfile = await getProfile()
+        if (apiProfile) applyApiProfile(apiProfile, profileData.email)
       }
-      await updateProfile(payload)
-      const apiProfile = await getProfile()
-      if (apiProfile) {
-        applyApiProfile(apiProfile, profileData.email)
+      if (logoUrlFromUpdate) {
+        setLogo((l) => {
+          if (l.url?.startsWith("blob:")) URL.revokeObjectURL(l.url)
+          return { ...l, url: logoUrlFromUpdate, file: null, uploaded: true, changed: false }
+        })
+      } else {
         setLogo((l) => ({ ...l, changed: false }))
       }
       setModals((m) => ({ ...m, profile: false }))
@@ -283,26 +313,28 @@ export default function AccountPage() {
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setLogo((l) => ({ ...l, changed: true }))
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const result = reader.result as string
-        setLogo((prev) => {
-          const isFirst = !prev.uploaded
-          queueMicrotask(() => {
-            showToast(
-              isFirst
-                ? t("account.logoPoints", { count: CONTRIBUTION_VALUES.logo }) ||
-                    `Logo 上傳成功！您獲得 ${CONTRIBUTION_VALUES.logo.toLocaleString()} 點貢獻值`
-                : t("account.logoUpdated") || "Logo 更新成功！",
-              "success"
-            )
-          })
-          return { ...prev, url: result, uploaded: true }
+      setLogo((prev) => {
+        if (prev.url?.startsWith("blob:")) URL.revokeObjectURL(prev.url)
+        const isFirst = !prev.uploaded
+        queueMicrotask(() => {
+          showToast(
+            isFirst
+              ? t("account.logoPoints", { count: CONTRIBUTION_VALUES.logo }) ||
+                  `Logo 上傳成功！您獲得 ${CONTRIBUTION_VALUES.logo.toLocaleString()} 點貢獻值`
+              : t("account.logoUpdated") || "Logo 更新成功！",
+            "success"
+          )
         })
-      }
-      reader.readAsDataURL(file)
+        return {
+          ...prev,
+          url: URL.createObjectURL(file),
+          file,
+          uploaded: true,
+          changed: true,
+        }
+      })
     }
+    e.target.value = ""
   }
 
   if (!isLoggedIn || !user) {
