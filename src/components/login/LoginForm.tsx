@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Card from "../ui/Card"
 import Input from "../ui/Input"
@@ -36,6 +36,7 @@ export default function LoginForm() {
   const router = useRouter()
   const { setUser } = useUser()
   const [formData, setFormData] = useState<LoginFormData>(INITIAL_LOGIN_FORM)
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: "",
@@ -134,14 +135,27 @@ export default function LoginForm() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">{t("login.password") || "密碼"}</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder={t("login.placeholders.password") || "••••••••"}
-                    value={formData.password}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={t("login.placeholders.password") || "••••••••"}
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, password: e.target.value }))
+                      }
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-muted-foreground hover:text-foreground focus:ring-primary/30 absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 focus:ring-2 focus:outline-none"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <Button variant="primary" type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? t("login.processing") || "登入中..." : t("login.submit") || "登入"}

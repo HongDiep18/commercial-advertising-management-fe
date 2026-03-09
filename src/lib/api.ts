@@ -20,19 +20,24 @@ export const api = {
   base,
   async request<T>(
     path: string,
-    options: Omit<RequestInit, "body"> & { body?: object } = {}
+    options: Omit<RequestInit, "body"> & { body?: object | FormData } = {}
   ): Promise<T> {
     const { body, ...init } = options
     const url = `${this.base}${path.startsWith("/") ? path : `/${path}`}`
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...getAuthHeader(),
-      ...(init.headers as Record<string, string>),
+    const isFormData = body instanceof FormData
+    const rawHeaders = { ...getAuthHeader(), ...(init.headers as Record<string, string>) }
+    if (isFormData) {
+      delete rawHeaders["Content-Type"]
+      delete rawHeaders["content-type"]
+    } else {
+      rawHeaders["Content-Type"] = "application/json"
     }
     const res = await fetch(url, {
       ...init,
-      headers,
-      ...(body !== undefined && { body: JSON.stringify(body) }),
+      headers: rawHeaders,
+      ...(body !== undefined && {
+        body: isFormData ? (body as FormData) : JSON.stringify(body),
+      }),
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok) {

@@ -100,5 +100,20 @@ export type UpdateProfilePayload = {
 
 export type UpdateProfileResponse = {
   message?: string
+  data?: ProfileData
+}
+
+export type ProfileData = {
+  logoUrl?: string | null
+  [key: string]: unknown
+}
+
+export type SetPasswordPayload = {
+  token: string
+  password: string
+}
+
+export type SetPasswordResponse = {
+  message?: string
   data?: unknown
 }

@@ -4,6 +4,8 @@ import type {
   LoginResponse,
   RegisterPayload,
   RegisterResponse,
+  SetPasswordPayload,
+  SetPasswordResponse,
   UpdateProfilePayload,
   UpdateProfileResponse,
 } from "@/types/auth"
@@ -51,9 +53,37 @@ export async function register(payload: RegisterPayload): Promise<RegisterRespon
   })
 }
 
+function profilePayloadToFormData(payload: Omit<UpdateProfilePayload, "upload_logo">): FormData {
+  const form = new FormData()
+  for (const [key, value] of Object.entries(payload)) {
+    form.append(key, String(value))
+  }
+  return form
+}
+
 export async function updateProfile(payload: UpdateProfilePayload): Promise<UpdateProfileResponse> {
   return api.request<UpdateProfileResponse>("/auth/update-profile", {
     method: "PATCH",
     body: payload,
+  })
+}
+
+export async function updateProfileWithLogo(
+  payload: Omit<UpdateProfilePayload, "upload_logo">,
+  logoFile: File
+): Promise<UpdateProfileResponse> {
+  const form = profilePayloadToFormData(payload)
+  form.append("logo_url", logoFile, logoFile.name)
+  return api.request<UpdateProfileResponse>("/auth/update-profile", {
+    method: "PATCH",
+    body: form,
+  })
+}
+
+export async function setPassword(payload: SetPasswordPayload): Promise<SetPasswordResponse> {
+  return api.request<SetPasswordResponse>("/auth/set-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: { token: payload.token, password: payload.password },
   })
 }

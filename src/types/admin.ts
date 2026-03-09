@@ -12,11 +12,6 @@ export enum ProfileRequestStatus {
   REJECTED = "REJECTED",
 }
 
-// export type ProfileRequestStatusUpdate = Exclude<
-//   ProfileRequestStatus.APPROVED,
-//   ProfileRequestStatus.REJECTED
-// >
-
 export type ProfileRequestStatusUpdate =
   | ProfileRequestStatus.APPROVED
   | ProfileRequestStatus.REJECTED

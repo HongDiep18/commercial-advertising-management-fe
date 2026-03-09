@@ -69,6 +69,9 @@ export default function RegisterForm() {
 
   const countries = getCountryOptions(t)
   const availableRegions = getRegionOptions(formData.country, t)
+  const hasCountry = Boolean(formData.country?.trim())
+  const regionInList = hasCountry && availableRegions.some((r) => r.value === formData.region)
+  const regionValue = hasCountry && regionInList ? formData.region : ""
 
   const categories = [
     { id: "semi", name: t("search.categories.semi") },
@@ -291,15 +294,16 @@ export default function RegisterForm() {
                 </FieldWithError>
                 <FieldWithError error={fieldErrors.region}>
                   <Select
-                    value={formData.region}
+                    key={formData.country || "__no_country__"}
+                    value={regionValue}
                     onValueChange={(v) => handleInputChange("region", v)}
-                    disabled={!formData.country}
+                    disabled={!hasCountry}
                     required
                   >
                     <Select.Trigger className="w-full">
                       <Select.Value
                         placeholder={
-                          !formData.country
+                          !hasCountry
                             ? t("register.placeholders.selectCountryFirst") || "請先選擇國家"
                             : t("register.placeholders.region") || "選擇地區 *"
                         }

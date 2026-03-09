@@ -401,6 +401,34 @@
       "failed": "Đăng nhập thất bại, vui lòng kiểm tra email và mật khẩu"
     }
   },
+  "setPassword": {
+    "title": "Đặt mật khẩu",
+    "description": "Tài khoản của bạn đã được duyệt. Vui lòng đặt mật khẩu để đăng nhập.",
+    "password": "Mật khẩu",
+    "confirm": "Xác nhận mật khẩu",
+    "submit": "Đặt mật khẩu",
+    "processing": "Đang đặt mật khẩu...",
+    "success": "Đã đặt mật khẩu. Đang chuyển đến trang đăng nhập...",
+    "invalidLink": "Liên kết không hợp lệ hoặc đã hết hạn",
+    "invalidLinkHint": "Vui lòng dùng liên kết trong email duyệt, hoặc yêu cầu gửi lại.",
+    "backToLogin": "Về trang đăng nhập",
+    "error": "Đặt mật khẩu thất bại. Liên kết có thể đã hết hạn.",
+    "placeholders": {
+      "password": "{{min}}–{{max}} ký tự, chữ hoa/thường, số, ký tự đặc biệt",
+      "confirm": "Nhập lại mật khẩu"
+    },
+    "hint": "8–128 ký tự; ít nhất một chữ cái, một số, một chữ in hoa, một chữ thường, một ký tự đặc biệt (vd. !@#$).",
+    "errors": {
+      "required": "Vui lòng nhập mật khẩu",
+      "minLength": "Mật khẩu cần ít nhất 8 ký tự",
+      "maxLength": "Mật khẩu tối đa 128 ký tự",
+      "letterAndNumber": "Mật khẩu phải có ít nhất một chữ cái và một chữ số",
+      "uppercase": "Mật khẩu phải có ít nhất một chữ in hoa",
+      "lowercase": "Mật khẩu phải có ít nhất một chữ thường",
+      "specialChar": "Mật khẩu phải có ít nhất một ký tự đặc biệt (vd. !@#$%^&*)",
+      "mismatch": "Hai mật khẩu không khớp"
+    }
+  },
   "account": {
     "companyLogo": "Logo công ty",
     "memberSince": "Thành viên từ",

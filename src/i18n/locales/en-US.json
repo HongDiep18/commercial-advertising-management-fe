@@ -401,6 +401,34 @@
       "failed": "Login failed, please check your email and password"
     }
   },
+  "setPassword": {
+    "title": "Set your password",
+    "description": "Your account has been approved. Choose a password to sign in.",
+    "password": "Password",
+    "confirm": "Confirm password",
+    "submit": "Set password",
+    "processing": "Setting password...",
+    "success": "Password set. Redirecting to login...",
+    "invalidLink": "Invalid or expired link",
+    "invalidLinkHint": "Please use the link from your approval email, or request a new one.",
+    "backToLogin": "Back to login",
+    "error": "Failed to set password. The link may have expired.",
+    "placeholders": {
+      "password": "{{min}}–{{max}} characters, upper/lower, number, special",
+      "confirm": "Enter password again"
+    },
+    "hint": "8–128 characters; at least one letter, one number, one uppercase, one lowercase, one special character (e.g. !@#$).",
+    "errors": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters",
+      "maxLength": "Password must be at most 128 characters",
+      "letterAndNumber": "Password must contain at least one letter and at least one number",
+      "uppercase": "Password must contain at least one uppercase character",
+      "lowercase": "Password must contain at least one lowercase character",
+      "specialChar": "Password must contain at least one special character (e.g. !@#$%^&*)",
+      "mismatch": "Passwords do not match"
+    }
+  },
   "account": {
     "companyLogo": "Company Logo",
     "memberSince": "Member since",
