@@ -8,6 +8,7 @@ import {
   CommercialType,
   AdType,
   AdStatus,
+  type FeatureKey,
 } from "@/types"
 import type {
   User,
@@ -232,6 +233,14 @@ export const COMMERCIAL_POINTS_RATE = 1
 
 export const DIAMOND_COMMERCIAL_THRESHOLD = 550000
 
+const ROLE_FEATURES: Record<UserRole, ReadonlyArray<FeatureKey>> = {
+  [UserRole.Guest]: [],
+  [UserRole.Free]: [],
+  [UserRole.Paid]: ["downloadDirectory"],
+  [UserRole.Admin]: ["adminPanel", "downloadDirectory"],
+  [UserRole.SuperAdmin]: ["adminPanel", "downloadDirectory"],
+}
+
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const STORAGE_KEY = "demo_user"
@@ -352,6 +361,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return Math.min((totalPoints / nextTierThreshold) * 100, 100)
   }
 
+  const canUseFeature = (feature: FeatureKey): boolean => {
+    console.log("user", user)
+    if (!user) return false
+    const features = ROLE_FEATURES[user.role] ?? []
+    return features.includes(feature)
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -370,6 +386,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         canViewEmail,
         canDownloadDirectory,
         getUpgradeProgress,
+        canUseFeature,
       }}
     >
       {children}

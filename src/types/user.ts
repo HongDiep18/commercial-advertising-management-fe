@@ -5,6 +5,7 @@ export enum UserRole {
   Free = "free",
   Paid = "paid",
   Admin = "admin",
+  SuperAdmin = "SUPER_ADMIN",
 }
 
 export type User = {
@@ -45,6 +46,10 @@ export type CanDownloadDirectoryFn = () => boolean
 
 export type GetUpgradeProgressFn = () => number
 
+export type FeatureKey = "adminPanel" | "downloadDirectory"
+
+export type CanUseFeatureFn = (feature: FeatureKey) => boolean
+
 export type UserContextType = {
   user: User | null
   isLoggedIn: boolean
@@ -61,4 +66,5 @@ export type UserContextType = {
   canViewEmail: CanViewEmailFn
   canDownloadDirectory: CanDownloadDirectoryFn
   getUpgradeProgress: GetUpgradeProgressFn
+  canUseFeature: CanUseFeatureFn
 }
