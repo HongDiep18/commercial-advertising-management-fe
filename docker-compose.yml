@@ -10,9 +10,10 @@ services:
     container_name: vn-buyer-guide-fe
 
     ports:
-      - "3000:3000"
+      - "80:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NODE_ENV=production
 
     restart: unless-stopped
 
