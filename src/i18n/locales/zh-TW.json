@@ -375,6 +375,7 @@
     "title": "登入帳號",
     "email": "電子郵件",
     "password": "密碼",
+    "forgotPassword": "忘記密碼？",
     "submit": "登入",
     "processing": "登入中...",
     "success": "登入成功！",
@@ -400,6 +401,16 @@
     "errors": {
       "failed": "登入失敗，請檢查您的帳號密碼"
     }
+  },
+  "forgotPassword": {
+    "title": "忘記密碼",
+    "description": "輸入您的電子郵件，我們將寄送重設密碼連結給您。",
+    "email": "電子郵件",
+    "submit": "寄送重設連結",
+    "processing": "寄送中...",
+    "success": "若此信箱有對應帳號，您將收到重設密碼連結。",
+    "backToLogin": "返回登入",
+    "error": "請求失敗，請再試一次。"
   },
   "setPassword": {
     "title": "設定密碼",

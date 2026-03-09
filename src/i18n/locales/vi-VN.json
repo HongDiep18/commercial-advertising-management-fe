@@ -375,6 +375,7 @@
     "title": "Đăng nhập",
     "email": "Email",
     "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
     "submit": "Đăng nhập",
     "processing": "Đang đăng nhập...",
     "success": "Đăng nhập thành công!",
@@ -400,6 +401,16 @@
     "errors": {
       "failed": "Đăng nhập thất bại, vui lòng kiểm tra email và mật khẩu"
     }
+  },
+  "forgotPassword": {
+    "title": "Quên mật khẩu",
+    "description": "Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.",
+    "email": "Email",
+    "submit": "Gửi link đặt lại",
+    "processing": "Đang gửi...",
+    "success": "Nếu có tài khoản với email này, bạn sẽ nhận được link đặt lại mật khẩu.",
+    "backToLogin": "Về trang đăng nhập",
+    "error": "Yêu cầu thất bại. Vui lòng thử lại."
   },
   "setPassword": {
     "title": "Đặt mật khẩu",

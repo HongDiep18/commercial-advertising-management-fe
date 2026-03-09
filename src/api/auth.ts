@@ -85,3 +85,11 @@ export async function setPassword(payload: SetPasswordPayload): Promise<SetPassw
     body: { token: payload.token, password: payload.password },
   })
 }
+
+export async function requestPasswordReset(email: string): Promise<{ message?: string }> {
+  return api.request<{ message?: string }>("/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: { email: email.trim() },
+  })
+}
