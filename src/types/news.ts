@@ -38,7 +38,8 @@ export type NewsListResponse = {
   total?: number
   page?: number
   limit?: number
-  meta?: { total?: number; page?: number; limit?: number }
+  totalPages?: number
+  meta?: { total?: number; page?: number; limit?: number; totalPages?: number }
   totalCount?: number
 }
 

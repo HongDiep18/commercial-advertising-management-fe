@@ -4,8 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { getNewsList, type NewsItem } from "@/api/news"
 
-const NEWS_PAGE_SIZE = 6
-const DEFAULT_LIMIT = 100
+const PAGE_SIZE = 6
 
 export type CategoryOption = {
   slug: string
@@ -17,6 +16,8 @@ export type CategoryOption = {
 export function useNewsList() {
   const { t } = useTranslation()
   const [news, setNews] = useState<NewsItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -24,16 +25,26 @@ export function useNewsList() {
   const [selectedSubcategorySlugs, setSelectedSubcategorySlugs] = useState<string[]>([])
   const [showSubcategoryFilter, setShowSubcategoryFilter] = useState(false)
 
+  const categorySlug = selectedCategorySlugs[0]
+  const subcategorySlug = selectedSubcategorySlugs[0]
+
   useEffect(() => {
     let cancelled = false
-    const rafId = requestAnimationFrame(() => {
-      setLoading(true)
-      setError(null)
+    const tid = requestAnimationFrame(() => {
+      if (!cancelled) {
+        setLoading(true)
+        setError(null)
+      }
     })
-    getNewsList(1, DEFAULT_LIMIT)
+    getNewsList(currentPage, PAGE_SIZE, {
+      categorySlug: categorySlug || undefined,
+      subcategorySlug: subcategorySlug || undefined,
+    })
       .then((res) => {
         if (cancelled) return
         setNews(res.data ?? [])
+        setTotal(res.total ?? 0)
+        setTotalPages(res.totalPages ?? 1)
       })
       .catch((err) => {
         if (!cancelled) setError(err?.message || t("news.errorLoad") || "無法載入最新消息")
@@ -43,9 +54,9 @@ export function useNewsList() {
       })
     return () => {
       cancelled = true
-      cancelAnimationFrame(rafId)
+      cancelAnimationFrame(tid)
     }
-  }, [t])
+  }, [currentPage, categorySlug, subcategorySlug, t])
 
   const categoryList = useMemo(() => {
     const bySlug = new Map<string, CategoryOption>()
@@ -79,28 +90,7 @@ export function useNewsList() {
     return Array.from(bySlug.values())
   }, [news])
 
-  const filteredNews = useMemo(() => {
-    let list = news
-    if (selectedCategorySlugs.length > 0) {
-      list = list.filter(
-        (item) => item.category?.slug && selectedCategorySlugs.includes(item.category.slug)
-      )
-    }
-    if (selectedSubcategorySlugs.length > 0) {
-      list = list.filter(
-        (item) => item.subcategory?.slug && selectedSubcategorySlugs.includes(item.subcategory.slug)
-      )
-    }
-    return list
-  }, [news, selectedCategorySlugs, selectedSubcategorySlugs])
-
-  const totalPages = Math.max(1, Math.ceil(filteredNews.length / NEWS_PAGE_SIZE))
   const safePage = Math.min(Math.max(1, currentPage), totalPages)
-
-  const pagedNews = useMemo(() => {
-    const start = (safePage - 1) * NEWS_PAGE_SIZE
-    return filteredNews.slice(start, start + NEWS_PAGE_SIZE)
-  }, [filteredNews, safePage])
 
   const setPage = (page: number) => setCurrentPage(page)
 
@@ -117,8 +107,8 @@ export function useNewsList() {
   }
 
   return {
-    news: pagedNews,
-    total: filteredNews.length,
+    news,
+    total,
     totalPages,
     currentPage: safePage,
     setPage,
