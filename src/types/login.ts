@@ -1,5 +1,5 @@
-import { UserRole, MEMBERSHIP_THRESHOLDS, MembershipTier } from "@/contexts/user-context"
 import type { User } from "@/contexts/user-context"
+import { MEMBERSHIP_THRESHOLDS, MembershipTier, UserRole } from "@/contexts/user-context"
 
 export type AuthUserFromApi = {
   id: string

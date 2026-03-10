@@ -46,7 +46,13 @@ export type CanDownloadDirectoryFn = () => boolean
 
 export type GetUpgradeProgressFn = () => number
 
-export type FeatureKey = "adminPanel" | "downloadDirectory"
+export enum FeatureKey {
+  AdminPanel = "adminPanel",
+  DownloadDirectory = "downloadDirectory",
+  AdPackageManagement = "adPackageManagement",
+}
+
+export type FeatureKeyType = FeatureKey
 
 export type CanUseFeatureFn = (feature: FeatureKey) => boolean
 

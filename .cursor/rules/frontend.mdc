@@ -1,0 +1,56 @@
+---
+alwaysApply: true
+tags:
+  - fe
+---
+You are working in the **frontend** of the VN Buyer Guide project (Next.js app in `fe/`).
+## Stack conventions
+- **UI**
+  - Prefer **shadcn/ui (Radix, Maia preset)** components from `@/components/ui` whenever a matching primitive exists (button, input, dialog, dropdown, toast, etc.).
+  - Follow existing Tailwind design tokens and shadcn class patterns rather than introducing new ad‑hoc styles.
+  - Only build custom components when shadcn does not provide a suitable primitive; compose them from shadcn primitives when possible.
+- **Data fetching**
+  - Use the existing `api.request<T>` wrapper in `src/lib/api.ts` for all HTTP calls.
+  - Use **@tanstack/react-query** for data fetching in client components:
+    - Always call APIs via a React Query hook, not directly in components.
+    - Prefer `useQuery`/`useMutation` for server state, local `useState` only for UI state.
+## API module structure
+When adding a new API under `src/api/`:
+- Create a **folder per backend module**, e.g. `src/api/ads-pricing/`, `src/api/auth/`, `src/api/companies/`.
+- Inside each folder, create **exactly three files**:
+1. `types.ts`
+   - Contains **only TypeScript types** and enums for this module:
+     - Response types (e.g. `FooResponse`, `FooListResponse`).
+     - Request/payload types (e.g. `CreateFooPayload`).
+     - Query types (e.g. `FooListQuery`).
+   - Types should mirror the backend DTOs as closely as possible, but can use `string` where backend enums are not yet exported.
+2. `service.ts`
+   - Contains **plain async functions** that wrap `api.request<T>`:
+     - One function per backend endpoint, e.g. `getFoo`, `createFoo`, `updateFoo`, `deleteFoo`.
+     - No React, no hooks, no component logic.
+   - All paths must match backend controllers (e.g. `"/admin/ad-packages/pricing"`).
+3. `hooks.ts`
+   - Contains **React Query hooks** that call the `service.ts` functions:
+     - `useFooList`, `useFooDetail`, `useCreateFoo`, `useUpdateFoo`, `useDeleteFoo`, etc.
+     - Define a stable `queryKey` helper (e.g. `fooKeys.all`, `fooKeys.list(query)`, `fooKeys.detail(id)`).
+     - Invalidate or refetch the appropriate queries on mutation `onSuccess`.
+## React Query usage
+- The global `QueryClientProvider` is already set up in `app/providers.tsx`. Do **not** create additional `QueryClient`s.
+- When adding new hooks:
+  - Always provide a `queryKey`.
+  - Use `enabled: ...` when the query depends on nullable params (e.g. `id`).
+  - Invalidate with `queryClient.invalidateQueries({ queryKey: ... })` after successful mutations.
+## Components and pages
+- **Server vs client components**
+  - Keep pages and layouts server components by default.
+  - Mark components as `"use client"` only when they:
+    - Use React hooks (including React Query hooks).
+    - Access `window`, `document`, `localStorage`, or browser APIs.
+- In client components that need data:
+  - Use the corresponding `useXxx` hook from `src/api/<module>/hooks.ts`.
+  - Do not call `fetch` or `api.request` directly.
+## Date pickers
+- The project currently uses a custom `Calendar` component in `src/components/ui/Calendar.tsx`.
+- When replacing or adding new date‑related UI:
+  - Prefer shadcn/Radix‑based date pickers where possible.
+  - If you extend or refactor the calendar, keep it under `src/components/ui` and align styling with shadcn button/input patterns.
