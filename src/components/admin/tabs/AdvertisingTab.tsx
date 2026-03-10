@@ -10,8 +10,10 @@ import {
   DialogTitle,
 } from "@/components/ui/Dialog"
 import Input from "@/components/ui/Input"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { AdSubmission } from "@/contexts/user-context"
-import { UserRole, useUser } from "@/contexts/user-context"
+import { useUser } from "@/contexts/user-context"
+import { FeatureKey } from "@/types"
 import {
   CheckCircle2,
   Clock,
@@ -26,14 +28,14 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useAdminData } from "../AdminDataContext"
 import { AdPackageManagement } from "../ad-package-management"
+import { useAdminData } from "../AdminDataContext"
 import { StatusBadge } from "../StatusBadge"
 
 export function AdvertisingTab() {
   const { t } = useTranslation()
   const { adSubmissions } = useAdminData()
-  const { user } = useUser()
+  const { canUseFeature } = useUser()
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedSubmission, setSelectedSubmission] = useState<AdSubmission | null>(null)
@@ -68,7 +70,7 @@ export function AdvertisingTab() {
     return matchesSearch && matchesStatus
   })
 
-  const isSuperAdmin = user?.role === UserRole.SuperAdmin
+  const canUseAdPackageManagement = canUseFeature(FeatureKey.AdPackageManagement)
 
   return (
     <div className="space-y-6">
@@ -96,28 +98,24 @@ export function AdvertisingTab() {
         </Card>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={viewMode === "orders" ? "default" : "outline"}
-            onClick={() => setViewMode("orders")}
-          >
+      <Tabs
+        value={viewMode}
+        onValueChange={(val) => setViewMode(val as "orders" | "packages")}
+        className="mt-2"
+      >
+        <TabsList variant="line">
+          <TabsTrigger value="orders">
             {t("admin.advertising.orderHistory") || "Ad order history"}
-          </Button>
-          {isSuperAdmin && (
-            <Button
-              size="sm"
-              variant={viewMode === "packages" ? "default" : "outline"}
-              onClick={() => setViewMode("packages")}
-            >
+          </TabsTrigger>
+          {canUseAdPackageManagement && (
+            <TabsTrigger value="packages">
               {t("admin.advertising.packageManagementTab") || "Ad package management"}
-            </Button>
+            </TabsTrigger>
           )}
-        </div>
-      </div>
+        </TabsList>
+      </Tabs>
 
-      {viewMode === "packages" && isSuperAdmin && <AdPackageManagement />}
+      {viewMode === "packages" && canUseAdPackageManagement && <AdPackageManagement />}
 
       {viewMode === "orders" && (
         <>
