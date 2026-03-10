@@ -237,8 +237,16 @@ const ROLE_FEATURES: Record<UserRole, ReadonlyArray<FeatureKey>> = {
   [UserRole.Guest]: [],
   [UserRole.Free]: [],
   [UserRole.Paid]: [FeatureKey.DownloadDirectory],
-  [UserRole.Admin]: [FeatureKey.AdminPanel, FeatureKey.DownloadDirectory],
-  [UserRole.SuperAdmin]: [FeatureKey.AdminPanel, FeatureKey.DownloadDirectory],
+  [UserRole.Admin]: [
+    FeatureKey.AdminPanel,
+    FeatureKey.DownloadDirectory,
+    FeatureKey.AdPackageManagement,
+  ],
+  [UserRole.SuperAdmin]: [
+    FeatureKey.AdminPanel,
+    FeatureKey.DownloadDirectory,
+    FeatureKey.AdPackageManagement,
+  ],
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)

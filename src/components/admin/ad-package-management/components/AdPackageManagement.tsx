@@ -21,7 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table"
-import { UserRole, useUser } from "@/contexts/user-context"
+import { useUser } from "@/contexts/user-context"
+import { FeatureKey } from "@/types"
 import { Pencil } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -77,8 +78,7 @@ function getPrintPlacementLabel(pkg: PublicAdPackageItem, t: (key: string) => st
 
 export function AdPackageManagement() {
   const { t } = useTranslation()
-  const { user } = useUser()
-  const isSuperAdmin = user?.role === UserRole.SuperAdmin
+  const { canUseFeature } = useUser()
 
   const [editingPackageId, setEditingPackageId] = useState<string | null>(null)
   const [editingPackageName, setEditingPackageName] = useState<string>("")
@@ -94,7 +94,7 @@ export function AdPackageManagement() {
   const updateMutation = useUpdateAdPackagePricing()
   const deleteMutation = useDeleteAdPackagePricing()
 
-  if (!isSuperAdmin) {
+  if (!canUseFeature(FeatureKey.AdPackageManagement)) {
     return (
       <Card>
         <CardContent className="text-muted-foreground p-6 text-sm">
