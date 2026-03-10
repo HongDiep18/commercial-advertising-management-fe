@@ -69,6 +69,7 @@ export function useCreateAdPackagePricing() {
     }) => createAdPackagePricing(packageId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: pricingKeys.all })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.all })
     },
   })
 }
@@ -88,6 +89,7 @@ export function useUpdateAdPackagePricing() {
         queryKey: pricingKeys.detail(variables.pricingId),
       })
       queryClient.invalidateQueries({ queryKey: pricingKeys.all })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.all })
     },
   })
 }
@@ -98,6 +100,7 @@ export function useDeleteAdPackagePricing() {
     mutationFn: (pricingId: string) => deleteAdPackagePricing(pricingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: pricingKeys.all })
+      queryClient.invalidateQueries({ queryKey: catalogKeys.all })
     },
   })
 }

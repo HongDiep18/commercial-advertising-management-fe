@@ -1,10 +1,11 @@
+import { cn } from "@/lib/utils"
 import type { Metadata } from "next"
+import { Figtree } from "next/font/google"
+import { Toaster } from "../src/components/ui/sonner"
 import "../src/index.css"
 import { Providers } from "./providers"
-import { Figtree } from "next/font/google";
-import { cn } from "@/lib/utils";
 
-const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
   title: "VN Buyer Guide",
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi" className={cn("font-sans", figtree.variable)}>
       <body>
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   )

@@ -1,26 +1,26 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import {
-  UserRole,
-  MembershipTier,
-  ContributionType,
-  CommercialType,
-  AdType,
-  AdStatus,
-  type FeatureKey,
-} from "@/types"
 import type {
-  User,
-  UserContextType,
+  AdSubmission,
+  CommercialHistory,
+  ContributionHistory,
   MembershipConfigEntry,
   NextTierInfo,
-  ContributionHistory,
-  CommercialHistory,
-  AdSubmission,
+  User,
+  UserContextType,
 } from "@/types"
+import {
+  AdStatus,
+  AdType,
+  CommercialType,
+  ContributionType,
+  FeatureKey,
+  MembershipTier,
+  UserRole,
+} from "@/types"
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 
-export { UserRole, MembershipTier } from "@/types"
+export { MembershipTier, UserRole } from "@/types"
 export type { User } from "@/types"
 
 export const MEMBERSHIP_THRESHOLDS: Record<MembershipTier, number> = {
@@ -116,8 +116,8 @@ export function getNextTierInfo(totalPoints: number): NextTierInfo | null {
   return { nextTier, pointsNeeded }
 }
 
-export { ContributionType, CommercialType } from "@/types"
-export type { ContributionHistory, CommercialHistory } from "@/types"
+export { CommercialType, ContributionType } from "@/types"
+export type { CommercialHistory, ContributionHistory } from "@/types"
 
 export const mockContributionHistory: ContributionHistory[] = [
   {
@@ -164,7 +164,7 @@ export const mockCommercialHistory: CommercialHistory[] = [
   },
 ]
 
-export { AdType, AdStatus } from "@/types"
+export { AdStatus, AdType } from "@/types"
 export type { AdSubmission } from "@/types"
 
 export const mockAdSubmissions: AdSubmission[] = [
@@ -236,9 +236,9 @@ export const DIAMOND_COMMERCIAL_THRESHOLD = 550000
 const ROLE_FEATURES: Record<UserRole, ReadonlyArray<FeatureKey>> = {
   [UserRole.Guest]: [],
   [UserRole.Free]: [],
-  [UserRole.Paid]: ["downloadDirectory"],
-  [UserRole.Admin]: ["adminPanel", "downloadDirectory"],
-  [UserRole.SuperAdmin]: ["adminPanel", "downloadDirectory"],
+  [UserRole.Paid]: [FeatureKey.DownloadDirectory],
+  [UserRole.Admin]: [FeatureKey.AdminPanel, FeatureKey.DownloadDirectory],
+  [UserRole.SuperAdmin]: [FeatureKey.AdminPanel, FeatureKey.DownloadDirectory],
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
@@ -362,7 +362,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const canUseFeature = (feature: FeatureKey): boolean => {
-    console.log("user", user)
     if (!user) return false
     const features = ROLE_FEATURES[user.role] ?? []
     return features.includes(feature)

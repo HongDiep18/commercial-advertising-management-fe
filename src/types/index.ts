@@ -1,5 +1,6 @@
 export {
   UserRole,
+  FeatureKey,
   type User,
   type SetUserFn,
   type LoginWithEmailFn,
@@ -13,7 +14,6 @@ export {
   type CanViewEmailFn,
   type CanDownloadDirectoryFn,
   type GetUpgradeProgressFn,
-  type FeatureKey,
   type CanUseFeatureFn,
   type UserContextType,
 } from "./user"

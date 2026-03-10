@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
-import { Menu, X, User, Shield, LogOut, ChevronDown } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { useUser } from "@/contexts/user-context"
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
-import LanguageSelector from "./LanguageSelector"
 import Button from "@/components/ui/Button"
+import { useUser } from "@/contexts/user-context"
+import { ChevronDown, LogOut, Menu, Shield, User, X } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
+import LanguageSelector from "./LanguageSelector"
 
 export default function Header() {
   const { t } = useTranslation()
