@@ -37,9 +37,7 @@ export default function Button({
   className,
   ...props
 }: ButtonProps) {
-  const cls = className
-    ? `${classesFor(variant, size)} ${className}`
-    : classesFor(variant, size)
+  const cls = className ? `${classesFor(variant, size)} ${className}` : classesFor(variant, size)
 
   if (asChild) {
     const child = (props as unknown as { children: ReactElement }).children
@@ -52,4 +50,3 @@ export default function Button({
 
   return <button {...props} className={cls} />
 }
-

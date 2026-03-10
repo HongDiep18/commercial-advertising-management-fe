@@ -8,7 +8,7 @@ import { AdminProvider, AdminDashboardContent } from "@/components/admin"
 
 export default function AdminPage() {
   const router = useRouter()
-  const { user, isLoggedIn } = useUser()
+  const { user, isLoggedIn, canUseFeature } = useUser()
 
   useEffect(() => {
     if (!isLoggedIn || !user) {
@@ -19,12 +19,12 @@ export default function AdminPage() {
       router.replace("/admin/demo")
       return
     }
-    if (user.role !== "admin") {
+    if (!canUseFeature("adminPanel")) {
       router.push("/login")
     }
-  }, [isLoggedIn, user, router])
+  }, [isLoggedIn, user, canUseFeature, router])
 
-  if (!isLoggedIn || !user || user.role !== "admin") {
+  if (!isLoggedIn || !user || !canUseFeature("adminPanel")) {
     return null
   }
 
