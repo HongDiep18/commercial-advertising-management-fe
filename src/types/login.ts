@@ -1,5 +1,5 @@
-import { UserRole, MEMBERSHIP_THRESHOLDS, MembershipTier } from "@/contexts/user-context"
 import type { User } from "@/contexts/user-context"
+import { MEMBERSHIP_THRESHOLDS, MembershipTier, UserRole } from "@/contexts/user-context"
 
 export type AuthUserFromApi = {
   id: string
@@ -54,12 +54,14 @@ export function mapApiUserToUser(payload: LoginUserPayload, email: string): User
   let role: UserRole
   if (rawRole === "admin" || rawRole === "administrator") {
     role = UserRole.Admin
+  } else if (rawRole === "super_admin") {
+    role = UserRole.SuperAdmin
   } else if (rawRole === "guest") {
     role = UserRole.Guest
   } else if (rawRole === "free" || rawRole === "bronze") {
     role = UserRole.Free
   } else {
-    role = UserRole.Paid
+    role = UserRole.Free
   }
 
   const apiTier = API_TIER_TO_MEMBERSHIP[rawRole]

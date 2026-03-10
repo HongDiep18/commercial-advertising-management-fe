@@ -1,17 +1,17 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
-import { Menu, X, User, Shield, LogOut, ChevronDown } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { useUser, UserRole } from "@/contexts/user-context"
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
-import LanguageSelector from "./LanguageSelector"
 import Button from "@/components/ui/Button"
+import { useUser } from "@/contexts/user-context"
+import { ChevronDown, LogOut, Menu, Shield, User, X } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
+import LanguageSelector from "./LanguageSelector"
 
 export default function Header() {
   const { t } = useTranslation()
-  const { user, isLoggedIn, logout } = useUser()
+  const { user, isLoggedIn, logout, canUseFeature } = useUser()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -109,7 +109,7 @@ export default function Header() {
                       <User className="h-4 w-4" />
                       {t("header.myAccount") || "我的帳戶"}
                     </Link>
-                    {user.role === UserRole.Admin && (
+                    {canUseFeature("adminPanel") && (
                       <Link
                         href={isDemoAdminUser(user) ? "/admin/demo" : "/admin"}
                         className="hover:!bg-header-red-dark mx-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm text-black transition-colors hover:bg-white/10 hover:text-white"
@@ -216,7 +216,7 @@ export default function Header() {
                       <User className="h-4 w-4" />
                       {t("header.myAccount") || "我的帳戶"}
                     </Link>
-                    {user.role === UserRole.Admin && (
+                    {canUseFeature("adminPanel") && (
                       <Link
                         href={isDemoAdminUser(user) ? "/admin/demo" : "/admin"}
                         className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"
