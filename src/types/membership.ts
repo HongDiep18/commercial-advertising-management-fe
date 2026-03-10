@@ -1,9 +1,9 @@
 export enum MembershipTier {
-  Guest = "guest",
-  Bronze = "bronze",
-  Silver = "silver",
-  Gold = "gold",
-  Diamond = "diamond",
+  GUEST = "NONE",
+  BRONZE = "BRONZE",
+  SILVER = "SILVER",
+  GOLD = "GOLD",
+  DIAMOND = "DIAMOND",
 }
 
 export type MembershipConfigEntry = {

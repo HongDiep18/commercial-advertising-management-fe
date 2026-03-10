@@ -2,8 +2,28 @@ import { api } from "@/lib/api"
 import { getStoredToken } from "@/api/auth"
 import type { ProfileFormData } from "@/types/account"
 import type { UpdateProfileResponse } from "@/types/auth"
+import { categories } from "@/components/directory/DirectorySidebar"
+import { categoryNameToIdMap } from "@/utils/companyHelpers"
 
-export type ProfileResponse = ProfileFormData & { uploadLogo?: string | null }
+const VALID_INDUSTRY_IDS = new Set(categories.map((c) => c.id))
+
+const INDUSTRY_KEYS = [
+  "industry",
+  "industryId",
+  "industry_id",
+  "industry_Name",
+  "industry_name",
+  "category",
+  "categoryId",
+  "category_id",
+  "category_Name",
+  "category_name",
+]
+
+export type ProfileResponse = ProfileFormData & {
+  uploadLogo?: string | null
+  membershipTier?: string
+}
 
 export type GetProfileResponse = {
   message?: string
@@ -19,13 +39,32 @@ function firstDefined<T>(record: Record<string, unknown>, keys: string[]): T | u
   return undefined
 }
 
+function normalizeIndustryId(value: unknown): string {
+  if (value === undefined || value === null) return ""
+  const v = String(value).trim()
+  if (!v) return ""
+  if (VALID_INDUSTRY_IDS.has(v)) return v
+  const fromMap = categoryNameToIdMap[v]
+  if (fromMap) return fromMap
+  const lower = v.toLowerCase()
+  if (VALID_INDUSTRY_IDS.has(lower)) return lower
+  const matchedId = categories.find((c) => c.id.toLowerCase() === lower)?.id
+  if (matchedId) return matchedId
+  return ""
+}
+
 function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
+  const rawIndustry = firstDefined<string>(d, INDUSTRY_KEYS) ?? ""
   return {
     ...(d as ProfileResponse),
-    contactName: (firstDefined<string>(d, ["contactName", "contactPerson", "contact_person"]) ?? "") as string,
+    contactName: (firstDefined<string>(d, ["contactName", "contactPerson", "contact_person"]) ??
+      "") as string,
     address: (firstDefined<string>(d, ["address", "companyAddress"]) ?? "") as string,
     description: (firstDefined<string>(d, ["description", "introduction"]) ?? "") as string,
     uploadLogo: firstDefined<string | null>(d, ["logoUrl", "uploadLogo"]) ?? undefined,
+    membershipTier: (firstDefined<string>(d, ["membershipTier", "membership_tier", "membership"]) ??
+      undefined) as string | undefined,
+    industry: normalizeIndustryId(rawIndustry),
   }
 }
 
