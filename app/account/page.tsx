@@ -21,7 +21,6 @@ import {
   AccountUpgradeModal,
   AccountProfileModal,
   AccountBenefitsModal,
-  COUNTRY_VALUES,
   REGION_KEYS_BY_COUNTRY,
   COUNTRY_NONE,
 } from "@/components/account"
@@ -31,6 +30,20 @@ import { updateProfile, updateProfileWithLogo } from "@/api/auth"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
 import { getDemoProfileForUser } from "@/components/login/demo"
+import { getCountryOptions } from "@/components/register/registerOptions"
+
+function normalizeMembershipTier(value: unknown): MembershipTier | null {
+  if (typeof value !== "string") return null
+  const v = value.trim().toUpperCase()
+  if (!v) return null
+  if (v === "GUEST") return MembershipTier.GUEST
+  if (v === "NONE") return MembershipTier.GUEST
+  if (v === "BRONZE") return MembershipTier.BRONZE
+  if (v === "SILVER") return MembershipTier.SILVER
+  if (v === "GOLD") return MembershipTier.GOLD
+  if (v === "DIAMOND") return MembershipTier.DIAMOND
+  return null
+}
 
 const INITIAL_PROFILE_FORM: ProfileFormData = {
   companyNameVi: "",
@@ -71,9 +84,18 @@ type LogoState = { url: string | null; file: File | null; uploaded: boolean; cha
 type ProfileState = { data: ProfileFormData; isSaving: boolean }
 type ToastState = { message: string; variant: ToastVariant; visible: boolean }
 
+function mapIsoCountryToRegionKey(country: string): string {
+  if (!country) return "other"
+  const c = country.trim().toUpperCase()
+  if (c === "VN" || c === "VNM") return "vietnam"
+  if (c === "TW" || c === "TWN") return "taiwan"
+  if (c === "CN" || c === "CHN") return "china"
+  return "other"
+}
+
 export default function AccountPage() {
   const router = useRouter()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user, isLoggedIn, getTotalPoints, getMemberTier, getNextTier } = useUser()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -92,6 +114,7 @@ export default function AccountPage() {
     data: { ...INITIAL_PROFILE_FORM, email: user?.email ?? "" },
     isSaving: false,
   })
+  const [profileTier, setProfileTier] = useState<MembershipTier | null>(null)
   const [profileFieldErrors, setProfileFieldErrors] = useState<
     Partial<Record<keyof ProfileFormData, string>>
   >({})
@@ -108,14 +131,7 @@ export default function AccountPage() {
   const setProfileData = (fn: (prev: ProfileFormData) => ProfileFormData) =>
     setProfile((p) => ({ ...p, data: fn(p.data) }))
 
-  const countries = useMemo(
-    () =>
-      COUNTRY_VALUES.map((value) => ({
-        value,
-        label: t(`register.countries.${value}`) || value,
-      })),
-    [t]
-  )
+  const countries = useMemo(() => getCountryOptions(i18n.language), [i18n.language])
 
   const regionsByCountry = useMemo(() => {
     const result: Record<string, { value: string; label: string }[]> = {}
@@ -129,8 +145,9 @@ export default function AccountPage() {
   }, [t])
 
   const hasCountry = Boolean(profileData.country?.trim())
+  const regionCountryKey = hasCountry ? mapIsoCountryToRegionKey(profileData.country) : "other"
   const availableRegions = hasCountry
-    ? regionsByCountry[profileData.country] || regionsByCountry.other
+    ? regionsByCountry[regionCountryKey] || regionsByCountry.other
     : []
   const regionInList = hasCountry && availableRegions.some((r) => r.value === profileData.region)
   const regionValue = hasCountry && regionInList ? profileData.region : ""
@@ -166,6 +183,9 @@ export default function AccountPage() {
       ...p,
       data: apiProfileToFormData(apiProfile, currentEmail ?? p.data.email),
     }))
+    setProfileTier(
+      normalizeMembershipTier((apiProfile as { membershipTier?: unknown }).membershipTier)
+    )
     if (apiProfile.uploadLogo) {
       setLogo((l) => {
         if (l.url?.startsWith("blob:")) URL.revokeObjectURL(l.url)
@@ -342,13 +362,14 @@ export default function AccountPage() {
   }
 
   const totalPoints = getTotalPoints()
-  const memberTier = getMemberTier()
+  const memberTier =
+    user.role === UserRole.Admin ? MembershipTier.DIAMOND : (profileTier ?? getMemberTier())
   const nextTierInfo = getNextTier()
   const tierConfig = MEMBERSHIP_CONFIG[memberTier]
   const nextThreshold =
     nextTierInfo?.nextTier != null
       ? MEMBERSHIP_THRESHOLDS[nextTierInfo.nextTier]
-      : MEMBERSHIP_THRESHOLDS[MembershipTier.Diamond]
+      : MEMBERSHIP_THRESHOLDS[MembershipTier.DIAMOND]
   const progressInTier = nextTierInfo ? (totalPoints / nextThreshold) * 100 : 100
 
   return (
@@ -373,7 +394,7 @@ export default function AccountPage() {
 
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-2">
-            {memberTier !== MembershipTier.Diamond && nextTierInfo && (
+            {memberTier !== MembershipTier.DIAMOND && nextTierInfo && (
               <AccountUpgradeCard
                 user={user}
                 memberTier={memberTier}

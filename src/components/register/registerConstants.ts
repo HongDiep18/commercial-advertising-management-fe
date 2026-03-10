@@ -1,5 +1,3 @@
-export type RegisterMembershipTier = "none" | "bronze" | "silver" | "gold" | "diamond"
-
 export interface RegisterFormData {
   companyNameVi: string
   companyNameCn: string
@@ -10,11 +8,9 @@ export interface RegisterFormData {
   companyAddress: string
   email: string
   country: string
-  region: string
   industry: string
   website: string
   introduction: string
-  membershipTier: RegisterMembershipTier
 }
 
 export const INITIAL_REGISTER_FORM: RegisterFormData = {
@@ -27,9 +23,7 @@ export const INITIAL_REGISTER_FORM: RegisterFormData = {
   companyAddress: "",
   email: "",
   country: "",
-  region: "",
   industry: "",
   website: "",
   introduction: "",
-  membershipTier: "none",
 }

@@ -13,7 +13,6 @@ const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "companyAddress",
   "email",
   "country",
-  "region",
   "industry",
   "website",
   "introduction",

@@ -11,7 +11,7 @@ export default function NewsPage() {
   const { t, i18n } = useTranslation()
 
   const {
-    news: filteredNews,
+    news,
     totalPages,
     currentPage,
     setPage,
@@ -79,14 +79,14 @@ export default function NewsPage() {
                 <p className="text-destructive">{error}</p>
               </div>
             )}
-            {!loading && !error && filteredNews.length === 0 && (
+            {!loading && !error && news.length === 0 && (
               <div className="py-16 text-center">
                 <p className="text-muted-foreground">{t("news.noNews")}</p>
               </div>
             )}
-            {!loading && !error && filteredNews.length > 0 && (
+            {!loading && !error && news.length > 0 && (
               <NewsCardList
-                items={filteredNews}
+                items={news}
                 lang={i18n.language}
                 totalPages={totalPages}
                 currentPage={currentPage}

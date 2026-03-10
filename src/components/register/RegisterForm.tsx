@@ -12,12 +12,9 @@ import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
 import { register } from "@/api/auth"
 import { formDataToRegisterPayload } from "@/types/auth"
-import {
-  INITIAL_REGISTER_FORM,
-  type RegisterFormData,
-  type RegisterMembershipTier,
-} from "./registerConstants"
-import { MEMBERSHIP_TIER_OPTIONS, getCountryOptions, getRegionOptions } from "./registerOptions"
+import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
+import { getCountryOptions } from "./registerOptions"
+import { REGISTER_CATEGORIES } from "./registerCategories"
 import { useCaptcha } from "./useCaptcha"
 import { REGISTER_ERROR_KEYS, validateRegisterForm } from "./registerValidation"
 
@@ -39,7 +36,7 @@ function FieldWithError({ error, children }: { error?: string; children: React.R
 }
 
 export default function RegisterForm() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const router = useRouter()
   const [formData, setFormData] = useState<RegisterFormData>(INITIAL_REGISTER_FORM)
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>(
@@ -67,25 +64,14 @@ export default function RegisterForm() {
     isValid: isCaptchaValid,
   } = useCaptcha()
 
-  const countries = getCountryOptions(t)
-  const availableRegions = getRegionOptions(formData.country, t)
-  const hasCountry = Boolean(formData.country?.trim())
-  const regionInList = hasCountry && availableRegions.some((r) => r.value === formData.region)
-  const regionValue = hasCountry && regionInList ? formData.region : ""
-
-  const categories = [
-    { id: "semi", name: t("search.categories.semi") },
-    { id: "elec", name: t("search.categories.elec") },
-    { id: "textile", name: t("search.categories.textile") },
-    { id: "food", name: t("search.categories.food") },
-    { id: "machine", name: t("search.categories.machine") },
-    { id: "plastic", name: t("search.categories.plastic") },
-  ]
+  const countries = getCountryOptions(i18n.language)
+  const categories = REGISTER_CATEGORIES.map((cat) => ({
+    id: cat.id,
+    name: t(cat.i18nKey) || `${cat.code}. ${cat.fallback}`,
+  }))
 
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
-    setFormData((prev: RegisterFormData) =>
-      field === "country" ? { ...prev, [field]: value, region: "" } : { ...prev, [field]: value }
-    )
+    setFormData((prev: RegisterFormData) => ({ ...prev, [field]: value }))
     if (fieldErrors[field])
       setFieldErrors((prev: Partial<Record<keyof RegisterFormData, string>>) => ({
         ...prev,
@@ -122,11 +108,23 @@ export default function RegisterForm() {
     setIsLoading(true)
     try {
       const payload = formDataToRegisterPayload({ ...formData, captcha: captchaInput })
+      if (process.env.NODE_ENV !== "production") {
+        console.debug("[Register] Request payload:", payload)
+      }
       await register(payload)
       setFormData({ ...INITIAL_REGISTER_FORM })
       refreshCaptcha()
       setRegistrationSuccess(true)
     } catch (err) {
+      const status =
+        err && typeof err === "object" && "status" in err
+          ? (err as { status: number }).status
+          : undefined
+      const data =
+        err && typeof err === "object" && "data" in err
+          ? (err as { data: unknown }).data
+          : undefined
+      console.error("[Register] Error:", { status, data, fullError: err })
       const msg = getErrorMessage(err)
       showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
     } finally {
@@ -271,7 +269,7 @@ export default function RegisterForm() {
                 </FieldWithError>
               </div>
 
-              <div className="registration-form grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="registration-form grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FieldWithError error={fieldErrors.country}>
                   <Select
                     value={formData.country}
@@ -289,38 +287,6 @@ export default function RegisterForm() {
                           {c.label}
                         </Select.Item>
                       ))}
-                    </Select.Content>
-                  </Select>
-                </FieldWithError>
-                <FieldWithError error={fieldErrors.region}>
-                  <Select
-                    key={formData.country || "__no_country__"}
-                    value={regionValue}
-                    onValueChange={(v) => handleInputChange("region", v)}
-                    disabled={!hasCountry}
-                    required
-                  >
-                    <Select.Trigger className="w-full">
-                      <Select.Value
-                        placeholder={
-                          !hasCountry
-                            ? t("register.placeholders.selectCountryFirst") || "請先選擇國家"
-                            : t("register.placeholders.region") || "選擇地區 *"
-                        }
-                      />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {availableRegions.length > 0 ? (
-                        availableRegions.map((r) => (
-                          <Select.Item key={r.value} value={r.value}>
-                            {r.label}
-                          </Select.Item>
-                        ))
-                      ) : (
-                        <div className="text-muted-foreground px-2 py-1.5 text-sm">
-                          {t("register.noRegions") || "無可用地區"}
-                        </div>
-                      )}
                     </Select.Content>
                   </Select>
                 </FieldWithError>
@@ -356,35 +322,6 @@ export default function RegisterForm() {
                   required
                 />
               </FieldWithError>
-
-              <div className="space-y-2">
-                <label className="text-foreground text-sm font-medium">
-                  {t("register.membershipTierLabel") || "會員等級"}
-                </label>
-                <Select
-                  value={formData.membershipTier}
-                  onValueChange={(value) =>
-                    handleInputChange("membershipTier", value as RegisterMembershipTier)
-                  }
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={t("register.placeholders.membershipTier") || "選擇會員等級"}
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {MEMBERSHIP_TIER_OPTIONS.map((opt) => (
-                      <Select.Item key={opt.value} value={opt.value}>
-                        {t(opt.labelKey)}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
-                <p className="text-muted-foreground text-xs">
-                  {t("register.membershipTierHint") ||
-                    "註冊後將以此等級權限自動登入，可於會員中心查看權益。"}
-                </p>
-              </div>
 
               <FieldWithError error={fieldErrors.introduction}>
                 <Textarea

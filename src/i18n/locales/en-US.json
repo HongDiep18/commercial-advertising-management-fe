@@ -308,6 +308,7 @@
     "membershipTierLabel": "Membership level",
     "membershipTierHint": "You will be logged in automatically with this level after registration; view benefits in Account.",
     "tiers": {
+      "guest": "Guest Member",
       "bronze": "Bronze Member",
       "silver": "Silver Member",
       "gold": "Gold Member",
@@ -342,6 +343,27 @@
       "singapore": "Singapore",
       "other": "Other",
       "other-region": "Other"
+    },
+    "industry": {
+      "A": "A. Textile and accessories",
+      "B": "B. Footwear, leather, bags & luggage",
+      "C": "C. Automobiles, motorbikes & parts",
+      "D": "D. Wood, rattan, bamboo & furniture",
+      "E": "E. Architecture & construction",
+      "F": "F. Electronics & home appliances",
+      "G": "G. Mechanical & industrial electrical",
+      "H": "H. Plastics, rubber & chemicals",
+      "I": "I. Agriculture, forestry, fishery & husbandry",
+      "J": "J. Metals & hardware",
+      "K": "K. Packaging & printing",
+      "L": "L. Maritime & aviation",
+      "M": "M. Securities, finance & insurance",
+      "N": "N. Handicrafts, gifts, jewelry & household",
+      "O": "O. Tourism, restaurants & sports",
+      "P": "P. Food & beverages",
+      "Q": "Q. Education, healthcare & medical equipment",
+      "R": "R. Legal and financial consulting",
+      "S": "S. Other service industries"
     },
     "placeholders": {
       "companyNameVi": "Company Name (Vietnamese)",
@@ -485,6 +507,11 @@
     "membershipBenefits": "Membership tiers & benefits",
     "currentTierLabel": "Current tier",
     "tiers": {
+      "NONE": "Guest",
+      "BRONZE": "Bronze Member",
+      "SILVER": "Silver Member",
+      "GOLD": "Gold Member",
+      "DIAMOND": "Diamond Member",
       "guest": "Guest",
       "bronze": "Bronze Member",
       "silver": "Silver Member",

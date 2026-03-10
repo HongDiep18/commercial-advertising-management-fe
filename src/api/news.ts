@@ -24,10 +24,16 @@ export async function getNewsList(
   const path = `/news?${search.toString()}`
   const res = await api.request<NewsListResponse>(path, { method: "GET" })
   const total = res.total ?? res.meta?.total ?? res.totalCount ?? undefined
+  const limitRes = res.limit ?? res.meta?.limit ?? limit
+  const totalPages =
+    res.meta?.totalPages ??
+    res.totalPages ??
+    (total != null && limitRes ? Math.ceil(total / limitRes) : 1)
   return {
     data: res.data ?? [],
     total,
     page: res.page ?? res.meta?.page ?? page,
-    limit: res.limit ?? res.meta?.limit ?? limit,
+    limit: limitRes,
+    totalPages,
   }
 }

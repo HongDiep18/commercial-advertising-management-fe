@@ -1,16 +1,9 @@
-import type { RegisterMembershipTier } from "./registerConstants"
-
-export type CountryOption = { value: string; labelKey: string; fallback: string }
+import countries from "i18n-iso-countries"
+import en from "i18n-iso-countries/langs/en.json"
+import vi from "i18n-iso-countries/langs/vi.json"
+import zh from "i18n-iso-countries/langs/zh.json"
 
 export type RegionOption = { value: string; labelKey: string; fallback: string }
-
-export const COUNTRY_OPTIONS: CountryOption[] = [
-  { value: "vietnam", labelKey: "register.countries.vietnam", fallback: "越南" },
-  { value: "taiwan", labelKey: "register.countries.taiwan", fallback: "台灣" },
-  { value: "china", labelKey: "register.countries.china", fallback: "中國" },
-  { value: "singapore", labelKey: "register.countries.singapore", fallback: "新加坡" },
-  { value: "other", labelKey: "register.countries.other", fallback: "其他" },
-]
 
 export const REGION_OPTIONS_BY_COUNTRY: Record<string, RegionOption[]> = {
   vietnam: [
@@ -35,17 +28,17 @@ export const REGION_OPTIONS_BY_COUNTRY: Record<string, RegionOption[]> = {
   other: [{ value: "other", labelKey: "register.regions.other", fallback: "其他" }],
 }
 
-export const MEMBERSHIP_TIER_OPTIONS: { value: RegisterMembershipTier; labelKey: string }[] = [
-  { value: "bronze", labelKey: "register.tiers.bronze" },
-  { value: "silver", labelKey: "register.tiers.silver" },
-  { value: "gold", labelKey: "register.tiers.gold" },
-  { value: "diamond", labelKey: "register.tiers.diamond" },
-]
+countries.registerLocale(en)
+countries.registerLocale(vi)
+countries.registerLocale(zh)
 
-export function getCountryOptions(
-  t: (key: string) => string
-): Array<{ value: string; label: string }> {
-  return COUNTRY_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) || o.fallback }))
+export function getCountryOptions(language: string): Array<{ value: string; label: string }> {
+  const lang = language.toLowerCase()
+  const isoLang = lang.startsWith("vi") ? "vi" : lang.startsWith("zh") ? "zh" : "en"
+  const names = countries.getNames(isoLang, { select: "official" }) as Record<string, string>
+  return Object.entries(names)
+    .map(([code, label]) => ({ value: code, label }))
+    .sort((a, b) => a.label.localeCompare(b.label))
 }
 
 export function getRegionOptions(

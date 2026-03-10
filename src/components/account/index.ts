@@ -6,7 +6,6 @@ export { AccountUpgradeModal } from "./AccountUpgradeModal"
 export { AccountProfileModal } from "./AccountProfileModal"
 export { AccountBenefitsModal } from "./AccountBenefitsModal"
 export {
-  COUNTRY_VALUES,
   REGION_KEYS_BY_COUNTRY,
   CONTRIBUTION_TYPE_CONFIG,
   COUNTRY_NONE,
