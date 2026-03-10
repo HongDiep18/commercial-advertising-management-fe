@@ -34,6 +34,14 @@ export const api = {
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok) {
+      if (typeof window !== "undefined") {
+        console.error("[API Error]", {
+          url,
+          status: res.status,
+          statusText: res.statusText,
+          data,
+        })
+      }
       const err = new Error((data as { message?: string }).message ?? res.statusText) as Error & {
         status: number
         data: unknown

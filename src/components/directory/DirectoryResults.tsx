@@ -145,7 +145,7 @@ export function DirectoryResults({
   const { user, isLoggedIn, getTotalPoints } = useUser()
 
   const totalPoints = getTotalPoints()
-  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.Bronze]
+  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]
 
   const companiesByCategory = useMemo(() => {
     const result: Record<string, ReturnType<typeof generateCompaniesForCategory>> = {}

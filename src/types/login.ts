@@ -42,10 +42,11 @@ export function getLoginErrorMessage(res: LoginResponse): string {
 }
 
 const API_TIER_TO_MEMBERSHIP: Record<string, MembershipTier> = {
-  bronze: MembershipTier.Bronze,
-  silver: MembershipTier.Silver,
-  gold: MembershipTier.Gold,
-  diamond: MembershipTier.Diamond,
+  GUEST: MembershipTier.GUEST,
+  BRONZE: MembershipTier.BRONZE,
+  SILVER: MembershipTier.SILVER,
+  GOLD: MembershipTier.GOLD,
+  DIAMOND: MembershipTier.DIAMOND,
 }
 
 export function mapApiUserToUser(payload: LoginUserPayload, email: string): User {

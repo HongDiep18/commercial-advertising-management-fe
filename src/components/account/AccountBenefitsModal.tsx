@@ -12,12 +12,7 @@ type AccountBenefitsModalProps = {
   t: TFunction
 }
 
-const TIERS: MembershipTier[] = [
-  MembershipTier.Bronze,
-  MembershipTier.Silver,
-  MembershipTier.Gold,
-  MembershipTier.Diamond,
-]
+const TIERS: MembershipTier[] = Object.values(MembershipTier)
 
 export function AccountBenefitsModal({ open, onClose, memberTier, t }: AccountBenefitsModalProps) {
   if (!open) return null

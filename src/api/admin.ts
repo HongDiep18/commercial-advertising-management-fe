@@ -34,7 +34,7 @@ export function mapProfileRequestToCompanyRequest(
     id: p.id,
     companyName: p.companyNameVi || p.companyNameCn || "",
     email: p.email,
-    contactPerson: p.contactPerson,
+    contactName: (p as { contactName?: string }).contactName ?? "",
     industry: p.industry,
     country: p.country,
     status: p.status as ProfileRequestStatus,

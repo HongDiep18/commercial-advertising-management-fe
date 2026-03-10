@@ -23,15 +23,15 @@ export { UserRole, MembershipTier } from "@/types"
 export type { User } from "@/types"
 
 export const MEMBERSHIP_THRESHOLDS: Record<MembershipTier, number> = {
-  [MembershipTier.Guest]: 0,
-  [MembershipTier.Bronze]: 50000,
-  [MembershipTier.Silver]: 150000,
-  [MembershipTier.Gold]: 300000,
-  [MembershipTier.Diamond]: 550000,
+  [MembershipTier.GUEST]: 0,
+  [MembershipTier.BRONZE]: 50000,
+  [MembershipTier.SILVER]: 150000,
+  [MembershipTier.GOLD]: 300000,
+  [MembershipTier.DIAMOND]: 550000,
 }
 
 export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = {
-  [MembershipTier.Guest]: {
+  [MembershipTier.GUEST]: {
     label: "訪客",
     labelEn: "Guest",
     minPoints: 0,
@@ -42,7 +42,7 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
     benefits: ["公司名（部分）", "地區"],
     restrictions: ["無官網、無電話、無地址、無稅號"],
   },
-  [MembershipTier.Bronze]: {
+  [MembershipTier.BRONZE]: {
     label: "銅牌會員",
     labelEn: "Bronze",
     minPoints: 50000,
@@ -53,7 +53,7 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
     benefits: ["本業 - 基礎版", "公司名、稅號、地區"],
     restrictions: ["無官網、無電話、無地址"],
   },
-  [MembershipTier.Silver]: {
+  [MembershipTier.SILVER]: {
     label: "銀牌會員",
     labelEn: "Silver",
     minPoints: 150000,
@@ -64,7 +64,7 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
     benefits: ["本業 - 完整版", "解鎖官網、電話、地址、Email"],
     restrictions: [],
   },
-  [MembershipTier.Gold]: {
+  [MembershipTier.GOLD]: {
     label: "金牌會員",
     labelEn: "Gold",
     minPoints: 300000,
@@ -75,7 +75,7 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
     benefits: ["本業 + 跨 3 產業 - 完整版", "解鎖自家產業 + 自選 3 個上下游產業"],
     restrictions: [],
   },
-  [MembershipTier.Diamond]: {
+  [MembershipTier.DIAMOND]: {
     label: "鑽石會員",
     labelEn: "Diamond",
     minPoints: 550000,
@@ -89,21 +89,21 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
 }
 
 export function getMembershipTier(totalPoints: number): MembershipTier {
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Diamond]) return MembershipTier.Diamond
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Gold]) return MembershipTier.Gold
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Silver]) return MembershipTier.Silver
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.Bronze]) return MembershipTier.Bronze
-  return MembershipTier.Guest
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.DIAMOND]) return MembershipTier.DIAMOND
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.GOLD]) return MembershipTier.GOLD
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER]) return MembershipTier.SILVER
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]) return MembershipTier.BRONZE
+  return MembershipTier.GUEST
 }
 
 export function getNextTierInfo(totalPoints: number): NextTierInfo | null {
   const currentTier = getMembershipTier(totalPoints)
   const tiers: MembershipTier[] = [
-    MembershipTier.Guest,
-    MembershipTier.Bronze,
-    MembershipTier.Silver,
-    MembershipTier.Gold,
-    MembershipTier.Diamond,
+    MembershipTier.GUEST,
+    MembershipTier.BRONZE,
+    MembershipTier.SILVER,
+    MembershipTier.GOLD,
+    MembershipTier.DIAMOND,
   ]
   const currentIndex = tiers.indexOf(currentTier)
 
@@ -279,7 +279,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const loginWithRegisteredUser = (email: string, name: string, membershipTier: MembershipTier) => {
     const minPoints = MEMBERSHIP_THRESHOLDS[membershipTier]
-    const role: UserRole = membershipTier === MembershipTier.Bronze ? UserRole.Free : UserRole.Paid
+    const role: UserRole = membershipTier === MembershipTier.BRONZE ? UserRole.Free : UserRole.Paid
     const newUser: User = {
       id: `user-reg-${Date.now()}`,
       email,
@@ -302,8 +302,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   const getMemberTier = (): MembershipTier => {
-    if (!user) return MembershipTier.Guest
-    if (user.role === UserRole.Admin) return MembershipTier.Diamond
+    if (!user) return MembershipTier.GUEST
+    if (user.role === UserRole.Admin) return MembershipTier.DIAMOND
     return getMembershipTier(getTotalPoints())
   }
 
@@ -316,31 +316,31 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const canViewPhone = (): boolean => {
     const tier = getMemberTier()
     return [
-      MembershipTier.Bronze,
-      MembershipTier.Silver,
-      MembershipTier.Gold,
-      MembershipTier.Diamond,
+      MembershipTier.BRONZE,
+      MembershipTier.SILVER,
+      MembershipTier.GOLD,
+      MembershipTier.DIAMOND,
     ].includes(tier)
   }
 
   const canViewWebsite = (): boolean => {
     const tier = getMemberTier()
     return [
-      MembershipTier.Bronze,
-      MembershipTier.Silver,
-      MembershipTier.Gold,
-      MembershipTier.Diamond,
+      MembershipTier.BRONZE,
+      MembershipTier.SILVER,
+      MembershipTier.GOLD,
+      MembershipTier.DIAMOND,
     ].includes(tier)
   }
 
   const canViewEmail = (): boolean => {
     const tier = getMemberTier()
-    return [MembershipTier.Silver, MembershipTier.Gold, MembershipTier.Diamond].includes(tier)
+    return [MembershipTier.SILVER, MembershipTier.GOLD, MembershipTier.DIAMOND].includes(tier)
   }
 
   const canDownloadDirectory = (): boolean => {
     const tier = getMemberTier()
-    return [MembershipTier.Gold, MembershipTier.Diamond].includes(tier)
+    return [MembershipTier.GOLD, MembershipTier.DIAMOND].includes(tier)
   }
 
   const getUpgradeProgress = (): number => {

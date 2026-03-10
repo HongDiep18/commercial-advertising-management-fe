@@ -5,7 +5,7 @@ import { User, Shield, Edit3 } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card from "@/components/ui/Card"
 import type { User as UserType } from "@/contexts/user-context"
-import type { MembershipTier } from "@/contexts/user-context"
+import { MembershipTier } from "@/contexts/user-context"
 import type { TFunction } from "i18next"
 import { UserRole } from "@/contexts/user-context"
 
@@ -53,12 +53,13 @@ export function AccountHeroCard({
           <div className="min-w-0 flex-1">
             <div className="mb-3 flex flex-wrap items-center gap-3">
               <h1 className="text-foreground text-2xl font-bold">{user.name}</h1>
+
               <span
                 className={`rounded-full px-3 py-1 text-sm font-medium ${tierConfig.bgColor} ${tierConfig.color}`}
               >
-                {user.role === UserRole.Admin
-                  ? t("account.tiers.admin") || "管理員"
-                  : t("account.tiers." + memberTier) || tierConfig.label}
+                {memberTier === MembershipTier.GUEST
+                  ? t("account.tiers.NONE") || t("account.tiers.GUEST") || "Guest"
+                  : `${memberTier} Member`}
               </span>
             </div>
             <p className="text-muted-foreground">{user.email}</p>

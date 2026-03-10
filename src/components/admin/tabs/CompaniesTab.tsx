@@ -142,7 +142,7 @@ export function CompaniesTab() {
                       <p className="text-foreground text-sm font-medium">{row.companyName}</p>
                       <p className="text-muted-foreground text-xs">{row.email}</p>
                     </td>
-                    <td className="px-4 py-3 text-sm">{row.contactPerson}</td>
+                    <td className="px-4 py-3 text-sm">{row.contactName}</td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">{row.industry}</td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">
                       {formatSubmittedAt(row.submittedAt, i18n.language)}
@@ -240,7 +240,7 @@ export function CompaniesTab() {
                 <div className="border-border grid gap-3 border-b pb-4 sm:grid-cols-2">
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
                     <p className="text-muted-foreground text-xs">{t("admin.companies.contact")}</p>
-                    <p className="text-sm font-medium">{selectedRequest.contactPerson}</p>
+                    <p className="text-sm font-medium">{selectedRequest.contactName}</p>
                   </div>
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
                     <p className="text-muted-foreground text-xs">{t("admin.companies.email")}</p>
