@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { ChevronDown, Search, X } from "lucide-react"
@@ -124,14 +124,12 @@ export default function SearchSection() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-10 text-center">
             <h2 className="mb-4 text-3xl font-bold">{t("search.title")}</h2>
-            <p className="text-base text-muted-foreground">
-              {t("search.subtitle")}
-            </p>
+            <p className="text-muted-foreground text-base">{t("search.subtitle")}</p>
           </div>
 
-          <div className="rounded-lg border border-border/50 bg-card p-6 shadow-sm">
+          <div className="border-border/50 bg-card rounded-lg border p-6 shadow-sm">
             {activeFilters.length > 0 && (
-              <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-border/50 pb-6">
+              <div className="border-border/50 mb-6 flex flex-wrap items-center gap-2 border-b pb-6">
                 <span className="text-sm font-medium">
                   {t("search.filterConditions")} ({activeFilters.length})
                 </span>
@@ -139,7 +137,7 @@ export default function SearchSection() {
                   <button
                     key={filter.id}
                     onClick={() => removeFilter(filter.id)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm transition-colors"
                   >
                     {filter.label}
                     <X className="h-3 w-3" />
@@ -147,7 +145,7 @@ export default function SearchSection() {
                 ))}
                 <button
                   onClick={clearAllFilters}
-                  className="text-sm text-muted-foreground underline hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground text-sm underline"
                 >
                   {t("search.clearAll")}
                 </button>
@@ -155,31 +153,34 @@ export default function SearchSection() {
             )}
 
             <div className="mb-6 flex flex-wrap gap-2">
-              <div className="flex gap-1 rounded-md bg-secondary/30 p-0.5">
+              <div className="bg-secondary/30 flex gap-1 rounded-md p-0.5">
                 <button
                   onClick={() => setSearchMode("company")}
-                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${searchMode === "company"
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                    }`}
+                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
+                    searchMode === "company"
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {t("search.byCompany")}
                 </button>
                 <button
                   onClick={() => setSearchMode("product")}
-                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${searchMode === "product"
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                    }`}
+                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
+                    searchMode === "product"
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {t("search.byProduct")}
                 </button>
                 <button
                   onClick={() => setSearchMode("all")}
-                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${searchMode === "all"
-                    ? "bg-primary text-white shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                    }`}
+                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
+                    searchMode === "all"
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {t("search.all")}
                 </button>
@@ -191,28 +192,29 @@ export default function SearchSection() {
                     setShowLocationDropdown(false)
                     setShowIndustryDropdown(!showIndustryDropdown)
                   }}
-                  className="inline-flex items-center gap-2 rounded-md border border-border/50 bg-background px-4 py-1.5 text-sm font-medium transition-colors hover:bg-secondary/30"
+                  className="border-border/50 bg-background hover:bg-secondary/30 inline-flex items-center gap-2 rounded-md border px-4 py-1.5 text-sm font-medium transition-colors"
                 >
                   {t("search.industryCategory")}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
 
                 {showIndustryDropdown && (
-                  <div className="absolute top-full left-0 z-10 mt-2 max-h-96 w-72 overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+                  <div className="border-border bg-card absolute top-full left-0 z-10 mt-2 max-h-96 w-72 overflow-y-auto rounded-lg border shadow-lg">
                     <div className="p-3">
                       <input
                         placeholder={t("search.searchCategory")}
-                        className="mb-3 h-9 w-full rounded-md border border-border/60 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                        className="border-border/60 focus:ring-primary/40 mb-3 h-9 w-full rounded-md border px-3 text-sm outline-none focus:ring-2"
                       />
                       <div className="space-y-1">
                         {categories.map((category) => (
                           <button
                             key={category.id}
                             onClick={() => toggleIndustry(category.id)}
-                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${isIndustrySelected(category.id)
-                              ? "bg-primary/10 text-primary font-medium"
-                              : "hover:bg-secondary/50"
-                              }`}
+                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${
+                              isIndustrySelected(category.id)
+                                ? "bg-primary/10 text-primary font-medium"
+                                : "hover:bg-secondary/50"
+                            }`}
                           >
                             {category.name}
                           </button>
@@ -229,30 +231,31 @@ export default function SearchSection() {
                     setShowIndustryDropdown(false)
                     setShowLocationDropdown(!showLocationDropdown)
                   }}
-                  className="inline-flex items-center gap-2 rounded-md border border-border/50 bg-background px-4 py-1.5 text-sm font-medium transition-colors hover:bg-secondary/30"
+                  className="border-border/50 bg-background hover:bg-secondary/30 inline-flex items-center gap-2 rounded-md border px-4 py-1.5 text-sm font-medium transition-colors"
                 >
                   {t("search.location")}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
 
                 {showLocationDropdown && (
-                  <div className="absolute top-full left-0 z-10 mt-2 w-56 rounded-lg border border-border bg-card shadow-lg">
+                  <div className="border-border bg-card absolute top-full left-0 z-10 mt-2 w-56 rounded-lg border shadow-lg">
                     <div className="p-3">
                       <input
                         placeholder={t("search.searchLocation")}
                         value={locationSearch}
                         onChange={(e) => setLocationSearch(e.target.value)}
-                        className="mb-3 h-9 w-full rounded-md border border-border/60 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                        className="border-border/60 focus:ring-primary/40 mb-3 h-9 w-full rounded-md border px-3 text-sm outline-none focus:ring-2"
                       />
                       <div className="space-y-1">
                         {filteredLocations.map((location) => (
                           <button
                             key={location.id}
                             onClick={() => toggleLocation(location.id)}
-                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${isLocationSelected(location.id)
-                              ? "bg-primary/10 text-primary font-medium"
-                              : "hover:bg-secondary/50"
-                              }`}
+                            className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${
+                              isLocationSelected(location.id)
+                                ? "bg-primary/10 text-primary font-medium"
+                                : "hover:bg-secondary/50"
+                            }`}
                           >
                             {location.name}
                           </button>
@@ -265,12 +268,12 @@ export default function SearchSection() {
             </div>
 
             <div className="relative mb-4">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <input
                 placeholder={getPlaceholder()}
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="h-11 w-full rounded-md border border-border/60 px-3 pl-10 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+                className="border-border/60 focus:ring-primary/40 h-11 w-full rounded-md border px-3 pl-10 text-sm outline-none focus:ring-2"
               />
             </div>
 
@@ -284,13 +287,15 @@ export default function SearchSection() {
           </div>
 
           <div className="mt-6 text-center">
-            <span className="mr-3 text-sm text-muted-foreground">{t("search.popularSearches")}</span>
+            <span className="text-muted-foreground mr-3 text-sm">
+              {t("search.popularSearches")}
+            </span>
             <div className="mt-2 inline-flex flex-wrap gap-2">
               {categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => handlePopularTagClick(category.name)}
-                  className="rounded-md border border-border bg-white px-3 py-1 text-xs font-normal text-foreground transition-colors hover:border-primary hover:text-primary"
+                  className="border-border text-foreground hover:border-primary hover:text-primary rounded-md border bg-white px-3 py-1 text-xs font-normal transition-colors"
                 >
                   {category.name}
                 </button>

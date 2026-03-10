@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, Suspense, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Header from "../../src/components/layout/Header"
 import Footer from "../../src/components/layout/Footer"
@@ -12,10 +12,15 @@ const defaultCategoryId = categories[0]?.id ?? "textile"
 function DirectoryContent() {
   const searchParams = useSearchParams()
   const categoryParam = searchParams.get("category")
+  const qParam = searchParams.get("q") ?? ""
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     () => categoryParam ?? defaultCategoryId
   )
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState(() => qParam)
+
+  useEffect(() => {
+    setSearchTerm(qParam)
+  }, [qParam])
 
   const effectiveCategory = categoryParam ?? selectedCategory ?? defaultCategoryId
 

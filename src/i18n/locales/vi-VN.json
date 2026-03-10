@@ -170,12 +170,12 @@
     "adContact": "Liên hệ QC"
   },
   "adContact": {
-    "heroTitle": "Liên hệ Quảng cáo",
+    "heroTitle": "Liên hệ quảng cáo",
     "heroDescription": "Nhiều giải pháp quảng cáo giúp bạn mở rộng thị trường kinh doanh Hoa kiều Việt Nam. Chọn loại quảng cáo phù hợp với bạn, đặt hàng ngay hoặc liên hệ với chúng tôi.",
-    "inquiryCustom": "Tư vấn Giải pháp",
+    "inquiryCustom": "Tư vấn giải pháp",
     "unit": "Đơn vị: VND",
     "select": "Chọn",
-    "adItem": "Mục Quảng cáo",
+    "adItem": "Mục quảng cáo",
     "duration": "Thời lượng",
     "price": "Giá",
     "discount": "Giảm giá",
@@ -185,30 +185,30 @@
     "selectedItems": "Đã chọn {{count}} mục quảng cáo",
     "clickToOrder": "Nhấp vào nút bên phải để điền thông tin đặt hàng",
     "orderNow": "Đặt hàng ngay",
-    "orderTitle": "Đặt Quảng cáo",
-    "companyInfo": "Thông tin Công ty",
-    "companyName": "Tên Công ty",
+    "orderTitle": "Đặt quảng cáo",
+    "companyInfo": "Thông tin công ty",
+    "companyName": "Tên công ty",
     "contactPerson": "Người liên hệ",
     "phone": "Điện thoại",
     "email": "Email",
-    "adItemSettings": "Cài đặt Mục Quảng cáo",
+    "adItemSettings": "Cài đặt mục quảng cáo",
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
     "selectStartDate": "Vui lòng chọn ngày bắt đầu",
     "autoCalculated": "Tự động tính toán bởi hệ thống",
     "bookedDatesNote": "Ngày màu xám đã được đặt trước và không thể chọn",
-    "adLink": "URL Liên kết Quảng cáo",
+    "adLink": "URL liên kết quảng cáo",
     "needDesign": "Cần dịch vụ thiết kế (phí thiết kế tính riêng)",
-    "uploadAdMaterial": "Tải lên Tài liệu Quảng cáo",
+    "uploadAdMaterial": "Tải lên tài liệu quảng cáo",
     "clickToUpload": "Nhấp để tải lên tệp",
     "notes": "Ghi chú",
     "notesPlaceholder": "Nếu bạn có yêu cầu hoặc ghi chú khác, vui lòng điền vào đây",
     "cancel": "Hủy",
-    "submitOrder": "Gửi Đơn hàng",
-    "inquiryTitle": "Tư vấn Trực tuyến",
-    "inquiryContent": "Nội dung Tư vấn",
+    "submitOrder": "Gửi đơn hàng",
+    "inquiryTitle": "Tư vấn trực tuyến",
+    "inquiryContent": "Nội dung tư vấn",
     "inquiryPlaceholder": "Vui lòng nhập câu hỏi của bạn...",
-    "submitInquiry": "Gửi Tư vấn",
+    "submitInquiry": "Gửi tư vấn",
     "tabs": {
       "platform": {
         "title": "Quảng cáo nền tảng",
@@ -219,25 +219,25 @@
         "description": "Quảng cáo danh mục in 2025, bao gồm các doanh nghiệp Hoa kiều Việt Nam, Singapore, Hồng Kông, Trung Quốc và Đài Loan"
       },
       "product": {
-        "title": "Đăng Bán Sản phẩm",
+        "title": "Đăng bán sản phẩm",
         "description": "Đăng sản phẩm của bạn trong phần bán sản phẩm để mở rộng thị trường Việt Nam"
       }
     },
     "pricing": {
       "popup": {
-        "title": "Quảng cáo Cửa sổ bật lên Trang chủ"
+        "title": "Popup trang chủ"
       },
       "featured": {
-        "title": "Phơi sáng Công ty Nổi bật"
+        "title": "Công ty nổi bật"
       },
       "listing": {
-        "title": "Quảng cáo Thư mục Công ty"
+        "title": "Quảng cáo công ty"
       },
       "directory": {
-        "title": "Bảng Giá Quảng cáo"
+        "title": "Bảng giá quảng cáo"
       },
       "product": {
-        "title": "Bảng Giá Đăng Sản phẩm"
+        "title": "Bảng giá đăng sản phẩm"
       }
     },
     "note": "Lưu ý: Kích thước quảng cáo cửa sổ bật lên được khuyến nghị là 800x600 pixel. Các công ty nổi bật cần cung cấp logo công ty và giới thiệu. Nếu cần dịch vụ thiết kế, vui lòng đánh dấu khi đặt hàng.",
@@ -266,25 +266,25 @@
         "subtitle": "Gia công CNC chuyên nghiệp, sản xuất linh kiện chính xác, 40 năm kinh nghiệm"
       },
       "2": {
-        "title": "Cập nhật Chính sách Ưu đãi Đầu tư Việt Nam 2026",
+        "title": "Cập nhật chính sách ưu đãi đầu tư Việt Nam 2026",
         "subtitle": "Tổng quan các biện pháp giảm thuế mới nhất và ưu đãi khu công nghiệp"
       },
       "3": {
-        "title": "Công ty Công nghệ Năng lượng Xanh",
+        "title": "Công ty công nghệ năng lượng xanh",
         "subtitle": "Thiết bị năng lượng mặt trời, hệ thống lưu trữ năng lượng thương hiệu hàng đầu"
       },
       "4": {
-        "title": "Đại hội Thường niên 2026 Phòng Thương mại Đài Loan-Việt Nam",
+        "title": "Đại hội thường niên 2026 Phòng thương mại Đài Loan-Việt Nam",
         "subtitle": "Ngày 15 tháng 3 tại Thành phố Hồ Chí Minh, chào mừng đăng ký"
       }
     }
   },
   "footer": {
-    "description": "Hướng dẫn mua hàng Việt Nam là phần mở rộng và nâng cấp kỹ thuật số của Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam, kết hợp sự tiện lợi và tính thời gian thực của Internet để cung cấp nền tảng trao đổi kinh doanh 24/7 cho các doanh nghiệp Hoa toàn cầu.",
+    "description": "Hướng dẫn mua hàng Việt Nam là phần mở rộng và nâng cấp kỹ thuật số của danh mục mua sắm doanh nghiệp Hoa Việt Nam, kết hợp sự tiện lợi và tính thời gian thực của Internet để cung cấp nền tảng trao đổi kinh doanh 24/7 cho các doanh nghiệp Hoa toàn cầu.",
     "companyName": "Công ty TNHH Kiến Hào (Việt Nam)",
-    "companyDescription": "Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam - Cung cấp tất cả thông tin danh mục mua sắm doanh nghiệp Hoa cho độc giả tiếng Hoa",
-    "contactInfo": "Thông tin Liên hệ",
-    "companyLocation": "Vị trí Công ty",
+    "companyDescription": "Danh mục mua sắm doanh nghiệp Hoa Việt Nam - Cung cấp tất cả thông tin danh mục mua sắm doanh nghiệp Hoa cho độc giả tiếng Hoa",
+    "contactInfo": "Thông tin liên hệ",
+    "companyLocation": "Vị trí công ty",
     "address": "81/11 Hồ Văn Huê, P.9, Q.Phú Nhuận, TP.HCM, Việt Nam",
     "phoneDirectory": "(Mua danh mục)",
     "mapTitle": "Bản đồ Vị trí Công ty",
@@ -292,8 +292,8 @@
     "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
   },
   "register": {
-    "title": "Đăng ký Thành viên",
-    "backToHome": "Về Trang chủ",
+    "title": "Đăng ký thành viên",
+    "backToHome": "Về trang chủ",
     "submit": "Đăng ký",
     "processing": "Đang xử lý...",
     "success": "Đăng ký thành công!",
@@ -301,10 +301,10 @@
     "successPendingWait": "Vui lòng chờ quản trị viên xét duyệt đơn đăng ký của bạn.",
     "successPendingIfApproved": "Nếu được duyệt, chúng tôi sẽ gửi email đến địa chỉ của bạn với liên kết đặt mật khẩu và đăng nhập.",
     "successPendingIfNotApproved": "Nếu không được duyệt, chúng tôi sẽ gửi email thông báo kết quả và lý do.",
-    "successPendingBackHome": "Về Trang chủ",
+    "successPendingBackHome": "Về trang chủ",
     "hasAccount": "Đã có tài khoản?",
     "loginLink": "Đăng nhập ngay",
-    "captchaRefresh": "Làm mới Mã xác minh",
+    "captchaRefresh": "Làm mới mã xác minh",
     "membershipTierLabel": "Hạng thành viên",
     "membershipTierHint": "Sau khi đăng ký bạn sẽ được đăng nhập tự động với quyền tương ứng; xem quyền lợi tại Tài khoản.",
     "tiers": {
@@ -556,17 +556,17 @@
     "upgradeBanner": {
       "guest": "Bạn hiện đang là khách và chỉ có thể xem tên công ty và khu vực một phần",
       "bronze": "Bạn hiện là thành viên Đồng. Nâng cấp để xem thông tin đầy đủ bao gồm trang web, điện thoại và địa chỉ",
-      "register": "Đăng ký Thành viên",
-      "upgrade": "Nâng cấp để Mở khóa Thông tin Đầy đủ"
+      "register": "Đăng ký thành viên",
+      "upgrade": "Nâng cấp để mở khóa thông tin đầy đủ"
     },
-    "breadcrumb": "Quay lại Danh mục Doanh nghiệp",
+    "breadcrumb": "Quay lại danh mục doanh nghiệp",
     "address": "Địa chỉ",
     "phone": "Điện thoại",
     "website": "Trang web",
     "contactPerson": "Người liên hệ",
     "region": "Khu vực",
     "taxId": "Mã số thuế",
-    "contactCompany": "Liên hệ Công ty",
+    "contactCompany": "Liên hệ công ty",
     "favorited": "Đã yêu thích",
     "addToFavorites": "Thêm vào yêu thích",
     "share": "Chia sẻ",
