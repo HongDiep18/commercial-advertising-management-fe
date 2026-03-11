@@ -183,6 +183,8 @@
     "item": "Item",
     "description": "Description",
     "selectedItems": "{{count}} advertising items selected",
+    "totalQuantity": "{{count}} units total",
+    "quantity": "Quantity",
     "clickToOrder": "Click the button on the right to fill in order information",
     "orderNow": "Order Now",
     "orderTitle": "Place Advertising Order",
@@ -224,32 +226,102 @@
       }
     },
     "pricing": {
-      "popup": { "title": "Homepage Popup Advertising" },
-      "featured": { "title": "Featured Company Exposure" },
-      "listing": { "title": "Company Directory Advertising" },
-      "directory": { "title": "Vietnam Chinese Business Procurement Directory" },
-      "product": { "title": "Product Sales Listing" },
+      "popup": {
+        "title": "Homepage Popup Advertising"
+      },
+      "featured": {
+        "title": "Featured Company Exposure"
+      },
+      "listing": {
+        "title": "Company Directory Advertising"
+      },
+      "directory": {
+        "title": "Vietnam Chinese Business Procurement Directory"
+      },
+      "product": {
+        "title": "Product Sales Listing"
+      },
       "platformItems": {
-        "popup-priority-1m": { "name": "Priority display (1st)", "duration": "1 month" },
-        "popup-priority-3m": { "name": "Priority display (1st)", "duration": "3 months" },
-        "popup-priority-6m": { "name": "Priority display (1st)", "duration": "6 months" },
-        "popup-priority-1y": { "name": "Priority display (1st)", "duration": "1 year" },
-        "popup-normal-1m": { "name": "Standard rotation (2nd–5th)", "duration": "1 month" },
-        "popup-normal-3m": { "name": "Standard rotation (2nd–5th)", "duration": "3 months" },
-        "popup-normal-6m": { "name": "Standard rotation (2nd–5th)", "duration": "6 months" },
-        "popup-normal-1y": { "name": "Standard rotation (2nd–5th)", "duration": "1 year" },
-        "popup-link": { "name": "“View details” link", "duration": "One-time" },
-        "popup-sort": { "name": "Sort order (raise position)", "duration": "Per time" },
-        "featured-1m": { "name": "Homepage featured company", "duration": "1 month" },
-        "featured-3m": { "name": "Homepage featured company", "duration": "3 months" },
-        "featured-6m": { "name": "Homepage featured company", "duration": "6 months" },
-        "featured-1y": { "name": "Homepage featured company", "duration": "1 year" },
-        "featured-highlight": { "name": "Featured company highlight", "duration": "1 month" },
-        "listing-top-1m": { "name": "Category top listing", "duration": "1 month" },
-        "listing-top-3m": { "name": "Category top listing", "duration": "3 months" },
-        "listing-top-6m": { "name": "Category top listing", "duration": "6 months" },
-        "listing-top-1y": { "name": "Category top listing", "duration": "1 year" },
-        "listing-highlight": { "name": "Company info highlight", "duration": "1 month" }
+        "popup-priority-1m": {
+          "name": "Priority display (1st)",
+          "duration": "1 month"
+        },
+        "popup-priority-3m": {
+          "name": "Priority display (1st)",
+          "duration": "3 months"
+        },
+        "popup-priority-6m": {
+          "name": "Priority display (1st)",
+          "duration": "6 months"
+        },
+        "popup-priority-1y": {
+          "name": "Priority display (1st)",
+          "duration": "1 year"
+        },
+        "popup-normal-1m": {
+          "name": "Standard rotation (2nd–5th)",
+          "duration": "1 month"
+        },
+        "popup-normal-3m": {
+          "name": "Standard rotation (2nd–5th)",
+          "duration": "3 months"
+        },
+        "popup-normal-6m": {
+          "name": "Standard rotation (2nd–5th)",
+          "duration": "6 months"
+        },
+        "popup-normal-1y": {
+          "name": "Standard rotation (2nd–5th)",
+          "duration": "1 year"
+        },
+        "popup-link": {
+          "name": "“View details” link",
+          "duration": "One-time"
+        },
+        "popup-sort": {
+          "name": "Sort order (raise position)",
+          "duration": "Per time"
+        },
+        "featured-1m": {
+          "name": "Homepage featured company",
+          "duration": "1 month"
+        },
+        "featured-3m": {
+          "name": "Homepage featured company",
+          "duration": "3 months"
+        },
+        "featured-6m": {
+          "name": "Homepage featured company",
+          "duration": "6 months"
+        },
+        "featured-1y": {
+          "name": "Homepage featured company",
+          "duration": "1 year"
+        },
+        "featured-highlight": {
+          "name": "Featured company highlight",
+          "duration": "1 month"
+        },
+        "listing-top-1m": {
+          "name": "Category top listing",
+          "duration": "1 month"
+        },
+        "listing-top-3m": {
+          "name": "Category top listing",
+          "duration": "3 months"
+        },
+        "listing-top-6m": {
+          "name": "Category top listing",
+          "duration": "6 months"
+        },
+        "listing-top-1y": {
+          "name": "Category top listing",
+          "duration": "1 year"
+        },
+        "listing-highlight": {
+          "name": "Company info highlight",
+          "duration": "1 month"
+        }
       },
       "directoryPositions": {
         "dir-cover": "Cover",
@@ -323,9 +395,7 @@
       "directory": "Vietnam Chinese Business Procurement Directory",
       "product": "Product Sales Listing"
     },
-    "duration": {
-      "annual": "Annual"
-    },
+    "durationAnnual": "Annual",
     "note": "Note: Popup ads recommended size is 800x600 pixels. Featured companies need to provide company logo and introduction. If design service is needed, please check the box when placing an order.",
     "directoryNotes": {
       "note1": "The above fees do not include taxes, design, and finalization.",
@@ -334,7 +404,8 @@
       "note4": "Deadline: October 31, 2024."
     },
     "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details.",
-    "inquirySuccess": "Thank you for your inquiry, we will reply to you as soon as possible!"
+    "inquirySuccess": "Thank you for your inquiry, we will reply to you as soon as possible!",
+    "mustLoginToOrder": "You must login to order"
   },
   "stickyBanner": {
     "expandText": "Expand Featured Info",
@@ -618,8 +689,14 @@
       "diamond": "Spend 550,000 VND"
     },
     "tierBenefits": {
-      "bronze": ["Base industry info", "Company name, tax ID, region"],
-      "silver": ["Full industry info", "Unlock website, phone, address, email"],
+      "bronze": [
+        "Base industry info",
+        "Company name, tax ID, region"
+      ],
+      "silver": [
+        "Full industry info",
+        "Unlock website, phone, address, email"
+      ],
       "gold": [
         "Own industry + 3 cross-industries (full)",
         "Unlock own industry + 3 upstream/downstream industries"
@@ -631,7 +708,9 @@
       ]
     },
     "tierRestrictions": {
-      "bronze": ["No website, phone, or address"],
+      "bronze": [
+        "No website, phone, or address"
+      ],
       "silver": [],
       "gold": [],
       "diamond": []

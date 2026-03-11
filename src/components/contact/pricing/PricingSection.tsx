@@ -1,10 +1,10 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
-import { directoryPricing, platformPricing, productPricing } from "../../data/contactMockData"
-import { TabType } from "../../utils/contactHelpers"
-import Card, { CardContent } from "../ui/Card"
-import Checkbox from "../ui/Checkbox"
+import { directoryPricing, platformPricing, productPricing } from "@/data/contactMockData"
+import { TabType } from "@/utils/contactHelpers"
+import Card, { CardContent } from "@/components/ui/Card"
+import Checkbox from "@/components/ui/Checkbox"
 import PricingTable from "./PricingTable"
 
 interface PricingSectionProps {
@@ -56,7 +56,7 @@ export default function PricingSection({
     return (
       <Card className="border-border/50">
         <CardContent className="p-6">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between pt-7">
             <h3 className="text-foreground text-lg font-bold">
               {t("adContact.pricing.directory.title")}
             </h3>
@@ -128,7 +128,7 @@ export default function PricingSection({
     <div className="space-y-6">
       <Card className="border-border/50">
         <CardContent className="p-6">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between pt-7">
             <h3 key={i18n.language} className="text-foreground text-lg font-bold">
               {t("adContact.pricing.product.title")}
             </h3>

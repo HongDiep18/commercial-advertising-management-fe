@@ -3,15 +3,19 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { X, Send } from "lucide-react"
-import Button from "../ui/Button"
-import Input from "../ui/Input"
-import Textarea from "../ui/Textarea"
-import Label from "../ui/Label"
+import Button from "@/components/ui/Button"
+import Input from "@/components/ui/Input"
+import Textarea from "@/components/ui/Textarea"
+import Label from "@/components/ui/Label"
 import AdItemForm from "./AdItemForm"
-import { getDurationMonths, addMonths } from "../../data/contactMockData"
+import { getDurationMonths, addMonths } from "@/data/contactMockData"
 import { format } from "date-fns"
+import type { UiAdItemDetails, UiSelectedAdItem } from "@/api/ad-orders/builders"
+import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
+import type { CreateAdOrderInput } from "@/types/types"
+import { isValidPhone } from "@/utils/validation/phone"
 
-interface OrderForm {
+type OrderForm = {
   company: string
   contact: string
   phone: string
@@ -19,30 +23,41 @@ interface OrderForm {
   notes: string
 }
 
-interface ItemDetail {
+type ItemDetail = {
   startDate: string
   endDate: string
   needDesign: boolean
   adLink: string
   files: File[]
+  quantity?: number
 }
 
-interface SelectedItem {
+type SelectedItem = {
   id: string
   name: string
   category: string
   duration?: string
   price: string
+  quantity?: number
 }
 
-interface OrderModalProps {
+type OrderModalProps = {
   isOpen: boolean
   onClose: () => void
   selectedItems: SelectedItem[]
-  onSubmit: (form: OrderForm, itemDetails: Record<string, ItemDetail>) => void
+  companyId?: string | null
+  onSubmit: (input: CreateAdOrderInput, meta: { subtotal: string }) => void
+  onQuantityChange?: (itemId: string, quantity: number) => void
 }
 
-export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }: OrderModalProps) {
+export default function OrderModal({
+  isOpen,
+  onClose,
+  selectedItems,
+  companyId,
+  onSubmit,
+  onQuantityChange,
+}: OrderModalProps) {
   const { t, i18n } = useTranslation()
   const [orderForm, setOrderForm] = useState<OrderForm>({
     company: "",
@@ -54,6 +69,8 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
 
   const [itemDetails, setItemDetails] = useState<Record<string, ItemDetail>>({})
   const [openCalendar, setOpenCalendar] = useState<string | null>(null)
+
+  const [phoneError, setPhoneError] = useState<string | null>(null)
 
   const handleStartDateChange = (itemId: string, date: Date | undefined, duration: string) => {
     if (!date) return
@@ -74,7 +91,14 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
     setOpenCalendar(null)
   }
 
-  const handleItemDetailChange = (itemId: string, field: string, value: string | boolean) => {
+  const handleItemDetailChange = (
+    itemId: string,
+    field: string,
+    value: string | boolean | number
+  ) => {
+    if (field === "quantity" && typeof value === "number") {
+      onQuantityChange?.(itemId, value)
+    }
     setItemDetails((prev) => ({
       ...prev,
       [itemId]: {
@@ -108,7 +132,19 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(orderForm, itemDetails)
+    if (!isValidPhone(orderForm.phone)) {
+      setPhoneError(t("register.errors.invalidPhone"))
+      return
+    }
+    setPhoneError(null)
+
+    const { input, subtotal } = buildCreateAdOrderInput({
+      notes: orderForm.notes,
+      companyId: companyId ?? null,
+      selectedItems: selectedItems as UiSelectedAdItem[],
+      itemDetailsById: itemDetails as Record<string, UiAdItemDetails>,
+    })
+    onSubmit(input, { subtotal })
     setOrderForm({
       company: "",
       contact: "",
@@ -117,6 +153,7 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
       notes: "",
     })
     setItemDetails({})
+    setPhoneError(null)
   }
 
   if (!isOpen) return null
@@ -168,9 +205,20 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
                   id="order-phone"
                   required
                   value={orderForm.phone}
-                  onChange={(e) => setOrderForm((prev) => ({ ...prev, phone: e.target.value }))}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setOrderForm((prev) => ({ ...prev, phone: value }))
+                    setPhoneError(
+                      value.trim() === ""
+                        ? null
+                        : isValidPhone(value)
+                          ? null
+                          : t("register.errors.invalidPhone")
+                    )
+                  }}
                   className="!bg-body-bg-light"
                 />
+                {phoneError && <p className="mt-1 text-sm text-red-500">{phoneError}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="order-email">Email *</Label>
@@ -198,13 +246,18 @@ export default function OrderModal({ isOpen, onClose, selectedItems, onSubmit }:
                   needDesign: false,
                   adLink: "",
                   files: [],
+                  quantity: item.quantity ?? 1,
+                }
+                const mergedDetails = {
+                  ...details,
+                  quantity: details.quantity ?? item.quantity ?? 1,
                 }
 
                 return (
                   <AdItemForm
                     key={item.id}
                     item={item}
-                    itemDetails={details}
+                    itemDetails={mergedDetails}
                     openCalendar={openCalendar}
                     onStartDateChange={(date) =>
                       handleStartDateChange(item.id, date, item.duration || "")

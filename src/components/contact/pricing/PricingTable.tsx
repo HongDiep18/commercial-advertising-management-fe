@@ -1,8 +1,8 @@
 'use client'
 
 import { useTranslation } from 'react-i18next'
-import Checkbox from '../ui/Checkbox'
-import Card, { CardContent } from '../ui/Card'
+import Checkbox from '@/components/ui/Checkbox'
+import Card, { CardContent } from '@/components/ui/Card'
 
 interface PricingItem {
   id: string

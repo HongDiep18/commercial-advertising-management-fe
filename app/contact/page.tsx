@@ -2,16 +2,24 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useRouter } from "next/navigation"
 import Header from "../../src/components/layout/Header"
 import Footer from "../../src/components/layout/Footer"
-import HeroSection from "../../src/components/contact/HeroSection"
-import TabNavigation from "../../src/components/contact/TabNavigation"
-import ContactContentSection from "../../src/components/contact/ContactContentSection"
-import PricingSection from "../../src/components/contact/PricingSection"
-import OrderModal from "../../src/components/contact/OrderModal"
-import InquiryModal from "../../src/components/contact/InquiryModal"
+import {
+  HeroSection,
+  TabNavigation,
+  ContactContentSection,
+  PricingSection,
+  OrderModal,
+  InquiryModal,
+} from "@/components/contact"
 import { TabType, getTabConfig } from "../../src/utils/contactHelpers"
 import { platformPricing, directoryPricing, productPricing } from "../../src/data/contactMockData"
+import { createAdOrder } from "../../src/api/ad-orders/service"
+import type { CreateAdOrderInput } from "@/types/types"
+import { useUser } from "../../src/contexts/user-context"
+
+export type SelectedEntry = { id: string; quantity: number }
 
 interface SelectedItem {
   id: string
@@ -19,22 +27,35 @@ interface SelectedItem {
   category: string
   duration?: string
   price: string
+  quantity: number
 }
 
 export default function ContactPage() {
   const { t } = useTranslation()
+  const router = useRouter()
+  const { user, isLoggedIn } = useUser()
   const [activeTab, setActiveTab] = useState<TabType>("platform")
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [selectedItems, setSelectedItems] = useState<SelectedEntry[]>([])
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
 
   const tabConfig = getTabConfig(t)
   const currentConfig = tabConfig[activeTab]
 
+  const selectedIds = selectedItems.map((e) => e.id)
+  const totalQuantity = selectedItems.reduce((sum, e) => sum + e.quantity, 0)
+
   const handleItemToggle = (itemId: string) => {
     setSelectedItems((prev) =>
-      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+      prev.some((e) => e.id === itemId)
+        ? prev.filter((e) => e.id !== itemId)
+        : [...prev, { id: itemId, quantity: 1 }]
     )
+  }
+
+  const handleQuantityChange = (itemId: string, quantity: number) => {
+    const q = Math.max(1, Math.floor(quantity))
+    setSelectedItems((prev) => prev.map((e) => (e.id === itemId ? { ...e, quantity: q } : e)))
   }
 
   const handleTabChange = (tab: TabType) => {
@@ -44,52 +65,54 @@ export default function ContactPage() {
 
   const getSelectedItemsDetails = (): SelectedItem[] => {
     const details: SelectedItem[] = []
+    const byId = Object.fromEntries(selectedItems.map((e) => [e.id, e.quantity]))
 
     if (activeTab === "platform") {
       Object.entries(platformPricing).forEach(([categoryKey, category]) => {
         category.items.forEach((item) => {
-          if (selectedItems.includes(item.id)) {
-            details.push({
-              id: item.id,
-              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
-              category: t(`adContact.pricing.${categoryKey}.title`),
-              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
-              price: item.price,
-            })
-          }
+          if (!byId[item.id]) return
+          details.push({
+            id: item.id,
+            name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
+            category: t(`adContact.pricing.${categoryKey}.title`),
+            duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
+            price: item.price,
+            quantity: byId[item.id],
+          })
         })
       })
     } else if (activeTab === "directory") {
       directoryPricing.forEach((item) => {
-        if (selectedItems.includes(item.id)) {
-          details.push({
-            id: item.id,
-            name: t(`adContact.pricing.directoryPositions.${item.id}`) || item.position,
-            category: t("adContact.categoryNames.directory"),
-            duration: t("adContact.duration.annual"),
-            price: item.price,
-          })
-        }
+        if (!byId[item.id]) return
+        details.push({
+          id: item.id,
+          name: t(`adContact.pricing.directoryPositions.${item.id}`) || item.position,
+          category: t("adContact.categoryNames.directory"),
+          duration: t("adContact.durationAnnual"),
+          price: item.price,
+          quantity: byId[item.id],
+        })
       })
     } else {
       productPricing.forEach((item) => {
-        if (selectedItems.includes(item.id)) {
-          details.push({
-            id: item.id,
-            name: `${t(`adContact.pricing.productItems.${item.id}.item`) || item.item} - ${t(`adContact.pricing.productItems.${item.id}.description`) || item.description}`,
-            category: t("adContact.categoryNames.product"),
-            duration: t(`adContact.pricing.productItems.${item.id}.duration`) || item.duration,
-            price: item.price,
-          })
-        }
+        if (!byId[item.id]) return
+        details.push({
+          id: item.id,
+          name: `${t(`adContact.pricing.productItems.${item.id}.item`) || item.item} - ${t(`adContact.pricing.productItems.${item.id}.description`) || item.description}`,
+          category: t("adContact.categoryNames.product"),
+          duration: t(`adContact.pricing.productItems.${item.id}.duration`) || item.duration,
+          price: item.price,
+          quantity: byId[item.id],
+        })
       })
     }
 
     return details
   }
 
-  const handleOrderSubmit = () => {
-    alert(t("adContact.orderSuccess", { count: selectedItems.length }))
+  const handleOrderSubmit = async (_input: CreateAdOrderInput) => {
+    await createAdOrder(_input)
+    alert(t("adContact.orderSuccess", { count: totalQuantity }))
     setShowOrderModal(false)
     setSelectedItems([])
   }
@@ -97,6 +120,15 @@ export default function ContactPage() {
   const handleInquirySubmit = () => {
     alert(t("adContact.inquirySuccess"))
     setShowInquiryModal(false)
+  }
+
+  const handleOrderClick = () => {
+    if (!isLoggedIn) {
+      alert(t("adContact.mustLoginToOrder") || "You must login to order")
+      router.push("/login?next=/contact")
+      return
+    }
+    setShowOrderModal(true)
   }
 
   return (
@@ -114,14 +146,15 @@ export default function ContactPage() {
             description={currentConfig.description}
             contact={currentConfig.contact}
             selectedCount={selectedItems.length}
+            totalQuantity={totalQuantity}
             onInquiryClick={() => setShowInquiryModal(true)}
-            onOrderClick={() => setShowOrderModal(true)}
+            onOrderClick={handleOrderClick}
           />
 
           <div className="space-y-6">
             <PricingSection
               activeTab={activeTab}
-              selectedItems={selectedItems}
+              selectedItems={selectedIds}
               onItemToggle={handleItemToggle}
             />
           </div>
@@ -132,7 +165,9 @@ export default function ContactPage() {
         isOpen={showOrderModal}
         onClose={() => setShowOrderModal(false)}
         selectedItems={getSelectedItemsDetails()}
+        companyId={user?.companyId ?? null}
         onSubmit={handleOrderSubmit}
+        onQuantityChange={handleQuantityChange}
       />
 
       <InquiryModal

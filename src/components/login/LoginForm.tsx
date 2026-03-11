@@ -13,6 +13,7 @@ import { Toast, type ToastVariant } from "../ui/Toast"
 import { login as loginApi } from "@/api/auth"
 import { useUser, UserRole } from "@/contexts/user-context"
 import { DemoLoginButtons, DEMO_USERS, DEMO_ACCOUNTS } from "./demo"
+import { getProfile, type ProfileResponse } from "@/api/profile"
 import {
   type LoginResponse,
   isLoginSuccess,
@@ -29,6 +30,28 @@ function getErrorMessage(err: unknown): string {
     if (data && typeof data.message === "string") return data.message
   }
   return ""
+}
+
+function getCompanyIdFromProfile(profile: ProfileResponse | null): string | undefined {
+  if (!profile) return undefined
+
+  const direct = (profile as { companyId?: unknown }).companyId
+  if (typeof direct === "string" && direct.trim()) return direct
+
+  const raw = profile as unknown as Record<string, unknown>
+
+  const fromTopLevel = raw["company_id"]
+  if (typeof fromTopLevel === "string" && fromTopLevel.trim()) return fromTopLevel
+
+  const nestedCompany = raw["company"]
+  if (nestedCompany && typeof nestedCompany === "object") {
+    const companyObj = nestedCompany as { id?: unknown }
+    if (typeof companyObj.id === "string" && companyObj.id.trim()) {
+      return companyObj.id
+    }
+  }
+
+  return undefined
 }
 
 export default function LoginForm() {
@@ -78,8 +101,21 @@ export default function LoginForm() {
       const payload = extractUserFromLoginResponse(resTyped, email)
       let role: string | undefined
       if (payload) {
-        setUser(mapApiUserToUser(payload, email))
+        let user = mapApiUserToUser(payload, email)
         role = payload.role
+
+        try {
+          const profile = await getProfile()
+          console.log("[Login] Profile", profile)
+          const companyId = getCompanyIdFromProfile(profile)
+          if (companyId) {
+            user = { ...user, companyId }
+          }
+        } catch (err) {
+          console.error("[Login] Failed to load profile/companyId", err)
+        }
+
+        setUser(user)
       } else {
         setUser({
           id: `api-${Date.now()}`,

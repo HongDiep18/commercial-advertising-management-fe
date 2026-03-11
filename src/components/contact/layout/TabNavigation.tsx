@@ -1,6 +1,6 @@
 'use client'
 
-import { TabType, getTabConfig } from '../../utils/contactHelpers'
+import { TabType, getTabConfig } from '@/utils/contactHelpers'
 import { useTranslation } from 'react-i18next'
 
 interface TabNavigationProps {

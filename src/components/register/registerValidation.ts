@@ -1,6 +1,7 @@
 import type { RegisterFormData } from "./registerConstants"
 import type { ProfileFormData } from "@/types/account"
 import { getRegionValuesForCountry } from "./registerOptions"
+import { isValidPhone } from "@/utils/validation/phone"
 
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
 const EMAIL_FIELD = "email" as const
@@ -35,17 +36,10 @@ const PROFILE_REQUIRED_KEYS: (keyof ProfileFormData)[] = [
   "description",
 ]
 
-const PHONE_REGEX = /^[\d\s\-+()]+$/
-const MIN_PHONE_DIGITS = 8
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function filled(v: unknown): boolean {
   return typeof v === "string" && v.trim().length > 0
-}
-
-function isPhone(value: string): boolean {
-  const t = value.trim()
-  return t.length > 0 && PHONE_REGEX.test(t) && (t.match(/\d/g) ?? []).length >= MIN_PHONE_DIGITS
 }
 
 function isEmail(value: string): boolean {
@@ -85,7 +79,7 @@ function runValidation(
   }
   for (const key of PHONE_FIELDS) {
     const val = data[key]
-    if (filled(val) && !isPhone(String(val))) {
+    if (filled(val) && !isValidPhone(String(val))) {
       errors.push({ field: key, kind: "invalidPhone" })
     }
   }
