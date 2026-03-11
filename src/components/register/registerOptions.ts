@@ -28,6 +28,13 @@ export const REGION_OPTIONS_BY_COUNTRY: Record<string, RegionOption[]> = {
   other: [{ value: "other", labelKey: "register.regions.other", fallback: "其他" }],
 }
 
+const COUNTRY_REGION_GROUPS: Record<string, keyof typeof REGION_OPTIONS_BY_COUNTRY> = {
+  VN: "vietnam",
+  TW: "taiwan",
+  CN: "china",
+  SG: "singapore",
+}
+
 countries.registerLocale(en)
 countries.registerLocale(vi)
 countries.registerLocale(zh)
@@ -41,10 +48,21 @@ export function getCountryOptions(language: string): Array<{ value: string; labe
     .sort((a, b) => a.label.localeCompare(b.label))
 }
 
+export function getRegionGroupForCountry(country: string): keyof typeof REGION_OPTIONS_BY_COUNTRY {
+  return COUNTRY_REGION_GROUPS[country.toUpperCase()] ?? "other"
+}
+
+export function getRegionValuesForCountry(country: string): string[] {
+  const key = getRegionGroupForCountry(country)
+  const list = REGION_OPTIONS_BY_COUNTRY[key] ?? []
+  return list.map((o) => o.value)
+}
+
 export function getRegionOptions(
   country: string,
   t: (key: string) => string
 ): Array<{ value: string; label: string }> {
-  const list = REGION_OPTIONS_BY_COUNTRY[country] ?? []
+  const key = getRegionGroupForCountry(country)
+  const list = REGION_OPTIONS_BY_COUNTRY[key] ?? []
   return list.map((o) => ({ value: o.value, label: t(o.labelKey) || o.fallback }))
 }
