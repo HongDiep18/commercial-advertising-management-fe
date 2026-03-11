@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { ChevronDown, Search, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { INDUSTRY_CATEGORIES } from "@/constants/categories"
 import Button from "../ui/Button"
 
 interface FilterTag {
@@ -10,7 +11,6 @@ interface FilterTag {
   label: string
 }
 
-const categoryIds = ["semi", "elec", "textile", "food", "machine", "plastic"]
 const locationIds = ["hcm", "hanoi", "binhduong", "dongnai", "danang", "haiphong"]
 
 export default function SearchSection() {
@@ -21,6 +21,7 @@ export default function SearchSection() {
 
   const [showIndustryDropdown, setShowIndustryDropdown] = useState(false)
   const [showLocationDropdown, setShowLocationDropdown] = useState(false)
+  const [industrySearch, setIndustrySearch] = useState("")
   const [locationSearch, setLocationSearch] = useState("")
   const [searchValue, setSearchValue] = useState("")
 
@@ -28,9 +29,9 @@ export default function SearchSection() {
   const locationDropdownRef = useRef<HTMLDivElement | null>(null)
 
   const categories = useMemo(() => {
-    return categoryIds.map((id) => ({
-      id,
-      name: t(`search.categories.${id}`),
+    return INDUSTRY_CATEGORIES.map((cat) => ({
+      id: cat.id,
+      name: t(cat.i18nKey) || cat.fallback,
     }))
   }, [t])
 
@@ -52,12 +53,19 @@ export default function SearchSection() {
       ) {
         setShowIndustryDropdown(false)
         setShowLocationDropdown(false)
+        setIndustrySearch("")
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  const filteredCategories = useMemo(() => {
+    if (!industrySearch.trim()) return categories
+    const term = industrySearch.trim().toLowerCase()
+    return categories.filter((cat) => cat.name.toLowerCase().includes(term))
+  }, [industrySearch, categories])
 
   const filteredLocations = useMemo(() => {
     if (!locationSearch.trim()) return allLocations
@@ -174,23 +182,16 @@ export default function SearchSection() {
                 >
                   {t("search.byProduct")}
                 </button>
-                <button
-                  onClick={() => setSearchMode("all")}
-                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
-                    searchMode === "all"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t("search.all")}
-                </button>
               </div>
 
               <div className="relative" ref={industryDropdownRef}>
                 <button
                   onClick={() => {
                     setShowLocationDropdown(false)
-                    setShowIndustryDropdown(!showIndustryDropdown)
+                    setShowIndustryDropdown((open) => {
+                      if (!open) setIndustrySearch("")
+                      return !open
+                    })
                   }}
                   className="border-border/50 bg-background hover:bg-secondary/30 inline-flex items-center gap-2 rounded-md border px-4 py-1.5 text-sm font-medium transition-colors"
                 >
@@ -202,11 +203,14 @@ export default function SearchSection() {
                   <div className="border-border bg-card absolute top-full left-0 z-10 mt-2 max-h-96 w-72 overflow-y-auto rounded-lg border shadow-lg">
                     <div className="p-3">
                       <input
+                        type="text"
+                        value={industrySearch}
+                        onChange={(e) => setIndustrySearch(e.target.value)}
                         placeholder={t("search.searchCategory")}
                         className="border-border/60 focus:ring-primary/40 mb-3 h-9 w-full rounded-md border px-3 text-sm outline-none focus:ring-2"
                       />
                       <div className="space-y-1">
-                        {categories.map((category) => (
+                        {filteredCategories.map((category) => (
                           <button
                             key={category.id}
                             onClick={() => toggleIndustry(category.id)}

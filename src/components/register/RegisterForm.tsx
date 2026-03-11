@@ -13,7 +13,7 @@ import { Toast, type ToastVariant } from "../ui/Toast"
 import { register } from "@/api/auth"
 import { formDataToRegisterPayload } from "@/types/auth"
 import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
-import { getCountryOptions } from "./registerOptions"
+import { getCountryOptions, getRegionOptions } from "./registerOptions"
 import { REGISTER_CATEGORIES } from "./registerCategories"
 import { useCaptcha } from "./useCaptcha"
 import { REGISTER_ERROR_KEYS, validateRegisterForm } from "./registerValidation"
@@ -69,6 +69,7 @@ export default function RegisterForm() {
     id: cat.id,
     name: t(cat.i18nKey) || `${cat.code}. ${cat.fallback}`,
   }))
+  const regions = getRegionOptions(formData.country, t)
 
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
     setFormData((prev: RegisterFormData) => ({ ...prev, [field]: value }))
@@ -273,7 +274,10 @@ export default function RegisterForm() {
                 <FieldWithError error={fieldErrors.country}>
                   <Select
                     value={formData.country}
-                    onValueChange={(v) => handleInputChange("country", v)}
+                    onValueChange={(v) => {
+                      handleInputChange("country", v)
+                      handleInputChange("region", "")
+                    }}
                     required
                   >
                     <Select.Trigger className="w-full">
@@ -290,27 +294,50 @@ export default function RegisterForm() {
                     </Select.Content>
                   </Select>
                 </FieldWithError>
-                <FieldWithError error={fieldErrors.industry}>
+                <FieldWithError error={fieldErrors.region}>
                   <Select
-                    value={formData.industry}
-                    onValueChange={(v) => handleInputChange("industry", v)}
+                    value={formData.region}
+                    onValueChange={(v) => handleInputChange("region", v)}
                     required
+                    disabled={!formData.country}
+                    options={regions}
                   >
                     <Select.Trigger className="w-full">
                       <Select.Value
-                        placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
+                        placeholder={t("register.placeholders.region") || "選擇地區 *"}
                       />
                     </Select.Trigger>
                     <Select.Content>
-                      {categories.map((cat) => (
-                        <Select.Item key={cat.id} value={cat.id}>
-                          {cat.name}
+                      {regions.map((r) => (
+                        <Select.Item key={r.value} value={r.value}>
+                          {r.label}
                         </Select.Item>
                       ))}
                     </Select.Content>
                   </Select>
                 </FieldWithError>
               </div>
+
+              <FieldWithError error={fieldErrors.industry}>
+                <Select
+                  value={formData.industry}
+                  onValueChange={(v) => handleInputChange("industry", v)}
+                  required
+                >
+                  <Select.Trigger className="w-full">
+                    <Select.Value
+                      placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
+                    />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {categories.map((cat) => (
+                      <Select.Item key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </FieldWithError>
 
               <FieldWithError error={fieldErrors.website}>
                 <Input
