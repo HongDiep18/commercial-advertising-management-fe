@@ -143,7 +143,7 @@ const Calendar = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between pt-7">
         <button type="button" onClick={goToPreviousMonth} className="hover:bg-muted rounded-md p-1">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
