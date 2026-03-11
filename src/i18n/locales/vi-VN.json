@@ -212,7 +212,7 @@
     "tabs": {
       "platform": {
         "title": "Quảng cáo nền tảng",
-        "description": "Vị trí quảng cáo có độ phơi sáng cao bao gồm cửa sổ bật lên trang chủ, công ty nổi bật và danh sách thư mục công ty"
+        "description": "Các vị trí quảng cáo có mức độ hiển thị cao như cửa sổ bật lên trên trang chủ của trang web, các công ty được chọn và danh mục công ty"
       },
       "directory": {
         "title": "Danh sách doanh nhân Trung Quốc mua hàng tại Việt Nam",
@@ -224,21 +224,107 @@
       }
     },
     "pricing": {
-      "popup": {
-        "title": "Popup trang chủ"
+      "popup": { "title": "Quảng cáo popup trang chủ" },
+      "featured": { "title": "Công ty nổi bật" },
+      "listing": { "title": "Quảng cáo danh mục công ty" },
+      "directory": { "title": "Danh sách doanh nhân Trung Quốc mua hàng tại Việt Nam" },
+      "product": { "title": "Đăng bán sản phẩm" },
+      "platformItems": {
+        "popup-priority-1m": { "name": "Ưu tiên hiển thị (vị trí 1)", "duration": "1 tháng" },
+        "popup-priority-3m": { "name": "Ưu tiên hiển thị (vị trí 1)", "duration": "3 tháng" },
+        "popup-priority-6m": { "name": "Ưu tiên hiển thị (vị trí 1)", "duration": "6 tháng" },
+        "popup-priority-1y": { "name": "Ưu tiên hiển thị (vị trí 1)", "duration": "1 năm" },
+        "popup-normal-1m": { "name": "Luân phiên thường (vị trí 2–5)", "duration": "1 tháng" },
+        "popup-normal-3m": { "name": "Luân phiên thường (vị trí 2–5)", "duration": "3 tháng" },
+        "popup-normal-6m": { "name": "Luân phiên thường (vị trí 2–5)", "duration": "6 tháng" },
+        "popup-normal-1y": { "name": "Luân phiên thường (vị trí 2–5)", "duration": "1 năm" },
+        "popup-link": { "name": "Liên kết \"Xem chi tiết\"", "duration": "Một lần" },
+        "popup-sort": { "name": "Điều chỉnh thứ tự", "duration": "Mỗi lần" },
+        "featured-1m": { "name": "Công ty nổi bật trang chủ", "duration": "1 tháng" },
+        "featured-3m": { "name": "Công ty nổi bật trang chủ", "duration": "3 tháng" },
+        "featured-6m": { "name": "Công ty nổi bật trang chủ", "duration": "6 tháng" },
+        "featured-1y": { "name": "Công ty nổi bật trang chủ", "duration": "1 năm" },
+        "featured-highlight": { "name": "Nhấn mạnh công ty nổi bật", "duration": "1 tháng" },
+        "listing-top-1m": { "name": "Đầu danh mục", "duration": "1 tháng" },
+        "listing-top-3m": { "name": "Đầu danh mục", "duration": "3 tháng" },
+        "listing-top-6m": { "name": "Đầu danh mục", "duration": "6 tháng" },
+        "listing-top-1y": { "name": "Đầu danh mục", "duration": "1 năm" },
+        "listing-highlight": { "name": "Nhấn mạnh thông tin công ty", "duration": "1 tháng" }
       },
-      "featured": {
-        "title": "Công ty nổi bật"
+      "directoryPositions": {
+        "dir-cover": "Bìa",
+        "dir-back": "Bìa sau",
+        "dir-inside-cover": "Bìa trong (trái/phải)",
+        "dir-inside-back": "Bìa sau trong (trái/phải)",
+        "dir-p2-p5": "Trong bìa P2–P5",
+        "dir-last5": "5 trang cuối (trừ trong bìa trái)",
+        "dir-category": "Quảng cáo chèn danh mục",
+        "dir-toc-full": "Bên mục lục (trang đầy)",
+        "dir-toc-half": "Bên mục lục (nửa trang)",
+        "dir-inner-color": "Trang trong màu",
+        "dir-inner-mono": "Trang trong đen trắng",
+        "dir-half-color": "Nửa trang màu",
+        "dir-quarter": "1/4 trang (13×9,5 cm)"
       },
-      "listing": {
-        "title": "Quảng cáo công ty"
-      },
-      "directory": {
-        "title": "Bảng giá quảng cáo"
-      },
-      "product": {
-        "title": "Bảng giá đăng sản phẩm"
+      "productItems": {
+        "prod-basic-1m": {
+          "item": "Gói cơ bản",
+          "description": "Một sản phẩm, 3 ảnh",
+          "duration": "1 tháng"
+        },
+        "prod-basic-3m": {
+          "item": "Gói cơ bản",
+          "description": "Một sản phẩm, 3 ảnh",
+          "duration": "3 tháng"
+        },
+        "prod-basic-6m": {
+          "item": "Gói cơ bản",
+          "description": "Một sản phẩm, 3 ảnh",
+          "duration": "6 tháng"
+        },
+        "prod-basic-1y": {
+          "item": "Gói cơ bản",
+          "description": "Một sản phẩm, 3 ảnh",
+          "duration": "1 năm"
+        },
+        "prod-adv-1m": {
+          "item": "Gói nâng cao",
+          "description": "10 ảnh + video",
+          "duration": "1 tháng"
+        },
+        "prod-adv-3m": {
+          "item": "Gói nâng cao",
+          "description": "10 ảnh + video",
+          "duration": "3 tháng"
+        },
+        "prod-adv-6m": {
+          "item": "Gói nâng cao",
+          "description": "10 ảnh + video",
+          "duration": "6 tháng"
+        },
+        "prod-adv-1y": {
+          "item": "Gói nâng cao",
+          "description": "10 ảnh + video",
+          "duration": "1 năm"
+        },
+        "prod-featured": {
+          "item": "Nổi bật trang chủ",
+          "description": "Hiển thị trên trang chủ",
+          "duration": "1 tháng"
+        },
+        "prod-top": {
+          "item": "Đầu danh mục",
+          "description": "Đầu trang danh mục",
+          "duration": "1 tháng"
+        }
       }
+    },
+    "categoryNames": {
+      "directory": "Danh sách doanh nhân Trung Quốc mua hàng tại Việt Nam",
+      "product": "Đăng bán sản phẩm"
+    },
+    "duration": {
+      "annual": "Theo năm"
     },
     "note": "Lưu ý: Kích thước quảng cáo cửa sổ bật lên được khuyến nghị là 800x600 pixel. Các công ty nổi bật cần cung cấp logo công ty và giới thiệu. Nếu cần dịch vụ thiết kế, vui lòng đánh dấu khi đặt hàng.",
     "directoryNotes": {
@@ -521,6 +607,11 @@
       "admin": "Quản trị viên"
     },
     "tierSpending": {
+      "NONE": "Không",
+      "BRONZE": "Miễn phí (đăng ký)",
+      "SILVER": "Chi tiêu 150.000 VND",
+      "GOLD": "Chi tiêu 300.000 VND",
+      "DIAMOND": "Chi tiêu 550.000 VND",
       "bronze": "Miễn phí (đăng ký)",
       "silver": "Chi tiêu 150.000 VND",
       "gold": "Chi tiêu 300.000 VND",
