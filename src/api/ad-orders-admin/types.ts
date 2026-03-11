@@ -66,3 +66,16 @@ export type AdminListOrdersResponse = {
   }
 }
 
+export type AdminOrdersStatusCounts = {
+  pending: number
+  approved: number
+  rejected: number
+  total: number
+}
+
+export type AdminOrdersMetricsResponse = {
+  currentMonthRevenue: number
+  currentMonthOrders: AdminOrdersStatusCounts
+  monthlyGrowthPercentage: number
+}
+
