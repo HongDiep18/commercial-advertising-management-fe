@@ -57,9 +57,7 @@ export function AccountHeroCard({
               <span
                 className={`rounded-full px-3 py-1 text-sm font-medium ${tierConfig.bgColor} ${tierConfig.color}`}
               >
-                {memberTier === MembershipTier.GUEST
-                  ? t("account.tiers.NONE") || t("account.tiers.GUEST") || "Guest"
-                  : `${memberTier} Member`}
+                {t(`account.tiers.${memberTier}`) || tierConfig.label}
               </span>
             </div>
             <p className="text-muted-foreground">{user.email}</p>

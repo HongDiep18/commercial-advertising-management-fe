@@ -3,13 +3,13 @@
 import { useTranslation } from "react-i18next"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Upload, X } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover"
-import Button from "../ui/Button"
-import Input from "../ui/Input"
-import Label from "../ui/Label"
-import Checkbox from "../ui/Checkbox"
-import Calendar from "../ui/Calendar"
-import { isDateDisabled, getDisabledDates } from "../../data/contactMockData"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
+import Button from "@/components/ui/Button"
+import Input from "@/components/ui/Input"
+import Label from "@/components/ui/Label"
+import Checkbox from "@/components/ui/Checkbox"
+import Calendar from "@/components/ui/Calendar"
+import { isDateDisabled, getDisabledDates } from "@/data/contactMockData"
 
 interface AdItemFormProps {
   item: {
@@ -18,6 +18,7 @@ interface AdItemFormProps {
     category: string
     duration?: string
     price: string
+    quantity?: number
   }
   itemDetails: {
     startDate: string
@@ -25,10 +26,11 @@ interface AdItemFormProps {
     needDesign: boolean
     adLink: string
     files: File[]
+    quantity?: number
   }
   openCalendar: string | null
   onStartDateChange: (date: Date | undefined) => void
-  onDetailChange: (field: string, value: string | boolean) => void
+  onDetailChange: (field: string, value: string | boolean | number) => void
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onRemoveFile: (index: number) => void
   onCalendarOpenChange: (open: boolean) => void
@@ -70,6 +72,7 @@ export default function AdItemForm({
           <Popover open={openCalendar === item.id} onOpenChange={onCalendarOpenChange}>
             <PopoverTrigger asChild>
               <Button
+                type="button"
                 variant="outline"
                 className={`w-full justify-start bg-transparent text-left font-normal ${
                   !itemDetails.startDate && "text-muted-foreground"

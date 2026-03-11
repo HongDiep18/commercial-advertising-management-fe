@@ -94,7 +94,7 @@ export function getMembershipTier(totalPoints: number): MembershipTier {
   if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.GOLD]) return MembershipTier.GOLD
   if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER]) return MembershipTier.SILVER
   if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]) return MembershipTier.BRONZE
-  return MembershipTier.GUEST
+  return MembershipTier.BRONZE
 }
 
 export function getNextTierInfo(totalPoints: number): NextTierInfo | null {

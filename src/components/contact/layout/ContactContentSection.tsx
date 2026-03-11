@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next"
 import { Phone, Mail, MessageCircle, FileText } from "lucide-react"
-import Button from "../ui/Button"
+import Button from "@/components/ui/Button"
 
 interface ContactContentSectionProps {
   title: string
@@ -12,6 +12,7 @@ interface ContactContentSectionProps {
     email: string
   }
   selectedCount: number
+  totalQuantity: number
   onInquiryClick: () => void
   onOrderClick: () => void
 }
@@ -21,6 +22,7 @@ export default function ContactContentSection({
   description,
   contact,
   selectedCount,
+  totalQuantity,
   onInquiryClick,
   onOrderClick,
 }: ContactContentSectionProps) {
@@ -67,6 +69,12 @@ export default function ContactContentSection({
             <div>
               <p className="text-foreground font-medium">
                 {t("adContact.selectedItems", { count: selectedCount })}
+                {totalQuantity !== selectedCount && (
+                  <span className="text-muted-foreground font-normal">
+                    {" · "}
+                    {t("adContact.totalQuantity", { count: totalQuantity })}
+                  </span>
+                )}
               </p>
               <p className="text-muted-foreground text-sm">{t("adContact.clickToOrder")}</p>
             </div>
