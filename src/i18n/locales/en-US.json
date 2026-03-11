@@ -904,6 +904,7 @@
       "qualityPassRate": "Quality pass rate"
     },
     "advertising": {
+      "assets": "Attachments",
       "monthlyRevenue": "Monthly revenue",
       "adOrders": "Ad orders",
       "monthlyGrowth": "Monthly growth",
