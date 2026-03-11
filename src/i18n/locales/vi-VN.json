@@ -904,6 +904,7 @@
       "qualityPassRate": "Tỷ lệ chất lượng đạt"
     },
     "advertising": {
+      "assets": "Hình ảnh đính kèm",
       "monthlyRevenue": "Doanh thu tháng",
       "adOrders": "Đơn quảng cáo",
       "monthlyGrowth": "Tăng trưởng tháng",
