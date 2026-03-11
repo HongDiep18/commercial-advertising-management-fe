@@ -918,7 +918,7 @@
       "noPricing": "Chưa có tuỳ chọn giá nào.",
       "pricingDialogDescription": "Cấu hình đơn giá cho gói quảng cáo này.",
       "packageManagementTable": {
-        "category": "Danh mục",
+        "category": "Loại Quảng cáo",
         "package": "Gói quảng cáo",
         "pricingVariants": "Số bảng giá",
         "actions": "Thao tác"
@@ -997,6 +997,9 @@
       "amount": "Số tiền",
       "submittedAt": "Thời gian gửi",
       "actions": "Thao tác",
+      "loadingOrders": "Đang tải đơn hàng...",
+      "ordersError": "Không tải được đơn hàng. Vui lòng thử lại.",
+      "noOrders": "Chưa có đơn hàng nào.",
       "adTypePopup": "Quảng cáo nền tảng",
       "adTypeDirectory": "Danh mục",
       "adTypeProduct": "Bán sản phẩm",
@@ -1006,6 +1009,7 @@
       "phone": "Số điện thoại",
       "selectedItems": "Mục đã chọn",
       "estimatedAmount": "Số tiền ước tính",
+      "designService": "Dịch vụ thiết kế",
       "sendEmail": "Gửi email",
       "call": "Gọi điện"
     },
