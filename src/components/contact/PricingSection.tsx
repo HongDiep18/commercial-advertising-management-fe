@@ -27,7 +27,11 @@ export default function PricingSection({
           <PricingTable
             key={categoryKey}
             title={t(`adContact.pricing.${categoryKey}.title`)}
-            items={[...category.items]}
+            items={category.items.map((item) => ({
+              ...item,
+              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
+              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
+            }))}
             selectedItems={selectedItems}
             onItemToggle={onItemToggle}
             columns={{
@@ -41,7 +45,7 @@ export default function PricingSection({
 
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p key={i18n.language} className="font-700 text-sm text-amber-800">
-            <p>{t("adContact.platformNotes.note")}</p>
+            <p>{t("adContact.note")}</p>
           </p>
         </div>
       </div>
@@ -88,7 +92,9 @@ export default function PricingSection({
                         onCheckedChange={() => onItemToggle(item.id)}
                       />
                     </td>
-                    <td className="px-3 py-3">{item.position}</td>
+                    <td className="px-3 py-3">
+                      {t(`adContact.pricing.directoryPositions.${item.id}`) || item.position}
+                    </td>
                     <td className="px-3 py-3 text-right font-medium">{item.price}</td>
                   </tr>
                 ))}
@@ -164,13 +170,18 @@ export default function PricingSection({
                         onCheckedChange={() => onItemToggle(item.id)}
                       />
                     </td>
-                    <td className="px-3 py-3 font-medium">{item.item}</td>
-                    <td className="text-muted-foreground px-3 py-3">{item.description}</td>
+                    <td className="px-3 py-3 font-medium">
+                      {t(`adContact.pricing.productItems.${item.id}.item`) || item.item}
+                    </td>
+                    <td className="text-muted-foreground px-3 py-3">
+                      {t(`adContact.pricing.productItems.${item.id}.description`) ||
+                        item.description}
+                    </td>
                     <td className="px-3 py-3">
-                      {item.duration}
+                      {t(`adContact.pricing.productItems.${item.id}.duration`) || item.duration}
                       {"discount" in item && item.discount && (
                         <span className="bg-primary/10 text-primary ml-2 rounded px-2 py-0.5 text-xs">
-                          折扣 {item.discount}
+                          {t("adContact.discount")} {item.discount}
                         </span>
                       )}
                     </td>

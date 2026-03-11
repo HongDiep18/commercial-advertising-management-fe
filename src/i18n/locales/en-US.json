@@ -224,21 +224,107 @@
       }
     },
     "pricing": {
-      "popup": {
-        "title": "Homepage Popup Advertising"
+      "popup": { "title": "Homepage Popup Advertising" },
+      "featured": { "title": "Featured Company Exposure" },
+      "listing": { "title": "Company Directory Advertising" },
+      "directory": { "title": "Vietnam Chinese Business Procurement Directory" },
+      "product": { "title": "Product Sales Listing" },
+      "platformItems": {
+        "popup-priority-1m": { "name": "Priority display (1st)", "duration": "1 month" },
+        "popup-priority-3m": { "name": "Priority display (1st)", "duration": "3 months" },
+        "popup-priority-6m": { "name": "Priority display (1st)", "duration": "6 months" },
+        "popup-priority-1y": { "name": "Priority display (1st)", "duration": "1 year" },
+        "popup-normal-1m": { "name": "Standard rotation (2nd–5th)", "duration": "1 month" },
+        "popup-normal-3m": { "name": "Standard rotation (2nd–5th)", "duration": "3 months" },
+        "popup-normal-6m": { "name": "Standard rotation (2nd–5th)", "duration": "6 months" },
+        "popup-normal-1y": { "name": "Standard rotation (2nd–5th)", "duration": "1 year" },
+        "popup-link": { "name": "“View details” link", "duration": "One-time" },
+        "popup-sort": { "name": "Sort order (raise position)", "duration": "Per time" },
+        "featured-1m": { "name": "Homepage featured company", "duration": "1 month" },
+        "featured-3m": { "name": "Homepage featured company", "duration": "3 months" },
+        "featured-6m": { "name": "Homepage featured company", "duration": "6 months" },
+        "featured-1y": { "name": "Homepage featured company", "duration": "1 year" },
+        "featured-highlight": { "name": "Featured company highlight", "duration": "1 month" },
+        "listing-top-1m": { "name": "Category top listing", "duration": "1 month" },
+        "listing-top-3m": { "name": "Category top listing", "duration": "3 months" },
+        "listing-top-6m": { "name": "Category top listing", "duration": "6 months" },
+        "listing-top-1y": { "name": "Category top listing", "duration": "1 year" },
+        "listing-highlight": { "name": "Company info highlight", "duration": "1 month" }
       },
-      "featured": {
-        "title": "Featured Company Exposure"
+      "directoryPositions": {
+        "dir-cover": "Cover",
+        "dir-back": "Back cover",
+        "dir-inside-cover": "Inside cover (left/right)",
+        "dir-inside-back": "Inside back (left/right)",
+        "dir-p2-p5": "Inside cover P2–P5",
+        "dir-last5": "Last 5 pages (excl. inside back left)",
+        "dir-category": "Category insert",
+        "dir-toc-full": "TOC (full page)",
+        "dir-toc-half": "TOC (half page)",
+        "dir-inner-color": "Inner color",
+        "dir-inner-mono": "Inner B&W",
+        "dir-half-color": "Half page color",
+        "dir-quarter": "1/4 page (13×9.5 cm)"
       },
-      "listing": {
-        "title": "Company Directory Advertising"
-      },
-      "directory": {
-        "title": "Advertising Price List"
-      },
-      "product": {
-        "title": "Product Listing Price List"
+      "productItems": {
+        "prod-basic-1m": {
+          "item": "Basic plan",
+          "description": "Single product, 3 images",
+          "duration": "1 month"
+        },
+        "prod-basic-3m": {
+          "item": "Basic plan",
+          "description": "Single product, 3 images",
+          "duration": "3 months"
+        },
+        "prod-basic-6m": {
+          "item": "Basic plan",
+          "description": "Single product, 3 images",
+          "duration": "6 months"
+        },
+        "prod-basic-1y": {
+          "item": "Basic plan",
+          "description": "Single product, 3 images",
+          "duration": "1 year"
+        },
+        "prod-adv-1m": {
+          "item": "Advanced plan",
+          "description": "10 images + video",
+          "duration": "1 month"
+        },
+        "prod-adv-3m": {
+          "item": "Advanced plan",
+          "description": "10 images + video",
+          "duration": "3 months"
+        },
+        "prod-adv-6m": {
+          "item": "Advanced plan",
+          "description": "10 images + video",
+          "duration": "6 months"
+        },
+        "prod-adv-1y": {
+          "item": "Advanced plan",
+          "description": "10 images + video",
+          "duration": "1 year"
+        },
+        "prod-featured": {
+          "item": "Homepage featured",
+          "description": "Shown on homepage",
+          "duration": "1 month"
+        },
+        "prod-top": {
+          "item": "Category top",
+          "description": "Top of category page",
+          "duration": "1 month"
+        }
       }
+    },
+    "categoryNames": {
+      "directory": "Vietnam Chinese Business Procurement Directory",
+      "product": "Product Sales Listing"
+    },
+    "duration": {
+      "annual": "Annual"
     },
     "note": "Note: Popup ads recommended size is 800x600 pixels. Featured companies need to provide company logo and introduction. If design service is needed, please check the box when placing an order.",
     "directoryNotes": {
@@ -521,6 +607,11 @@
       "admin": "Administrator"
     },
     "tierSpending": {
+      "NONE": "None",
+      "BRONZE": "Free (registration)",
+      "SILVER": "Spend 150,000 VND",
+      "GOLD": "Spend 300,000 VND",
+      "DIAMOND": "Spend 550,000 VND",
       "bronze": "Free (registration)",
       "silver": "Spend 150,000 VND",
       "gold": "Spend 300,000 VND",

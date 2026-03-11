@@ -46,14 +46,14 @@ export default function ContactPage() {
     const details: SelectedItem[] = []
 
     if (activeTab === "platform") {
-      Object.entries(platformPricing).forEach(([, category]) => {
+      Object.entries(platformPricing).forEach(([categoryKey, category]) => {
         category.items.forEach((item) => {
           if (selectedItems.includes(item.id)) {
             details.push({
               id: item.id,
-              name: item.name,
-              category: category.title,
-              duration: item.duration,
+              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
+              category: t(`adContact.pricing.${categoryKey}.title`),
+              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
               price: item.price,
             })
           }
@@ -64,9 +64,9 @@ export default function ContactPage() {
         if (selectedItems.includes(item.id)) {
           details.push({
             id: item.id,
-            name: item.position,
-            category: "越南華商採購名錄",
-            duration: "年度",
+            name: t(`adContact.pricing.directoryPositions.${item.id}`) || item.position,
+            category: t("adContact.categoryNames.directory"),
+            duration: t("adContact.duration.annual"),
             price: item.price,
           })
         }
@@ -76,9 +76,9 @@ export default function ContactPage() {
         if (selectedItems.includes(item.id)) {
           details.push({
             id: item.id,
-            name: `${item.item} - ${item.description}`,
-            category: "商品銷售刊登",
-            duration: item.duration,
+            name: `${t(`adContact.pricing.productItems.${item.id}.item`) || item.item} - ${t(`adContact.pricing.productItems.${item.id}.description`) || item.description}`,
+            category: t("adContact.categoryNames.product"),
+            duration: t(`adContact.pricing.productItems.${item.id}.duration`) || item.duration,
             price: item.price,
           })
         }
