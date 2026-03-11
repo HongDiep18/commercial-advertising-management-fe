@@ -16,7 +16,7 @@ function classesFor(variant: Variant, size: Size) {
   const variants: Record<Variant, string> = {
     default: "bg-slate-900 text-white hover:bg-slate-800",
     outline: "border border-slate-200 bg-transparent text-slate-900 hover:bg-slate-50",
-    ghost: "bg-transparent text-slate-900 hover:bg-slate-100",
+    ghost: "bg-transparent text-slate-900 hover:bg-primary hover:text-white",
     primary: "bg-primary text-white hover:bg-primary/90",
   }
 

@@ -997,6 +997,9 @@
       "amount": "Amount",
       "submittedAt": "Submitted",
       "actions": "Actions",
+      "loadingOrders": "Loading orders...",
+      "ordersError": "Failed to load orders. Please try again later.",
+      "noOrders": "No orders found.",
       "adTypePopup": "Platform Ad",
       "adTypeDirectory": "Directory",
       "adTypeProduct": "Product Sales",
@@ -1006,6 +1009,7 @@
       "phone": "Phone",
       "selectedItems": "Selected Items",
       "estimatedAmount": "Estimated Amount",
+      "designService": "Design service",
       "sendEmail": "Send Email",
       "call": "Call"
     },

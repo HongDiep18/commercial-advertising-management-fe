@@ -9,7 +9,6 @@ import {
 import type {
   AdminCreatePricingPayload,
   AdminUpdatePricingPayload,
-  PublicAdPackageItem,
 } from "@/api/ads-pricing/types"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
@@ -27,54 +26,10 @@ import { Pencil } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { AdPackageLabel, getAdPackageLabelText } from "@/components/admin/advertising/AdPackageLabel"
 import type { EditablePricingRow, SaveStatus } from "../types"
 import { DurationUnitType, PricingModelType } from "../types"
 import { AdPackagePricingDialog } from "./AdPackagePricingDialog"
-
-type PrintPlacementMetadata = {
-  page_position?: string | null
-  page_side?: string | null
-  page_size?: string | null
-  color_type?: string | null
-  dimensions_cm?: string | null
-}
-
-function getPrintPlacementLabel(pkg: PublicAdPackageItem, t: (key: string) => string): string {
-  const rawMeta = pkg.metadata ?? {}
-  const meta = rawMeta as PrintPlacementMetadata
-
-  const position = meta.page_position ?? ""
-  const side = meta.page_side ?? ""
-  const size = meta.page_size ?? ""
-  const color = meta.color_type ?? ""
-  const dimensions = (meta.dimensions_cm ?? "").replace(/\s+/g, "")
-
-  const keyArray = [position]
-  if (side) {
-    keyArray.push(side)
-  }
-  if (size) {
-    keyArray.push(size)
-  }
-  if (color) {
-    keyArray.push(color)
-  }
-  if (dimensions) {
-    keyArray.push(dimensions)
-  }
-
-  const key = keyArray.join("_")
-  if (key) {
-    const fullKey = `admin.advertising.adPackageType.PRINT_PLACEMENT.${key}`
-    const translated = t(fullKey)
-    if (translated) {
-      return translated
-    }
-  }
-
-  const generic = t(`admin.advertising.adPackageType.${pkg.type}`)
-  return generic || pkg.name
-}
 
 export function AdPackageManagement() {
   const { t } = useTranslation()
@@ -318,19 +273,12 @@ export function AdPackageManagement() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>{t("admin.advertising.packageManagementTable.category")}</TableHead>
+                <TableHead>{t("admin.advertising.packageManagementTable.package")}</TableHead>
                 <TableHead>
-                  {t("admin.advertising.packageManagementTable.category") || "Category"}
+                  {t("admin.advertising.packageManagementTable.pricingVariants")}
                 </TableHead>
-                <TableHead>
-                  {t("admin.advertising.packageManagementTable.package") || "Package"}
-                </TableHead>
-                <TableHead>
-                  {t("admin.advertising.packageManagementTable.pricingVariants") ||
-                    "Pricing variants"}
-                </TableHead>
-                <TableHead>
-                  {t("admin.advertising.packageManagementTable.actions") || "Actions"}
-                </TableHead>
+                <TableHead>{t("admin.advertising.packageManagementTable.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -339,16 +287,24 @@ export function AdPackageManagement() {
                   return null
                 }
                 return cat.packages.map((pkg, index) => {
-                  const packageLabel =
-                    pkg.type === "PRINT_PLACEMENT"
-                      ? getPrintPlacementLabel(pkg, t)
-                      : t(`admin.advertising.adPackageType.${pkg.type}`)
+                  const packageLabel = getAdPackageLabelText({
+                    packageType: pkg.type,
+                    packageMetadata: pkg.metadata,
+                    fallbackLabel: pkg.name,
+                    t,
+                  })
                   return (
                     <TableRow key={pkg.id}>
                       <TableCell className="font-medium">
                         {index === 0 ? t(`admin.advertising.adCategory.${cat.type}`) : ""}
                       </TableCell>
-                      <TableCell>{packageLabel}</TableCell>
+                      <TableCell>
+                        <AdPackageLabel
+                          packageType={pkg.type}
+                          packageMetadata={pkg.metadata}
+                          fallbackLabel={pkg.name}
+                        />
+                      </TableCell>
                       <TableCell>{pkg.pricing.length}</TableCell>
                       <TableCell>
                         <Button
