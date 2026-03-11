@@ -183,6 +183,8 @@
     "item": "項目",
     "description": "說明",
     "selectedItems": "已選擇 {{count}} 個廣告項目",
+    "totalQuantity": "共 {{count}} 單位",
+    "quantity": "數量",
     "clickToOrder": "點擊右側按鈕填寫訂單資訊",
     "orderNow": "立即下單",
     "orderTitle": "廣告下單",
@@ -234,12 +236,166 @@
         "title": "企業名錄廣告"
       },
       "directory": {
-        "title": "廣告價目表"
+        "title": "越南華商採購名錄"
       },
       "product": {
-        "title": "商品刊登價目表"
+        "title": "商品銷售刊登"
+      },
+      "platformItems": {
+        "popup-priority-1m": {
+          "name": "優先顯示（第1順位）",
+          "duration": "1個月"
+        },
+        "popup-priority-3m": {
+          "name": "優先顯示（第1順位）",
+          "duration": "3個月"
+        },
+        "popup-priority-6m": {
+          "name": "優先顯示（第1順位）",
+          "duration": "6個月"
+        },
+        "popup-priority-1y": {
+          "name": "優先顯示（第1順位）",
+          "duration": "1年"
+        },
+        "popup-normal-1m": {
+          "name": "一般輪播（第2-5順位）",
+          "duration": "1個月"
+        },
+        "popup-normal-3m": {
+          "name": "一般輪播（第2-5順位）",
+          "duration": "3個月"
+        },
+        "popup-normal-6m": {
+          "name": "一般輪播（第2-5順位）",
+          "duration": "6個月"
+        },
+        "popup-normal-1y": {
+          "name": "一般輪播（第2-5順位）",
+          "duration": "1年"
+        },
+        "popup-link": {
+          "name": "「查看詳情」連結設定",
+          "duration": "單次"
+        },
+        "popup-sort": {
+          "name": "排序調整（提升順位）",
+          "duration": "每次"
+        },
+        "featured-1m": {
+          "name": "首頁精選企業展示",
+          "duration": "1個月"
+        },
+        "featured-3m": {
+          "name": "首頁精選企業展示",
+          "duration": "3個月"
+        },
+        "featured-6m": {
+          "name": "首頁精選企業展示",
+          "duration": "6個月"
+        },
+        "featured-1y": {
+          "name": "首頁精選企業展示",
+          "duration": "1年"
+        },
+        "featured-highlight": {
+          "name": "精選企業加強標示",
+          "duration": "1個月"
+        },
+        "listing-top-1m": {
+          "name": "分類置頂顯示",
+          "duration": "1個月"
+        },
+        "listing-top-3m": {
+          "name": "分類置頂顯示",
+          "duration": "3個月"
+        },
+        "listing-top-6m": {
+          "name": "分類置頂顯示",
+          "duration": "6個月"
+        },
+        "listing-top-1y": {
+          "name": "分類置頂顯示",
+          "duration": "1年"
+        },
+        "listing-highlight": {
+          "name": "企業資訊加強顯示",
+          "duration": "1個月"
+        }
+      },
+      "directoryPositions": {
+        "dir-cover": "封面",
+        "dir-back": "封底",
+        "dir-inside-cover": "封面裏（左）/ 封面裏（右）",
+        "dir-inside-back": "封底裏（左）/ 封底裏（右）",
+        "dir-p2-p5": "封面裡 P2-P5",
+        "dir-last5": "封底前五頁（不含封底左）",
+        "dir-category": "分類夾頁廣告",
+        "dir-toc-full": "目錄旁（全頁）",
+        "dir-toc-half": "目錄旁（半頁）",
+        "dir-inner-color": "內頁彩色",
+        "dir-inner-mono": "內頁單色",
+        "dir-half-color": "半頁彩色",
+        "dir-quarter": "1/4 內頁單（13x9.5cm）"
+      },
+      "productItems": {
+        "prod-basic-1m": {
+          "item": "基本方案",
+          "description": "單一商品，含圖片3張",
+          "duration": "1個月"
+        },
+        "prod-basic-3m": {
+          "item": "基本方案",
+          "description": "單一商品，含圖片3張",
+          "duration": "3個月"
+        },
+        "prod-basic-6m": {
+          "item": "基本方案",
+          "description": "單一商品，含圖片3張",
+          "duration": "6個月"
+        },
+        "prod-basic-1y": {
+          "item": "基本方案",
+          "description": "單一商品，含圖片3張",
+          "duration": "1年"
+        },
+        "prod-adv-1m": {
+          "item": "進階方案",
+          "description": "含圖片10張+影片",
+          "duration": "1個月"
+        },
+        "prod-adv-3m": {
+          "item": "進階方案",
+          "description": "含圖片10張+影片",
+          "duration": "3個月"
+        },
+        "prod-adv-6m": {
+          "item": "進階方案",
+          "description": "含圖片10張+影片",
+          "duration": "6個月"
+        },
+        "prod-adv-1y": {
+          "item": "進階方案",
+          "description": "含圖片10張+影片",
+          "duration": "1年"
+        },
+        "prod-featured": {
+          "item": "首頁精選推薦",
+          "description": "商品顯示於首頁",
+          "duration": "1個月"
+        },
+        "prod-top": {
+          "item": "分類置頂",
+          "description": "分類頁面置頂",
+          "duration": "1個月"
+        }
       }
     },
+    "categoryNames": {
+      "directory": "越南華商採購名錄",
+      "product": "商品銷售刊登"
+    },
+    "durationAnnual": "年度",
     "note": "備註：彈窗廣告建議尺寸為 800x600 像素，精選企業需提供公司 Logo 及簡介。如需設計服務，請在下單時勾選。",
     "directoryNotes": {
       "note1": "以上費用不包括稅金、稿件設計、完稿。",
@@ -248,7 +404,8 @@
       "note4": "截稿日期為 2024 年 10 月 31 日。"
     },
     "orderSuccess": "感謝您的訂單！\n\n已選擇 {{count}} 個廣告項目\n我們將盡快與您聯繫確認詳情。",
-    "inquirySuccess": "感謝您的諮詢，我們將盡快回覆您！"
+    "inquirySuccess": "感謝您的諮詢，我們將盡快回覆您！",
+    "mustLoginToOrder": "請先登入才能下單"
   },
   "stickyBanner": {
     "expandText": "展開精選資訊",
@@ -521,6 +678,11 @@
       "admin": "管理員"
     },
     "tierSpending": {
+      "NONE": "無",
+      "BRONZE": "免費（註冊即享）",
+      "SILVER": "消費 15 萬 VND",
+      "GOLD": "消費 30 萬 VND",
+      "DIAMOND": "消費 55 萬 VND",
       "bronze": "免費（註冊即享）",
       "silver": "消費 15 萬 VND",
       "gold": "消費 30 萬 VND",

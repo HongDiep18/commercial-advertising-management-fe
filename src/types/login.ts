@@ -9,6 +9,7 @@ export type AuthUserFromApi = {
   contributionPoints?: number
   commercialPoints?: number
   createdAt?: string
+  companyId?: string
 }
 
 export type LoginUserPayload = {
@@ -19,6 +20,7 @@ export type LoginUserPayload = {
   contributionPoints?: number
   commercialPoints?: number
   createdAt?: string
+  companyId?: string
 }
 
 export type LoginResponse = {
@@ -72,6 +74,7 @@ export function mapApiUserToUser(payload: LoginUserPayload, email: string): User
 
   return {
     id: payload.id,
+    companyId: payload.companyId,
     email: payload.email ?? email,
     name: payload.name ?? payload.email?.split("@")[0] ?? email.split("@")[0] ?? "User",
     role,
@@ -89,6 +92,8 @@ export function extractUserFromLoginResponse(
   if (!apiUser || typeof apiUser !== "object") return null
   const u = apiUser as AuthUserFromApi
   if (!u.id && !u.email) return null
+  const apiCompanyId =
+    (typeof u.companyId === "string" && u.companyId.trim() ? u.companyId : undefined) ?? undefined
   return {
     id: u.id || `api-${fallbackEmail}`,
     email: u.email ?? fallbackEmail,
@@ -97,5 +102,6 @@ export function extractUserFromLoginResponse(
     contributionPoints: u.contributionPoints,
     commercialPoints: u.commercialPoints,
     createdAt: u.createdAt,
+    companyId: apiCompanyId,
   }
 }
