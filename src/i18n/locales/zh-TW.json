@@ -990,6 +990,9 @@
       "amount": "金額",
       "submittedAt": "提交時間",
       "actions": "操作",
+      "loadingOrders": "載入訂單中...",
+      "ordersError": "無法載入訂單，請稍後再試。",
+      "noOrders": "尚無訂單。",
       "adTypePopup": "平台廣告",
       "adTypeDirectory": "採購名錄",
       "adTypeProduct": "商品銷售",
@@ -999,6 +1002,7 @@
       "phone": "電話",
       "selectedItems": "選擇項目",
       "estimatedAmount": "預估金額",
+      "designService": "設計服務",
       "sendEmail": "發送郵件",
       "call": "撥打電話"
     },
