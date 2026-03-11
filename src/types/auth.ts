@@ -35,6 +35,7 @@ export type RegisterPayload = {
   company_address: string
   email: string
   country: string
+  region: string
   industry: string
   website: string
   introduction: string
@@ -56,6 +57,7 @@ export function formDataToRegisterPayload(form: {
   companyAddress: string
   email: string
   country: string
+  region: string
   industry: string
   website: string
   introduction: string
@@ -71,6 +73,7 @@ export function formDataToRegisterPayload(form: {
     company_address: form.companyAddress,
     email: form.email,
     country: form.country,
+    region: form.region,
     industry: form.industry,
     website: form.website,
     introduction: form.introduction,

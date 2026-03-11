@@ -1,5 +1,6 @@
 import type { RegisterFormData } from "./registerConstants"
 import type { ProfileFormData } from "@/types/account"
+import { getRegionValuesForCountry } from "./registerOptions"
 
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
 const EMAIL_FIELD = "email" as const
@@ -13,6 +14,7 @@ const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "companyAddress",
   "email",
   "country",
+  "region",
   "industry",
   "website",
   "introduction",
@@ -50,7 +52,7 @@ function isEmail(value: string): boolean {
   return EMAIL_REGEX.test(value.trim())
 }
 
-export type RegisterErrorKind = "required" | "invalidEmail" | "invalidPhone"
+export type RegisterErrorKind = "required" | "invalidEmail" | "invalidPhone" | "invalidRegion"
 
 export type RegisterValidationResult =
   | { valid: true }
@@ -64,6 +66,7 @@ export const REGISTER_ERROR_KEYS: Record<RegisterErrorKind, string> = {
   required: "register.errors.requiredField",
   invalidEmail: "register.errors.invalidEmail",
   invalidPhone: "register.errors.invalidPhone",
+  invalidRegion: "register.errors.invalidRegion",
 }
 
 export const PROFILE_ERROR_KEYS = REGISTER_ERROR_KEYS
@@ -94,6 +97,13 @@ export function validateRegisterForm(data: RegisterFormData): RegisterValidation
     field: keyof RegisterFormData
     kind: RegisterErrorKind
   }>
+
+  if (filled(data.country) && filled(data.region)) {
+    const allowedRegions = getRegionValuesForCountry(data.country)
+    if (!allowedRegions.includes(data.region)) {
+      errors.push({ field: "region", kind: "invalidRegion" })
+    }
+  }
   if (errors.length === 0) return { valid: true }
   return { valid: false, errors }
 }
