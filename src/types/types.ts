@@ -1,36 +1,62 @@
-export type DurationUnit = "day" | "week" | "month" | "year"
-
-export type PricingModel = "duration" | "one_time" | "per_action"
-
-export type AdOrderStatus = "draft" | "submitted" | "pending" | "approved" | "rejected"
-
-export type CreateAdOrderItemInput = {
-  packageId: string
-  pricingId: string
-  durationValue?: number | null
-  durationUnit?: DurationUnit | null
-  startDate: string
-  designServiceRequired: boolean
-  adLinkUrl: string
-  unitPrice: string
-  quantity: number
+export enum DurationUnitEnum {
+  DAY = "day",
+  WEEK = "week",
+  MONTH = "month",
+  YEAR = "year",
 }
 
-export type CreateAdOrderInput = {
+export enum AdOrderStatusEnum {
+  DRAFT = "draft",
+  SUBMITTED = "submitted",
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+}
+
+export enum AdOrderAssetTypeEnum {
+  AD_MATERIAL = "ad_material",
+  AD_IMAGE = "ad_image",
+  AD_VIDEO = "ad_video",
+  AD_AUDIO = "ad_audio",
+  AD_TEXT = "ad_text",
+}
+
+export type CreateAdOrderDto = {
   companyId?: string | null
   notes?: string | null
-  items: CreateAdOrderItemInput[]
+  items: CreateAdOrderItemDto[]
+}
+
+export type CreateAdOrderItemDto = {
+  packageId: string
+  pricingId: string
+  startDate: string
+  adLinkUrl: string
+  unitPrice: string
+  lineTotal: string
+  quantity?: number
+  designServiceRequired?: boolean
+  durationValue?: number | null
+  durationUnit?: DurationUnitEnum | null
+}
+
+export type AdOrderAssetDto = {
+  orderItemId?: string
+  assetType: string
+  fileUrl?: string
+  fileSizeKb?: number
+  notes?: string
 }
 
 export type CreateAdOrderResponse = {
   message?: string
   data?: {
     orderId: string
-    status: AdOrderStatus
+    status: AdOrderStatusEnum
     subtotal: string
-    items?: Array<{
-      id: string
-      pricingId: string
-    }>
+    items?: Array<{ id: string; pricingId: string }>
   }
 }
+
+export type CreateAdOrderInput = CreateAdOrderDto
+export type CreateAdOrderItemInput = CreateAdOrderItemDto

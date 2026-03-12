@@ -30,7 +30,7 @@ export default function ContactContentSection({
 
   return (
     <>
-      <div className="bg-body-bg-dark bg-muted/30 mb-8 rounded-lg p-6">
+      <div className="!bg-body-bg-dark mb-8 rounded-lg p-6">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div>
             <h2 className="text-foreground mb-2 text-xl font-bold">{title}</h2>

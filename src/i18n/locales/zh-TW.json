@@ -408,6 +408,7 @@
       "note4": "截稿日期為 2024 年 10 月 31 日。"
     },
     "orderSuccess": "感謝您的訂單！\n\n已選擇 {{count}} 個廣告項目\n我們將盡快與您聯繫確認詳情。",
+    "orderError": "訂單無法完成，請再試一次。",
     "inquirySuccess": "感謝您的諮詢，我們將盡快回覆您！",
     "mustLoginToOrder": "請先登入才能下單"
   },
