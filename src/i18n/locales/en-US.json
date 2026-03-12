@@ -408,6 +408,7 @@
       "note4": "Deadline: October 31, 2024."
     },
     "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details.",
+    "orderError": "Your order could not be completed. Please try again.",
     "inquirySuccess": "Thank you for your inquiry, we will reply to you as soon as possible!",
     "mustLoginToOrder": "You must login to order"
   },

@@ -36,10 +36,11 @@ export function buildCreateAdOrderInput(params: {
     const details = params.itemDetailsById[item.id]
     const unitPrice = parseVndToBigIntString(item.price)
     const quantity = Math.max(1, details?.quantity ?? item.quantity ?? 1)
+    const lineTotal = (BigInt(unitPrice) * BigInt(quantity)).toString()
 
     return {
-      packageId: item.packageId || item.id,
-      pricingId: item.pricingId || item.id,
+      packageId: item.packageId ?? item.id,
+      pricingId: item.pricingId ?? item.id,
       durationValue: null,
       durationUnit: null,
       startDate: details?.startDate || "",
@@ -47,11 +48,13 @@ export function buildCreateAdOrderInput(params: {
       adLinkUrl: details?.adLink || "",
       unitPrice,
       quantity,
+      lineTotal,
     }
   })
 
   const subtotalBigInt = items.reduce((acc, it) => {
-    const line = BigInt(it.unitPrice) * BigInt(it.quantity)
+    const q = it.quantity ?? 1
+    const line = BigInt(it.unitPrice) * BigInt(q)
     return acc + line
   }, BigInt(0))
 

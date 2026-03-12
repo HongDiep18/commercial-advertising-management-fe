@@ -408,6 +408,7 @@
       "note4": "Hạn chót: 31 tháng 10 năm 2024."
     },
     "orderSuccess": "Cảm ơn bạn đã đặt hàng!\n\nĐã chọn {{count}} mục quảng cáo\nChúng tôi sẽ liên hệ với bạn sớm để xác nhận chi tiết.",
+    "orderError": "Đơn hàng của bạn không thể hoàn tất. Vui lòng thử lại.",
     "inquirySuccess": "Cảm ơn bạn đã tư vấn, chúng tôi sẽ trả lời bạn sớm nhất có thể!",
     "mustLoginToOrder": "Bạn cần đăng nhập để đặt hàng"
   },
