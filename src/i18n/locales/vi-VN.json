@@ -1251,9 +1251,6 @@
     },
     "modals": {
       "contactSeller": "Liên hệ người bán",
-      "contactPerson": "Người liên hệ",
-      "phone": "Số điện thoại",
-      "email": "Email",
       "yourName": "Họ tên của bạn",
       "yourEmail": "Email của bạn",
       "message": "Nội dung lời nhắn (tùy chọn)",
