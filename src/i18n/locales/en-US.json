@@ -1251,9 +1251,6 @@
     },
     "modals": {
       "contactSeller": "Contact Seller",
-      "contactPerson": "Contact Person",
-      "phone": "Phone",
-      "email": "Email",
       "yourName": "Your Name",
       "yourEmail": "Your Email",
       "message": "Message (Optional)",
