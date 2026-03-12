@@ -5,7 +5,7 @@ import type { AdminOrderDto, AdminOrderStatus } from "@/api/ad-orders-admin/type
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
-import Badge from "@/components/ui/Badge"
+import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
 import { useDebounce } from "@/hooks/useDebounce"
 import { Eye, Mail, Search } from "lucide-react"
@@ -15,17 +15,6 @@ import { StatusBadge } from "../StatusBadge"
 import { AdOrderDetailDialog } from "./AdOrderDetailDialog"
 
 type StatusFilter = "all" | AdminOrderStatus
-
-function getCategoryBadgeStyles(type: string): React.CSSProperties {
-  let hash = 0
-  for (let i = 0; i < type.length; i += 1) {
-    hash = (hash * 31 + type.charCodeAt(i)) | 0
-  }
-  const hue = Math.abs(hash) % 360
-  const backgroundColor = `hsl(${hue} 90% 95%)`
-  const color = `hsl(${hue} 60% 25%)`
-  return { backgroundColor, color }
-}
 
 export function AdOrdersManagement() {
   const { t } = useTranslation()
@@ -148,13 +137,9 @@ export function AdOrdersManagement() {
                           return (
                             <div className="flex flex-col gap-1">
                               {uniqueTypes.map((type) => (
-                                <Badge
-                                  key={type}
-                                  className="justify-center font-semibold"
-                                  style={getCategoryBadgeStyles(type)}
-                                >
+                                <TextColorBadge key={type} colorKey={type}>
                                   {t(`admin.advertising.adCategory.${type}`)}
-                                </Badge>
+                                </TextColorBadge>
                               ))}
                             </div>
                           )

@@ -18,6 +18,10 @@
     "adminPanel": "管理後台",
     "logout": "登出"
   },
+  "error": {
+    "failedToLoadOrders": "無法載入訂單",
+    "failedToLoadOrdersMetrics": "無法載入訂單統計數據"
+  },
   "hero": {
     "title": "華商採購網－連結優質商業夥伴",
     "subtitle": "匯集超過 3,980 家在越南的優質台灣企業，提供最完整的產業分類與企業資料，協助您快速找到理想的合作夥伴，開創更多商業機會",

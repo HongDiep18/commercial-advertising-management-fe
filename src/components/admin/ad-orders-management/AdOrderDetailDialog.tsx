@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/Dialog"
 import { AdPackageLabel } from "@/components/admin/advertising/AdPackageLabel"
+import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
 import { CheckCircle2, Link2, Mail, Paperclip, Phone, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -142,12 +143,9 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
                 return (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {uniqueTypes.map((type) => (
-                      <span
-                        key={type}
-                        className="inline-flex items-center justify-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700"
-                      >
+                      <TextColorBadge key={type} colorKey={type}>
                         {t(`admin.advertising.adCategory.${type}`)}
-                      </span>
+                      </TextColorBadge>
                     ))}
                   </div>
                 )
