@@ -18,6 +18,10 @@
     "adminPanel": "Admin Panel",
     "logout": "Log out"
   },
+  "error": {
+    "failedToLoadOrders": "Failed to load orders",
+    "failedToLoadOrdersMetrics": "Failed to load orders metrics"
+  },
   "hero": {
     "title": "Vietnam Buyer Guide - Connect Quality Business Partners",
     "subtitle": "Gathering over 3,980 quality Taiwanese enterprises in Vietnam, providing the most complete industry classification and company information to help you quickly find ideal partners and create more business opportunities",
