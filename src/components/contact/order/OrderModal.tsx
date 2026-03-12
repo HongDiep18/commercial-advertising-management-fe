@@ -13,6 +13,7 @@ import { format } from "date-fns"
 import type { UiAdItemDetails, UiSelectedAdItem } from "@/api/ad-orders/builders"
 import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
 import type { CreateAdOrderInput } from "@/types/types"
+import type { AdOrderAssetToUpload } from "@/api/ad-orders/service"
 import { isValidPhone } from "@/utils/validation/phone"
 
 type OrderForm = {
@@ -46,7 +47,10 @@ type OrderModalProps = {
   onClose: () => void
   selectedItems: SelectedItem[]
   companyId?: string | null
-  onSubmit: (input: CreateAdOrderInput, meta: { subtotal: string }) => void
+  onSubmit: (
+    input: CreateAdOrderInput,
+    meta: { subtotal: string; assets: AdOrderAssetToUpload[] }
+  ) => void
   onQuantityChange?: (itemId: string, quantity: number) => void
 }
 
@@ -144,7 +148,18 @@ export default function OrderModal({
       selectedItems: selectedItems as UiSelectedAdItem[],
       itemDetailsById: itemDetails as Record<string, UiAdItemDetails>,
     })
-    onSubmit(input, { subtotal })
+
+    const assets: AdOrderAssetToUpload[] = []
+    selectedItems.forEach((item) => {
+      const details = itemDetails[item.id]
+      const files = details?.files ?? []
+      const pricingId = (item as UiSelectedAdItem).pricingId || item.id
+      files.forEach((file) => {
+        assets.push({ pricingId, assetType: "ad_material", file })
+      })
+    })
+
+    onSubmit(input, { subtotal, assets })
     setOrderForm({
       company: "",
       contact: "",

@@ -6,32 +6,48 @@ import { TabType } from "@/utils/contactHelpers"
 import Card, { CardContent } from "@/components/ui/Card"
 import Checkbox from "@/components/ui/Checkbox"
 import PricingTable from "./PricingTable"
+import {
+  groupPlatformByCategory,
+  type PlatformCatalogItem,
+} from "@/api/ads-pricing/contactPlatform"
 
 interface PricingSectionProps {
   activeTab: TabType
   selectedItems: string[]
   onItemToggle: (itemId: string) => void
+  platformCatalogItems?: PlatformCatalogItem[]
 }
 
 export default function PricingSection({
   activeTab,
   selectedItems,
   onItemToggle,
+  platformCatalogItems = [],
 }: PricingSectionProps) {
   const { t, i18n } = useTranslation()
 
   if (activeTab === "platform") {
+    const useApiCatalog = platformCatalogItems.length > 0
+    const categories = useApiCatalog
+      ? groupPlatformByCategory(platformCatalogItems)
+      : Object.entries(platformPricing).map(([categoryKey, category]) => ({
+          categoryKey,
+          categoryName: t(`adContact.pricing.${categoryKey}.title`),
+          items: category.items.map((item) => ({
+            id: item.id,
+            name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
+            duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
+            price: item.price,
+          })),
+        }))
+
     return (
       <div className="space-y-6">
-        {Object.entries(platformPricing).map(([categoryKey, category]) => (
+        {categories.map((cat) => (
           <PricingTable
-            key={categoryKey}
-            title={t(`adContact.pricing.${categoryKey}.title`)}
-            items={category.items.map((item) => ({
-              ...item,
-              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
-              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
-            }))}
+            key={cat.categoryKey}
+            title={cat.categoryName}
+            items={cat.items}
             selectedItems={selectedItems}
             onItemToggle={onItemToggle}
             columns={{
