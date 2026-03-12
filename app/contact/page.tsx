@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useRouter } from "next/navigation"
 import Header from "../../src/components/layout/Header"
@@ -15,7 +15,9 @@ import {
 } from "@/components/contact"
 import { TabType, getTabConfig } from "../../src/utils/contactHelpers"
 import { platformPricing, directoryPricing, productPricing } from "../../src/data/contactMockData"
-import { createAdOrder } from "../../src/api/ad-orders/service"
+import { createAdOrder, attachAssetsAndSubmitOrder } from "../../src/api/ad-orders/service"
+import { useAvailableAdPackages } from "@/api/ads-pricing/hooks"
+import { flattenPlatformCatalog } from "@/api/ads-pricing/contactPlatform"
 import type { CreateAdOrderInput } from "@/types/types"
 import { useUser } from "../../src/contexts/user-context"
 
@@ -28,6 +30,8 @@ interface SelectedItem {
   duration?: string
   price: string
   quantity: number
+  packageId?: string
+  pricingId?: string
 }
 
 export default function ContactPage() {
@@ -41,6 +45,12 @@ export default function ContactPage() {
 
   const tabConfig = getTabConfig(t)
   const currentConfig = tabConfig[activeTab]
+
+  const { data: adPackagesData } = useAvailableAdPackages()
+  const platformCatalogItems = useMemo(
+    () => (adPackagesData ? flattenPlatformCatalog(adPackagesData) : []),
+    [adPackagesData]
+  )
 
   const selectedIds = selectedItems.map((e) => e.id)
   const totalQuantity = selectedItems.reduce((sum, e) => sum + e.quantity, 0)
@@ -68,19 +78,35 @@ export default function ContactPage() {
     const byId = Object.fromEntries(selectedItems.map((e) => [e.id, e.quantity]))
 
     if (activeTab === "platform") {
-      Object.entries(platformPricing).forEach(([categoryKey, category]) => {
-        category.items.forEach((item) => {
+      if (platformCatalogItems.length > 0) {
+        platformCatalogItems.forEach((item) => {
           if (!byId[item.id]) return
           details.push({
             id: item.id,
-            name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
-            category: t(`adContact.pricing.${categoryKey}.title`),
-            duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
+            name: item.name,
+            category: item.categoryName,
+            duration: item.duration,
             price: item.price,
             quantity: byId[item.id],
+            packageId: item.packageId,
+            pricingId: item.pricingId,
           })
         })
-      })
+      } else {
+        Object.entries(platformPricing).forEach(([categoryKey, category]) => {
+          category.items.forEach((item) => {
+            if (!byId[item.id]) return
+            details.push({
+              id: item.id,
+              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
+              category: t(`adContact.pricing.${categoryKey}.title`),
+              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
+              price: item.price,
+              quantity: byId[item.id],
+            })
+          })
+        })
+      }
     } else if (activeTab === "directory") {
       directoryPricing.forEach((item) => {
         if (!byId[item.id]) return
@@ -110,11 +136,26 @@ export default function ContactPage() {
     return details
   }
 
-  const handleOrderSubmit = async (_input: CreateAdOrderInput) => {
-    await createAdOrder(_input)
-    alert(t("adContact.orderSuccess", { count: totalQuantity }))
-    setShowOrderModal(false)
-    setSelectedItems([])
+  const handleOrderSubmit = async (
+    input: CreateAdOrderInput,
+    meta: { subtotal: string; assets: { pricingId: string; assetType: string; file: File }[] }
+  ) => {
+    try {
+      const res = await createAdOrder(input)
+      const orderId = res?.data?.orderId
+      if (!orderId) {
+        alert(t("adContact.orderError") || "Order created but no order ID returned.")
+        return
+      }
+      await attachAssetsAndSubmitOrder(orderId, meta.assets)
+      alert(t("adContact.orderSuccess", { count: totalQuantity }))
+      setShowOrderModal(false)
+      setSelectedItems([])
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : t("adContact.orderError") || "Order failed."
+      alert(message)
+    }
   }
 
   const handleInquirySubmit = () => {
@@ -140,23 +181,26 @@ export default function ContactPage() {
 
         <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
 
-        <section className="bg-body-bg-light mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <ContactContentSection
-            title={currentConfig.title}
-            description={currentConfig.description}
-            contact={currentConfig.contact}
-            selectedCount={selectedItems.length}
-            totalQuantity={totalQuantity}
-            onInquiryClick={() => setShowInquiryModal(true)}
-            onOrderClick={handleOrderClick}
-          />
-
-          <div className="space-y-6">
-            <PricingSection
-              activeTab={activeTab}
-              selectedItems={selectedIds}
-              onItemToggle={handleItemToggle}
+        <section className="bg-body-bg-light w-full">
+          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <ContactContentSection
+              title={currentConfig.title}
+              description={currentConfig.description}
+              contact={currentConfig.contact}
+              selectedCount={selectedItems.length}
+              totalQuantity={totalQuantity}
+              onInquiryClick={() => setShowInquiryModal(true)}
+              onOrderClick={handleOrderClick}
             />
+
+            <div className="space-y-6">
+              <PricingSection
+                activeTab={activeTab}
+                selectedItems={selectedIds}
+                onItemToggle={handleItemToggle}
+                platformCatalogItems={platformCatalogItems}
+              />
+            </div>
           </div>
         </section>
       </div>
