@@ -18,6 +18,10 @@
     "adminPanel": "Quản trị",
     "logout": "Đăng xuất"
   },
+  "error": {
+    "failedToLoadOrders": "Không thể tải đơn hàng",
+    "failedToLoadOrdersMetrics": "Không thể tải số liệu đơn hàng"
+  },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
     "subtitle": "Tập hợp hơn 3,980 doanh nghiệp Đài Loan chất lượng tại Việt Nam, cung cấp phân loại ngành công nghiệp và thông tin doanh nghiệp đầy đủ nhất để giúp bạn nhanh chóng tìm thấy đối tác lý tưởng và tạo ra nhiều cơ hội kinh doanh hơn",
