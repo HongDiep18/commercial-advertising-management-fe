@@ -64,45 +64,6 @@ export default function PropertyModals({
               {contactProperty.title}
             </p>
 
-            <div className="space-y-4 mb-6">
-              <div className="flex items-center gap-3 p-3 bg-[#E8E6E1] rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t("property.modals.contactPerson")}</p>
-                  <p className="font-medium text-foreground">
-                    {contactProperty.contact.name}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 bg-[#E8E6E1] rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t("property.modals.phone")}</p>
-                  <p className="font-medium text-foreground">
-                    {contactProperty.contact.phone}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 bg-[#E8E6E1] rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-primary" />
-                </div>
-
-                <div>
-                  <p className="text-xs text-muted-foreground">{t("property.modals.email")}</p>
-                  <p className="font-medium text-foreground">
-                    {contactProperty.contact.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-
               {/* Inquiry Form */}
               <div className="space-y-3">
                 <input

@@ -1236,9 +1236,6 @@
     },
     "modals": {
       "contactSeller": "聯繫賣家",
-      "contactPerson": "聯繫人",
-      "phone": "電話",
-      "email": "Email",
       "yourName": "您的姓名",
       "yourEmail": "您的 Email",
       "message": "留言內容（選填）",
