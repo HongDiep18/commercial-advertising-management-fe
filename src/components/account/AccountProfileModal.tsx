@@ -40,6 +40,7 @@ type AccountProfileModalProps = {
   availableRegions: RegionOption[]
   regionValue: string
   hasCountry: boolean
+  readOnly?: boolean
   t: TFunction
 }
 
@@ -59,6 +60,7 @@ export function AccountProfileModal({
   availableRegions,
   regionValue,
   hasCountry,
+  readOnly = false,
   t,
 }: AccountProfileModalProps) {
   if (!open) return null
@@ -69,7 +71,9 @@ export function AccountProfileModal({
         <div className="bg-body-bg-dark border-border sticky top-0 z-10 flex items-center justify-between border-b border-gray-300 px-6 py-4">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <Edit3 className="text-primary h-5 w-5" />
-            {t("account.editProfile") || "編輯會員資料"}
+            {readOnly
+              ? t("account.editReadOnly") || "查看會員資料"
+              : t("account.editProfile") || "編輯會員資料"}
           </h2>
           <Button
             variant="ghost"
@@ -86,13 +90,15 @@ export function AccountProfileModal({
               {t("account.companyLogo") || "公司 Logo"}
             </h3>
             <div className="flex items-center gap-6">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={onLogoUpload}
-                accept="image/*"
-                className="hidden"
-              />
+              {!readOnly && (
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={onLogoUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+              )}
               <div
                 className={`border-border !bg-body-bg-dark-foreground flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-400 ${!companyLogo ? "bg-muted/60" : ""}`}
               >
@@ -107,23 +113,27 @@ export function AccountProfileModal({
                 )}
               </div>
               <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="hover:!bg-header-red-dark border !border-gray-400 bg-transparent hover:!text-white"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  {companyLogo
-                    ? t("account.reupload") || "重新上傳"
-                    : t("account.uploadLogo") || "上傳 Logo"}
-                </Button>
-                {!logoUploaded && (
-                  <p className="text-primary text-xs">
-                    {t("account.uploadLogoPoints", {
-                      count: CONTRIBUTION_VALUES.logo,
-                    }) || `上傳 Logo 可獲得 ${CONTRIBUTION_VALUES.logo.toLocaleString()} 點`}
-                  </p>
+                {!readOnly && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="hover:!bg-header-red-dark border !border-gray-400 bg-transparent hover:!text-white"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {companyLogo
+                        ? t("account.reupload") || "重新上傳"
+                        : t("account.uploadLogo") || "上傳 Logo"}
+                    </Button>
+                    {!logoUploaded && (
+                      <p className="text-primary text-xs">
+                        {t("account.uploadLogoPoints", {
+                          count: CONTRIBUTION_VALUES.logo,
+                        }) || `上傳 Logo 可獲得 ${CONTRIBUTION_VALUES.logo.toLocaleString()} 點`}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -139,6 +149,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
                   value={profileData.companyNameVi}
                   onChange={(e) => onProfileChange("companyNameVi", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
               <FieldWithError error={fieldErrors.companyNameCn}>
@@ -146,6 +157,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
                   value={profileData.companyNameCn}
                   onChange={(e) => onProfileChange("companyNameCn", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
             </div>
@@ -155,6 +167,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.phone") || "電話"}
                   value={profileData.phone}
                   onChange={(e) => onProfileChange("phone", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
               <FieldWithError error={fieldErrors.taxId}>
@@ -162,6 +175,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.taxId") || "稅號"}
                   value={profileData.taxId}
                   onChange={(e) => onProfileChange("taxId", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
             </div>
@@ -171,6 +185,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
                   value={profileData.contactName}
                   onChange={(e) => onProfileChange("contactName", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
               <FieldWithError error={fieldErrors.contactPhone}>
@@ -178,6 +193,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
                   value={profileData.contactPhone}
                   onChange={(e) => onProfileChange("contactPhone", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
             </div>
@@ -187,6 +203,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.companyAddress") || "公司地址"}
                   value={profileData.address}
                   onChange={(e) => onProfileChange("address", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
               <FieldWithError error={fieldErrors.email}>
@@ -194,6 +211,7 @@ export function AccountProfileModal({
                   placeholder={t("register.placeholders.email") || "E-Mail"}
                   value={profileData.email}
                   onChange={(e) => onProfileChange("email", e.target.value)}
+                  disabled={readOnly}
                 />
               </FieldWithError>
             </div>
@@ -202,6 +220,7 @@ export function AccountProfileModal({
                 <Select
                   value={profileData.country || COUNTRY_NONE}
                   onValueChange={(value) => onProfileChange("country", value)}
+                  disabled={readOnly}
                   options={[
                     {
                       value: COUNTRY_NONE,
@@ -233,7 +252,7 @@ export function AccountProfileModal({
                   key={profileData.country || "__no_country__"}
                   value={regionValue}
                   onValueChange={(value) => onProfileChange("region", value)}
-                  disabled={!hasCountry}
+                  disabled={readOnly || !hasCountry}
                   options={availableRegions}
                 >
                   <Select.Trigger className="w-full">
@@ -268,6 +287,7 @@ export function AccountProfileModal({
                 <Select
                   value={profileData.industry}
                   onValueChange={(value) => onProfileChange("industry", value)}
+                  disabled={readOnly}
                   options={categories.map((cat) => ({
                     value: cat,
                     label: t(`directory.categories.${cat}`) || cat,
@@ -294,6 +314,7 @@ export function AccountProfileModal({
                 placeholder="Website"
                 value={profileData.website}
                 onChange={(e) => onProfileChange("website", e.target.value)}
+                disabled={readOnly}
               />
             </FieldWithError>
             <FieldWithError error={fieldErrors.description}>
@@ -302,6 +323,7 @@ export function AccountProfileModal({
                 value={profileData.description}
                 onChange={(e) => onProfileChange("description", e.target.value)}
                 rows={3}
+                disabled={readOnly}
               />
             </FieldWithError>
           </div>
@@ -311,16 +333,18 @@ export function AccountProfileModal({
               className="hover:!bg-header-red-dark flex-1 border !border-gray-400 bg-transparent hover:!text-white"
               onClick={onClose}
             >
-              {t("account.cancel") || "取消"}
+              {readOnly ? t("common.close") || "關閉" : t("account.cancel") || "取消"}
             </Button>
-            <Button
-              className="!bg-header-red-dark hover:!bg-header-red-dark/80 flex-1 text-white hover:!text-white"
-              onClick={onSave}
-              disabled={isSaving}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {t("account.saveChanges") || "儲存變更"}
-            </Button>
+            {!readOnly && (
+              <Button
+                className="!bg-header-red-dark hover:!bg-header-red-dark/80 flex-1 text-white hover:!text-white"
+                onClick={onSave}
+                disabled={isSaving}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {t("account.saveChanges") || "儲存變更"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
