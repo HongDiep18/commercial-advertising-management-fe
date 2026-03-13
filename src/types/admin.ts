@@ -52,6 +52,14 @@ export type ProfileRequestRow = {
   submittedAt: string
   industry: string
   country: string
+  userId?: string
+  companyId?: string
+  isActive?: boolean
+  deletedAt?: string | null
+}
+
+export function isCompanyActive(row: Pick<ProfileRequestRow, "isActive">): boolean {
+  return row.isActive !== false
 }
 
 export enum AdStatus {

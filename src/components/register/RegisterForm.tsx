@@ -13,7 +13,7 @@ import { Toast, type ToastVariant } from "../ui/Toast"
 import { register } from "@/api/auth"
 import { formDataToRegisterPayload } from "@/types/auth"
 import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
-import { getCountryOptions, getRegionOptions } from "./registerOptions"
+import { getCountryOptions } from "./registerOptions"
 import { REGISTER_CATEGORIES } from "./registerCategories"
 import { useCaptcha } from "./useCaptcha"
 import { REGISTER_ERROR_KEYS, validateRegisterForm } from "./registerValidation"
@@ -69,7 +69,6 @@ export default function RegisterForm() {
     id: cat.id,
     name: t(cat.i18nKey) || `${cat.code}. ${cat.fallback}`,
   }))
-  const regions = getRegionOptions(formData.country, t)
 
   const handleInputChange = (field: keyof RegisterFormData, value: string) => {
     setFormData((prev: RegisterFormData) => ({ ...prev, [field]: value }))
@@ -270,13 +269,12 @@ export default function RegisterForm() {
                 </FieldWithError>
               </div>
 
-              <div className="registration-form grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="registration-form gap-4 md:grid-cols-2">
                 <FieldWithError error={fieldErrors.country}>
                   <Select
                     value={formData.country}
                     onValueChange={(v) => {
                       handleInputChange("country", v)
-                      handleInputChange("region", "")
                     }}
                     required
                   >
@@ -289,28 +287,6 @@ export default function RegisterForm() {
                       {countries.map((c) => (
                         <Select.Item key={c.value} value={c.value}>
                           {c.label}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
-                </FieldWithError>
-                <FieldWithError error={fieldErrors.region}>
-                  <Select
-                    value={formData.region}
-                    onValueChange={(v) => handleInputChange("region", v)}
-                    required
-                    disabled={!formData.country}
-                    options={regions}
-                  >
-                    <Select.Trigger className="w-full">
-                      <Select.Value
-                        placeholder={t("register.placeholders.region") || "選擇地區 *"}
-                      />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {regions.map((r) => (
-                        <Select.Item key={r.value} value={r.value}>
-                          {r.label}
                         </Select.Item>
                       ))}
                     </Select.Content>

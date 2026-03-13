@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowRight, Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Card from "../ui/Card"
@@ -54,9 +54,12 @@ function getCompanyIdFromProfile(profile: ProfileResponse | null): string | unde
   return undefined
 }
 
+const LOGIN_REASON_DISABLED = "disabled"
+
 export default function LoginForm() {
   const { t } = useTranslation()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { setUser } = useUser()
   const [formData, setFormData] = useState<LoginFormData>(INITIAL_LOGIN_FORM)
   const [showPassword, setShowPassword] = useState(false)
@@ -66,6 +69,15 @@ export default function LoginForm() {
     variant: "info",
     visible: false,
   })
+
+  const reason = searchParams.get("reason")
+  const isDisabledReason = reason === LOGIN_REASON_DISABLED
+
+  useEffect(() => {
+    if (isDisabledReason && typeof window !== "undefined") {
+      router.replace("/login", { scroll: false })
+    }
+  }, [isDisabledReason, router])
 
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
@@ -157,6 +169,14 @@ export default function LoginForm() {
               </Card.Title>
             </Card.Header>
             <Card.Content className="space-y-6">
+              {isDisabledReason && (
+                <p
+                  className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm"
+                  role="alert"
+                >
+                  {t("login.accountDisabled", "Your account has been disabled.")}
+                </p>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">{t("login.email") || "電子郵件"}</Label>

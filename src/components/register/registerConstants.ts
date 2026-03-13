@@ -8,7 +8,6 @@ export interface RegisterFormData {
   companyAddress: string
   email: string
   country: string
-  region: string
   industry: string
   website: string
   introduction: string
@@ -24,7 +23,6 @@ export const INITIAL_REGISTER_FORM: RegisterFormData = {
   companyAddress: "",
   email: "",
   country: "",
-  region: "",
   industry: "",
   website: "",
   introduction: "",

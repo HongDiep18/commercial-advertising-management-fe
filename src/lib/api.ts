@@ -1,8 +1,11 @@
+import { clearSessionAndRedirectToLogin } from "@/lib/session"
+import { AUTH_TOKEN_KEY } from "@/lib/storage-keys"
+
 const PROXY_PREFIX = "/api/proxy"
 
 function getAuthHeader(): Record<string, string> {
   if (typeof window === "undefined") return {}
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem(AUTH_TOKEN_KEY)
   if (!token) return {}
   return { Authorization: `Bearer ${token}` }
 }
@@ -35,6 +38,19 @@ export const api = {
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok) {
+      const isAuthPublicPath =
+        path.startsWith("/auth/login") ||
+        path.startsWith("/auth/register") ||
+        path.startsWith("/auth/forgot-password") ||
+        path.startsWith("/auth/set-password")
+      if (res.status === 401 && typeof window !== "undefined" && !isAuthPublicPath) {
+        const reason = (data as { message?: string; code?: string }).message
+          ?.toLowerCase()
+          .includes("disabled")
+          ? "disabled"
+          : undefined
+        clearSessionAndRedirectToLogin(reason ?? "unauthorized")
+      }
       if (typeof window !== "undefined") {
         console.error("[API Error]", {
           url,
