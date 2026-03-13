@@ -20,7 +20,8 @@
   },
   "error": {
     "failedToLoadOrders": "無法載入訂單",
-    "failedToLoadOrdersMetrics": "無法載入訂單統計數據"
+    "failedToLoadOrdersMetrics": "無法載入訂單統計數據",
+    "failedToLoadCompanies": "無法載入企業"
   },
   "hero": {
     "title": "華商採購網－連結優質商業夥伴",

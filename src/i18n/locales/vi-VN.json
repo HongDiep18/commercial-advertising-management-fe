@@ -20,7 +20,8 @@
   },
   "error": {
     "failedToLoadOrders": "Không thể tải đơn hàng",
-    "failedToLoadOrdersMetrics": "Không thể tải số liệu đơn hàng"
+    "failedToLoadOrdersMetrics": "Không thể tải số liệu đơn hàng",
+    "failedToLoadCompanies": "Không thể tải công ty"
   },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",

@@ -3,6 +3,7 @@
 import { useFeaturedCompanies } from "@/api/companies/hooks"
 import { Award, MapPin, Phone } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import Badge from "../ui/Badge"
 import Card from "../ui/Card"
@@ -10,7 +11,25 @@ import Card from "../ui/Card"
 export default function FeaturedCompanies() {
   const { t } = useTranslation()
   const { data, isLoading, isError } = useFeaturedCompanies()
-  const companies = (data ?? []).slice(0, 3)
+  const companies = useMemo(() => data ?? [], [data])
+  const [activeIndex, setActiveIndex] = useState<number>(0)
+
+  useEffect(() => {
+    if (companies.length <= 3) return
+    const timer = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 3) % companies.length)
+    }, 10_000)
+    return () => window.clearInterval(timer)
+  }, [companies.length])
+
+  const visibleCompanies = useMemo(() => {
+    if (companies.length <= 3) return companies
+    const result = []
+    for (let i = 0; i < 3; i++) {
+      result.push(companies[(activeIndex + i) % companies.length])
+    }
+    return result
+  }, [activeIndex, companies])
 
   return (
     <section id="featured" className="bg-body-bg-light py-20">
@@ -35,16 +54,16 @@ export default function FeaturedCompanies() {
             </div>
           ) : isError ? (
             <div className="text-muted-foreground py-8 text-sm">
-              {t("error.failedToLoadOrders") || "Failed to load data"}
+              {t("error.failedToLoadCompanies") || "Failed to load data"}
             </div>
           ) : companies.length === 0 ? (
             <div className="text-muted-foreground py-8 text-sm">{t("directory.noResults")}</div>
           ) : (
-            companies.map((company) => {
+            visibleCompanies.map((company) => {
               const isVerified = Boolean(company.featuredHighlight)
               return (
                 <Link key={company.id} href={`/directory/${company.id}`} className="block h-full">
-                  <Card className="group border-border flex h-full cursor-pointer flex-col overflow-hidden pt-12 transition-all duration-300 hover:shadow-xl">
+                  <Card className="group border-border animate-in fade-in-0 flex h-full cursor-pointer flex-col overflow-hidden pt-12 transition-all duration-500 hover:shadow-xl">
                     <div className="bg-muted aspect-video overflow-hidden">
                       <img
                         src={company.logoUrl || "/placeholder.svg"}

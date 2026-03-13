@@ -20,7 +20,8 @@
   },
   "error": {
     "failedToLoadOrders": "Failed to load orders",
-    "failedToLoadOrdersMetrics": "Failed to load orders metrics"
+    "failedToLoadOrdersMetrics": "Failed to load orders metrics",
+    "failedToLoadCompanies": "Failed to load companies"
   },
   "hero": {
     "title": "Vietnam Buyer Guide - Connect Quality Business Partners",
