@@ -5,12 +5,12 @@ i18n: zh-TW, en-US, vi-VN. Stack: React 19, Next 16, TypeScript, Tailwind.
 
 ## Scripts
 
-| Command         | Description      |
-| --------------- | ---------------- |
-| `npm run dev`   | Start dev server |
-| `npm run build` | Production build |
-| `npm run start` | Run production   |
-| `npm run lint`  | Run ESLint       |
+| Command          | Description      |
+| ---------------- | ---------------- |
+| `pnpm run dev`   | Start dev server |
+| `pnpm run build` | Production build |
+| `pnpm run start` | Run production   |
+| `pnpm run lint`  | Run ESLint       |
 
 ## Docker
 
