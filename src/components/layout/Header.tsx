@@ -3,6 +3,7 @@
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
 import Button from "@/components/ui/Button"
 import { useUser } from "@/contexts/user-context"
+import { FeatureKey } from "@/types"
 import { ChevronDown, LogOut, Menu, Shield, User, X } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
@@ -109,7 +110,7 @@ export default function Header() {
                       <User className="h-4 w-4" />
                       {t("header.myAccount") || "我的帳戶"}
                     </Link>
-                    {canUseFeature("adminPanel") && (
+                    {canUseFeature(FeatureKey.AdminPanel) && (
                       <Link
                         href={isDemoAdminUser(user) ? "/admin/demo" : "/admin"}
                         className="hover:!bg-header-red-dark mx-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm text-black transition-colors hover:bg-white/10 hover:text-white"
@@ -216,7 +217,7 @@ export default function Header() {
                       <User className="h-4 w-4" />
                       {t("header.myAccount") || "我的帳戶"}
                     </Link>
-                    {canUseFeature("adminPanel") && (
+                    {canUseFeature(FeatureKey.AdminPanel) && (
                       <Link
                         href={isDemoAdminUser(user) ? "/admin/demo" : "/admin"}
                         className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"

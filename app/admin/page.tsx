@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useUser } from "@/contexts/user-context"
+import { AdminDashboardContent, AdminProvider } from "@/components/admin"
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
-import { AdminProvider, AdminDashboardContent } from "@/components/admin"
+import { useUser } from "@/contexts/user-context"
+import { FeatureKey } from "@/types"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function AdminPage() {
   const router = useRouter()
@@ -19,12 +20,12 @@ export default function AdminPage() {
       router.replace("/admin/demo")
       return
     }
-    if (!canUseFeature("adminPanel")) {
+    if (!canUseFeature(FeatureKey.AdminPanel)) {
       router.push("/login")
     }
   }, [isLoggedIn, user, canUseFeature, router])
 
-  if (!isLoggedIn || !user || !canUseFeature("adminPanel")) {
+  if (!isLoggedIn || !user || !canUseFeature(FeatureKey.AdminPanel)) {
     return null
   }
 

@@ -25,6 +25,7 @@ export const api = {
     } else {
       rawHeaders["Content-Type"] = "application/json"
     }
+    console.log("url", url)
     const res = await fetch(url, {
       ...init,
       headers: rawHeaders,
