@@ -1,9 +1,14 @@
 import type { NewsItem } from "@/api/news"
 
-export function formatNewsDate(iso: string): string {
+const localeMap: Record<string, string> = {
+  "zh-TW": "zh-TW",
+  "en-US": "en-US",
+  "vi-VN": "vi-VN",
+}
+
+export function formatNewsDate(iso: string, lang = "vi-VN"): string {
   try {
-    const d = new Date(iso)
-    return d.toLocaleDateString("zh-TW", {
+    return new Date(iso).toLocaleDateString(localeMap[lang] ?? "vi-VN", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -17,14 +22,14 @@ export function getTitleByLang(item: NewsItem, lang: string): string {
   if (lang === "zh-TW" && item.titleZhTw) return item.titleZhTw
   if (lang === "en-US" && item.titleEn) return item.titleEn
   if (lang === "vi-VN" && item.title) return item.title
-  return item.titleZhTw || item.titleEn || item.title || ""
+  return item.title || item.titleZhTw || item.titleEn || ""
 }
 
 export function getSummaryByLang(item: NewsItem, lang: string): string {
   if (lang === "zh-TW" && item.summaryZhTw) return item.summaryZhTw
   if (lang === "en-US" && item.summaryEn) return item.summaryEn
   if (lang === "vi-VN" && item.summaryVi) return item.summaryVi
-  return item.summaryZhTw || item.summaryEn || item.summaryVi || ""
+  return item.summaryVi || item.summaryZhTw || item.summaryEn || ""
 }
 
 function getNameByLang(obj: Record<string, unknown> | null | undefined, lang: string): string {
