@@ -863,6 +863,16 @@
       "出口": "出口"
     }
   },
+  "popupPriority": {
+    "title": "精選企業",
+    "subtitle": "此企業已購買彈窗優先方案。",
+    "view": "查看詳情",
+    "hideToday": "今天不再顯示",
+    "close": "關閉",
+    "heroBadge": "精選推薦",
+    "heroTitle": "2025 越南華商採購名錄",
+    "heroDescription": "收錄超過 3,000 家在越台商企業資訊，是您拓展越南市場的最佳工具。"
+  },
   "news": {
     "heroTitle": "最新消息",
     "heroDescription": "掌握越南華商圈最新動態、生活資訊、旅遊情報及重要法規更新，助您在越南經商生活更加順利。",

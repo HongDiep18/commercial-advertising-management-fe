@@ -694,14 +694,8 @@
       "diamond": "Spend 550,000 VND"
     },
     "tierBenefits": {
-      "bronze": [
-        "Base industry info",
-        "Company name, tax ID, region"
-      ],
-      "silver": [
-        "Full industry info",
-        "Unlock website, phone, address, email"
-      ],
+      "bronze": ["Base industry info", "Company name, tax ID, region"],
+      "silver": ["Full industry info", "Unlock website, phone, address, email"],
       "gold": [
         "Own industry + 3 cross-industries (full)",
         "Unlock own industry + 3 upstream/downstream industries"
@@ -713,9 +707,7 @@
       ]
     },
     "tierRestrictions": {
-      "bronze": [
-        "No website, phone, or address"
-      ],
+      "bronze": ["No website, phone, or address"],
       "silver": [],
       "gold": [],
       "diamond": []
@@ -877,6 +869,16 @@
       "製造": "Manufacturing",
       "出口": "Export"
     }
+  },
+  "popupPriority": {
+    "title": "Featured company",
+    "subtitle": "This company purchased the popup priority package.",
+    "view": "View details",
+    "hideToday": "Don't show again today",
+    "close": "Close",
+    "heroBadge": "Featured Recommendation",
+    "heroTitle": "2025 Vietnam Chinese Business Procurement Directory",
+    "heroDescription": "Featuring information on over 3,000 Taiwanese-invested enterprises in Vietnam, this is your best tool for expanding into the Vietnamese market."
   },
   "news": {
     "heroTitle": "Latest News",

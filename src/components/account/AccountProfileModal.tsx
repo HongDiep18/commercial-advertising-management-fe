@@ -1,16 +1,16 @@
 "use client"
 
-import type { RefObject } from "react"
-import { Edit3, X, Upload, Save, ImageIcon } from "lucide-react"
+import { categories } from "@/components/directory/DirectorySidebar"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
-import Textarea from "@/components/ui/Textarea"
 import Select from "@/components/ui/Select"
-import { categories } from "@/components/directory/DirectorySidebar"
+import Textarea from "@/components/ui/Textarea"
 import { CONTRIBUTION_VALUES } from "@/contexts/user-context"
-import { COUNTRY_NONE } from "./accountConstants"
 import type { ProfileFormData } from "@/types/account"
 import type { TFunction } from "i18next"
+import { Edit3, ImageIcon, Save, Upload, X } from "lucide-react"
+import type { RefObject } from "react"
+import { COUNTRY_NONE } from "./accountConstants"
 
 type CountryOption = { value: string; label: string }
 type RegionOption = { value: string; label: string }
@@ -269,8 +269,8 @@ export function AccountProfileModal({
                   value={profileData.industry}
                   onValueChange={(value) => onProfileChange("industry", value)}
                   options={categories.map((cat) => ({
-                    value: cat.id,
-                    label: t(`directory.categories.${cat.id}`) || cat.name,
+                    value: cat,
+                    label: t(`directory.categories.${cat}`) || cat,
                   }))}
                 >
                   <Select.Trigger className="w-full min-w-0">
@@ -280,8 +280,8 @@ export function AccountProfileModal({
                   </Select.Trigger>
                   <Select.Content>
                     {categories.map((cat) => (
-                      <Select.Item key={cat.id} value={cat.id}>
-                        {t(`directory.categories.${cat.id}`) || cat.name}
+                      <Select.Item key={cat} value={cat}>
+                        {t(`directory.categories.${cat}`) || cat}
                       </Select.Item>
                     ))}
                   </Select.Content>
