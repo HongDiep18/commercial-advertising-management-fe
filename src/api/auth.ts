@@ -1,4 +1,5 @@
 import { api } from "@/lib/api"
+import { AUTH_TOKEN_KEY } from "@/lib/storage-keys"
 import type {
   LoginPayload,
   LoginResponse,
@@ -10,11 +11,15 @@ import type {
   UpdateProfileResponse,
 } from "@/types/auth"
 
-const TOKEN_STORAGE_KEY = "token"
-
 export function getStoredToken(): string | null {
   if (typeof window === "undefined") return null
-  return localStorage.getItem(TOKEN_STORAGE_KEY)
+  return localStorage.getItem(AUTH_TOKEN_KEY)
+}
+
+export { clearSessionAndRedirectToLogin } from "@/lib/session"
+
+export async function checkAuthSession(): Promise<void> {
+  await api.request<unknown>("/auth/profile", { method: "GET" })
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
@@ -38,7 +43,7 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
     data.token ??
     null
   if (token && typeof window !== "undefined") {
-    localStorage.setItem(TOKEN_STORAGE_KEY, token)
+    localStorage.setItem(AUTH_TOKEN_KEY, token)
   }
 
   return data

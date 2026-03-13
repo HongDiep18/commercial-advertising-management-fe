@@ -15,6 +15,8 @@ export type AdminData = {
   companyRequestsLoading?: boolean
   companyRequestsError?: string
   updateCompanyRequestStatus?: (id: string, status: ProfileRequestStatusUpdate) => Promise<void>
+  updateUserActive?: (userId: string, isActive: boolean) => Promise<void>
+  deleteCompany?: (userId: string) => Promise<void>
 }
 
 export const AdminDataContext = createContext<AdminData | null>(null)
