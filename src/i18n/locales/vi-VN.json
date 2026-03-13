@@ -694,14 +694,8 @@
       "diamond": "Chi tiêu 550.000 VND"
     },
     "tierBenefits": {
-      "bronze": [
-        "Ngành cơ bản",
-        "Tên công ty, mã số thuế, khu vực"
-      ],
-      "silver": [
-        "Ngành đầy đủ",
-        "Mở khóa trang web, điện thoại, địa chỉ, email"
-      ],
+      "bronze": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
+      "silver": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
       "gold": [
         "Ngành của bạn + 3 ngành liên quan (đầy đủ)",
         "Mở khóa ngành của bạn + 3 ngành thượng/hạ nguồn"
@@ -713,9 +707,7 @@
       ]
     },
     "tierRestrictions": {
-      "bronze": [
-        "Không có trang web, điện thoại hoặc địa chỉ"
-      ],
+      "bronze": ["Không có trang web, điện thoại hoặc địa chỉ"],
       "silver": [],
       "gold": [],
       "diamond": []
@@ -877,6 +869,16 @@
       "製造": "Sản xuất",
       "出口": "Xuất khẩu"
     }
+  },
+  "popupPriority": {
+    "title": "Doanh nghiệp nổi bật",
+    "subtitle": "Doanh nghiệp này đã mua gói popup ưu tiên.",
+    "view": "Xem chi tiết",
+    "hideToday": "Không hiển thị lại hôm nay",
+    "close": "Đóng",
+    "heroBadge": "Gợi ý nổi bật",
+    "heroTitle": "Danh mục Mua sắm Doanh nghiệp Hoa Việt Nam 2025",
+    "heroDescription": "Tổng hợp thông tin của hơn 3.000 doanh nghiệp Đài Loan tại Việt Nam, là công cụ tốt nhất để bạn mở rộng thị trường Việt Nam."
   },
   "news": {
     "heroTitle": "Tin Tức Mới Nhất",

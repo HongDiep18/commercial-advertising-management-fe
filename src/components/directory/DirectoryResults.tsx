@@ -1,6 +1,7 @@
 "use client"
 
 import { useCompanyDirectory } from "@/api/companies/hooks"
+import { useDebounce } from "@/hooks/useDebounce"
 import { Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -60,7 +61,8 @@ export function DirectoryResults({
   const totalPoints = getTotalPoints()
   const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]
 
-  const filterKey = `${selectedCategory || ""}-${searchTerm}`
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+  const filterKey = `${selectedCategory || ""}-${debouncedSearchTerm}`
   const [pageState, setPageState] = useState<{ key: string; page: number }>({
     key: filterKey,
     page: 1,
@@ -74,7 +76,7 @@ export function DirectoryResults({
   const setCurrentPage = (page: number) => setPageState((prev) => ({ ...prev, page }))
 
   const { data, isLoading, isError } = useCompanyDirectory({
-    search: searchTerm || undefined,
+    search: debouncedSearchTerm || undefined,
     industry: selectedCategory || undefined,
     page: currentPage,
     limit: ITEMS_PER_PAGE,
@@ -162,7 +164,7 @@ export function DirectoryResults({
                   />
                 </div>
                 <h3 className="line-clamp-2 text-xs font-medium group-hover:underline">
-                  {isGuest ? maskCompanyName(company.name) : company.name}
+                  <span>{isGuest ? maskCompanyName(company.name) : company.name}</span>
                 </h3>
               </Link>
             ))}

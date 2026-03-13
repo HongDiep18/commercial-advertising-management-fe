@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
-import { ChevronDown, Search, X } from "lucide-react"
-import { useTranslation } from "react-i18next"
 import { INDUSTRY_CATEGORIES } from "@/constants/categories"
+import { ChevronDown, Search, X } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
 
 interface FilterTag {

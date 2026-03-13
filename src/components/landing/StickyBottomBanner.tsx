@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { ChevronDown, ChevronUp, Building2, Newspaper, ArrowRight } from "lucide-react"
+import { usePopupRotationalCompanies } from "@/api/active-ads/hooks"
+import { ArrowRight, Building2, ChevronDown, ChevronUp } from "lucide-react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
 
 interface BannerItem {
-  id: number
-  type: "company" | "news"
+  id: string
+  type: "company"
   title: string
   subtitle: string
   image?: string
@@ -15,59 +16,28 @@ interface BannerItem {
   tag: string
 }
 
-const bannerConfig = [
-  {
-    id: 1,
-    type: "company" as const,
-    image: "/assets/images/sticky-bottom/modern-manufacturing-facility.png",
-    link: "/directory",
-    tagKey: "featuredCompany",
-    titleKey: "1",
-  },
-  {
-    id: 2,
-    type: "news" as const,
-    link: "/about",
-    tagKey: "latestNews",
-    titleKey: "2",
-  },
-  {
-    id: 3,
-    type: "company" as const,
-    image: "/assets/images/sticky-bottom/solar-panels-green-energy.jpg",
-    link: "/directory",
-    tagKey: "featuredCompany",
-    titleKey: "3",
-  },
-  {
-    id: 4,
-    type: "news" as const,
-    link: "/about",
-    tagKey: "eventAnnouncement",
-    titleKey: "4",
-  },
-]
-
 const STORAGE_KEY = "sticky-banner-hidden-date"
 
 export default function StickyBottomBanner() {
   const { t } = useTranslation()
+  const { data: popupCompanies } = usePopupRotationalCompanies()
   const [isVisible, setIsVisible] = useState(false)
   const [isExpanded, setIsExpanded] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
   const bannerItems = useMemo<BannerItem[]>(() => {
-    return bannerConfig.map((config) => ({
-      id: config.id,
-      type: config.type,
-      title: t(`stickyBanner.items.${config.titleKey}.title`),
-      subtitle: t(`stickyBanner.items.${config.titleKey}.subtitle`),
-      image: config.image,
-      link: config.link,
-      tag: t(`stickyBanner.tags.${config.tagKey}`),
+    const companies = popupCompanies ?? []
+    return companies.map((company) => ({
+      id: company.id,
+      type: "company",
+      title: company.name,
+      subtitle: company.description,
+      image: company.logoUrl ?? undefined,
+      link: company.adLinkUrl || `/directory/${company.id}`,
+      tag: t("stickyBanner.tags.featuredCompany"),
     }))
-  }, [t])
+  }, [popupCompanies, t])
 
   useEffect(() => {
     const hiddenDate = localStorage.getItem(STORAGE_KEY)
@@ -81,6 +51,7 @@ export default function StickyBottomBanner() {
 
   useEffect(() => {
     if (!isPaused && isExpanded && isVisible) {
+      if (bannerItems.length === 0) return
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % bannerItems.length)
       }, 7000)
@@ -92,7 +63,7 @@ export default function StickyBottomBanner() {
     setIsExpanded((prev) => !prev)
   }, [])
 
-  if (!isVisible) return null
+  if (!isVisible || bannerItems.length === 0) return null
 
   const currentItem = bannerItems[currentIndex]
 
@@ -124,7 +95,7 @@ export default function StickyBottomBanner() {
 
           <div className="relative p-4 pt-6">
             <div className="flex items-center gap-4">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {currentItem.image ? (
                   <div className="relative h-20 w-20 overflow-hidden rounded-lg">
                     <img
@@ -135,11 +106,7 @@ export default function StickyBottomBanner() {
                   </div>
                 ) : (
                   <div className="bg-primary/10 flex h-20 w-20 items-center justify-center rounded-lg">
-                    {currentItem.type === "company" ? (
-                      <Building2 className="text-primary h-8 w-8" />
-                    ) : (
-                      <Newspaper className="text-primary h-8 w-8" />
-                    )}
+                    <Building2 className="text-primary h-8 w-8" />
                   </div>
                 )}
               </div>
@@ -156,12 +123,12 @@ export default function StickyBottomBanner() {
                 <p className="text-muted-foreground truncate text-sm">{currentItem.subtitle}</p>
               </div>
 
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <Button
                   asChild
                   size="sm"
                   variant="primary"
-                  className="hover:bg-header-red-light/100 gap-1 text-white"
+                  className="hover:bg-header-red-light gap-1 text-white"
                 >
                   <a href={currentItem.link}>
                     {t("stickyBanner.viewDetails")}
