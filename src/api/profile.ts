@@ -1,11 +1,11 @@
-import { api } from "@/lib/api"
 import { getStoredToken } from "@/api/auth"
+import { categories } from "@/components/directory/DirectorySidebar"
+import { api } from "@/lib/api"
 import type { ProfileFormData } from "@/types/account"
 import type { UpdateProfileResponse } from "@/types/auth"
-import { categories } from "@/components/directory/DirectorySidebar"
 import { categoryNameToIdMap } from "@/utils/companyHelpers"
 
-const VALID_INDUSTRY_IDS = new Set(categories.map((c) => c.id))
+const VALID_INDUSTRY_IDS = new Set(categories.map((c) => c))
 
 const INDUSTRY_KEYS = [
   "industry",
@@ -48,7 +48,7 @@ function normalizeIndustryId(value: unknown): string {
   if (fromMap) return fromMap
   const lower = v.toLowerCase()
   if (VALID_INDUSTRY_IDS.has(lower)) return lower
-  const matchedId = categories.find((c) => c.id.toLowerCase() === lower)?.id
+  const matchedId = categories.find((c) => c.toLowerCase() === lower)
   if (matchedId) return matchedId
   return ""
 }
