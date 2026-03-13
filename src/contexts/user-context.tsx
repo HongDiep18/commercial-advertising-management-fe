@@ -18,6 +18,7 @@ import {
   MembershipTier,
   UserRole,
 } from "@/types"
+import { USER_STORAGE_KEY } from "@/lib/storage-keys"
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 
 export { MembershipTier, UserRole } from "@/types"
@@ -251,15 +252,13 @@ const ROLE_FEATURES: Record<UserRole, ReadonlyArray<FeatureKey>> = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
-const STORAGE_KEY = "demo_user"
-
 function getStoredUser(): User | null {
   if (typeof window === "undefined") return null
   try {
-    const s = localStorage.getItem(STORAGE_KEY)
+    const s = localStorage.getItem(USER_STORAGE_KEY)
     return s ? (JSON.parse(s) as User) : null
   } catch {
-    localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(USER_STORAGE_KEY)
     return null
   }
 }
@@ -276,8 +275,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const setUser = (u: User | null) => {
     setUserState(u)
     if (typeof window === "undefined") return
-    if (u) localStorage.setItem(STORAGE_KEY, JSON.stringify(u))
-    else localStorage.removeItem(STORAGE_KEY)
+    if (u) localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(u))
+    else localStorage.removeItem(USER_STORAGE_KEY)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

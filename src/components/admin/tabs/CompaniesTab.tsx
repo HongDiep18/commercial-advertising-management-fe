@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { format, isValid } from "date-fns"
-import { CheckCircle2, Eye, X, XCircle } from "lucide-react"
+import { CheckCircle2, Eye, Trash2, X, XCircle, ToggleLeft, ToggleRight } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import {
@@ -18,11 +18,13 @@ import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { PROFILE_REQUEST_FILTERS } from "../constants"
 import { useAdminData } from "../AdminDataContext"
 import {
+  getProfileRequestFilterState,
+  isCompanyActive,
   type ProfileRequestFilterId,
   type ProfileRequestRow,
   ProfileRequestStatus,
-  getProfileRequestFilterState,
 } from "@/types/admin"
+import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
 
 function formatSubmittedAt(dateStr: string, locale: string): string {
   if (!dateStr?.trim()) return dateStr ?? ""
@@ -47,6 +49,8 @@ export function CompaniesTab() {
     companyRequestsLoading,
     companyRequestsError,
     updateCompanyRequestStatus,
+    updateUserActive,
+    deleteCompany,
   } = useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
   const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -61,6 +65,65 @@ export function CompaniesTab() {
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
+
+  const resolveUserIdForRow = async (row: ProfileRequestRow): Promise<string | null> => {
+    if (row.userId) return row.userId
+
+    const detail = await getProfileRequestById(row.id)
+    const userId = extractUserIdFromProfileRequest(detail)
+
+    if (!userId) {
+      showToast(t("admin.companies.userIdRequired", "User ID not available for this row"), "error")
+      return null
+    }
+
+    return userId
+  }
+
+  const handleToggleActive = async (row: ProfileRequestRow, nextActive: boolean) => {
+    if (!updateUserActive) return
+
+    const userId = await resolveUserIdForRow(row)
+    if (!userId) return
+
+    setUpdatingId(row.id)
+    updateUserActive(userId, nextActive)
+      .then(() =>
+        showToast(
+          nextActive
+            ? t("admin.companies.enabledSuccess", "Account enabled")
+            : t("admin.companies.disabledSuccess", "Account disabled"),
+          "success"
+        )
+      )
+      .catch(() => showToast(t("admin.companies.updateError"), "error"))
+      .finally(() => setUpdatingId(null))
+  }
+
+  const handleDeleteCompanyClick = async (row: ProfileRequestRow) => {
+    if (!deleteCompany) return
+
+    const confirmed = window.confirm(
+      t(
+        "admin.companies.deleteCompanyConfirm",
+        "Delete this company? The user will be deactivated."
+      )
+    )
+    if (!confirmed) return
+
+    const userId = await resolveUserIdForRow(row)
+    if (!userId) return
+
+    setUpdatingId(row.id)
+    deleteCompany(userId)
+      .then(() =>
+        showToast(t("admin.companies.deleteCompanySuccess", "Company deleted"), "success")
+      )
+      .catch(() =>
+        showToast(t("admin.companies.deleteCompanyError", "Failed to delete company"), "error")
+      )
+      .finally(() => setUpdatingId(null))
+  }
 
   const { statusCounts, filtered } = useMemo(
     () => getProfileRequestFilterState(companyRequests, filter),
@@ -193,6 +256,52 @@ export function CompaniesTab() {
                               <XCircle className="h-4 w-4" />
                             </Button>
                           </>
+                        )}
+                        {row.status === ProfileRequestStatus.APPROVED &&
+                          (() => {
+                            const active = isCompanyActive(row)
+                            const nextActive = !active
+                            return (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`h-8 ${
+                                  active
+                                    ? "!text-green-600 hover:!bg-green-700 hover:!text-white"
+                                    : "!text-red-600 hover:!bg-red-700 hover:!text-white"
+                                }`}
+                                aria-label={
+                                  active
+                                    ? t("admin.companies.disableAccount", "Disable account")
+                                    : t("admin.companies.enableAccount", "Enable account")
+                                }
+                                title={
+                                  active
+                                    ? t("admin.companies.enableAccount", "Enable account")
+                                    : t("admin.companies.disableAccount", "Disable account")
+                                }
+                                disabled={!!updatingId}
+                                onClick={() => handleToggleActive(row, nextActive)}
+                              >
+                                {active ? (
+                                  <ToggleLeft className="h-4 w-4" />
+                                ) : (
+                                  <ToggleRight className="h-4 w-4" />
+                                )}
+                              </Button>
+                            )
+                          })()}
+                        {row.status === ProfileRequestStatus.APPROVED && deleteCompany && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-white"
+                            aria-label={t("admin.companies.deleteCompany", "Delete company")}
+                            disabled={!!updatingId}
+                            onClick={() => handleDeleteCompanyClick(row)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         )}
                         <Button
                           variant="ghost"
