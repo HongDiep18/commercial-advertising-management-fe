@@ -32,10 +32,14 @@ export function NewsCard({ item, lang }: { item: NewsItem; lang: string }) {
     >
       <div className="bg-muted relative aspect-[16/9] overflow-hidden">
         <Image
-          src={item.thumbnailUrl || "/placeholder.svg"}
+          src={
+            item.thumbnailUrl
+              ? `/api/image-proxy?url=${encodeURIComponent(item.thumbnailUrl)}&w=800&q=75`
+              : "/placeholder.svg"
+          }
           alt={title}
           fill
-          referrerPolicy="no-referrer"
+          unoptimized
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute top-3 left-3">
