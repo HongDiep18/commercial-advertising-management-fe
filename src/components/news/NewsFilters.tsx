@@ -10,11 +10,11 @@ type Props = {
   categoryList: CategoryOption[]
   subcategoryList: CategoryOption[]
   selectedCategorySlugs: string[]
-  selectedSubcategorySlugs: string[]
+  selectedSubcategoryIds: string[]
   showSubcategoryFilter: boolean
   lang: string
   onCategoryChange: (slugs: string[]) => void
-  onSubcategoryToggle: (slug: string) => void
+  onSubcategoryToggle: (id: string) => void
   onToggleFilterPanel: () => void
   onClearSubcategories: () => void
 }
@@ -23,7 +23,7 @@ export function NewsFilters({
   categoryList,
   subcategoryList,
   selectedCategorySlugs,
-  selectedSubcategorySlugs,
+  selectedSubcategoryIds,
   showSubcategoryFilter,
   lang,
   onCategoryChange,
@@ -85,40 +85,42 @@ export function NewsFilters({
             variant="outline"
             size="sm"
             onClick={onToggleFilterPanel}
+            aria-expanded={showSubcategoryFilter}
+            aria-controls="subcategory-filter-panel"
             className={`!border-header-red-dark hover:!bg-header-red-dark/80 hover:!text-white ${
               showSubcategoryFilter ? "!border-header-red-dark text-primary" : ""
             }`}
           >
             <Filter className="mr-2 h-4 w-4" />
             {t("news.industryFilter")}
-            {selectedSubcategorySlugs.length > 0 && (
+            {selectedSubcategoryIds.length > 0 && (
               <span className="bg-primary text-primary-foreground ml-2 rounded px-1.5 py-0.5 text-xs">
-                {selectedSubcategorySlugs.length}
+                {selectedSubcategoryIds.length}
               </span>
             )}
           </Button>
         </div>
 
         {showSubcategoryFilter && (
-          <div className="border-border border-t pt-4 pb-4">
+          <div id="subcategory-filter-panel" role="region" aria-label="Subcategory filters" className="border-border border-t pt-4 pb-4">
             <div className="mb-3 flex items-center gap-2">
               <span className="text-muted-foreground text-sm">{t("news.subcategoryFilter")}</span>
-              {selectedSubcategorySlugs.length > 0 && (
+              {selectedSubcategoryIds.length > 0 && (
                 <button
                   onClick={onClearSubcategories}
                   className="text-primary text-xs hover:underline"
                 >
-                  {t("news.clearAll")}（{selectedSubcategorySlugs.length}）
+                  {t("news.clearAll")}（{selectedSubcategoryIds.length}）
                 </button>
               )}
             </div>
             <div className="flex flex-wrap gap-2">
               {subcategoryList.map((sub) => {
-                const isSelected = selectedSubcategorySlugs.includes(sub.slug)
+                const isSelected = selectedSubcategoryIds.includes(sub.id)
                 return (
                   <button
-                    key={sub.slug}
-                    onClick={() => onSubcategoryToggle(sub.slug)}
+                    key={sub.id}
+                    onClick={() => onSubcategoryToggle(sub.id)}
                     className={`bg-body-bg-dark rounded-full border border-gray-300 px-3 py-1.5 text-xs transition-colors ${
                       isSelected
                         ? "border-primary bg-primary text-primary-foreground"

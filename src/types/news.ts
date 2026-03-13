@@ -4,6 +4,7 @@ export type NewsCategory = {
   nameVi: string
   nameZhTw: string
   nameEn: string
+  subcategories?: NewsSubcategory[]
 }
 
 export type NewsSubcategory = {
@@ -12,25 +13,23 @@ export type NewsSubcategory = {
   nameVi: string
   nameZhTw: string
   nameEn: string
-  categoryId: string
 }
 
 export type NewsItem = {
   id: string
   sourceSite: string
   url: string
-  guid: string
   title: string
-  titleZhTw: string
-  titleEn: string
+  titleZhTw: string | null
+  titleEn: string | null
   publishedAt: string
   thumbnailUrl: string
-  status: string
-  category: NewsCategory
-  subcategory: NewsSubcategory
-  summaryVi: string
-  summaryZhTw: string
-  summaryEn: string
+  status: "DRAFT" | "PUBLISHED"
+  category: NewsCategory | null
+  subcategory: NewsSubcategory | null
+  summaryVi: string | null
+  summaryZhTw: string | null
+  summaryEn: string | null
 }
 
 export type NewsListResponse = {
@@ -47,5 +46,5 @@ export type NewsListParams = {
   page?: number
   limit?: number
   categorySlug?: string
-  subcategorySlug?: string
+  subcategoryId?: string
 }

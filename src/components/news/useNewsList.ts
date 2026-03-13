@@ -1,130 +1,177 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useTranslation } from "react-i18next"
-import { getNewsList, type NewsItem } from "@/api/news"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { getNewsList, getNewsCategories, type NewsItem, type NewsCategory } from "@/api/news"
 
 const PAGE_SIZE = 6
 
 export type CategoryOption = {
+  id: string
   slug: string
   nameVi: string
   nameZhTw: string
   nameEn: string
 }
 
-export function useNewsList() {
+export type NewsListInitialData = {
+  news: NewsItem[]
+  categories: NewsCategory[]
+  total: number
+  totalPages: number
+}
+
+export function useNewsList(initialData?: NewsListInitialData) {
   const { t } = useTranslation()
-  const [news, setNews] = useState<NewsItem[]>([])
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(true)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Derive filter state from URL — stable string primitives as effect deps
+  const pageParam = Math.max(1, Number(searchParams.get("page") ?? "1") || 1)
+  const categoryParam = searchParams.get("category") ?? ""
+  const subcategoryParam = searchParams.get("subcategory") ?? ""
+
+  const selectedCategorySlugs = useMemo(
+    () => categoryParam.split(",").filter(Boolean),
+    [categoryParam]
+  )
+  const selectedSubcategoryIds = useMemo(
+    () => subcategoryParam.split(",").filter(Boolean),
+    [subcategoryParam]
+  )
+
+  const [news, setNews] = useState<NewsItem[]>(initialData?.news ?? [])
+  const [categories, setCategories] = useState<NewsCategory[]>(initialData?.categories ?? [])
+  const [total, setTotal] = useState(initialData?.total ?? 0)
+  const [totalPages, setTotalPages] = useState(initialData?.totalPages ?? 1)
+  const [loading, setLoading] = useState(!initialData)
   const [error, setError] = useState<string | null>(null)
-  const [selectedCategorySlugs, setSelectedCategorySlugs] = useState<string[]>([])
-  const [selectedSubcategorySlugs, setSelectedSubcategorySlugs] = useState<string[]>([])
   const [showSubcategoryFilter, setShowSubcategoryFilter] = useState(false)
 
-  const categorySlug = selectedCategorySlugs[0]
-  const subcategorySlug = selectedSubcategorySlugs[0]
+  // Stores the params the SSR initial data was fetched for.
+  // While current params still match, skip the fetch entirely — including on
+  // StrictMode's second mount. Cleared when params change away from initial values.
+  const ssrParams = useRef(
+    initialData ? { page: pageParam, category: categoryParam, subcategory: subcategoryParam } : null
+  )
+
+  const errorFallback = t("news.errorLoad") || "無法載入最新消息"
+
+  const updateUrl = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString())
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value) params.delete(key)
+      else params.set(key, value)
+    })
+    if (params.get("page") === "1") params.delete("page")
+    const query = params.toString()
+    router.push(`${pathname}${query ? `?${query}` : ""}`)
+  }
 
   useEffect(() => {
-    let cancelled = false
-    const tid = requestAnimationFrame(() => {
-      if (!cancelled) {
-        setLoading(true)
-        setError(null)
-      }
-    })
-    getNewsList(currentPage, PAGE_SIZE, {
-      categorySlug: categorySlug || undefined,
-      subcategorySlug: subcategorySlug || undefined,
-    })
+    if (initialData?.categories?.length) return
+    getNewsCategories().then((res) => setCategories(Array.isArray(res) ? res : [])).catch(() => setCategories([]))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    if (
+      ssrParams.current &&
+      ssrParams.current.page === pageParam &&
+      ssrParams.current.category === categoryParam &&
+      ssrParams.current.subcategory === subcategoryParam
+    ) {
+      // Params still match SSR data — skip fetch entirely (safe across StrictMode remounts)
+      return () => controller.abort()
+    }
+    ssrParams.current = null
+
+    setLoading(true)
+    setError(null)
+    getNewsList(
+      pageParam,
+      PAGE_SIZE,
+      {
+        categorySlug: categoryParam || undefined,
+        subcategoryId: subcategoryParam || undefined,
+      },
+      controller.signal
+    )
       .then((res) => {
-        if (cancelled) return
+        const resolvedTotalPages = res.totalPages ?? 1
         setNews(res.data ?? [])
         setTotal(res.total ?? 0)
-        setTotalPages(res.totalPages ?? 1)
+        setTotalPages(resolvedTotalPages)
+        if (pageParam > resolvedTotalPages) {
+          const params = new URLSearchParams(searchParams.toString())
+          params.set("page", String(resolvedTotalPages))
+          if (params.get("page") === "1") params.delete("page")
+          const query = params.toString()
+          router.replace(`${pathname}${query ? `?${query}` : ""}`)
+        }
       })
       .catch((err) => {
-        if (!cancelled) setError(err?.message || t("news.errorLoad") || "無法載入最新消息")
+        if (err?.name !== "AbortError") setError(err?.message || errorFallback)
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
+        if (!controller.signal.aborted) setLoading(false)
       })
-    return () => {
-      cancelled = true
-      cancelAnimationFrame(tid)
-    }
-  }, [currentPage, categorySlug, subcategorySlug, t])
+    return () => controller.abort()
+  }, [pageParam, categoryParam, subcategoryParam])
 
-  const categoryList = useMemo(() => {
-    const bySlug = new Map<string, CategoryOption>()
-    news.forEach((item) => {
-      const cat = item.category
-      if (cat?.slug && !bySlug.has(cat.slug)) {
-        bySlug.set(cat.slug, {
-          slug: cat.slug,
-          nameVi: cat.nameVi ?? "",
-          nameZhTw: cat.nameZhTw ?? "",
-          nameEn: cat.nameEn ?? "",
-        })
-      }
-    })
-    return Array.from(bySlug.values())
-  }, [news])
+  const categoryList = useMemo((): CategoryOption[] => {
+    return categories.map((cat) => ({
+      id: cat.id,
+      slug: cat.slug,
+      nameVi: cat.nameVi ?? "",
+      nameZhTw: cat.nameZhTw ?? "",
+      nameEn: cat.nameEn ?? "",
+    }))
+  }, [categories])
 
   const subcategoryList = useMemo((): CategoryOption[] => {
-    const bySlug = new Map<string, CategoryOption>()
-    news.forEach((item) => {
-      const sub = item.subcategory
-      if (sub?.slug && !bySlug.has(sub.slug)) {
-        bySlug.set(sub.slug, {
-          slug: sub.slug,
-          nameVi: sub.nameVi ?? "",
-          nameZhTw: sub.nameZhTw ?? "",
-          nameEn: sub.nameEn ?? "",
-        })
-      }
-    })
-    return Array.from(bySlug.values())
-  }, [news])
-
-  const safePage = Math.min(Math.max(1, currentPage), totalPages)
-
-  const setPage = (page: number) => setCurrentPage(page)
-
-  const toggleSubcategory = (slug: string) => {
-    setSelectedSubcategorySlugs((prev) =>
-      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+    const selectedCats =
+      selectedCategorySlugs.length > 0
+        ? categories.filter((cat) => selectedCategorySlugs.includes(cat.slug))
+        : categories
+    return selectedCats.flatMap((cat) =>
+      (cat.subcategories ?? []).map((sub) => ({
+        id: sub.id,
+        slug: sub.slug,
+        nameVi: sub.nameVi ?? "",
+        nameZhTw: sub.nameZhTw ?? "",
+        nameEn: sub.nameEn ?? "",
+      }))
     )
-    setCurrentPage(1)
-  }
+  }, [categories, selectedCategorySlugs])
 
-  const setSelectedCategorySlugsAndResetPage = (slugs: string[]) => {
-    setSelectedCategorySlugs(slugs)
-    setCurrentPage(1)
-  }
+  const safePage = Math.min(Math.max(1, pageParam), totalPages)
 
   return {
     news,
     total,
     totalPages,
     currentPage: safePage,
-    setPage,
+    setPage: (page: number) => updateUrl({ page: String(page) }),
     loading,
     error,
     categoryList,
     subcategoryList,
     selectedCategorySlugs,
-    selectedSubcategorySlugs,
+    selectedSubcategoryIds,
     showSubcategoryFilter,
-    setSelectedCategorySlugs: setSelectedCategorySlugsAndResetPage,
     setShowSubcategoryFilter,
-    toggleSubcategory,
-    clearSubcategories: () => {
-      setSelectedSubcategorySlugs([])
-      setCurrentPage(1)
+    setSelectedCategorySlugs: (slugs: string[]) =>
+      updateUrl({ category: slugs.join(",") || null, subcategory: null, page: null }),
+    toggleSubcategory: (id: string) => {
+      const next = selectedSubcategoryIds.includes(id)
+        ? selectedSubcategoryIds.filter((s) => s !== id)
+        : [...selectedSubcategoryIds, id]
+      updateUrl({ subcategory: next.join(",") || null, page: null })
     },
+    clearSubcategories: () => updateUrl({ subcategory: null, page: null }),
   }
 }
