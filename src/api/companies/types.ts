@@ -43,3 +43,21 @@ export type CompanyCategoriesResponse = {
   categories: CompanyCategoryItem[]
 }
 
+export type FeaturedCompanyItem = {
+  id: string
+  name: string
+  logoUrl?: string | null
+  email: string
+  contactName: string
+  phone: string
+  industry: string
+  address: string
+  description: string
+  featuredHighlight?: boolean
+  companyInfoHighlight?: boolean
+  adLinkUrl?: string
+  metadata?: Record<string, unknown>
+  sortPriority?: number
+}
+
+export type FeaturedCompaniesResponse = FeaturedCompanyItem[]

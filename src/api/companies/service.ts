@@ -3,6 +3,7 @@ import type {
   CompanyCategoriesResponse,
   CompanyDirectoryQuery,
   CompanyDirectoryResponse,
+  FeaturedCompaniesResponse,
 } from "./types"
 
 function buildQuery(params: Record<string, string | number | boolean | undefined>): string {
@@ -27,6 +28,13 @@ export async function getCompanyDirectory(
 
 export async function getCompanyCategories(): Promise<CompanyCategoriesResponse> {
   const res = await api.request<CompanyCategoriesResponse>("/companies/categories", {
+    method: "GET",
+  })
+  return res
+}
+
+export async function getFeaturedCompanies(): Promise<FeaturedCompaniesResponse> {
+  const res = await api.request<FeaturedCompaniesResponse>("/companies/featured", {
     method: "GET",
   })
   return res

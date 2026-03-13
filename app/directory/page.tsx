@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, Suspense, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
-import Header from "../../src/components/layout/Header"
-import Footer from "../../src/components/layout/Footer"
-import { DirectorySidebar, categories } from "../../src/components/directory/DirectorySidebar"
+import { Suspense, useEffect, useState } from "react"
 import { DirectoryResults } from "../../src/components/directory/DirectoryResults"
+import { DirectorySidebar, categories } from "../../src/components/directory/DirectorySidebar"
+import Footer from "../../src/components/layout/Footer"
+import Header from "../../src/components/layout/Header"
 
-const defaultCategoryId = categories[0]?.id ?? "textile"
+const defaultCategoryId = categories[0] ?? "textile"
 
 function DirectoryContent() {
   const searchParams = useSearchParams()
