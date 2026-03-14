@@ -1,19 +1,17 @@
-'use client'
+import type { Metadata } from "next"
+import AboutPageClient from "../../src/components/about/AboutPageClient"
 
-import Header from '../../src/components/layout/Header'
-import Footer from '../../src/components/layout/Footer'
-import AboutHero from '../../src/components/about/AboutHero'
-import AboutBody from '../../src/components/about/AboutBody'
+export const metadata: Metadata = {
+  title: "About Us | VN Buyer Guide - Vietnam Buyer Guide",
+  description:
+    "Learn about VN Buyer Guide: connecting quality business partners in Vietnam. Taiwanese enterprises, industry classification, and company information for finding ideal partners and creating business opportunities.",
+  openGraph: {
+    title: "About Us | VN Buyer Guide - Vietnam Buyer Guide",
+    description: "Learn about VN Buyer Guide: connecting quality business partners in Vietnam.",
+    type: "website",
+  },
+}
 
 export default function AboutPage() {
-    return (
-        <div className="min-h-screen bg-background scroll-smooth">
-            <Header />
-            <main className="pt-16">
-                <AboutHero />
-                <AboutBody />
-            </main>
-            <Footer />
-        </div>
-    )
+  return <AboutPageClient />
 }
