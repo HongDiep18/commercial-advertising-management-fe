@@ -1,59 +1,18 @@
-"use client"
+import type { Metadata } from "next"
+import DirectoryPageClient from "../../src/components/directory/DirectoryPageClient"
 
-import { useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
-import { DirectoryResults } from "../../src/components/directory/DirectoryResults"
-import { DirectorySidebar, categories } from "../../src/components/directory/DirectorySidebar"
-import Footer from "../../src/components/layout/Footer"
-import Header from "../../src/components/layout/Header"
-
-const defaultCategoryId = categories[0] ?? "textile"
-
-function DirectoryContent() {
-  const searchParams = useSearchParams()
-  const categoryParam = searchParams.get("category")
-  const qParam = searchParams.get("q") ?? ""
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    () => categoryParam ?? defaultCategoryId
-  )
-  const [searchTerm, setSearchTerm] = useState(() => qParam)
-
-  useEffect(() => {
-    setSearchTerm(qParam)
-  }, [qParam])
-
-  const effectiveCategory = categoryParam ?? selectedCategory ?? defaultCategoryId
-
-  return (
-    <div className="bg-body-bg-dark min-h-screen">
-      <Header />
-      <main className="pt-16">
-        <div className="w-full px-4 py-8 sm:px-6 lg:px-6">
-          <div className="flex flex-col gap-8 lg:flex-row">
-            <DirectorySidebar
-              selectedCategory={effectiveCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-
-            <div className="min-w-0 flex-1">
-              <DirectoryResults
-                selectedCategory={effectiveCategory}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              />
-            </div>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
-  )
+export const metadata: Metadata = {
+  title: "Company Directory | VN Buyer Guide - Find Businesses in Vietnam",
+  description:
+    "Browse the VN Buyer Guide company directory: find Taiwanese enterprises in Vietnam by industry, category, and location. Search companies and connect with quality business partners.",
+  openGraph: {
+    title: "Company Directory | VN Buyer Guide - Find Businesses in Vietnam",
+    description:
+      "Browse the company directory: find enterprises in Vietnam by industry and location. Connect with quality business partners.",
+    type: "website",
+  },
 }
 
 export default function DirectoryPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <DirectoryContent />
-    </Suspense>
-  )
+  return <DirectoryPageClient />
 }

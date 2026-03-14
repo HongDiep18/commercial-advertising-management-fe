@@ -1,27 +1,18 @@
-"use client"
+import type { Metadata } from "next"
+import HomePageClient from "../src/components/landing/HomePageClient"
 
-import FeaturedCompanies from "../src/components/landing/FeaturedCompanies"
-import HeroSection from "../src/components/landing/HeroSection"
-import PopupPriorityCompanyModal from "../src/components/landing/PopupPriorityCompanyModal"
-import SearchSection from "../src/components/landing/SearchSection"
-import StatsSection from "../src/components/landing/StatsSection"
-import StickyBottomBanner from "../src/components/landing/StickyBottomBanner"
-import Footer from "../src/components/layout/Footer"
-import Header from "../src/components/layout/Header"
+export const metadata: Metadata = {
+  title: "VN Buyer Guide | Vietnam Buyer Guide - Connect Quality Business Partners",
+  description:
+    "Vietnam Buyer Guide - Connect Quality Business Partners. Find Taiwanese enterprises in Vietnam, industry classification and company information for ideal partners and business opportunities.",
+  openGraph: {
+    title: "VN Buyer Guide | Vietnam Buyer Guide - Connect Quality Business Partners",
+    description:
+      "Vietnam Buyer Guide - Connect Quality Business Partners. Find enterprises in Vietnam, industry classification and company information.",
+    type: "website",
+  },
+}
 
 export default function HomePage() {
-  return (
-    <div className="min-h-screen">
-      <Header />
-      <main className="pt-16">
-        <HeroSection />
-        <SearchSection />
-        <FeaturedCompanies />
-        <StatsSection />
-      </main>
-      <Footer />
-      <StickyBottomBanner />
-      <PopupPriorityCompanyModal />
-    </div>
-  )
+  return <HomePageClient />
 }
