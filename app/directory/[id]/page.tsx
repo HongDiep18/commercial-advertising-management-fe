@@ -1,21 +1,29 @@
-'use client'
+import type { Metadata } from "next"
+import { getCompanyData } from "@/data/mockCompanies"
+import CompanyDetailPageClient from "@/components/company/CompanyDetailPageClient"
 
-import Header from '../../../src/components/layout/Header'
-import Footer from '../../../src/components/layout/Footer'
-import CompanyDetail from '../../../src/components/company/CompanyDetail'
-import React from 'react'
+type Props = { params: Promise<{ id: string }> }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params
+  const company = getCompanyData(id)
+  const title = [company.nameEn || company.nameCn, "VN Buyer Guide"].filter(Boolean).join(" | ")
+  const description =
+    company.introduction?.replace(/\s+/g, " ").trim().slice(0, 160) ||
+    `${company.nameEn || company.nameCn} - ${company.category}. VN Buyer Guide company profile.`
 
-export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const resolvedParams = React.use(params)
-    const {id} = resolvedParams
-    return (
-        <div className="min-h-screen bg-background">
-            <Header />
-            <main className="pt-16">
-                <CompanyDetail companyId={id} />
-            </main>
-            <Footer />
-        </div>
-    )
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description: description.slice(0, 200),
+      type: "website",
+    },
+  }
+}
+
+export default async function CompanyDetailPage({ params }: Props) {
+  const { id } = await params
+  return <CompanyDetailPageClient companyId={id} />
 }
