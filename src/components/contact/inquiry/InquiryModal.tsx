@@ -1,12 +1,12 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { X, Send } from 'lucide-react'
-import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
-import Textarea from '@/components/ui/Textarea'
-import Label from '@/components/ui/Label'
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+import { X, Send } from "lucide-react"
+import Button from "@/components/ui/Button"
+import Input from "@/components/ui/Input"
+import Textarea from "@/components/ui/Textarea"
+import Label from "@/components/ui/Label"
 
 interface InquiryForm {
   company: string
@@ -25,40 +25,42 @@ interface InquiryModalProps {
 export default function InquiryModal({ isOpen, onClose, onSubmit }: InquiryModalProps) {
   const { t, i18n } = useTranslation()
   const [inquiryForm, setInquiryForm] = useState<InquiryForm>({
-    company: '',
-    contact: '',
-    phone: '',
-    email: '',
-    message: '',
+    company: "",
+    contact: "",
+    phone: "",
+    email: "",
+    message: "",
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit()
     setInquiryForm({
-      company: '',
-      contact: '',
-      phone: '',
-      email: '',
-      message: '',
+      company: "",
+      contact: "",
+      phone: "",
+      email: "",
+      message: "",
     })
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-body-bg-dark rounded-lg w-full max-w-md">
-        <div className="border-b border-border border-gray-400 px-6 py-4 flex items-center justify-between">
-          <h2 key={i18n.language} className="text-xl font-bold">{t('adContact.inquiryTitle')}</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-body-bg-dark w-full max-w-md rounded-lg">
+        <div className="border-border flex items-center justify-between border-b border-gray-400 px-6 py-4">
+          <h2 key={i18n.language} className="text-xl font-bold">
+            {t("adContact.inquiryTitle")}
+          </h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 bg-body-bg-dark">
+        <form onSubmit={handleSubmit} className="bg-body-bg-dark space-y-4 p-6">
           <div className="space-y-2">
-            <Label htmlFor="inquiry-company">{t('adContact.companyName')}</Label>
+            <Label htmlFor="inquiry-company">{t("adContact.companyName")}</Label>
             <Input
               id="inquiry-company"
               value={inquiryForm.company}
@@ -67,7 +69,7 @@ export default function InquiryModal({ isOpen, onClose, onSubmit }: InquiryModal
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="inquiry-contact">{t('adContact.contactPerson')} *</Label>
+            <Label htmlFor="inquiry-contact">{t("adContact.contactPerson")} *</Label>
             <Input
               id="inquiry-contact"
               required
@@ -77,7 +79,7 @@ export default function InquiryModal({ isOpen, onClose, onSubmit }: InquiryModal
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="inquiry-phone">{t('adContact.phone')} *</Label>
+            <Label htmlFor="inquiry-phone">{t("adContact.phone")} *</Label>
             <Input
               id="inquiry-phone"
               required
@@ -97,12 +99,12 @@ export default function InquiryModal({ isOpen, onClose, onSubmit }: InquiryModal
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="inquiry-message">{t('adContact.inquiryContent')} *</Label>
+            <Label htmlFor="inquiry-message">{t("adContact.inquiryContent")} *</Label>
             <Textarea
               id="inquiry-message"
               rows={4}
               required
-              placeholder={t('adContact.inquiryPlaceholder')}
+              placeholder={t("adContact.inquiryPlaceholder")}
               value={inquiryForm.message}
               onChange={(e) => setInquiryForm((prev) => ({ ...prev, message: e.target.value }))}
               className="!bg-body-bg-dark"
@@ -110,12 +112,20 @@ export default function InquiryModal({ isOpen, onClose, onSubmit }: InquiryModal
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" className="flex-1 border !border-gray-400 bg-transparent hover:!bg-header-red-dark hover:!text-white" onClick={onClose}>
-              {t('adContact.cancel')}
+            <Button
+              type="button"
+              variant="outline"
+              className="hover:!bg-header-red-dark flex-1 border !border-gray-400 bg-transparent hover:!text-white"
+              onClick={onClose}
+            >
+              {t("adContact.cancel")}
             </Button>
-            <Button type="submit" className="flex-1 !bg-header-red-dark text-white hover:!bg-header-red-light">
-              <Send className="w-4 h-4 mr-2" />
-              {t('adContact.submitInquiry')}
+            <Button
+              type="submit"
+              className="!bg-header-red-dark hover:!bg-header-red-light flex-1 text-white"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {t("adContact.submitInquiry")}
             </Button>
           </div>
         </form>
