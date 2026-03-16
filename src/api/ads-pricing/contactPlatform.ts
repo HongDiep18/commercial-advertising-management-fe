@@ -9,6 +9,11 @@ export type PlatformCatalogItem = {
   pricingId: string
   categoryId: string
   categoryName: string
+  packageType?: string
+  categoryType?: string
+  placementKey?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 const DURATION_PLURALS: Record<string, string> = {
@@ -35,21 +40,53 @@ function formatPriceVnd(finalPrice: number): string {
   return finalPrice.toLocaleString("en-US")
 }
 
+function isChineseLocale(locale: string): boolean {
+  return locale.startsWith("zh")
+}
+
+function pickName(
+  nameEn: string | null | undefined,
+  nameZh: string | null | undefined,
+  locale: string
+): string {
+  const useChinese = isChineseLocale(locale)
+  if (useChinese && nameZh) return nameZh
+  if (nameEn) return nameEn
+  return nameZh ?? ""
+}
+
+function buildPrintPlacementKey(metadata: Record<string, unknown> | null): string | undefined {
+  if (!metadata) return undefined
+  const pos = metadata.page_position as string | undefined
+  if (!pos) return undefined
+  const side = metadata.page_side as string | undefined
+  const size = metadata.page_size as string | undefined
+  const color = metadata.color_type as string | undefined
+  const parts: string[] = [pos]
+  if (side) parts.push(side)
+  if (size && (pos === "next_to_toc" || pos === "inner_page" || size !== "full")) parts.push(size)
+  if (color) parts.push(color)
+  return parts.join("_").replace(/-/g, "_")
+}
+
 export function flattenPlatformCatalog(
-  categories: PublicAdPackageCategoryItem[]
+  categories: PublicAdPackageCategoryItem[],
+  locale: string
 ): PlatformCatalogItem[] {
   const rows: PlatformCatalogItem[] = []
 
   for (const category of categories) {
     if (!category.isActive) continue
-    const categoryName = category.nameZh ?? category.name
+    const categoryName = pickName(category.name, category.nameZh, locale)
 
     for (const pkg of category.packages ?? []) {
       if (!pkg.isActive) continue
-      const packageName = pkg.nameZh ?? pkg.name
+      const packageName = pickName(pkg.name, pkg.nameZh, locale)
 
       for (const pricing of pkg.pricing ?? []) {
         if (!pricing.isActive) continue
+        const placementKey =
+          pkg.type === "PRINT_PLACEMENT" ? buildPrintPlacementKey(pkg.metadata ?? null) : undefined
         rows.push({
           id: pricing.id,
           name: packageName,
@@ -59,6 +96,11 @@ export function flattenPlatformCatalog(
           pricingId: pricing.id,
           categoryId: category.id,
           categoryName,
+          packageType: pkg.type,
+          categoryType: category.type,
+          placementKey,
+          durationValue: pricing.durationValue,
+          durationUnit: pricing.durationUnit,
         })
       }
     }

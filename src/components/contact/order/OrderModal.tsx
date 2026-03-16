@@ -160,15 +160,6 @@ export default function OrderModal({
     })
 
     onSubmit(input, { subtotal, assets })
-    setOrderForm({
-      company: "",
-      contact: "",
-      phone: "",
-      email: "",
-      notes: "",
-    })
-    setItemDetails({})
-    setPhoneError(null)
   }
 
   if (!isOpen) return null
@@ -193,6 +184,7 @@ export default function OrderModal({
             >
               {t("adContact.companyInfo")}
             </h3>
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="order-company">{t("adContact.companyName")} *</Label>
