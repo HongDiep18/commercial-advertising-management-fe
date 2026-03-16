@@ -60,7 +60,7 @@ export default function Header() {
               {t("header.directory")}
             </Link>
             <Link
-              href="/store"
+              href={process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"}
               className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
             >
               {t("header.store")}
@@ -177,7 +177,7 @@ export default function Header() {
                 {t("header.directory")}
               </Link>
               <Link
-                href="/store"
+                href={process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"}
                 className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                 onClick={closeMobileMenu}
               >
