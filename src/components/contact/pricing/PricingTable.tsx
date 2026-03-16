@@ -1,8 +1,17 @@
-'use client'
+"use client"
 
-import { useTranslation } from 'react-i18next'
-import Checkbox from '@/components/ui/Checkbox'
-import Card, { CardContent } from '@/components/ui/Card'
+import { useTranslation } from "react-i18next"
+import Checkbox from "@/components/ui/Checkbox"
+import Card, { CardContent } from "@/components/ui/Card"
+
+function normalizePackageTypeKey(type: string): string {
+  const withUnderscores = type.replace(/-/g, "_").replace(/\s+/g, "_")
+  if (/^[A-Z0-9_]+$/.test(withUnderscores)) return withUnderscores
+  return withUnderscores
+    .replace(/([A-Z])/g, (_, c: string) => `_${c}`)
+    .replace(/^_/, "")
+    .toUpperCase()
+}
 
 interface PricingItem {
   id: string
@@ -13,6 +22,10 @@ interface PricingItem {
   duration?: string
   price: string
   discount?: string
+  packageType?: string
+  placementKey?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 interface PricingTableProps {
@@ -41,37 +54,39 @@ export default function PricingTable({
   return (
     <Card className="border-border/50">
       <CardContent className="p-6 pt-9">
-        <div className="flex items-center justify-between mb-4">
-          <h3 key={i18n.language} className="text-lg font-bold text-foreground">{title}</h3>
-          <span className="text-xs text-muted-foreground">{t('adContact.unit')}</span>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 key={i18n.language} className="text-foreground text-lg font-bold">
+            {title}
+          </h3>
+          <span className="text-muted-foreground text-xs">{t("adContact.unit")}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-body-bg-dark border-b border-border bg-muted/50">
+              <tr className="bg-body-bg-dark border-border bg-muted/50 border-b">
                 {columns.select && (
-                  <th className="text-left py-3 px-3 font-semibold w-10 whitespace-nowrap">
-                    {t('adContact.select')}
+                  <th className="w-10 px-3 py-3 text-left font-semibold whitespace-nowrap">
+                    {t("adContact.select")}
                   </th>
                 )}
                 {columns.item && (
-                  <th className="text-left py-3 px-3 font-semibold whitespace-nowrap">
-                    {columns.description ? t('adContact.item') : t('adContact.adItem')}
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">
+                    {columns.description ? t("adContact.item") : t("adContact.adItem")}
                   </th>
                 )}
                 {columns.description && (
-                  <th className="text-left py-3 px-3 font-semibold whitespace-nowrap">
-                    {t('adContact.description')}
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">
+                    {t("adContact.description")}
                   </th>
                 )}
                 {columns.duration && (
-                  <th className="text-left py-3 px-3 font-semibold whitespace-nowrap">
-                    {t('adContact.duration')}
+                  <th className="px-3 py-3 text-left font-semibold whitespace-nowrap">
+                    {t("adContact.duration")}
                   </th>
                 )}
                 {columns.price && (
-                  <th className="text-right py-3 px-3 font-semibold whitespace-nowrap">
-                    {t('adContact.price')}
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">
+                    {t("adContact.price")}
                   </th>
                 )}
               </tr>
@@ -80,13 +95,13 @@ export default function PricingTable({
               {items.map((item) => (
                 <tr
                   key={item.id}
-                  className={`border-b border-border/90 hover:bg-body-bg-dark cursor-pointer transition-colors ${
-                    selectedItems.includes(item.id) ? 'bg-primary/5' : ''
+                  className={`border-border/90 hover:bg-body-bg-dark cursor-pointer border-b transition-colors ${
+                    selectedItems.includes(item.id) ? "bg-primary/5" : ""
                   }`}
                   onClick={() => onItemToggle(item.id)}
                 >
                   {columns.select && (
-                    <td className="py-3 px-3">
+                    <td className="px-3 py-3">
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
                         onCheckedChange={() => onItemToggle(item.id)}
@@ -94,25 +109,50 @@ export default function PricingTable({
                     </td>
                   )}
                   {columns.item && (
-                    <td className="py-3 px-3 font-medium">
-                      {item.name || item.position || item.item}
+                    <td className="px-3 py-3 font-medium">
+                      {(() => {
+                        const baseName = item.name || item.position || item.item
+                        const isVietnamese =
+                          i18n.language === "vi-VN" || i18n.language?.startsWith("vi")
+                        if (isVietnamese && item.packageType) {
+                          const typeKey = normalizePackageTypeKey(item.packageType)
+                          if (typeKey === "PRINT_PLACEMENT" && item.placementKey) {
+                            const placementKey = `adContact.pricing.platformItems.PRINT_PLACEMENT.${item.placementKey}`
+                            const translated = t(placementKey)
+                            if (translated !== placementKey) return translated
+                          }
+                          const key = `adContact.pricing.platformItems.${typeKey}.name`
+                          const translated = t(key)
+                          return translated !== key ? translated : baseName
+                        }
+                        return baseName
+                      })()}
                     </td>
                   )}
                   {columns.description && (
-                    <td className="py-3 px-3 text-muted-foreground">{item.description}</td>
+                    <td className="text-muted-foreground px-3 py-3">{item.description}</td>
                   )}
                   {columns.duration && (
-                    <td className="py-3 px-3">
-                      {item.duration}
+                    <td className="px-3 py-3">
+                      {(() => {
+                        if (item.durationValue != null && item.durationUnit) {
+                          const unitKey = `adContact.durationUnit.${item.durationUnit}`
+                          const unitLabel = t(unitKey)
+                          if (unitLabel !== unitKey) {
+                            return `${item.durationValue} ${unitLabel}`
+                          }
+                        }
+                        return item.duration
+                      })()}
                       {item.discount && (
-                        <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                          {t('adContact.discount')} {item.discount}
+                        <span className="bg-primary/10 text-primary ml-2 rounded px-2 py-0.5 text-xs">
+                          {t("adContact.discount")} {item.discount}
                         </span>
                       )}
                     </td>
                   )}
                   {columns.price && (
-                    <td className="py-3 px-3 text-right font-medium">{item.price}</td>
+                    <td className="px-3 py-3 text-right font-medium">{item.price}</td>
                   )}
                 </tr>
               ))}

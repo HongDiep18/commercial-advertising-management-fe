@@ -49,13 +49,16 @@ export type AdOrderAssetDto = {
 }
 
 export type CreateAdOrderResponse = {
-  message?: string
-  data?: {
-    orderId: string
-    status: AdOrderStatusEnum
-    subtotal: string
-    items?: Array<{ id: string; pricingId: string }>
-  }
+  id: string
+  userId: string
+  companyId: string | null
+  status: AdOrderStatusEnum
+  subtotal: number
+  notes: string | null
+  submittedAt: string | null
+  createdAt: string
+  updatedAt: string
+  items?: Array<{ id: string; pricingId: string }>
 }
 
 export type CreateAdOrderInput = CreateAdOrderDto

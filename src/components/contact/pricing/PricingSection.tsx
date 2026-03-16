@@ -16,37 +16,76 @@ interface PricingSectionProps {
   selectedItems: string[]
   onItemToggle: (itemId: string) => void
   platformCatalogItems?: PlatformCatalogItem[]
+  allowMockFallback?: boolean
 }
+
+const PLATFORM_CATEGORY_TYPES = new Set(["HOMEPAGE_POPUP", "FEATURED_COMPANY", "COMPANY_DIRECTORY"])
 
 export default function PricingSection({
   activeTab,
   selectedItems,
   onItemToggle,
   platformCatalogItems = [],
+  allowMockFallback = true,
 }: PricingSectionProps) {
   const { t, i18n } = useTranslation()
+  const isVietnamese = i18n.language === "vi-VN" || i18n.language?.startsWith("vi")
+
+  const renderPricingLoadError = () => (
+    <Card className="border-border/50">
+      <CardContent className="p-6">
+        <p className="text-muted-foreground text-sm">
+          {t("adContact.pricingLoadError") ||
+            "Unable to load pricing from server. Please try again later."}
+        </p>
+      </CardContent>
+    </Card>
+  )
+
+  const getCategoryTitle = (categoryName: string, categoryType?: string) => {
+    if (!isVietnamese || !categoryType) return categoryName
+    const categoryTypeKey = categoryType.replace(/-/g, "_").toUpperCase()
+    return t(`adContact.pricing.adPackageCategory.${categoryTypeKey}`) || categoryName
+  }
 
   if (activeTab === "platform") {
-    const useApiCatalog = platformCatalogItems.length > 0
+    const platformOnlyItems = platformCatalogItems.filter((item) =>
+      PLATFORM_CATEGORY_TYPES.has(item.categoryType ?? "")
+    )
+
+    const useApiCatalog = platformOnlyItems.length > 0
+
     const categories = useApiCatalog
-      ? groupPlatformByCategory(platformCatalogItems)
-      : Object.entries(platformPricing).map(([categoryKey, category]) => ({
-          categoryKey,
-          categoryName: t(`adContact.pricing.${categoryKey}.title`),
-          items: category.items.map((item) => ({
-            id: item.id,
-            name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
-            duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
-            price: item.price,
-          })),
-        }))
+      ? groupPlatformByCategory(platformOnlyItems)
+      : allowMockFallback
+        ? Object.entries(platformPricing).map(([categoryKey, category]) => ({
+            categoryKey,
+            categoryName: t(`adContact.pricing.${categoryKey}.title`),
+            items: category.items.map((item) => ({
+              id: item.id,
+              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
+              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
+              price: item.price,
+            })),
+          }))
+        : []
 
     return (
       <div className="space-y-6">
+        {!useApiCatalog && !allowMockFallback && renderPricingLoadError()}
+
         {categories.map((cat) => (
           <PricingTable
             key={cat.categoryKey}
-            title={cat.categoryName}
+            title={(() => {
+              if (!useApiCatalog) return cat.categoryName
+              const first = cat.items[0]
+              const categoryType =
+                first && typeof first === "object" && "categoryType" in first
+                  ? (first as { categoryType?: string }).categoryType
+                  : undefined
+              return getCategoryTitle(cat.categoryName, categoryType)
+            })()}
             items={cat.items}
             selectedItems={selectedItems}
             onItemToggle={onItemToggle}
@@ -69,6 +108,36 @@ export default function PricingSection({
   }
 
   if (activeTab === "directory") {
+    const printItems = platformCatalogItems.filter((item) => item.categoryType === "PLATFORM_PRINT")
+    const useApiCatalog = printItems.length > 0
+
+    if (useApiCatalog) {
+      const categories = groupPlatformByCategory(printItems)
+      return (
+        <div className="space-y-6">
+          {categories.map((cat) => (
+            <PricingTable
+              key={cat.categoryKey}
+              title={t("adContact.pricing.directory.title")}
+              items={cat.items}
+              selectedItems={selectedItems}
+              onItemToggle={onItemToggle}
+              columns={{
+                select: true,
+                item: true,
+                duration: true,
+                price: true,
+              }}
+            />
+          ))}
+        </div>
+      )
+    }
+
+    if (!allowMockFallback) {
+      return renderPricingLoadError()
+    }
+
     return (
       <Card className="border-border/50">
         <CardContent className="p-6">
@@ -138,6 +207,43 @@ export default function PricingSection({
         </CardContent>
       </Card>
     )
+  }
+
+  const productItemsFromApi = platformCatalogItems.filter(
+    (item) => item.categoryType === "PRODUCT_LISTING"
+  )
+  const useApiProductCatalog = productItemsFromApi.length > 0
+
+  if (useApiProductCatalog) {
+    return (
+      <div className="space-y-6">
+        <PricingTable
+          title={t("adContact.pricing.product.title")}
+          items={productItemsFromApi.map((item) => ({
+            id: item.id,
+            name: item.name,
+            packageType: item.packageType,
+            duration: item.duration,
+            durationValue: item.durationValue ?? null,
+            durationUnit: item.durationUnit ?? null,
+            price: item.price,
+          }))}
+          selectedItems={selectedItems}
+          onItemToggle={onItemToggle}
+          columns={{
+            select: true,
+            item: true,
+            description: false,
+            duration: true,
+            price: true,
+          }}
+        />
+      </div>
+    )
+  }
+
+  if (!allowMockFallback) {
+    return renderPricingLoadError()
   }
 
   return (
