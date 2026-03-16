@@ -182,6 +182,12 @@
     "select": "Select",
     "adItem": "Advertising Item",
     "duration": "Duration",
+    "durationUnit": {
+      "MONTH": "month",
+      "DAY": "day",
+      "WEEK": "week",
+      "YEAR": "year"
+    },
     "price": "Price",
     "discount": "Discount",
     "pagePosition": "Page / Position",
@@ -193,6 +199,7 @@
     "clickToOrder": "Click the button on the right to fill in order information",
     "orderNow": "Order Now",
     "orderTitle": "Place Advertising Order",
+    "startDateRequired": "Please select a start date for each advertising item.",
     "companyInfo": "Company Information",
     "companyName": "Company Name",
     "contactPerson": "Contact Person",
@@ -246,7 +253,22 @@
       "product": {
         "title": "Product Sales Listing"
       },
+      "adPackageCategory": {
+        "HOMEPAGE_POPUP": "Homepage Popup Advertising"
+      },
       "platformItems": {
+        "POPUP_PRIORITY_SLOT": {
+          "name": "Priority Display (First Position)"
+        },
+        "POPUP_NORMAL_SLOT": {
+          "name": "General Rotation (2nd–5th Positions)"
+        },
+        "POPUP_LINK": {
+          "name": "\"View Details\" Link Setting"
+        },
+        "POPUP_SORT": {
+          "name": "Ranking Adjustment (Promoting Rank)"
+        },
         "popup-priority-1m": {
           "name": "Priority display (1st)",
           "duration": "1 month"

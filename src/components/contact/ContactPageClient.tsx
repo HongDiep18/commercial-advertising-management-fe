@@ -20,6 +20,7 @@ import { useAvailableAdPackages } from "@/api/ads-pricing/hooks"
 import { flattenPlatformCatalog } from "@/api/ads-pricing/contactPlatform"
 import type { CreateAdOrderInput } from "@/types/types"
 import { useUser } from "@/contexts/user-context"
+import { Toast, type ToastVariant } from "@/components/ui/Toast"
 
 export type SelectedEntry = { id: string; quantity: number }
 
@@ -35,21 +36,30 @@ interface SelectedItem {
 }
 
 export default function ContactPageClient() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const router = useRouter()
   const { user, isLoggedIn } = useUser()
   const [activeTab, setActiveTab] = useState<TabType>("platform")
   const [selectedItems, setSelectedItems] = useState<SelectedEntry[]>([])
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
+    message: "",
+    variant: "info",
+    visible: false,
+  })
+
+  const showToast = (message: string, variant: ToastVariant = "info") =>
+    setToast({ message, variant, visible: true })
+  const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
 
   const tabConfig = getTabConfig(t)
   const currentConfig = tabConfig[activeTab]
 
   const { data: adPackagesData } = useAvailableAdPackages()
   const platformCatalogItems = useMemo(
-    () => (adPackagesData ? flattenPlatformCatalog(adPackagesData) : []),
-    [adPackagesData]
+    () => (adPackagesData ? flattenPlatformCatalog(adPackagesData, i18n.language) : []),
+    [adPackagesData, i18n.language]
   )
 
   const selectedIds = selectedItems.map((e) => e.id)
@@ -140,32 +150,57 @@ export default function ContactPageClient() {
     input: CreateAdOrderInput,
     meta: { subtotal: string; assets: { pricingId: string; assetType: string; file: File }[] }
   ) => {
+    const hasMissingStartDate = input.items.some(
+      (item) => !item.startDate || item.startDate.trim() === ""
+    )
+    if (hasMissingStartDate) {
+      showToast(
+        t("adContact.startDateRequired") || "Please select a start date for each advertising item.",
+        "warning"
+      )
+      throw new Error("startDateRequired")
+    }
+
     try {
       const res = await createAdOrder(input)
-      const orderId = res?.data?.orderId
+      const orderId = res.id
       if (!orderId) {
-        alert(t("adContact.orderError") || "Order created but no order ID returned.")
+        showToast(t("adContact.orderError") || "Order created but no order ID returned.", "error")
         return
       }
-      await attachAssetsAndSubmitOrder(orderId, meta.assets)
-      alert(t("adContact.orderSuccess", { count: totalQuantity }))
+      try {
+        await attachAssetsAndSubmitOrder(orderId, meta.assets)
+      } catch (assetError) {
+        console.error("[handleOrderSubmit] Asset upload failed", {
+          orderId,
+          assetCount: meta.assets.length,
+          assetError,
+        })
+        showToast(
+          t("adContact.orderError") || "Your order could not be completed. Please try again.",
+          "error"
+        )
+        throw assetError
+      }
+      showToast(t("adContact.orderSuccess", { count: totalQuantity }), "success")
       setShowOrderModal(false)
       setSelectedItems([])
     } catch (err) {
+      console.error("[handleOrderSubmit] Order submission failed", err)
       const message =
         err instanceof Error ? err.message : t("adContact.orderError") || "Order failed."
-      alert(message)
+      showToast(message, "error")
     }
   }
 
   const handleInquirySubmit = () => {
-    alert(t("adContact.inquirySuccess"))
+    showToast(t("adContact.inquirySuccess"), "success")
     setShowInquiryModal(false)
   }
 
   const handleOrderClick = () => {
     if (!isLoggedIn) {
-      alert(t("adContact.mustLoginToOrder") || "You must login to order")
+      showToast(t("adContact.mustLoginToOrder") || "You must login to order", "warning")
       router.push("/login?next=/contact")
       return
     }
@@ -221,6 +256,14 @@ export default function ContactPageClient() {
       />
 
       <Footer />
+
+      <Toast
+        message={toast.message}
+        variant={toast.variant}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={4500}
+      />
     </main>
   )
 }

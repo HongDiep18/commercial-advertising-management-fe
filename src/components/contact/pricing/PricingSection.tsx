@@ -27,9 +27,18 @@ export default function PricingSection({
   const { t, i18n } = useTranslation()
 
   if (activeTab === "platform") {
-    const useApiCatalog = platformCatalogItems.length > 0
+    const platformOnlyItems =
+      platformCatalogItems.length > 0
+        ? platformCatalogItems.filter(
+            (item) =>
+              item.categoryType === "HOMEPAGE_POPUP" ||
+              item.categoryType === "FEATURED_COMPANY" ||
+              item.categoryType === "COMPANY_DIRECTORY"
+          )
+        : []
+    const useApiCatalog = platformOnlyItems.length > 0
     const categories = useApiCatalog
-      ? groupPlatformByCategory(platformCatalogItems)
+      ? groupPlatformByCategory(platformOnlyItems)
       : Object.entries(platformPricing).map(([categoryKey, category]) => ({
           categoryKey,
           categoryName: t(`adContact.pricing.${categoryKey}.title`),
@@ -43,21 +52,31 @@ export default function PricingSection({
 
     return (
       <div className="space-y-6">
-        {categories.map((cat) => (
-          <PricingTable
-            key={cat.categoryKey}
-            title={cat.categoryName}
-            items={cat.items}
-            selectedItems={selectedItems}
-            onItemToggle={onItemToggle}
-            columns={{
-              select: true,
-              item: true,
-              duration: true,
-              price: true,
-            }}
-          />
-        ))}
+        {categories.map((cat) => {
+          const firstItem =
+            useApiCatalog && cat.items[0] && "categoryType" in cat.items[0] ? cat.items[0] : null
+          const isVietnamese = i18n.language === "vi-VN" || i18n.language?.startsWith("vi")
+          const categoryTypeKey = firstItem?.categoryType?.replace(/-/g, "_").toUpperCase()
+          const categoryTitle =
+            isVietnamese && categoryTypeKey
+              ? t(`adContact.pricing.adPackageCategory.${categoryTypeKey}`) || cat.categoryName
+              : cat.categoryName
+          return (
+            <PricingTable
+              key={cat.categoryKey}
+              title={categoryTitle}
+              items={cat.items}
+              selectedItems={selectedItems}
+              onItemToggle={onItemToggle}
+              columns={{
+                select: true,
+                item: true,
+                duration: true,
+                price: true,
+              }}
+            />
+          )
+        })}
 
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p key={i18n.language} className="font-700 text-sm text-amber-800">
@@ -69,6 +88,35 @@ export default function PricingSection({
   }
 
   if (activeTab === "directory") {
+    const printItems =
+      platformCatalogItems.length > 0
+        ? platformCatalogItems.filter((item) => item.categoryType === "PLATFORM_PRINT")
+        : []
+    const useApiCatalog = printItems.length > 0
+
+    if (useApiCatalog) {
+      const categories = groupPlatformByCategory(printItems)
+      return (
+        <div className="space-y-6">
+          {categories.map((cat) => (
+            <PricingTable
+              key={cat.categoryKey}
+              title={t("adContact.pricing.directory.title")}
+              items={cat.items}
+              selectedItems={selectedItems}
+              onItemToggle={onItemToggle}
+              columns={{
+                select: true,
+                item: true,
+                duration: true,
+                price: true,
+              }}
+            />
+          ))}
+        </div>
+      )
+    }
+
     return (
       <Card className="border-border/50">
         <CardContent className="p-6">
@@ -137,6 +185,40 @@ export default function PricingSection({
           </div>
         </CardContent>
       </Card>
+    )
+  }
+
+  const productItemsFromApi =
+    platformCatalogItems.length > 0
+      ? platformCatalogItems.filter((item) => item.categoryType === "PRODUCT_LISTING")
+      : []
+  const useApiProductCatalog = productItemsFromApi.length > 0
+
+  if (useApiProductCatalog) {
+    return (
+      <div className="space-y-6">
+        <PricingTable
+          title={t("adContact.pricing.product.title")}
+          items={productItemsFromApi.map((item) => ({
+            id: item.id,
+            name: item.name,
+            packageType: item.packageType,
+            duration: item.duration,
+            durationValue: item.durationValue ?? null,
+            durationUnit: item.durationUnit ?? null,
+            price: item.price,
+          }))}
+          selectedItems={selectedItems}
+          onItemToggle={onItemToggle}
+          columns={{
+            select: true,
+            item: true,
+            description: false,
+            duration: true,
+            price: true,
+          }}
+        />
+      </div>
     )
   }
 

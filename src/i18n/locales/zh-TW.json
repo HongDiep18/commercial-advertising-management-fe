@@ -182,6 +182,12 @@
     "select": "選擇",
     "adItem": "廣告項目",
     "duration": "時長",
+    "durationUnit": {
+      "MONTH": "個月",
+      "DAY": "天",
+      "WEEK": "週",
+      "YEAR": "年"
+    },
     "price": "金額",
     "discount": "折扣",
     "pagePosition": "頁次 / 版位",
@@ -193,6 +199,7 @@
     "clickToOrder": "點擊右側按鈕填寫訂單資訊",
     "orderNow": "立即下單",
     "orderTitle": "廣告下單",
+    "startDateRequired": "請為每一個廣告項目選擇開始日期。",
     "companyInfo": "公司資訊",
     "companyName": "公司名稱",
     "contactPerson": "聯絡人",
@@ -246,7 +253,22 @@
       "product": {
         "title": "商品銷售刊登"
       },
+      "adPackageCategory": {
+        "HOMEPAGE_POPUP": "首頁彈窗廣告"
+      },
       "platformItems": {
+        "POPUP_PRIORITY_SLOT": {
+          "name": "優先展示（第一位）"
+        },
+        "POPUP_NORMAL_SLOT": {
+          "name": "一般輪播（第2–5位）"
+        },
+        "POPUP_LINK": {
+          "name": "「查看詳情」連結設定"
+        },
+        "POPUP_SORT": {
+          "name": "排序調整（提升順位）"
+        },
         "popup-priority-1m": {
           "name": "優先顯示（第1順位）",
           "duration": "1個月"
