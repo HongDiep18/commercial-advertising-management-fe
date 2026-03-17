@@ -182,8 +182,15 @@
     "select": "Select",
     "adItem": "Advertising Item",
     "duration": "Duration",
+    "durationUnit": {
+      "MONTH": "month",
+      "DAY": "day",
+      "WEEK": "week",
+      "YEAR": "year"
+    },
     "price": "Price",
     "discount": "Discount",
+    "pricingLoadError": "Unable to load pricing from server. Please try again later.",
     "pagePosition": "Page / Position",
     "item": "Item",
     "description": "Description",
@@ -193,6 +200,9 @@
     "clickToOrder": "Click the button on the right to fill in order information",
     "orderNow": "Order Now",
     "orderTitle": "Place Advertising Order",
+    "startDateRequired": "Please select a start date for each advertising item.",
+    "demoOrderInfo": "This is a demo account. Orders here are for demonstration only and are not actually submitted.",
+    "overlapWarning": "You already have an order for this advertising package with overlapping dates. Please choose different dates.",
     "companyInfo": "Company Information",
     "companyName": "Company Name",
     "contactPerson": "Contact Person",
@@ -246,7 +256,22 @@
       "product": {
         "title": "Product Sales Listing"
       },
+      "adPackageCategory": {
+        "HOMEPAGE_POPUP": "Homepage Popup Advertising"
+      },
       "platformItems": {
+        "POPUP_PRIORITY_SLOT": {
+          "name": "Priority Display (First Position)"
+        },
+        "POPUP_NORMAL_SLOT": {
+          "name": "General Rotation (2nd–5th Positions)"
+        },
+        "POPUP_LINK": {
+          "name": "\"View Details\" Link Setting"
+        },
+        "POPUP_SORT": {
+          "name": "Ranking Adjustment (Promoting Rank)"
+        },
         "popup-priority-1m": {
           "name": "Priority display (1st)",
           "duration": "1 month"
@@ -559,6 +584,7 @@
   },
   "login": {
     "title": "Login",
+    "accountDisabled": "Your account has been disabled.",
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot password?",
@@ -631,6 +657,7 @@
     "memberSince": "Member since",
     "viewBenefits": "View membership benefits",
     "editProfile": "Edit profile",
+    "editReadOnly": "View profile details",
     "goAdmin": "Go to admin",
     "upgradeProgress": "Upgrade progress",
     "currentTier": "Current tier",
@@ -1038,6 +1065,16 @@
       "approvedSuccess": "Request approved successfully",
       "rejectedSuccess": "Request rejected",
       "updateError": "Failed to update status",
+      "enableAccount": "Enable account",
+      "disableAccount": "Disable account",
+      "enabledSuccess": "Account enabled",
+      "disabledSuccess": "Account disabled",
+      "userIdRequired": "User ID not available for this row",
+      "deleteCompany": "Delete company",
+      "deleteCompanyConfirm": "Delete this company? The user will be deactivated.",
+      "deleteCompanySuccess": "Company deleted",
+      "deleteCompanyError": "Failed to delete company",
+      "cannotEnableDeleted": "The company had been deleted, cannot enable it.",
       "companyName": "Company Name",
       "contact": "Contact",
       "email": "Email",

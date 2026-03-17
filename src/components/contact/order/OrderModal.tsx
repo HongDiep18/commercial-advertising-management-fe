@@ -12,8 +12,9 @@ import { getDurationMonths, addMonths } from "@/data/contactMockData"
 import { format } from "date-fns"
 import type { UiAdItemDetails, UiSelectedAdItem } from "@/api/ad-orders/builders"
 import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
+import { hasOverlapWithExistingOrders, type NewOrderItem } from "@/api/ad-orders/overlap"
 import type { CreateAdOrderInput } from "@/types/types"
-import type { AdOrderAssetToUpload } from "@/api/ad-orders/service"
+import { type AdOrderAssetToUpload, getMyPendingOrderItems } from "@/api/ad-orders/service"
 import { isValidPhone } from "@/utils/validation/phone"
 
 type OrderForm = {
@@ -50,7 +51,7 @@ type OrderModalProps = {
   onSubmit: (
     input: CreateAdOrderInput,
     meta: { subtotal: string; assets: AdOrderAssetToUpload[] }
-  ) => void
+  ) => void | Promise<void>
   onQuantityChange?: (itemId: string, quantity: number) => void
 }
 
@@ -134,7 +135,7 @@ export default function OrderModal({
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!isValidPhone(orderForm.phone)) {
       setPhoneError(t("register.errors.invalidPhone"))
@@ -149,6 +150,31 @@ export default function OrderModal({
       itemDetailsById: itemDetails as Record<string, UiAdItemDetails>,
     })
 
+    const newItems: NewOrderItem[] = selectedItems.map((item) => {
+      const details = itemDetails[item.id]
+      const sel = item as UiSelectedAdItem
+      return {
+        packageName: item.name,
+        pricingName: item.duration ?? "",
+        startDate: details?.startDate ?? "",
+        endDate: details?.endDate ?? details?.startDate ?? "",
+        pricingId: sel.pricingId ?? sel.id,
+      }
+    })
+
+    try {
+      const existingItems = await getMyPendingOrderItems()
+      if (hasOverlapWithExistingOrders(existingItems, newItems)) {
+        alert(
+          t("adContact.overlapWarning") ||
+            "You already have an order for this advertising package with overlapping dates. Please choose different dates."
+        )
+        return
+      }
+    } catch (err) {
+      console.error("[OrderModal] Failed to check existing orders for overlap", err)
+    }
+
     const assets: AdOrderAssetToUpload[] = []
     selectedItems.forEach((item) => {
       const details = itemDetails[item.id]
@@ -159,16 +185,13 @@ export default function OrderModal({
       })
     })
 
-    onSubmit(input, { subtotal, assets })
-    setOrderForm({
-      company: "",
-      contact: "",
-      phone: "",
-      email: "",
-      notes: "",
-    })
-    setItemDetails({})
-    setPhoneError(null)
+    try {
+      await onSubmit(input, { subtotal, assets })
+      setOrderForm({ company: "", contact: "", phone: "", email: "", notes: "" })
+      setItemDetails({})
+    } catch {
+      console.error("[OrderModal] Failed to submit order")
+    }
   }
 
   if (!isOpen) return null
@@ -193,6 +216,7 @@ export default function OrderModal({
             >
               {t("adContact.companyInfo")}
             </h3>
+
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="order-company">{t("adContact.companyName")} *</Label>

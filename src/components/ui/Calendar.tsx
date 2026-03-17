@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { format } from "date-fns"
+import { enUS, vi, zhTW, type Locale } from "date-fns/locale"
 
 export interface CalendarProps {
   mode?: "single" | "range"
@@ -17,19 +19,44 @@ export interface CalendarProps {
   }
   className?: string
   initialFocus?: boolean
+  localeCode?: string
 }
 
+const localeMap: Record<string, Locale> = {
+  "en-US": enUS,
+  en: enUS,
+  "vi-VN": vi,
+  vi: vi,
+  "zh-TW": zhTW,
+  "zh-CN": zhTW,
+  zh: zhTW,
+}
+
+const WEEKDAY_ANCHOR = new Date(2024, 0, 7)
+
 const Calendar = ({
-  mode = "single",
   selected,
   onSelect,
   disabled,
   modifiers,
   modifiersClassNames,
   className = "",
-  initialFocus = false,
+  localeCode = "en-US",
 }: CalendarProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const locale = localeMap[localeCode] ?? localeMap[localeCode?.split("-")[0] ?? ""] ?? enUS
+
+  const monthLabel = useMemo(
+    () => format(currentMonth, "LLLL yyyy", { locale }),
+    [currentMonth, locale]
+  )
+  const dayNames = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(WEEKDAY_ANCHOR)
+      d.setDate(d.getDate() + i)
+      return format(d, "EEEEEE", { locale })
+    })
+  }, [locale])
 
   const today = new Date()
   const year = currentMonth.getFullYear()
@@ -125,22 +152,6 @@ const Calendar = ({
     setCurrentMonth(new Date(year, month + 1, 1))
   }
 
-  const monthNames = [
-    "一月",
-    "二月",
-    "三月",
-    "四月",
-    "五月",
-    "六月",
-    "七月",
-    "八月",
-    "九月",
-    "十月",
-    "十一月",
-    "十二月",
-  ]
-  const dayNames = ["日", "一", "二", "三", "四", "五", "六"]
-
   return (
     <div className={`w-full ${className}`}>
       <div className="mb-4 flex items-center justify-between pt-7">
@@ -154,9 +165,7 @@ const Calendar = ({
             />
           </svg>
         </button>
-        <div className="font-semibold">
-          {year}年{month + 1}月
-        </div>
+        <div className="font-semibold">{monthLabel}</div>
         <button type="button" onClick={goToNextMonth} className="hover:bg-muted rounded-md p-1">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

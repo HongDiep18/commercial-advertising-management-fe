@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
 import {
+  deleteCompany,
   getAllProfileRequests,
   mapProfileRequestToCompanyRequest,
+  patchUserActive,
   updateProfileRequestStatus,
 } from "@/api/admin"
 import { mockAdSubmissions } from "@/contexts/user-context"
@@ -44,6 +46,22 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     [refetchCompanyRequests]
   )
 
+  const updateUserActive = useCallback(
+    async (userId: string, isActive: boolean) => {
+      await patchUserActive(userId, isActive)
+      refetchCompanyRequests()
+    },
+    [refetchCompanyRequests]
+  )
+
+  const deleteCompanyApi = useCallback(
+    async (userId: string) => {
+      await deleteCompany(userId)
+      refetchCompanyRequests()
+    },
+    [refetchCompanyRequests]
+  )
+
   const value = useMemo<AdminData>(
     () => ({
       companyRequests,
@@ -55,8 +73,17 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       companyRequestsLoading,
       companyRequestsError,
       updateCompanyRequestStatus,
+      updateUserActive,
+      deleteCompany: deleteCompanyApi,
     }),
-    [companyRequests, companyRequestsLoading, companyRequestsError, updateCompanyRequestStatus]
+    [
+      companyRequests,
+      companyRequestsLoading,
+      companyRequestsError,
+      updateCompanyRequestStatus,
+      updateUserActive,
+      deleteCompanyApi,
+    ]
   )
   return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>
 }

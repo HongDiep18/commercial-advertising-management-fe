@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { AuthSessionCheck } from "../src/components/AuthSessionCheck"
 import { UserProvider } from "../src/contexts/user-context"
 import "../src/i18n/config"
 
@@ -40,7 +41,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <UserProvider>{langReady ? <div key={i18n.language}>{children}</div> : null}</UserProvider>
+      <UserProvider>
+        <AuthSessionCheck />
+        {langReady ? <div key={i18n.language}>{children}</div> : null}
+      </UserProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )

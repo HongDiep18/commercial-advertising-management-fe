@@ -1,6 +1,5 @@
 import type { RegisterFormData } from "./registerConstants"
 import type { ProfileFormData } from "@/types/account"
-import { getRegionValuesForCountry } from "./registerOptions"
 import { isValidPhone } from "@/utils/validation/phone"
 
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
@@ -15,7 +14,6 @@ const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "companyAddress",
   "email",
   "country",
-  "region",
   "industry",
   "website",
   "introduction",
@@ -91,13 +89,6 @@ export function validateRegisterForm(data: RegisterFormData): RegisterValidation
     field: keyof RegisterFormData
     kind: RegisterErrorKind
   }>
-
-  if (filled(data.country) && filled(data.region)) {
-    const allowedRegions = getRegionValuesForCountry(data.country)
-    if (!allowedRegions.includes(data.region)) {
-      errors.push({ field: "region", kind: "invalidRegion" })
-    }
-  }
   if (errors.length === 0) return { valid: true }
   return { valid: false, errors }
 }

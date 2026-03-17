@@ -182,8 +182,15 @@
     "select": "選擇",
     "adItem": "廣告項目",
     "duration": "時長",
+    "durationUnit": {
+      "MONTH": "個月",
+      "DAY": "天",
+      "WEEK": "週",
+      "YEAR": "年"
+    },
     "price": "金額",
     "discount": "折扣",
+    "pricingLoadError": "無法從伺服器載入價格資訊，請稍後再試。",
     "pagePosition": "頁次 / 版位",
     "item": "項目",
     "description": "說明",
@@ -193,6 +200,9 @@
     "clickToOrder": "點擊右側按鈕填寫訂單資訊",
     "orderNow": "立即下單",
     "orderTitle": "廣告下單",
+    "startDateRequired": "請為每一個廣告項目選擇開始日期。",
+    "demoOrderInfo": "此為示範帳號，這裡的下單僅供體驗，並不會實際送出。",
+    "overlapWarning": "您已有此廣告方案與相同時段的重複訂單。請選擇其他日期或移除重複項目。",
     "companyInfo": "公司資訊",
     "companyName": "公司名稱",
     "contactPerson": "聯絡人",
@@ -246,7 +256,22 @@
       "product": {
         "title": "商品銷售刊登"
       },
+      "adPackageCategory": {
+        "HOMEPAGE_POPUP": "首頁彈窗廣告"
+      },
       "platformItems": {
+        "POPUP_PRIORITY_SLOT": {
+          "name": "優先展示（第一位）"
+        },
+        "POPUP_NORMAL_SLOT": {
+          "name": "一般輪播（第2–5位）"
+        },
+        "POPUP_LINK": {
+          "name": "「查看詳情」連結設定"
+        },
+        "POPUP_SORT": {
+          "name": "排序調整（提升順位）"
+        },
         "popup-priority-1m": {
           "name": "優先顯示（第1順位）",
           "duration": "1個月"
@@ -559,6 +584,7 @@
   },
   "login": {
     "title": "登入帳號",
+    "accountDisabled": "您的帳號已被停用。",
     "email": "電子郵件",
     "password": "密碼",
     "forgotPassword": "忘記密碼？",
@@ -631,6 +657,7 @@
     "memberSince": "會員加入日期",
     "viewBenefits": "查看會員權益",
     "editProfile": "編輯會員資料",
+    "editReadOnly": "查看會員資料",
     "goAdmin": "進入管理後台",
     "upgradeProgress": "升級進度",
     "currentTier": "目前等級",
@@ -1031,6 +1058,16 @@
       "approvedSuccess": "已通過審核",
       "rejectedSuccess": "已拒絕",
       "updateError": "更新狀態失敗",
+      "enableAccount": "啟用帳號",
+      "disableAccount": "停用帳號",
+      "enabledSuccess": "已啟用帳號",
+      "disabledSuccess": "已停用帳號",
+      "userIdRequired": "此列無使用者 ID",
+      "deleteCompany": "刪除公司",
+      "deleteCompanyConfirm": "確定刪除此公司？該使用者將被停用。",
+      "deleteCompanySuccess": "已刪除公司",
+      "deleteCompanyError": "刪除公司失敗",
+      "cannotEnableDeleted": "該公司已被刪除，無法啟用。",
       "companyName": "公司名稱",
       "contact": "聯絡人",
       "email": "電子信箱",

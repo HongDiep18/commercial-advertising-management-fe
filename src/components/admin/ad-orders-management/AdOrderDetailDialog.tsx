@@ -49,7 +49,10 @@ function getPricingModelLabel(model: string, t: (key: string) => string): string
   }
 }
 
-function getItemPricingLabel(item: AdminOrderDto["items"][number], t: (key: string) => string): string {
+function getItemPricingLabel(
+  item: AdminOrderDto["items"][number],
+  t: (key: string) => string
+): string {
   if (item.pricingModel !== "DURATION") {
     return getPricingModelLabel(item.pricingModel, t)
   }
@@ -219,7 +222,7 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
           </div>
 
           <div className="flex gap-3 border-t py-5">
-            <Button className="flex-1" variant="default" asChild>
+            <Button className="bg-primary flex-1" variant="primary" asChild>
               <a href={`mailto:${order.company?.email ?? order.user.email}`}>
                 <Mail className="mr-2 h-4 w-4" />
                 {t("admin.advertising.sendEmail") || "Send email"}
@@ -228,7 +231,7 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
             {order.company?.phone ? (
               <Button
                 variant="outline"
-                className="hover:bg-header-red-dark/70! flex-1 border border-gray-300! bg-transparent hover:text-white!"
+                className="hover:bg-header-red-dark/70! flex-1 border border-gray-300! !bg-transparent hover:text-white!"
                 asChild
               >
                 <a href={`tel:${order.company.phone}`}>

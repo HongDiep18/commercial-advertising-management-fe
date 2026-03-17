@@ -182,8 +182,15 @@
     "select": "Chọn",
     "adItem": "Mục quảng cáo",
     "duration": "Thời lượng",
+    "durationUnit": {
+      "MONTH": "tháng",
+      "DAY": "ngày",
+      "WEEK": "tuần",
+      "YEAR": "năm"
+    },
     "price": "Giá",
     "discount": "Giảm giá",
+    "pricingLoadError": "Không thể tải bảng giá từ máy chủ. Vui lòng thử lại sau.",
     "pagePosition": "Trang / Vị trí",
     "item": "Mục",
     "description": "Mô tả",
@@ -193,6 +200,9 @@
     "clickToOrder": "Nhấp vào nút bên phải để điền thông tin đặt hàng",
     "orderNow": "Đặt hàng ngay",
     "orderTitle": "Đặt quảng cáo",
+    "startDateRequired": "Vui lòng chọn ngày bắt đầu cho từng mục quảng cáo.",
+    "demoOrderInfo": "Đây là tài khoản demo. Đơn hàng chỉ để trải nghiệm và sẽ không được gửi thực tế.",
+    "overlapWarning": "Bạn đã có đơn hàng cho gói quảng cáo này với thời gian trùng lặp. Vui lòng chọn ngày khác hoặc bỏ đơn trùng.",
     "companyInfo": "Thông tin công ty",
     "companyName": "Tên công ty",
     "contactPerson": "Người liên hệ",
@@ -246,7 +256,68 @@
       "product": {
         "title": "Đăng bán sản phẩm"
       },
+      "adPackageCategory": {
+        "HOMEPAGE_POPUP": "Popup trang chủ",
+        "FEATURED_COMPANY": "Công ty nổi bật",
+        "COMPANY_DIRECTORY": "Danh mục công ty",
+        "PLATFORM_PRINT": "Quảng cáo ấn phẩm",
+        "PRODUCT_LISTING": "Danh sách sản phẩm"
+      },
       "platformItems": {
+        "POPUP_PRIORITY_SLOT": {
+          "name": "Ưu tiên hiển thị (vị trí 1)"
+        },
+        "POPUP_ROTATION_SLOT": {
+          "name": "Luân phiên chung (vị trí 2–5)"
+        },
+        "POPUP_VIEW_DETAILS_LINK": {
+          "name": "Thiết lập liên kết \"Xem chi tiết\""
+        },
+        "POPUP_RANKING_ADJUSTMENT": {
+          "name": "Điều chỉnh xếp hạng (nâng thứ hạng)"
+        },
+        "FEATURED_HOMEPAGE_DISPLAY": {
+          "name": "Hiển thị công ty nổi bật trang chủ"
+        },
+        "FEATURED_HIGHLIGHT_BOOST": {
+          "name": "Tăng nhấn mạnh công ty nổi bật"
+        },
+        "COMPANY_CATEGORY_TOP": {
+          "name": "Hiển thị đầu trang danh mục"
+        },
+        "COMPANY_INFO_HIGHLIGHT": {
+          "name": "Nhấn mạnh thông tin công ty"
+        },
+        "PRINT_PLACEMENT": {
+          "name": "Vị trí quảng cáo in ấn",
+          "front_cover": "Bìa trước",
+          "back_cover": "Bìa sau",
+          "inside_front_cover_left": "Bìa trong trước — Trái",
+          "inside_front_cover_right": "Bìa trong trước — Phải",
+          "inside_back_cover_left": "Bìa trong sau — Trái",
+          "inside_back_cover_right": "Bìa trong sau — Phải",
+          "inner_page_p2_p5": "Trang trong P2–P5",
+          "pre_back_cover_5pages": "5 trang trước bìa sau",
+          "category_insert": "Quảng cáo chèn danh mục",
+          "next_to_toc_full": "Cạnh mục lục — Trang nguyên",
+          "next_to_toc_half": "Cạnh mục lục — Nửa trang",
+          "inner_page_full_color": "Trang trong — Màu",
+          "inner_page_full_monochrome": "Trang trong — Đen trắng",
+          "inner_page_half_color": "Nửa trang — Màu",
+          "inner_page_quarter": "Một phần tư trang trong (13 × 9,5 cm)"
+        },
+        "LISTING_BASIC_PLAN": {
+          "name": "Gói cơ bản — Một sản phẩm, tối đa 3 ảnh"
+        },
+        "LISTING_ADVANCED_PLAN": {
+          "name": "Gói nâng cao — Tối đa 10 ảnh + video"
+        },
+        "LISTING_BOOST_HOMEPAGE": {
+          "name": "Đề xuất nổi bật trang chủ (Đẩy)"
+        },
+        "LISTING_BOOST_CATEGORY": {
+          "name": "Hiển thị đầu danh mục (Đẩy)"
+        },
         "popup-priority-1m": {
           "name": "Ưu tiên hiển thị (vị trí 1)",
           "duration": "1 tháng"
@@ -559,6 +630,7 @@
   },
   "login": {
     "title": "Đăng nhập",
+    "accountDisabled": "Tài khoản của bạn đã bị vô hiệu hóa.",
     "email": "Email",
     "password": "Mật khẩu",
     "forgotPassword": "Quên mật khẩu?",
@@ -631,6 +703,7 @@
     "memberSince": "Thành viên từ",
     "viewBenefits": "Xem quyền lợi hội viên",
     "editProfile": "Chỉnh sửa hồ sơ",
+    "editReadOnly": "Chi tiết hồ sơ",
     "goAdmin": "Vào quản trị",
     "upgradeProgress": "Tiến độ nâng cấp",
     "currentTier": "Hạng hiện tại",
@@ -1038,6 +1111,16 @@
       "approvedSuccess": "Đã duyệt thành công",
       "rejectedSuccess": "Đã từ chối",
       "updateError": "Cập nhật trạng thái thất bại",
+      "enableAccount": "Bật tài khoản",
+      "disableAccount": "Tắt tài khoản",
+      "enabledSuccess": "Đã bật tài khoản",
+      "disabledSuccess": "Đã tắt tài khoản",
+      "userIdRequired": "Không có ID người dùng cho dòng này",
+      "deleteCompany": "Xóa công ty",
+      "deleteCompanyConfirm": "Xóa công ty này? Người dùng sẽ bị vô hiệu hóa.",
+      "deleteCompanySuccess": "Đã xóa công ty",
+      "deleteCompanyError": "Xóa công ty thất bại",
+      "cannotEnableDeleted": "Công ty đã bị xóa, không thể kích hoạt lại.",
       "companyName": "Tên công ty",
       "contact": "Liên hệ",
       "email": "Email",

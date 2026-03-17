@@ -440,6 +440,7 @@ export default function AccountPage() {
         availableRegions={availableRegions}
         regionValue={regionValue}
         hasCountry={hasCountry}
+        readOnly={user.role !== UserRole.Admin}
         t={t}
       />
 
