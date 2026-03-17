@@ -5,23 +5,32 @@ import { useRouter } from "next/navigation"
 import { useUser } from "@/contexts/user-context"
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
 import { AdminDemoProvider, AdminDashboardContent } from "@/components/admin"
+import { FeatureKey } from "@/types"
 
 export default function AdminDemoPage() {
   const router = useRouter()
-  const { user, isLoggedIn } = useUser()
+  const { user, isLoggedIn, isAuthReady, canUseFeature } = useUser()
 
   useEffect(() => {
+    if (!isAuthReady) return
     if (!isLoggedIn || !user) {
       router.push("/login")
       return
     }
-    if (!isDemoAdminUser(user)) {
+    if (canUseFeature(FeatureKey.AdminPanel) && !isDemoAdminUser(user)) {
       router.replace("/admin")
     }
-  }, [isLoggedIn, user, router])
+  }, [isAuthReady, isLoggedIn, user, canUseFeature, router])
 
-  if (!isLoggedIn || !user || !isDemoAdminUser(user)) {
-    return null
+  if (!isAuthReady) {
+    return <div className="text-muted-foreground p-6 text-sm">Loading…</div>
+  }
+
+  if (!isLoggedIn || !user) {
+    return <div className="text-muted-foreground p-6 text-sm">Loading…</div>
+  }
+  if (canUseFeature(FeatureKey.AdminPanel) && !isDemoAdminUser(user)) {
+    return <div className="text-muted-foreground p-6 text-sm">Loading…</div>
   }
 
   return (

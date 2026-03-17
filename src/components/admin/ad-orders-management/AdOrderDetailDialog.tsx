@@ -14,6 +14,7 @@ import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
 import { CheckCircle2, Link2, Mail, Paperclip, Phone, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { formatDateTimeForLocale } from "@/utils/datetime"
 
 type AdOrderDetailDialogProps = {
   order: AdminOrderDto | null
@@ -66,14 +67,12 @@ function getOrderDisplayName(order: AdminOrderDto): string {
   return order.company?.nameVi ?? order.company?.nameCn ?? order.user.email
 }
 
-function getSubmittedAtLabel(order: AdminOrderDto): string {
-  const date = new Date(order.createdAt)
-  if (Number.isNaN(date.getTime())) return order.createdAt
-  return date.toLocaleString()
+function getSubmittedAtLabel(order: AdminOrderDto, locale: string): string {
+  return formatDateTimeForLocale(order.createdAt, locale)
 }
 
 export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetailDialogProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   if (!order) return null
 
   return (
@@ -94,7 +93,7 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
           <DialogDescription>
             {(t("admin.advertising.submittedOn") || "Submitted on") +
               " " +
-              getSubmittedAtLabel(order)}
+              getSubmittedAtLabel(order, i18n.language)}
           </DialogDescription>
         </DialogHeader>
 

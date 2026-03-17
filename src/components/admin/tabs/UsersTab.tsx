@@ -1,20 +1,72 @@
 "use client"
 
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Ban, CheckCircle2, Pencil } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { StatusBadge } from "../StatusBadge"
 import { useAdminData } from "../AdminDataContext"
+import { useUser } from "@/contexts/user-context"
+import { FeatureKey } from "@/types"
+import { useAdminUsers } from "@/api/admin-users/hooks"
+import { formatDateTimeForLocale } from "@/utils/datetime"
+import { patchUserActive } from "@/api/admin"
+import { Toast, type ToastVariant } from "@/components/ui/Toast"
+import { useQueryClient } from "@tanstack/react-query"
 
 export function UsersTab() {
-  const { t } = useTranslation()
-  const { users } = useAdminData()
+  const { t, i18n } = useTranslation()
+  const { users, updateUserActive } = useAdminData()
+  const { canUseFeature } = useUser()
+  const isRealAdmin = canUseFeature(FeatureKey.AdminPanel)
+  const queryClient = useQueryClient()
+  const { data: apiUsers } = useAdminUsers(isRealAdmin)
+  const rows = apiUsers ?? users
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
+    message: "",
+    variant: "info",
+    visible: false,
+  })
+
+  const showToast = (message: string, variant: ToastVariant = "info") =>
+    setToast({ message, variant, visible: true })
+  const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
+
+  const handleToggleUserActive = async (userId: string, nextIsActive: boolean) => {
+    if (!isRealAdmin) return
+    const question = nextIsActive
+      ? t("admin.users.confirmEnable") || "Do you want to enable this account?"
+      : t("admin.users.confirmDisable") || "Do you want to disable this account?"
+    const ok = window.confirm(question)
+    if (!ok) return
+
+    setUpdatingUserId(userId)
+    try {
+      if (updateUserActive) {
+        await updateUserActive(userId, nextIsActive)
+      } else {
+        await patchUserActive(userId, nextIsActive)
+      }
+      showToast(
+        nextIsActive
+          ? t("admin.users.enabledSuccess") || "Account enabled."
+          : t("admin.users.disabledSuccess") || "Account disabled.",
+        "success"
+      )
+      await queryClient.invalidateQueries({ queryKey: ["admin", "users"] })
+    } catch {
+      showToast(t("admin.users.updateError") || "Failed to update account status.", "error")
+    } finally {
+      setUpdatingUserId(null)
+    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {t("admin.users.usersCount", { count: users.length })}
+          {t("admin.users.usersCount", { count: rows.length })}
         </p>
       </div>
 
@@ -45,13 +97,15 @@ export function UsersTab() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
+                {rows.map((u) => (
                   <tr
                     key={u.id}
                     className="border-border/50 hover:bg-muted/20 hover:bg-body-table-dark-hover border-b"
                   >
                     <td className="px-4 py-3">
-                      <p className="text-foreground text-sm font-medium">{u.name}</p>
+                      <p className="text-foreground text-sm font-medium">
+                        {"contactName" in u ? u.contactName : u.name}
+                      </p>
                       <p className="text-muted-foreground text-xs">{u.email}</p>
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">{u.company}</td>
@@ -72,7 +126,9 @@ export function UsersTab() {
                             : t("admin.users.roleFree")}
                       </span>
                     </td>
-                    <td className="text-muted-foreground px-4 py-3 text-sm">{u.lastLogin}</td>
+                    <td className="text-muted-foreground px-4 py-3 text-sm">
+                      {formatDateTimeForLocale(u.lastLogin, i18n.language)}
+                    </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={u.status} />
                     </td>
@@ -91,14 +147,19 @@ export function UsersTab() {
                           className="hover:!bg-header-red-dark h-8 hover:!text-white"
                           title={
                             u.status === "active"
-                              ? t("admin.users.suspend")
-                              : t("admin.users.enable")
+                              ? t("admin.users.enable")
+                              : t("admin.users.suspend")
                           }
+                          disabled={!isRealAdmin || updatingUserId === u.id}
+                          onClick={() => {
+                            const nextIsActive = u.status !== "active"
+                            void handleToggleUserActive(u.id, nextIsActive)
+                          }}
                         >
                           {u.status === "active" ? (
-                            <Ban className="text-muted-foreground h-4 w-4" />
-                          ) : (
                             <CheckCircle2 className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <Ban className="text-muted-foreground h-4 w-4" />
                           )}
                         </Button>
                       </div>
@@ -117,7 +178,7 @@ export function UsersTab() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {users
+            {rows
               .filter((u) => u.status === "active")
               .slice(0, 4)
               .map((u) => (
@@ -127,19 +188,31 @@ export function UsersTab() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium">
-                      {u.name.charAt(0)}
+                      {("contactName" in u ? u.contactName : u.name).charAt(0)}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{u.name}</p>
+                      <p className="text-sm font-medium">
+                        {"contactName" in u ? u.contactName : u.name}
+                      </p>
                       <p className="text-muted-foreground text-xs">{u.email}</p>
                     </div>
                   </div>
-                  <span className="text-muted-foreground text-xs">{u.lastLogin}</span>
+                  <span className="text-muted-foreground text-xs">
+                    {formatDateTimeForLocale(u.lastLogin, i18n.language)}
+                  </span>
                 </div>
               ))}
           </div>
         </CardContent>
       </Card>
+
+      <Toast
+        message={toast.message}
+        variant={toast.variant}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={4500}
+      />
     </div>
   )
 }

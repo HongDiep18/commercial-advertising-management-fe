@@ -1257,6 +1257,11 @@
       "roleFree": "Free member",
       "suspend": "Suspend",
       "enable": "Enable",
+      "confirmDisable": "Do you want to disable this account?",
+      "confirmEnable": "Do you want to enable this account?",
+      "disabledSuccess": "Account disabled.",
+      "enabledSuccess": "Account enabled.",
+      "updateError": "Failed to update account status.",
       "recentLogins": "Recent logins"
     }
   },
