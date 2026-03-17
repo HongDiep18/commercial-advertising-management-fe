@@ -13,11 +13,12 @@ import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { StatusBadge } from "../StatusBadge"
 import { AdOrderDetailDialog } from "./AdOrderDetailDialog"
+import { formatDateTimeForLocale } from "@/utils/datetime"
 
 type StatusFilter = "all" | AdminOrderStatus
 
 export function AdOrdersManagement() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
@@ -159,7 +160,7 @@ export function AdOrdersManagement() {
                         <VndPrice value={order.totalAmount} />
                       </td>
                       <td className="text-muted-foreground px-4 py-3 text-sm">
-                        {new Date(order.createdAt).toLocaleString()}
+                        {formatDateTimeForLocale(order.createdAt, i18n.language)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
