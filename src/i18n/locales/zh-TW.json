@@ -1250,6 +1250,11 @@
       "roleFree": "免費會員",
       "suspend": "停權",
       "enable": "啟用",
+      "confirmDisable": "確定要停用此帳號嗎？",
+      "confirmEnable": "確定要啟用此帳號嗎？",
+      "disabledSuccess": "已停用帳號。",
+      "enabledSuccess": "已啟用帳號。",
+      "updateError": "更新帳號狀態失敗。",
       "recentLogins": "最近登入紀錄"
     }
   },

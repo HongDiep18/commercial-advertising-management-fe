@@ -21,7 +21,7 @@ export default function AdminPage() {
       return
     }
     if (!canUseFeature(FeatureKey.AdminPanel)) {
-      router.push("/login")
+      router.replace("/admin/demo")
     }
   }, [isLoggedIn, user, canUseFeature, router])
 

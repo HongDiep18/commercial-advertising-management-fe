@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { Shield } from "lucide-react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import { ADMIN_TABS } from "./constants"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import {
   DashboardTab,
   CompaniesTab,
@@ -18,7 +19,24 @@ import {
 
 export function AdminDashboardContent() {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState("dashboard")
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const allowedTabIds = useMemo(() => new Set(ADMIN_TABS.map((x) => x.id)), [])
+
+  const activeTab = useMemo(() => {
+    const fromUrl = searchParams?.get("tab") ?? ""
+    return allowedTabIds.has(fromUrl) ? fromUrl : "dashboard"
+  }, [searchParams, allowedTabIds])
+
+  const setActiveTabAndPersist = (tabId: string) => {
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? "")
+    if (tabId === "dashboard") nextParams.delete("tab")
+    else nextParams.set("tab", tabId)
+    const qs = nextParams.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+  }
 
   const renderTab = () => {
     switch (activeTab) {
@@ -69,7 +87,7 @@ export function AdminDashboardContent() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => setActiveTabAndPersist(tab.id)}
                     className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                       isActive
                         ? "border-primary text-primary"
