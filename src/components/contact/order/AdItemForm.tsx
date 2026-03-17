@@ -111,6 +111,7 @@ export default function AdItemForm({
                 }}
                 className="w-full"
                 initialFocus
+                localeCode={i18n.language}
               />
             </PopoverContent>
           </Popover>

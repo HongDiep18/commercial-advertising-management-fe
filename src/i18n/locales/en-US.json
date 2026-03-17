@@ -202,6 +202,7 @@
     "orderTitle": "Place Advertising Order",
     "startDateRequired": "Please select a start date for each advertising item.",
     "demoOrderInfo": "This is a demo account. Orders here are for demonstration only and are not actually submitted.",
+    "overlapWarning": "You already have an order for this advertising package with overlapping dates. Please choose different dates.",
     "companyInfo": "Company Information",
     "companyName": "Company Name",
     "contactPerson": "Contact Person",
