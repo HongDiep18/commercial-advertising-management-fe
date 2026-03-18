@@ -7,8 +7,6 @@ import {
   UserRole,
   MembershipTier,
   MEMBERSHIP_CONFIG,
-  MEMBERSHIP_THRESHOLDS,
-  CONTRIBUTION_VALUES,
 } from "@/contexts/user-context"
 import { useTranslation } from "react-i18next"
 import Header from "@/components/layout/Header"
@@ -96,7 +94,7 @@ function mapIsoCountryToRegionKey(country: string): string {
 export default function AccountPage() {
   const router = useRouter()
   const { t, i18n } = useTranslation()
-  const { user, isLoggedIn, getTotalPoints, getMemberTier, getNextTier } = useUser()
+  const { user, isLoggedIn, getMemberTier } = useUser()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [modals, setModals] = useState<Modals>({
@@ -335,13 +333,9 @@ export default function AccountPage() {
     if (file) {
       setLogo((prev) => {
         if (prev.url?.startsWith("blob:")) URL.revokeObjectURL(prev.url)
-        const isFirst = !prev.uploaded
         queueMicrotask(() => {
           showToast(
-            isFirst
-              ? t("account.logoPoints", { count: CONTRIBUTION_VALUES.logo }) ||
-                  `Logo 上傳成功！您獲得 ${CONTRIBUTION_VALUES.logo.toLocaleString()} 點貢獻值`
-              : t("account.logoUpdated") || "Logo 更新成功！",
+            t("account.logoUpdated") || "Logo 更新成功！",
             "success"
           )
         })
@@ -361,16 +355,9 @@ export default function AccountPage() {
     return null
   }
 
-  const totalPoints = getTotalPoints()
   const memberTier =
     user.role === UserRole.Admin ? MembershipTier.DIAMOND : (profileTier ?? getMemberTier())
-  const nextTierInfo = getNextTier()
   const tierConfig = MEMBERSHIP_CONFIG[memberTier]
-  const nextThreshold =
-    nextTierInfo?.nextTier != null
-      ? MEMBERSHIP_THRESHOLDS[nextTierInfo.nextTier]
-      : MEMBERSHIP_THRESHOLDS[MembershipTier.DIAMOND]
-  const progressInTier = nextTierInfo ? (totalPoints / nextThreshold) * 100 : 100
 
   return (
     <main className="bg-body-bg-dark min-h-screen">
@@ -394,22 +381,13 @@ export default function AccountPage() {
 
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-6 lg:grid-cols-2">
-            {memberTier !== MembershipTier.DIAMOND && nextTierInfo && (
+            {user.role !== UserRole.Admin && (
               <AccountUpgradeCard
-                user={user}
-                memberTier={memberTier}
-                tierConfig={tierConfig}
-                totalPoints={totalPoints}
-                nextTierInfo={nextTierInfo}
-                progressInTier={progressInTier}
-                t={t}
                 onHowToUpgrade={() => setModals((m) => ({ ...m, upgrade: true }))}
               />
             )}
 
-            {user.role !== UserRole.Admin && (
-              <AccountPointsHistory totalPoints={totalPoints} t={t} />
-            )}
+            {user.role !== UserRole.Admin && <AccountPointsHistory />}
 
             {user.commercialPoints > 0 && <AccountCommercialHistory t={t} />}
           </div>
