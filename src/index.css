@@ -2,6 +2,26 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes messageSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wiggle {
+  0%,100% { transform: rotate(0deg); }
+  15%     { transform: rotate(-12deg); }
+  30%     { transform: rotate(12deg); }
+  45%     { transform: rotate(-8deg); }
+  60%     { transform: rotate(8deg); }
+  75%     { transform: rotate(-4deg); }
+  90%     { transform: rotate(4deg); }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
