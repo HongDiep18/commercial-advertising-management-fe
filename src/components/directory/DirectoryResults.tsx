@@ -11,7 +11,7 @@ import { maskCompanyName } from "../../utils/companyHelpers"
 import { Pagination } from "../ui/Pagination"
 
 interface DirectoryResultsProps {
-  selectedCategory: string | null
+  selectedCategories: string[]
   searchTerm: string
   setSearchTerm: (term: string) => void
 }
@@ -51,7 +51,7 @@ function SearchBar({
 }
 
 export function DirectoryResults({
-  selectedCategory,
+  selectedCategories,
   searchTerm,
   setSearchTerm,
 }: DirectoryResultsProps) {
@@ -62,7 +62,7 @@ export function DirectoryResults({
   const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
-  const filterKey = `${selectedCategory || ""}-${debouncedSearchTerm}`
+  const filterKey = `${selectedCategories.join(",")}-${debouncedSearchTerm}`
   const [pageState, setPageState] = useState<{ key: string; page: number }>({
     key: filterKey,
     page: 1,
@@ -75,39 +75,41 @@ export function DirectoryResults({
   const currentPage = pageState.page
   const setCurrentPage = (page: number) => setPageState((prev) => ({ ...prev, page }))
 
+  const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
   const { data, isLoading, isError } = useCompanyDirectory({
     search: debouncedSearchTerm || undefined,
-    industry: selectedCategory || undefined,
+    industry: industryParam,
     page: currentPage,
     limit: ITEMS_PER_PAGE,
     sortBy: "name",
     sortOrder: "asc",
   })
 
-  const displayedCompanies = data?.companies ?? []
-  const totalPages = data?.pagination.totalPages ?? 1
-  const displayTotalResults = data?.pagination.total ?? 0
+  const rawCompanies = data?.companies ?? []
+  const searchValue = debouncedSearchTerm?.trim() ?? ""
+  const isSearching = searchValue.length > 0
+
+  const displayedCompanies = rawCompanies.filter((c) => {
+    if (selectedCategories.length > 0 && !selectedCategories.includes(c.industry)) return false
+    if (!isSearching) return true
+
+    const haystack = [c.name, c.industry, c.address, c.description, c.contactName, c.email, c.phone]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+
+    return haystack.includes(searchValue.toLowerCase())
+  })
+
+  const usesClientFiltering = isSearching || selectedCategories.length > 0
+  const totalPages = usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
+  const displayTotalResults = usesClientFiltering
+    ? displayedCompanies.length
+    : (data?.pagination.total ?? 0)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
     window.scrollTo({ top: 0, behavior: "smooth" })
-  }
-
-  if (!selectedCategory) {
-    return (
-      <section>
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
-          <div className="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-            <Search className="text-muted-foreground h-8 w-8" />
-          </div>
-          <h2 className="mb-2 text-xl font-semibold">{t("directory.selectCategory")}</h2>
-          <p className="text-muted-foreground max-w-md">
-            {t("directory.selectCategoryDescription")}
-          </p>
-        </div>
-      </section>
-    )
   }
 
   return (
@@ -116,11 +118,13 @@ export function DirectoryResults({
 
       <div className="border-border mb-6 flex items-center justify-between border-b pb-4">
         <h2 key={i18n.language} className="text-xl font-semibold">
-          {selectedCategory
-            ? t(`directory.categories.${selectedCategory}`, {
-                defaultValue: selectedCategory,
-              })
-            : ""}
+          {selectedCategories.length === 0
+            ? t("directory.allCategories", { defaultValue: "All" })
+            : selectedCategories.length === 1
+              ? t(`directory.categories.${selectedCategories[0]}`, {
+                  defaultValue: selectedCategories[0],
+                })
+              : `${selectedCategories.length} ${t("directory.industryCategory")}`}
         </h2>
         <span className="text-muted-foreground text-sm">
           {displayTotalResults.toLocaleString()} {t("directory.results")}
@@ -147,7 +151,11 @@ export function DirectoryResults({
             {displayedCompanies.map((company) => (
               <Link
                 key={company.id}
-                href={`/directory/${company.id}${selectedCategory ? `?fromCategory=${encodeURIComponent(selectedCategory)}` : ""}`}
+                href={`/directory/${company.id}${
+                  selectedCategories.length === 1
+                    ? `?fromCategory=${encodeURIComponent(selectedCategories[0])}`
+                    : ""
+                }`}
                 className="group"
               >
                 <div

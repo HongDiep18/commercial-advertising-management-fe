@@ -911,6 +911,7 @@
     "results": "results",
     "noResults": "No companies found matching the criteria",
     "industryCategory": "Industry Category",
+    "allCategories": "All",
     "categories": {
       "textile": "Textile, Apparel & Accessories",
       "shoes": "Footwear, Shoe Materials, Leather & Luggage",
