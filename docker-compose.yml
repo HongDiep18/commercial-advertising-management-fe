@@ -13,6 +13,7 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - API_BASE_URL=${API_BASE_URL}
       - API_BASE_PATH=${API_BASE_PATH}
+      - CHATBOT_API_KEY=${CHATBOT_API_KEY}
       - NODE_ENV=production
 
     extra_hosts:
