@@ -1,7 +1,9 @@
 "use client"
 
-import { useCompanyCategories } from "@/api/companies/hooks"
 import { useTranslation } from "react-i18next"
+import type { DirectoryCategoryRow } from "./useDirectoryCategories"
+
+export const ALL_CATEGORY_ID = "all"
 
 export const categories = [
   "textile",
@@ -25,18 +27,27 @@ export const categories = [
 ]
 
 interface DirectorySidebarProps {
-  selectedCategory: string | null
-  setSelectedCategory: (category: string | null) => void
+  selectedCategories: string[]
+  setSelectedCategories: (categories: string[]) => void
+  categories: DirectoryCategoryRow[]
 }
 
-export function DirectorySidebar({ selectedCategory, setSelectedCategory }: DirectorySidebarProps) {
+export function DirectorySidebar({
+  selectedCategories,
+  setSelectedCategories,
+  categories,
+}: DirectorySidebarProps) {
   const { t } = useTranslation()
-  const { data } = useCompanyCategories()
-  const countsById =
-    data?.categories.reduce<Record<string, number>>((acc, category) => {
-      acc[category.industry] = (acc[category.industry] ?? 0) + category.count
-      return acc
-    }, {}) ?? {}
+
+  const isAllSelected = selectedCategories.length === 0
+  const toggleCategory = (id: string) => {
+    if (selectedCategories.includes(id)) {
+      setSelectedCategories(selectedCategories.filter((x) => x !== id))
+      return
+    }
+    setSelectedCategories([...selectedCategories, id])
+  }
+
   return (
     <aside className="border-border bg-card/30 sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 border-r lg:block">
       <div className="bg-body-bg-dark pr-4 font-medium">
@@ -45,13 +56,25 @@ export function DirectorySidebar({ selectedCategory, setSelectedCategory }: Dire
             {t("directory.industryCategory")}
           </h3>
           <div className="max-h-[calc(100vh-10rem)] space-y-0.5 overflow-y-auto">
+            <button
+              onClick={() => setSelectedCategories([])}
+              className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${
+                isAllSelected
+                  ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              }`}
+            >
+              <span className="line-clamp-1 text-sm">
+                {t("directory.allCategories", { defaultValue: "All" })}
+              </span>
+            </button>
             {categories.map((category) => {
-              const isSelected = selectedCategory === category
+              const isSelected = selectedCategories.includes(category.id)
 
               return (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  key={category.id}
+                  onClick={() => toggleCategory(category.id)}
                   className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${
                     isSelected
                       ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
@@ -59,12 +82,12 @@ export function DirectorySidebar({ selectedCategory, setSelectedCategory }: Dire
                   }`}
                 >
                   <span className="line-clamp-1 text-sm">
-                    {t(`directory.categories.${category}`)}
+                    {t(`directory.categories.${category.id}`, { defaultValue: category.id })}
                   </span>
                   <span
                     className={`ml-2 shrink-0 text-xs ${isSelected ? "text-primary" : "text-muted-foreground/60"}`}
                   >
-                    {(countsById[category] ?? 0).toLocaleString()}
+                    {(category.count ?? 0).toLocaleString()}
                   </span>
                 </button>
               )

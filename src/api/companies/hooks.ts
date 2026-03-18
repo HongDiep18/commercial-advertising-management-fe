@@ -9,14 +9,18 @@ import { getCompanyCategories, getCompanyDirectory, getFeaturedCompanies } from 
 
 const companiesKeys = {
   all: ["companies"] as const,
-  directory: (query: CompanyDirectoryQuery) => [...companiesKeys.all, "directory", query] as const,
+  directory: (query: CompanyDirectoryQuery) => {
+    const normalized: CompanyDirectoryQuery = {
+      ...query,
+      industry: Array.isArray(query.industry) ? [...query.industry].sort() : query.industry,
+    }
+    return [...companiesKeys.all, "directory", normalized] as const
+  },
   categories: () => [...companiesKeys.all, "categories"] as const,
   featured: () => [...companiesKeys.all, "featured"] as const,
 }
 
-export function useCompanyDirectory(
-  query: CompanyDirectoryQuery
-): {
+export function useCompanyDirectory(query: CompanyDirectoryQuery): {
   data?: CompanyDirectoryResponse
   isLoading: boolean
   isError: boolean
@@ -29,7 +33,7 @@ export function useCompanyDirectory(
   return { data, isLoading, isError }
 }
 
-export function useCompanyCategories(): {
+export function useCompanyCategories(enabled: boolean = true): {
   data?: CompanyCategoriesResponse
   isLoading: boolean
   isError: boolean
@@ -37,6 +41,7 @@ export function useCompanyCategories(): {
   const { data, isLoading, isError } = useQuery({
     queryKey: companiesKeys.categories(),
     queryFn: () => getCompanyCategories(),
+    enabled,
   })
 
   return { data, isLoading, isError }
@@ -54,5 +59,3 @@ export function useFeaturedCompanies(): {
 
   return { data, isLoading, isError }
 }
-
-

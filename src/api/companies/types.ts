@@ -3,7 +3,7 @@ export type CompanyDirectorySortOrder = "asc" | "desc"
 
 export type CompanyDirectoryQuery = {
   search?: string
-  industry?: string
+  industry?: string | string[]
   page?: number
   limit?: number
   sortBy?: CompanyDirectorySortBy
