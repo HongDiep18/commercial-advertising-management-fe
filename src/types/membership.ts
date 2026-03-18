@@ -25,8 +25,9 @@ export type MembershipThresholds = Record<MembershipTier, number>
 export type NextTierInfo = {
   nextTier: MembershipTier | null
   pointsNeeded: number
+  spendingNeeded?: number
 }
 
-export type GetMembershipTierFn = (totalPoints: number) => MembershipTier
+export type GetMembershipTierFn = (totalPoints: number, totalSpending?: number) => MembershipTier
 
-export type GetNextTierInfoFn = (totalPoints: number) => NextTierInfo | null
+export type GetNextTierInfoFn = (totalPoints: number, totalSpending?: number) => NextTierInfo | null

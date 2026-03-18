@@ -74,7 +74,7 @@ export function AccountUpgradeModal({ open, onClose, t }: AccountUpgradeModalPro
                   <Megaphone className="text-primary h-4 w-4" />
                   {t("account.buyAd") || "購買廣告"}
                 </span>
-                <span className="text-primary font-semibold">1 VND = 1 點</span>
+                <span className="text-primary font-semibold">1 VND = 1 {t("account.points")}</span>
               </div>
               <p className="text-muted-foreground ml-2 text-xs">
                 {t("account.buyAdDiamondHint") || "花 55 萬買廣告，直接送鑽石會員"}
@@ -85,7 +85,7 @@ export function AccountUpgradeModal({ open, onClose, t }: AccountUpgradeModalPro
                   <ShoppingCart className="text-primary h-4 w-4" />
                   {t("account.shopSpending") || "商城消費"}
                 </span>
-                <span className="text-primary font-semibold">1 VND = 1 點</span>
+                <span className="text-primary font-semibold">1 VND = 1 {t("account.points")}</span>
               </div>
               <p className="text-muted-foreground ml-2 text-xs">
                 {t("account.shopSpendingHint") || "買茶葉送名錄，升級看全站資料"}
