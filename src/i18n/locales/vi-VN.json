@@ -711,6 +711,9 @@
     "points": "điểm",
     "pointsToUpgrade": "Còn cần điểm để nâng cấp",
     "howToUpgrade": "Cách nâng cấp",
+    "maxTier": "Cấp cao nhất",
+    "congratulations": "Xin chúc mừng!",
+    "diamondMemberStatus": "Bạn đã đạt cấp Kim Cương cao nhất",
     "pointsHistory": "Lịch sử điểm",
     "totalPoints": "Tổng điểm",
     "viewAllRecords": "Xem tất cả",
@@ -759,20 +762,33 @@
     "tierSpending": {
       "NONE": "Không",
       "BRONZE": "Miễn phí (đăng ký)",
-      "SILVER": "Chi tiêu 150.000 VND",
-      "GOLD": "Chi tiêu 300.000 VND",
-      "DIAMOND": "Chi tiêu 550.000 VND",
+      "SILVER": "Chi tiêu 80.000 VND",
+      "GOLD": "Chi tiêu 230.000 VND",
+      "DIAMOND": "Chi tiêu 530.000 VND",
       "bronze": "Miễn phí (đăng ký)",
-      "silver": "Chi tiêu 150.000 VND",
-      "gold": "Chi tiêu 300.000 VND",
-      "diamond": "Chi tiêu 550.000 VND"
+      "silver": "Chi tiêu 80.000 VND",
+      "gold": "Chi tiêu 230.000 VND",
+      "diamond": "Chi tiêu 530.000 VND"
     },
     "tierBenefits": {
+      "NONE": ["Tên công ty (một phần)", "Khu vực"],
+      "guest": ["Tên công ty (một phần)", "Khu vực"],
+      "BRONZE": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
       "bronze": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
+      "SILVER": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
       "silver": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
+      "GOLD": [
+        "Ngành của bạn + 3 ngành liên quan (đầy đủ)",
+        "Mở khóa ngành của bạn + 3 ngành thượng/hạ nguồn"
+      ],
       "gold": [
         "Ngành của bạn + 3 ngành liên quan (đầy đủ)",
         "Mở khóa ngành của bạn + 3 ngành thượng/hạ nguồn"
+      ],
+      "DIAMOND": [
+        "Tất cả ngành (đầy đủ)",
+        "Thay thế danh mục in",
+        "Mở khóa tất cả ngành và trường (kể cả di động)"
       ],
       "diamond": [
         "Tất cả ngành (đầy đủ)",
@@ -781,11 +797,40 @@
       ]
     },
     "tierRestrictions": {
+      "NONE": ["Không có trang web, điện thoại, địa chỉ, mã số thuế"],
+      "guest": ["Không có trang web, điện thoại, địa chỉ, mã số thuế"],
+      "BRONZE": ["Không có trang web, điện thoại hoặc địa chỉ"],
       "bronze": ["Không có trang web, điện thoại hoặc địa chỉ"],
+      "SILVER": [],
       "silver": [],
+      "GOLD": [],
       "gold": [],
+      "DIAMOND": [],
       "diamond": []
-    }
+    },
+    "pointsHistoryModal": "Lịch sử điểm",
+    "allTransactions": "Tất cả giao dịch",
+    "filterBySource": "Lọc theo nguồn",
+    "sourceAll": "Tất cả nguồn",
+    "sourceRegistration": "Đăng ký",
+    "sourceLogoUpload": "Tải logo",
+    "sourceAdPurchase": "Mua quảng cáo",
+    "sourceStorePurchase": "Mua hàng",
+    "sourceAdminAdjustment": "Điều chỉnh quản trị",
+    "sourceAdminDeduction": "Khấu trừ quản trị",
+    "transactionDate": "Ngày",
+    "transactionPoints": "Điểm",
+    "transactionBalance": "Số dư",
+    "transactionDescription": "Mô tả",
+    "noPointsHistory": "Chưa có lịch sử điểm",
+    "noPointsHistoryDesc": "Bắt đầu kiếm điểm bằng cách hoàn thành nhiệm vụ!",
+    "loadingHistory": "Đang tải lịch sử...",
+    "errorLoadingHistory": "Lỗi khi tải lịch sử điểm",
+    "page": "Trang",
+    "of": "của",
+    "previousPage": "Trước",
+    "nextPage": "Tiếp",
+    "closeModal": "Đóng"
   },
   "adContactForm": {
     "title": "Quản trị",

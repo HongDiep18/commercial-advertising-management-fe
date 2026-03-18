@@ -29,7 +29,15 @@ export const MEMBERSHIP_THRESHOLDS: Record<MembershipTier, number> = {
   [MembershipTier.BRONZE]: 50000,
   [MembershipTier.SILVER]: 150000,
   [MembershipTier.GOLD]: 300000,
-  [MembershipTier.DIAMOND]: 550000,
+  [MembershipTier.DIAMOND]: 600000,
+}
+
+export const SPENDING_THRESHOLDS: Record<MembershipTier, number> = {
+  [MembershipTier.GUEST]: 0,
+  [MembershipTier.BRONZE]: 0,
+  [MembershipTier.SILVER]: 80000,
+  [MembershipTier.GOLD]: 230000,
+  [MembershipTier.DIAMOND]: 530000,
 }
 
 export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = {
@@ -60,7 +68,7 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
     labelEn: "Silver",
     minPoints: 150000,
     maxPoints: 299999,
-    spendingRequired: "消費 15 萬 VND",
+    spendingRequired: "消費 8 萬 VND",
     color: "text-slate-500",
     bgColor: "bg-slate-200",
     benefits: ["本業 - 完整版", "解鎖官網、電話、地址、Email"],
@@ -70,8 +78,8 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
     label: "金牌會員",
     labelEn: "Gold",
     minPoints: 300000,
-    maxPoints: 549999,
-    spendingRequired: "消費 30 萬 VND",
+    maxPoints: 599999,
+    spendingRequired: "消費 23 萬 VND",
     color: "text-yellow-600",
     bgColor: "bg-yellow-100",
     benefits: ["本業 + 跨 3 產業 - 完整版", "解鎖自家產業 + 自選 3 個上下游產業"],
@@ -80,9 +88,9 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
   [MembershipTier.DIAMOND]: {
     label: "鑽石會員",
     labelEn: "Diamond",
-    minPoints: 550000,
+    minPoints: 600000,
     maxPoints: null,
-    spendingRequired: "消費 55 萬 VND",
+    spendingRequired: "消費 53 萬 VND",
     color: "text-sky-600",
     bgColor: "bg-sky-100",
     benefits: ["全站所有產業 - 完整版", "取代紙本名錄", "解鎖所有產業、所有欄位（含手機）"],
@@ -90,16 +98,33 @@ export const MEMBERSHIP_CONFIG: Record<MembershipTier, MembershipConfigEntry> = 
   },
 }
 
-export function getMembershipTier(totalPoints: number): MembershipTier {
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.DIAMOND]) return MembershipTier.DIAMOND
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.GOLD]) return MembershipTier.GOLD
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER]) return MembershipTier.SILVER
-  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]) return MembershipTier.BRONZE
-  return MembershipTier.BRONZE
+export function getMembershipTier(totalPoints: number, totalSpending: number = 0): MembershipTier {
+  if (
+    totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.DIAMOND] &&
+    totalSpending >= SPENDING_THRESHOLDS[MembershipTier.DIAMOND]
+  ) {
+    return MembershipTier.DIAMOND
+  }
+  if (
+    totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.GOLD] &&
+    totalSpending >= SPENDING_THRESHOLDS[MembershipTier.GOLD]
+  ) {
+    return MembershipTier.GOLD
+  }
+  if (
+    totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER] &&
+    totalSpending >= SPENDING_THRESHOLDS[MembershipTier.SILVER]
+  ) {
+    return MembershipTier.SILVER
+  }
+  if (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]) {
+    return MembershipTier.BRONZE
+  }
+  return MembershipTier.GUEST
 }
 
-export function getNextTierInfo(totalPoints: number): NextTierInfo | null {
-  const currentTier = getMembershipTier(totalPoints)
+export function getNextTierInfo(totalPoints: number, totalSpending: number = 0): NextTierInfo | null {
+  const currentTier = getMembershipTier(totalPoints, totalSpending)
   const tiers: MembershipTier[] = [
     MembershipTier.GUEST,
     MembershipTier.BRONZE,
@@ -113,8 +138,9 @@ export function getNextTierInfo(totalPoints: number): NextTierInfo | null {
 
   const nextTier = tiers[currentIndex + 1]
   const pointsNeeded = MEMBERSHIP_THRESHOLDS[nextTier] - totalPoints
+  const spendingNeeded = SPENDING_THRESHOLDS[nextTier] - totalSpending
 
-  return { nextTier, pointsNeeded }
+  return { nextTier, pointsNeeded, spendingNeeded }
 }
 
 export { CommercialType, ContributionType } from "@/types"
