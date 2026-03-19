@@ -2,11 +2,13 @@
 
 import { useCompanyDirectory } from "@/api/companies/hooks"
 import { useDebounce } from "@/hooks/useDebounce"
+import { isDemoUser } from "@/components/login/demo"
+import { mockCompanies } from "@/data/mockCompanies"
 import { Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { MEMBERSHIP_THRESHOLDS, MembershipTier, useUser } from "../../contexts/user-context"
+import { MEMBERSHIP_THRESHOLDS, MembershipTier, UserRole, useUser } from "../../contexts/user-context"
 import { maskCompanyName } from "../../utils/companyHelpers"
 import { Pagination } from "../ui/Pagination"
 
@@ -57,9 +59,12 @@ export function DirectoryResults({
 }: DirectoryResultsProps) {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn, getTotalPoints } = useUser()
+  const isDemo = isLoggedIn && !!user && isDemoUser(user)
+  const isAdmin = !!user && user.role === UserRole.Admin
 
   const totalPoints = getTotalPoints()
-  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]
+  const isGuest =
+    !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const filterKey = `${selectedCategories.join(",")}-${debouncedSearchTerm}`
@@ -76,16 +81,39 @@ export function DirectoryResults({
   const setCurrentPage = (page: number) => setPageState((prev) => ({ ...prev, page }))
 
   const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
-  const { data, isLoading, isError } = useCompanyDirectory({
-    search: debouncedSearchTerm || undefined,
-    industry: industryParam,
-    page: currentPage,
-    limit: ITEMS_PER_PAGE,
-    sortBy: "name",
-    sortOrder: "asc",
-  })
+  const { data, isLoading, isError } = useCompanyDirectory(
+    isDemo
+      ? {
+          page: 1,
+          limit: ITEMS_PER_PAGE,
+          sortBy: "name",
+          sortOrder: "asc",
+        }
+      : {
+          search: debouncedSearchTerm || undefined,
+          industry: industryParam,
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sortBy: "name",
+          sortOrder: "asc",
+        }
+  )
 
-  const rawCompanies = data?.companies ?? []
+  const rawCompanies = isDemo
+    ? Object.values(mockCompanies).map((c) => ({
+        id: c.id,
+        name: c.nameEn || c.nameCn,
+        logoUrl: c.logo,
+        email: c.email,
+        contactName: c.contactPerson,
+        phone: c.phone,
+        industry: c.id.split("-")[0] || "other",
+        address: c.address,
+        description: c.introduction,
+        companyInfoHighlight: false,
+        sortPriority: 0,
+      }))
+    : (data?.companies ?? [])
   const searchValue = debouncedSearchTerm?.trim() ?? ""
   const isSearching = searchValue.length > 0
 
@@ -102,10 +130,9 @@ export function DirectoryResults({
   })
 
   const usesClientFiltering = isSearching || selectedCategories.length > 0
-  const totalPages = usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
-  const displayTotalResults = usesClientFiltering
-    ? displayedCompanies.length
-    : (data?.pagination.total ?? 0)
+  const totalPages = isDemo || usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
+  const displayTotalResults =
+    isDemo || usesClientFiltering ? displayedCompanies.length : (data?.pagination.total ?? 0)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)

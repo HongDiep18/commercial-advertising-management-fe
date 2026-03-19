@@ -61,3 +61,19 @@ export type FeaturedCompanyItem = {
 }
 
 export type FeaturedCompaniesResponse = FeaturedCompanyItem[]
+
+export type CompanyDetail = {
+  id: string
+  logoUrl?: string | null
+  companyNameVi?: string | null
+  companyNameCn?: string | null
+  industry: string
+  email: string
+  phone: string
+  address: string
+  description: string
+  taxId?: string | null
+  region?: string | null
+  website?: string | null
+  contactName: string
+}
