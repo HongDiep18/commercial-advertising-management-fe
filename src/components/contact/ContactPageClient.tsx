@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import {
@@ -39,8 +39,9 @@ export interface SelectedItem {
 export default function ContactPageClient() {
   const { t, i18n } = useTranslation()
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { user, isLoggedIn } = useUser()
-  const [activeTab, setActiveTab] = useState<TabType>("platform")
   const [selectedItems, setSelectedItems] = useState<SelectedEntry[]>([])
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
@@ -53,6 +54,13 @@ export default function ContactPageClient() {
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
+
+  const activeTab = useMemo<TabType>(() => {
+    const fromUrl = searchParams?.get("tab") ?? ""
+    return fromUrl === "directory" || fromUrl === "product" || fromUrl === "platform"
+      ? (fromUrl as TabType)
+      : "platform"
+  }, [searchParams])
 
   const tabConfig = getTabConfig(t)
   const currentConfig = tabConfig[activeTab]
@@ -93,9 +101,20 @@ export default function ContactPageClient() {
   }
 
   const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab)
-    setSelectedItems([])
+    const nextParams = new URLSearchParams(searchParams?.toString() ?? "")
+    if (tab === "platform") nextParams.delete("tab")
+    else nextParams.set("tab", tab)
+    const qs = nextParams.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
   }
+
+  const prevTabRef = useRef<TabType>(activeTab)
+  useEffect(() => {
+    if (prevTabRef.current !== activeTab) {
+      prevTabRef.current = activeTab
+      setSelectedItems([])
+    }
+  }, [activeTab])
 
   const getSelectedItemsDetails = (): SelectedItem[] => {
     const details: SelectedItem[] = []

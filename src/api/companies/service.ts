@@ -3,13 +3,23 @@ import type {
   CompanyCategoriesResponse,
   CompanyDirectoryQuery,
   CompanyDirectoryResponse,
+  CompanyDetail,
   FeaturedCompaniesResponse,
 } from "./types"
 
-function buildQuery(params: Record<string, string | number | boolean | undefined>): string {
+type QueryValue = string | number | boolean | undefined | Array<string | number | boolean>
+
+function buildQuery(params: Record<string, QueryValue>): string {
   const searchParams = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null || value === "") return
+    if (Array.isArray(value)) {
+      value.forEach((v) => {
+        if (v === undefined || v === null || v === "") return
+        searchParams.append(key, String(v))
+      })
+      return
+    }
     searchParams.append(key, String(value))
   })
   const qs = searchParams.toString()
@@ -40,4 +50,9 @@ export async function getFeaturedCompanies(): Promise<FeaturedCompaniesResponse>
   return res
 }
 
-
+export async function getCompanyDetail(id: string): Promise<CompanyDetail> {
+  const res = await api.request<CompanyDetail>(`/companies/${encodeURIComponent(id)}`, {
+    method: "GET",
+  })
+  return res
+}

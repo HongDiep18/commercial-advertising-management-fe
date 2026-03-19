@@ -59,8 +59,8 @@ export function AccountBenefitsModal({ open, onClose, memberTier, t }: AccountBe
                     )}
                   </div>
                   <div className="text-right text-sm">
-                    <p className="font-medium">{MEMBERSHIP_THRESHOLDS[tier].toLocaleString()} 點</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="font-medium text-primary">{MEMBERSHIP_THRESHOLDS[tier].toLocaleString()} {t("account.points")}</p>
+                    <p className="text-muted-foreground text-xs font-medium">
                       {t(`account.tierSpending.${tier}`) || config.spendingRequired}
                     </p>
                   </div>

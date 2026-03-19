@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { format, isValid } from "date-fns"
 import { CheckCircle2, Eye, Trash2, X, XCircle, ToggleLeft, ToggleRight } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
@@ -25,22 +24,7 @@ import {
   ProfileRequestStatus,
 } from "@/types/admin"
 import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
-
-function formatSubmittedAt(dateStr: string, locale: string): string {
-  if (!dateStr?.trim()) return dateStr ?? ""
-
-  const normalized = dateStr.trim().replace(" ", "T")
-  const date = new Date(normalized)
-
-  if (!isValid(date)) return dateStr
-  const hasTime = /T\d| \d{1,2}:/.test(dateStr.trim())
-
-  if (locale === "zh-TW")
-    return hasTime ? format(date, "yyyy年M月d日 HH:mm") : format(date, "yyyy年M月d日")
-  if (locale === "vi-VN")
-    return hasTime ? format(date, "dd/MM/yyyy HH:mm") : format(date, "dd/MM/yyyy")
-  return hasTime ? format(date, "MMM d, yyyy 'at' h:mm a") : format(date, "MMM d, yyyy")
-}
+import { formatDateTimeForLocale } from "@/utils/datetime"
 
 export function CompaniesTab() {
   const { t, i18n } = useTranslation()
@@ -208,7 +192,7 @@ export function CompaniesTab() {
                     <td className="px-4 py-3 text-sm">{row.contactName}</td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">{row.industry}</td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">
-                      {formatSubmittedAt(row.submittedAt, i18n.language)}
+                      {formatDateTimeForLocale(row.submittedAt, i18n.language)}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={row.status} />
@@ -342,7 +326,7 @@ export function CompaniesTab() {
                 <DialogTitle>{selectedRequest.companyName}</DialogTitle>
                 <DialogDescription>
                   {t("admin.companies.submittedOn")}{" "}
-                  {formatSubmittedAt(selectedRequest.submittedAt, i18n.language)}
+                    {formatDateTimeForLocale(selectedRequest.submittedAt, i18n.language)}
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-4 px-5">

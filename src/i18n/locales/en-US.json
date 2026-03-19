@@ -665,6 +665,9 @@
     "points": "points",
     "pointsToUpgrade": "Points to upgrade",
     "howToUpgrade": "How to upgrade",
+    "maxTier": "Max tier",
+    "congratulations": "Congratulations!",
+    "diamondMemberStatus": "You have reached the highest Diamond membership tier",
     "pointsHistory": "Points history",
     "totalPoints": "Total points",
     "viewAllRecords": "View all records",
@@ -713,20 +716,33 @@
     "tierSpending": {
       "NONE": "None",
       "BRONZE": "Free (registration)",
-      "SILVER": "Spend 150,000 VND",
-      "GOLD": "Spend 300,000 VND",
-      "DIAMOND": "Spend 550,000 VND",
+      "SILVER": "Spend 80,000 VND",
+      "GOLD": "Spend 230,000 VND",
+      "DIAMOND": "Spend 530,000 VND",
       "bronze": "Free (registration)",
-      "silver": "Spend 150,000 VND",
-      "gold": "Spend 300,000 VND",
-      "diamond": "Spend 550,000 VND"
+      "silver": "Spend 80,000 VND",
+      "gold": "Spend 230,000 VND",
+      "diamond": "Spend 530,000 VND"
     },
     "tierBenefits": {
+      "NONE": ["Company name (partial)", "Region"],
+      "guest": ["Company name (partial)", "Region"],
+      "BRONZE": ["Base industry info", "Company name, tax ID, region"],
       "bronze": ["Base industry info", "Company name, tax ID, region"],
+      "SILVER": ["Full industry info", "Unlock website, phone, address, email"],
       "silver": ["Full industry info", "Unlock website, phone, address, email"],
+      "GOLD": [
+        "Own industry + 3 cross-industries (full)",
+        "Unlock own industry + 3 upstream/downstream industries"
+      ],
       "gold": [
         "Own industry + 3 cross-industries (full)",
         "Unlock own industry + 3 upstream/downstream industries"
+      ],
+      "DIAMOND": [
+        "All industries (full)",
+        "Replaces print directory",
+        "Unlock all industries and fields (incl. mobile)"
       ],
       "diamond": [
         "All industries (full)",
@@ -735,11 +751,40 @@
       ]
     },
     "tierRestrictions": {
+      "NONE": ["No website, phone, address, or tax ID"],
+      "guest": ["No website, phone, address, or tax ID"],
+      "BRONZE": ["No website, phone, or address"],
       "bronze": ["No website, phone, or address"],
+      "SILVER": [],
       "silver": [],
+      "GOLD": [],
       "gold": [],
+      "DIAMOND": [],
       "diamond": []
-    }
+    },
+    "pointsHistoryModal": "Points History",
+    "allTransactions": "All Transactions",
+    "filterBySource": "Filter by Source",
+    "sourceAll": "All Sources",
+    "sourceRegistration": "Registration",
+    "sourceLogoUpload": "Logo Upload",
+    "sourceAdPurchase": "Ad Purchase",
+    "sourceStorePurchase": "Store Purchase",
+    "sourceAdminAdjustment": "Admin Adjustment",
+    "sourceAdminDeduction": "Admin Deduction",
+    "transactionDate": "Date",
+    "transactionPoints": "Points",
+    "transactionBalance": "Balance",
+    "transactionDescription": "Description",
+    "noPointsHistory": "No points history yet",
+    "noPointsHistoryDesc": "Start earning points by completing tasks!",
+    "loadingHistory": "Loading history...",
+    "errorLoadingHistory": "Error loading points history",
+    "page": "Page",
+    "of": "of",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "closeModal": "Close"
   },
   "adContactForm": {
     "title": "Admin Panel",
@@ -866,6 +911,7 @@
     "results": "results",
     "noResults": "No companies found matching the criteria",
     "industryCategory": "Industry Category",
+    "allCategories": "All",
     "categories": {
       "textile": "Textile, Apparel & Accessories",
       "shoes": "Footwear, Shoe Materials, Leather & Luggage",
@@ -1257,6 +1303,11 @@
       "roleFree": "Free member",
       "suspend": "Suspend",
       "enable": "Enable",
+      "confirmDisable": "Do you want to disable this account?",
+      "confirmEnable": "Do you want to enable this account?",
+      "disabledSuccess": "Account disabled.",
+      "enabledSuccess": "Account enabled.",
+      "updateError": "Failed to update account status.",
       "recentLogins": "Recent logins"
     }
   },

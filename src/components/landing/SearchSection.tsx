@@ -1,7 +1,11 @@
 "use client"
 
+import { useCompanyCategories } from "@/api/companies/hooks"
 import { INDUSTRY_CATEGORIES } from "@/constants/categories"
+import { isDemoUser } from "@/components/login/demo"
+import { useUser } from "@/contexts/user-context"
 import { ChevronDown, Search, X } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import Button from "../ui/Button"
@@ -15,6 +19,9 @@ const locationIds = ["hcm", "hanoi", "binhduong", "dongnai", "danang", "haiphong
 
 export default function SearchSection() {
   const { t } = useTranslation()
+  const router = useRouter()
+  const { user, isLoggedIn } = useUser()
+  const isDemo = isLoggedIn && !!user && isDemoUser(user)
   const [searchMode, setSearchMode] = useState<"company" | "product" | "all">("company")
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
@@ -28,12 +35,33 @@ export default function SearchSection() {
   const industryDropdownRef = useRef<HTMLDivElement | null>(null)
   const locationDropdownRef = useRef<HTMLDivElement | null>(null)
 
+  const { data: companyCategoriesData } = useCompanyCategories(!isDemo)
   const categories = useMemo(() => {
+    if (isDemo) {
+      return INDUSTRY_CATEGORIES.map((cat) => ({
+        id: cat.id,
+        name: t(cat.i18nKey) || cat.fallback,
+      }))
+    }
+
+    const apiIndustries =
+      companyCategoriesData?.categories
+        ?.map((c) => String(c.industry ?? "").trim())
+        .filter((s) => s !== "") ?? []
+
+    const uniqueApiIndustries = Array.from(new Set(apiIndustries))
+    if (uniqueApiIndustries.length > 0) {
+      return uniqueApiIndustries.map((id) => ({
+        id,
+        name: t(`directory.categories.${id}`, { defaultValue: id }),
+      }))
+    }
+
     return INDUSTRY_CATEGORIES.map((cat) => ({
       id: cat.id,
       name: t(cat.i18nKey) || cat.fallback,
     }))
-  }, [t])
+  }, [companyCategoriesData, isDemo, t])
 
   const allLocations = useMemo(() => {
     return locationIds.map((id) => ({
@@ -77,7 +105,7 @@ export default function SearchSection() {
     const tags: FilterTag[] = []
     selectedIndustries.forEach((id) => {
       const category = categories.find((c) => c.id === id)
-      if (category) tags.push({ id: `ind-${id}`, label: category.name })
+      tags.push({ id: `ind-${id}`, label: category?.name ?? id })
     })
     selectedLocations.forEach((id) => {
       const location = allLocations.find((l) => l.id === id)
@@ -122,8 +150,11 @@ export default function SearchSection() {
     return t("search.placeholders.all")
   }
 
-  const handlePopularTagClick = (tag: string) => {
-    setSearchValue(tag)
+  const handleSearchSubmit = () => {
+    const params = new URLSearchParams()
+    if (searchValue.trim()) params.set("q", searchValue.trim())
+    selectedIndustries.forEach((id) => params.append("industry", id))
+    router.push(`/directory${params.toString() ? `?${params.toString()}` : ""}`)
   }
 
   return (
@@ -172,7 +203,7 @@ export default function SearchSection() {
                 >
                   {t("search.byCompany")}
                 </button>
-                <button
+                {/* <button
                   onClick={() => setSearchMode("product")}
                   className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
                     searchMode === "product"
@@ -181,7 +212,7 @@ export default function SearchSection() {
                   }`}
                 >
                   {t("search.byProduct")}
-                </button>
+                </button> */}
               </div>
 
               <div className="relative" ref={industryDropdownRef}>
@@ -283,6 +314,8 @@ export default function SearchSection() {
 
             <Button
               variant="primary"
+              type="button"
+              onClick={handleSearchSubmit}
               className="flex h-10 w-full items-center justify-center text-sm font-medium"
             >
               <Search className="mr-2 h-4 w-4" />
@@ -290,7 +323,7 @@ export default function SearchSection() {
             </Button>
           </div>
 
-          <div className="mt-6 text-center">
+          {/* <div className="mt-6 text-center">
             <span className="text-muted-foreground mr-3 text-sm">
               {t("search.popularSearches")}
             </span>
@@ -305,7 +338,7 @@ export default function SearchSection() {
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

@@ -51,7 +51,7 @@ export function AccountCommercialHistory({ t }: AccountCommercialHistoryProps) {
                   {item.amount.toLocaleString()} VND
                 </p>
                 <p className="text-sm text-green-600">
-                  +{item.points.toLocaleString()} 點
+                  +{item.points.toLocaleString()} {t("account.points")}
                 </p>
               </div>
             </div>
