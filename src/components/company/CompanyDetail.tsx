@@ -30,6 +30,8 @@ import {
   MembershipTier,
 } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
+import { isDemoUser } from "@/components/login/demo"
+import { useCompanyDetail } from "@/api/companies/hooks"
 import { getCompanyData } from "../../data/mockCompanies"
 import {
   maskCompanyName,
@@ -47,6 +49,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const fromCategory = searchParams.get("fromCategory")
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn, getTotalPoints } = useUser()
+  const isDemo = isLoggedIn && !!user && isDemoUser(user)
   const [isFavorite, setIsFavorite] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
@@ -55,7 +58,50 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     window.scrollTo(0, 0)
   }, [companyId])
 
-  const company = getCompanyData(companyId)
+  const {
+    data: apiCompany,
+    isLoading: isCompanyLoading,
+    isError: isCompanyError,
+  } = useCompanyDetail(companyId, !isDemo)
+
+  if (!isDemo && isCompanyLoading) {
+    return (
+      <div className="bg-body-bg-dark py-16 text-center">
+        <p className="text-muted-foreground">{t("directory.loading") || "Loading..."}</p>
+      </div>
+    )
+  }
+
+  if (!isDemo && (isCompanyError || !apiCompany)) {
+    return (
+      <div className="bg-body-bg-dark py-16 text-center">
+        <p className="text-muted-foreground">
+          {t("error.failedToLoadOrders") || "Failed to load data"}
+        </p>
+      </div>
+    )
+  }
+
+  const company = isDemo
+    ? getCompanyData(companyId)
+    : {
+        id: apiCompany!.id,
+        nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
+        nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
+        logo: apiCompany!.logoUrl ?? "/placeholder.svg",
+        category: apiCompany!.industry,
+        categoryTags: [],
+        address: apiCompany!.address,
+        phone: apiCompany!.phone,
+        email: apiCompany!.email,
+        website: apiCompany!.website ?? "",
+        contactPerson: apiCompany!.contactName,
+        region: apiCompany!.region ?? "",
+        taxId: apiCompany!.taxId ?? "",
+        introduction: apiCompany!.description,
+        services: [],
+        products: [],
+      }
 
   const companyNameCn = t(`companyDetail.companies.${companyId}.nameCn`, {
     defaultValue: company.nameCn,
@@ -63,25 +109,23 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const companyNameEn = t(`companyDetail.companies.${companyId}.nameEn`, {
     defaultValue: company.nameEn,
   })
-  const companyNameVn = company.nameVn
-    ? t(`companyDetail.companies.${companyId}.nameVn`, { defaultValue: company.nameVn })
-    : undefined
 
   const categoryId = categoryNameToIdMap[company.category] || ""
   const translatedCategory = categoryId ? t(`directory.categories.${categoryId}`) : company.category
 
   const totalPoints = getTotalPoints()
 
-  const isGuest = !isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE]
+  const isAdmin = !!user && user.role === UserRole.Admin
+  const isGuest =
+    !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
   const isBronze =
     isLoggedIn &&
     user &&
+    !isAdmin &&
     totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE] &&
     totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER]
   const isSilverOrAbove =
-    isLoggedIn &&
-    user &&
-    (totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER] || user.role === UserRole.Admin)
+    isLoggedIn && user && (isAdmin || totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER])
 
   const isFreeUser = !isSilverOrAbove
 
@@ -177,11 +221,6 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                   <p key={`${i18n.language}-en`} className="text-muted-foreground mb-1 text-lg">
                     {isGuest ? maskCompanyName(companyNameEn) : companyNameEn}
                   </p>
-                  {companyNameVn && (
-                    <p key={`${i18n.language}-vn`} className="text-muted-foreground text-base">
-                      {isGuest ? maskCompanyName(companyNameVn) : companyNameVn}
-                    </p>
-                  )}
                 </div>
 
                 <div className="mb-6 flex flex-wrap gap-2">
