@@ -19,10 +19,10 @@ interface Message {
 
 function getOrCreateGuestId(): string {
   if (typeof window === "undefined") return ""
-  let id = localStorage.getItem(GUEST_ID_KEY)
+  let id = sessionStorage.getItem(GUEST_ID_KEY)
   if (!id) {
     id = crypto.randomUUID()
-    localStorage.setItem(GUEST_ID_KEY, id)
+    sessionStorage.setItem(GUEST_ID_KEY, id)
   }
   return id
 }
@@ -40,9 +40,13 @@ export default function ChatbotWidget() {
   const [mounted, setMounted] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
   const [pingActive, setPingActive] = useState(true)
-  const [showBadge, setShowBadge] = useState(true)
+  const [showBadge, setShowBadge] = useState(false)
+  const [lastBotPreview, setLastBotPreview] = useState<string | null>(null)
   const [isWiggling, setIsWiggling] = useState(false)
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
+  const [quickQuestionsDismissed, setQuickQuestionsDismissed] = useState(false)
+  const [spamBlockUntil, setSpamBlockUntil] = useState<Date | null>(null)
+  const [spamSecondsLeft, setSpamSecondsLeft] = useState(0)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -59,6 +63,7 @@ export default function ChatbotWidget() {
     t("chatbot.quickQ7"),
     t("chatbot.quickQ8"),
     t("chatbot.quickQ9"),
+    t("chatbot.quickQ10"),
   ]
 
   // Pick 5 random questions — re-randomise each time the panel opens or language changes
@@ -90,13 +95,15 @@ export default function ChatbotWidget() {
   // Keep openRef in sync so wiggle interval can read it without re-registering
   useEffect(() => { openRef.current = open }, [open])
 
-  // Close tooltip, badge and stop ping when chat opens
+  // Close tooltip, badge and stop ping when chat opens; scroll to bottom on open
   useEffect(() => {
     if (open) {
       setShowTooltip(false)
       setPingActive(false)
       setShowBadge(false)
+      setLastBotPreview(null)
       sessionStorage.setItem(TOOLTIP_SEEN_KEY, "1")
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 80)
     }
   }, [open])
 
@@ -133,15 +140,56 @@ export default function ChatbotWidget() {
     if (open) loadHistory()
   }, [isLoggedIn])
 
-  // Scroll to bottom whenever messages change
+  // Scroll to bottom whenever messages change or suggestions panel toggles
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [messages, quickQuestionsDismissed])
+
+  // Re-scroll after streaming ends — the quick questions panel renders after the last token,
+  // pushing the final message up out of view
+  useEffect(() => {
+    if (!streaming) {
+      const t = setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50)
+      return () => clearTimeout(t)
+    }
+  }, [streaming])
 
   // Focus input when panel opens
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 100)
   }, [open])
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    el.style.height = "auto"
+    el.style.height = `${Math.min(el.scrollHeight, 88)}px`
+  }, [input])
+
+  // Spam block countdown — ticks every second until the block expires
+  useEffect(() => {
+    if (!spamBlockUntil) return
+    const interval = setInterval(() => {
+      const left = Math.ceil((spamBlockUntil.getTime() - Date.now()) / 1000)
+      if (left <= 0) {
+        setSpamBlockUntil(null)
+        setSpamSecondsLeft(0)
+      } else {
+        setSpamSecondsLeft(left)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [spamBlockUntil])
+
+  function formatCountdown(secs: number): string {
+    if (secs >= 3600) return `${Math.ceil(secs / 3600)}h`
+    const m = Math.floor(secs / 60)
+    const s = secs % 60
+    if (m > 0 && s > 0) return `${m}m ${s}s`
+    if (m > 0) return `${m}m`
+    return `${secs}s`
+  }
 
   function getAuthToken(): string | null {
     if (!isLoggedIn || typeof window === "undefined") return null
@@ -209,9 +257,13 @@ export default function ChatbotWidget() {
       })
 
       if (res.status === 429) {
-        const retryAfter = res.headers.get("Retry-After")
+        const data = await res.json().catch(() => ({}))
+        const msg: string = (data as { message?: string }).message ?? ""
+        const match = msg.match(/(\d+)\s*seconds?/i)
+        const seconds = match ? parseInt(match[1], 10) : 300
+        setSpamBlockUntil(new Date(Date.now() + seconds * 1000))
+        setSpamSecondsLeft(seconds)
         setMessages((prev) => prev.slice(0, -1))
-        setError(t("chatbot.errorRateLimit") + (retryAfter ? ` (${retryAfter}s)` : ""))
         return
       }
       if (!res.ok) {
@@ -278,6 +330,16 @@ export default function ChatbotWidget() {
     } finally {
       setStreaming(false)
       abortRef.current = null
+      if (!openRef.current) {
+        setShowBadge(true)
+        setMessages((prev) => {
+          const last = prev[prev.length - 1]
+          if (last?.role === "assistant" && last.content) {
+            setLastBotPreview(last.content)
+          }
+          return prev
+        })
+      }
     }
   }
 
@@ -298,6 +360,7 @@ export default function ChatbotWidget() {
     setError(null)
     setInput("")
     setStreaming(false)
+    setQuickQuestionsDismissed(false)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -309,7 +372,10 @@ export default function ChatbotWidget() {
 
   // Active conversation = user has sent at least one message
   const hasConversation = messages.some((m) => m.role === "user")
-  const showQuickQuestions = !hasConversation && !streaming
+  const showQuickQuestions = !streaming && !input.trim()
+  const askedQuestions = new Set(messages.filter((m) => m.role === "user").map((m) => m.content))
+  const visibleQuickQuestions = quickQuestions.filter((q) => !askedQuestions.has(q)).slice(0, hasConversation ? 2 : 3)
+  const showQuickQuestionsPanel = showQuickQuestions && visibleQuickQuestions.length > 0 && (!hasConversation || !quickQuestionsDismissed)
 
   return (
     <>
@@ -317,7 +383,7 @@ export default function ChatbotWidget() {
       {open && (
         <div
           className="fixed right-4 z-50 flex w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
-          style={{ bottom: "76px", height: "clamp(420px, 65vh, 680px)", maxHeight: "calc(100vh - 6rem)" }}
+          style={{ bottom: "76px", height: "clamp(520px, 75vh, 780px)", maxHeight: "calc(100vh - 5rem)" }}
         >
           {/* ── Header ── */}
           <div className="bg-primary flex shrink-0 items-center gap-3 px-4 py-3">
@@ -339,10 +405,13 @@ export default function ChatbotWidget() {
             {/* Actions */}
             <button
               onClick={handleNewChat}
-              className="rounded-full p-1.5 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
+              className="flex items-center gap-1 rounded-full px-2 py-1.5 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
               title={t("chatbot.newChat")}
             >
               <RotateCcw className="h-4 w-4" />
+              {hasConversation && (
+                <span className="text-xs">{t("chatbot.newChat")}</span>
+              )}
             </button>
             <button
               onClick={() => setOpen(false)}
@@ -393,7 +462,7 @@ export default function ChatbotWidget() {
                     <div className="bg-primary mb-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full">
                       <Bot className="h-3.5 w-3.5 text-white" />
                     </div>
-                    <div className="border-primary/20 max-w-[88%] rounded-2xl rounded-bl-sm border bg-primary/5 px-3.5 py-2.5 text-sm leading-relaxed text-gray-700">
+                    <div className="max-w-[88%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-3.5 py-2.5 text-sm leading-relaxed text-gray-700 shadow-sm">
                       {t("chatbot.greeting")}
                     </div>
                   </div>
@@ -409,7 +478,7 @@ export default function ChatbotWidget() {
                   )}
                   <div className={`relative max-w-[88%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col gap-1`}>
                     <div
-                      className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                      className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed [overflow-wrap:anywhere] ${
                         msg.role === "user"
                           ? "bg-primary rounded-br-sm text-white"
                           : "rounded-bl-sm bg-gray-100 text-gray-800"
@@ -428,16 +497,19 @@ export default function ChatbotWidget() {
                           <ReactMarkdown
                             key={i18n.language}
                             components={{
-                              a: ({ href, children }) => (
-                                <a
-                                  href={href}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-primary font-medium underline underline-offset-2 hover:opacity-75"
-                                >
-                                  {children}
-                                </a>
-                              ),
+                              a: ({ href, children }) => {
+                                const safeHref = href && /^https?:\/\//i.test(href) ? href : "#"
+                                return (
+                                  <a
+                                    href={safeHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary font-medium underline underline-offset-2 hover:opacity-75"
+                                  >
+                                    {children}
+                                  </a>
+                                )
+                              },
                             }}
                           >
                             {msg.content || "…"}
@@ -485,21 +557,41 @@ export default function ChatbotWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* ── Suggested replies (shown above input until user sends first message) ── */}
-          {showQuickQuestions && (
+          {/* ── Suggested replies ── */}
+          {showQuickQuestionsPanel && (
             <div className="shrink-0 border-t border-gray-100 bg-white px-4 pt-3 pb-2">
-              <p className="mb-2 text-[11px] font-medium text-gray-400">{t("chatbot.quickQuestions")}</p>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[11px] font-medium text-gray-400">{t("chatbot.quickQuestions")}</p>
+                {hasConversation && (
+                  <button
+                    onClick={() => setQuickQuestionsDismissed(true)}
+                    className="rounded-full p-0.5 text-gray-400 hover:text-gray-600"
+                    aria-label="Dismiss suggestions"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
               <div className="flex flex-wrap gap-1.5">
-                {quickQuestions.slice(0, 3).map((q) => (
+                {visibleQuickQuestions.map((q) => (
                   <button
                     key={q}
                     onClick={() => sendMessage(q)}
-                    className="border-primary/40 text-primary hover:bg-primary rounded-full border px-3 py-1.5 text-xs transition-colors hover:text-white"
+                    className={`border-primary/40 text-primary hover:bg-primary rounded-full border transition-colors hover:text-white ${
+                      hasConversation ? "px-2.5 py-1 text-[11px]" : "px-3 py-1.5 text-xs"
+                    }`}
                   >
                     {q}
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* ── Spam block notice ── */}
+          {spamBlockUntil && (
+            <div className="shrink-0 border-t border-amber-100 bg-amber-50 px-4 py-2 text-xs text-amber-800">
+              ⚠️ {t("chatbot.errorSpam", { time: formatCountdown(spamSecondsLeft) })}
             </div>
           )}
 
@@ -518,7 +610,7 @@ export default function ChatbotWidget() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={t("chatbot.placeholder")}
-                    disabled={streaming}
+                    disabled={streaming || !!spamBlockUntil}
                     rows={1}
                     className={`flex-1 resize-none rounded-xl border px-3.5 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 ${
                       isOver
@@ -527,11 +619,11 @@ export default function ChatbotWidget() {
                           ? "border-amber-400 bg-amber-50 focus:border-amber-400 focus:ring-amber-200"
                           : "border-gray-200 bg-gray-50 focus:border-primary/40 focus:ring-primary/20"
                     }`}
-                    style={{ maxHeight: "88px", overflowY: "auto" }}
+                    style={{ overflowY: "auto" }}
                   />
                   <button
                     onClick={() => sendMessage(input)}
-                    disabled={streaming || !input.trim() || isOver}
+                    disabled={streaming || !input.trim() || isOver || !!spamBlockUntil}
                     className="bg-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-all hover:opacity-90 active:scale-95 disabled:opacity-35"
                   >
                     <Send className="h-4 w-4" />
@@ -558,6 +650,25 @@ export default function ChatbotWidget() {
         className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2 transition-all duration-500 ease-out"
         style={{ transform: mounted ? "translateY(0)" : "translateY(80px)", opacity: mounted ? 1 : 0 }}
       >
+        {/* Bot reply preview bubble */}
+        {!open && lastBotPreview && (
+          <div className="relative mr-1 w-[min(14rem,calc(100vw-5rem))] animate-[fadeSlideUp_0.3s_ease-out]">
+            <div
+              className="cursor-pointer rounded-2xl rounded-br-sm bg-white px-3 py-2 shadow-lg ring-1 ring-gray-200"
+              onClick={() => setOpen(true)}
+            >
+              <button
+                onClick={(e) => { e.stopPropagation(); setLastBotPreview(null) }}
+                className="absolute top-1.5 right-1.5 rounded-full p-0.5 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-3 w-3" />
+              </button>
+              <p className="line-clamp-2 pr-4 text-sm leading-snug text-gray-700">{lastBotPreview}</p>
+            </div>
+            <div className="absolute right-4 -bottom-2 h-0 w-0 border-t-8 border-r-8 border-t-white border-r-transparent" style={{ filter: "drop-shadow(0 1px 1px rgb(0 0 0 / 0.08))" }} />
+          </div>
+        )}
+
         {/* Tooltip bubble */}
         {showTooltip && !open && (
           <div className="relative mr-1 w-[min(14rem,calc(100vw-5rem))] animate-[fadeSlideUp_0.3s_ease-out]">
@@ -585,9 +696,14 @@ export default function ChatbotWidget() {
           {!open && pingActive && (
             <span className="bg-primary absolute inset-0 animate-ping rounded-full opacity-40" />
           )}
+          {showBadge && !open && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
+              1
+            </span>
+          )}
           <button
             onClick={() => setOpen((v) => !v)}
-            className="bg-primary relative flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
+            className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#d10a22] to-[#a20519] shadow-xl transition-transform hover:scale-105 active:scale-95"
             style={isWiggling ? { animation: "wiggle 0.7s ease-in-out" } : undefined}
             aria-label={t("chatbot.title")}
           >
