@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-
-const getBackendBase = () =>
-  (process.env.API_BASE_URL ?? "").replace(/\/$/, "") +
-  (process.env.API_BASE_PATH ?? "/api/v1").replace(/^\//, "/")
+import { getBackendBase } from "../../_utils"
 
 function buildHeaders(request: NextRequest): Record<string, string> {
   const chatbotKey = process.env.CHATBOT_API_KEY ?? ""
