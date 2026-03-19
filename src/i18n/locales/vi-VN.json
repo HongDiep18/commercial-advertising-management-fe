@@ -1319,7 +1319,14 @@
       "estimatedAmount": "Số tiền ước tính",
       "designService": "Dịch vụ thiết kế",
       "sendEmail": "Gửi email",
-      "call": "Gọi điện"
+      "call": "Gọi điện",
+      "confirmApprove": "Duyệt đơn quảng cáo này?",
+      "confirmReject": "Từ chối đơn quảng cáo này?",
+      "approvedSuccess": "Đã duyệt đơn quảng cáo.",
+      "rejectedSuccess": "Đã từ chối đơn quảng cáo.",
+      "updateError": "Không thể cập nhật đơn quảng cáo.",
+      "approveNote": "Ghi chú duyệt",
+      "rejectReason": "Lý do từ chối"
     },
     "property": {
       "listingsCount": "{{count}} bất động sản",

@@ -5,7 +5,9 @@
     "search": "Search",
     "about": "About",
     "contact": "Contact",
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel",
+    "required": "Required"
   },
   "header": {
     "aboutUs": "About Us",
@@ -1273,7 +1275,14 @@
       "estimatedAmount": "Estimated Amount",
       "designService": "Design service",
       "sendEmail": "Send Email",
-      "call": "Call"
+      "call": "Call",
+      "confirmApprove": "Approve this advertising order?",
+      "confirmReject": "Reject this advertising order?",
+      "approvedSuccess": "Advertising order approved.",
+      "rejectedSuccess": "Advertising order rejected.",
+      "updateError": "Failed to update advertising order.",
+      "approveNote": "Approval note",
+      "rejectReason": "Rejection reason"
     },
     "property": {
       "listingsCount": "{{count}} listings",
