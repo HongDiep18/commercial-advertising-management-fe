@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-
-const getBackendBase = () =>
-  (process.env.API_BASE_URL ?? "").replace(/\/$/, "") +
-  (process.env.API_BASE_PATH ?? "/api/v1").replace(/^\//, "/")
+import { getBackendBase } from "../../_utils"
 
 export async function POST(request: NextRequest) {
   const chatbotKey = process.env.CHATBOT_API_KEY
   if (!chatbotKey) {
-    return NextResponse.json({ error: "Chatbot not configured" }, { status: 500 })
+    return NextResponse.json({ error: "Service unavailable" }, { status: 503 })
   }
 
   const body = await request.text()
