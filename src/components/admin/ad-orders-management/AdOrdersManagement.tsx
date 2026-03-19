@@ -1,6 +1,10 @@
 "use client"
 
-import { useAdminOrders } from "@/api/ad-orders-admin/hooks"
+import {
+  useAdminOrders,
+  useApproveAdminOrder,
+  useRejectAdminOrder,
+} from "@/api/ad-orders-admin/hooks"
 import type { AdminOrderDto, AdminOrderStatus } from "@/api/ad-orders-admin/types"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
@@ -8,14 +12,23 @@ import Input from "@/components/ui/Input"
 import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
 import { useDebounce } from "@/hooks/useDebounce"
-import { Eye, Mail, Search } from "lucide-react"
+import { CheckCircle2, Eye, Mail, Search, XCircle } from "lucide-react"
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { StatusBadge } from "../StatusBadge"
 import { AdOrderDetailDialog } from "./AdOrderDetailDialog"
+import { AdOrderStatusActionDialog } from "./AdOrderStatusActionDialog"
 import { formatDateTimeForLocale } from "@/utils/datetime"
+import { useQueryClient } from "@tanstack/react-query"
+import { Toast, type ToastVariant } from "@/components/ui/Toast"
 
 type StatusFilter = "all" | AdminOrderStatus
+const ORDER_ACTION = {
+  APPROVE: "approve",
+  REJECT: "reject",
+} as const
+type ActionType = (typeof ORDER_ACTION)[keyof typeof ORDER_ACTION]
+type ActionModalState = { type: ActionType | null; orderId: string | null; text: string }
 
 export function AdOrdersManagement() {
   const { t, i18n } = useTranslation()
@@ -24,6 +37,28 @@ export function AdOrdersManagement() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [selectedOrder, setSelectedOrder] = useState<AdminOrderDto | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
+  const [actionModal, setActionModal] = useState<ActionModalState>({
+    type: null,
+    orderId: null,
+    text: "",
+  })
+  const MAX_TEXT_LEN = 300
+  const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
+    message: "",
+    variant: "info",
+    visible: false,
+  })
+  const queryClient = useQueryClient()
+  const { approve, isPending: isApproving } = useApproveAdminOrder()
+  const { reject, isPending: isRejecting } = useRejectAdminOrder()
+
+  const showToast = (message: string, variant: ToastVariant = "info") =>
+    setToast({ message, variant, visible: true })
+  const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
+  const openActionModal = (type: ActionType, orderId: string) =>
+    setActionModal({ type, orderId, text: "" })
+  const closeActionModal = () => setActionModal({ type: null, orderId: null, text: "" })
 
   const { data, isLoading, isError } = useAdminOrders({
     search: debouncedSearchQuery || undefined,
@@ -42,6 +77,35 @@ export function AdOrdersManagement() {
     APPROVED: { labelKey: "approved" },
     REJECTED: { labelKey: "rejected" },
   }
+
+  const handleStatusAction = async (type: ActionType, id: string, text: string) => {
+    try {
+      setUpdatingOrderId(id)
+      if (type === ORDER_ACTION.APPROVE) {
+        await approve({ id, note: text })
+      } else {
+        await reject({ id, reason: text })
+      }
+      await queryClient.invalidateQueries({ queryKey: ["admin", "ad-orders"] })
+      showToast(
+        type === ORDER_ACTION.APPROVE
+          ? t("admin.advertising.approvedSuccess") || "Advertising order approved."
+          : t("admin.advertising.rejectedSuccess") || "Advertising order rejected.",
+        "success"
+      )
+    } catch {
+      showToast(
+        t("admin.advertising.updateError") || "Failed to update advertising order.",
+        "error"
+      )
+    } finally {
+      setUpdatingOrderId(null)
+    }
+  }
+
+  const isApproveAction = actionModal.type === ORDER_ACTION.APPROVE
+  const isRejectAction = actionModal.type === ORDER_ACTION.REJECT
+  const isActionOpen = actionModal.type !== null
 
   return (
     <div className="space-y-4">
@@ -164,6 +228,32 @@ export function AdOrdersManagement() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
+                          {order.status === "PENDING" && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={
+                                  updatingOrderId === order.id || isApproving || isRejecting
+                                }
+                                title={t("admin.status.approved")}
+                                onClick={() => openActionModal(ORDER_ACTION.APPROVE, order.id)}
+                              >
+                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={
+                                  updatingOrderId === order.id || isApproving || isRejecting
+                                }
+                                title={t("admin.status.rejected")}
+                                onClick={() => openActionModal(ORDER_ACTION.REJECT, order.id)}
+                              >
+                                <XCircle className="h-4 w-4 text-red-600" />
+                              </Button>
+                            </>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -197,6 +287,46 @@ export function AdOrdersManagement() {
           setIsDetailOpen(open)
           if (!open) setSelectedOrder(null)
         }}
+      />
+
+      <AdOrderStatusActionDialog
+        open={isActionOpen}
+        onOpenChange={(open) => {
+          if (!open) closeActionModal()
+        }}
+        title={isApproveAction ? t("admin.status.approved") : t("admin.status.rejected")}
+        description={
+          isApproveAction
+            ? t("admin.advertising.confirmApprove") || "Approve this advertising order?"
+            : t("admin.advertising.confirmReject") || "Reject this advertising order?"
+        }
+        label={
+          isApproveAction
+            ? t("admin.advertising.approveNote", { defaultValue: "Approval note" })
+            : t("admin.advertising.rejectReason", { defaultValue: "Rejection reason" })
+        }
+        value={actionModal.text}
+        maxLength={MAX_TEXT_LEN}
+        required={isRejectAction}
+        confirmLabel={isApproveAction ? t("admin.status.approved") : t("admin.status.rejected")}
+        cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
+        isSubmitting={isApproving || isRejecting}
+        onValueChange={(value) => setActionModal((prev) => ({ ...prev, text: value }))}
+        onConfirm={() => {
+          const id = actionModal.orderId
+          if (!id) return
+          const type = actionModal.type
+          if (!type) return
+          void handleStatusAction(type, id, actionModal.text.trim()).then(closeActionModal)
+        }}
+      />
+
+      <Toast
+        message={toast.message}
+        variant={toast.variant}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={4500}
       />
     </div>
   )

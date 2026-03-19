@@ -1259,7 +1259,14 @@
       "estimatedAmount": "預估金額",
       "designService": "設計服務",
       "sendEmail": "發送郵件",
-      "call": "撥打電話"
+      "call": "撥打電話",
+      "confirmApprove": "確認核准此廣告訂單？",
+      "confirmReject": "確認拒絕此廣告訂單？",
+      "approvedSuccess": "廣告訂單已核准。",
+      "rejectedSuccess": "廣告訂單已拒絕。",
+      "updateError": "更新廣告訂單失敗。",
+      "approveNote": "核准備註",
+      "rejectReason": "拒絕原因"
     },
     "property": {
       "listingsCount": "{{count}} 筆物業",
