@@ -2,6 +2,8 @@
 
 import { useCompanyCategories } from "@/api/companies/hooks"
 import { INDUSTRY_CATEGORIES } from "@/constants/categories"
+import { isDemoUser } from "@/components/login/demo"
+import { useUser } from "@/contexts/user-context"
 import { ChevronDown, Search, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -18,6 +20,8 @@ const locationIds = ["hcm", "hanoi", "binhduong", "dongnai", "danang", "haiphong
 export default function SearchSection() {
   const { t } = useTranslation()
   const router = useRouter()
+  const { user, isLoggedIn } = useUser()
+  const isDemo = isLoggedIn && !!user && isDemoUser(user)
   const [searchMode, setSearchMode] = useState<"company" | "product" | "all">("company")
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
@@ -31,8 +35,15 @@ export default function SearchSection() {
   const industryDropdownRef = useRef<HTMLDivElement | null>(null)
   const locationDropdownRef = useRef<HTMLDivElement | null>(null)
 
-  const { data: companyCategoriesData } = useCompanyCategories(true)
+  const { data: companyCategoriesData } = useCompanyCategories(!isDemo)
   const categories = useMemo(() => {
+    if (isDemo) {
+      return INDUSTRY_CATEGORIES.map((cat) => ({
+        id: cat.id,
+        name: t(cat.i18nKey) || cat.fallback,
+      }))
+    }
+
     const apiIndustries =
       companyCategoriesData?.categories
         ?.map((c) => String(c.industry ?? "").trim())
@@ -50,7 +61,7 @@ export default function SearchSection() {
       id: cat.id,
       name: t(cat.i18nKey) || cat.fallback,
     }))
-  }, [companyCategoriesData, t])
+  }, [companyCategoriesData, isDemo, t])
 
   const allLocations = useMemo(() => {
     return locationIds.map((id) => ({
@@ -137,10 +148,6 @@ export default function SearchSection() {
     if (searchMode === "company") return t("search.placeholders.company")
     if (searchMode === "product") return t("search.placeholders.product")
     return t("search.placeholders.all")
-  }
-
-  const handlePopularTagClick = (tag: string) => {
-    setSearchValue(tag)
   }
 
   const handleSearchSubmit = () => {

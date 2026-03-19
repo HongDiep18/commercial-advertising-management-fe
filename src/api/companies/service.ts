@@ -3,6 +3,7 @@ import type {
   CompanyCategoriesResponse,
   CompanyDirectoryQuery,
   CompanyDirectoryResponse,
+  CompanyDetail,
   FeaturedCompaniesResponse,
 } from "./types"
 
@@ -44,6 +45,13 @@ export async function getCompanyCategories(): Promise<CompanyCategoriesResponse>
 
 export async function getFeaturedCompanies(): Promise<FeaturedCompaniesResponse> {
   const res = await api.request<FeaturedCompaniesResponse>("/companies/featured", {
+    method: "GET",
+  })
+  return res
+}
+
+export async function getCompanyDetail(id: string): Promise<CompanyDetail> {
+  const res = await api.request<CompanyDetail>(`/companies/${encodeURIComponent(id)}`, {
     method: "GET",
   })
   return res
