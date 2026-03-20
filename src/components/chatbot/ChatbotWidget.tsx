@@ -19,10 +19,10 @@ interface Message {
 
 function getOrCreateGuestId(): string {
   if (typeof window === "undefined") return ""
-  let id = sessionStorage.getItem(GUEST_ID_KEY)
+  let id = localStorage.getItem(GUEST_ID_KEY)
   if (!id) {
     id = crypto.randomUUID()
-    sessionStorage.setItem(GUEST_ID_KEY, id)
+    localStorage.setItem(GUEST_ID_KEY, id)
   }
   return id
 }
@@ -126,7 +126,7 @@ export default function ChatbotWidget() {
   useEffect(() => {
     if (!open || historyLoaded) return
     loadHistory()
-  }, [open])
+  }, [open, historyLoaded])
 
   // Reload session when auth state changes (e.g. user logs in mid-session)
   useEffect(() => {
@@ -232,7 +232,7 @@ export default function ChatbotWidget() {
 
   async function sendMessage(text: string) {
     const trimmed = text.trim()
-    if (!trimmed || streaming || trimmed.length > 200) return
+    if (!trimmed || streaming || trimmed.length > 200 || spamBlockUntil) return
 
     setError(null)
     setInput("")
@@ -348,13 +348,18 @@ export default function ChatbotWidget() {
     try {
       const body: Record<string, string> = {}
       if (isGuest()) body.guestId = getOrCreateGuestId()
-      await fetch("/api/chatbot/session", {
+      const res = await fetch("/api/chatbot/session", {
         method: "DELETE",
         headers: getHeaders(),
         body: JSON.stringify(body),
       })
+      if (!res.ok) {
+        setError(t("chatbot.errorGeneric"))
+        return
+      }
     } catch {
-      // ignore
+      setError(t("chatbot.errorGeneric"))
+      return
     }
     setMessages([{ role: "assistant", content: "", isGreeting: true, timestamp: new Date().toISOString() }])
     setError(null)
@@ -372,7 +377,7 @@ export default function ChatbotWidget() {
 
   // Active conversation = user has sent at least one message
   const hasConversation = messages.some((m) => m.role === "user")
-  const showQuickQuestions = !streaming && !input.trim()
+  const showQuickQuestions = !streaming && !input.trim() && !spamBlockUntil
   const askedQuestions = new Set(messages.filter((m) => m.role === "user").map((m) => m.content))
   const visibleQuickQuestions = quickQuestions.filter((q) => !askedQuestions.has(q)).slice(0, hasConversation ? 2 : 3)
   const showQuickQuestionsPanel = showQuickQuestions && visibleQuickQuestions.length > 0 && (!hasConversation || !quickQuestionsDismissed)
