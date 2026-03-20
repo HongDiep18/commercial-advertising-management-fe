@@ -1097,7 +1097,7 @@
       "propertyViews": "Property Views",
       "trendToday": "+8 today",
       "attentionRequired": "Attention Required",
-      "pendingAlert": "{{count}} company applications pending, 1 news source paused.",
+      "pendingAlert": "{{count}} company applications pending.",
       "recentActivity": "Recent Activity",
       "activityNewCompany": "New company application",
       "activityCompanyDetail": "Fuhua Plastic submitted company registration",
