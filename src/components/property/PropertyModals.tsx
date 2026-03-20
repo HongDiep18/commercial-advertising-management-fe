@@ -15,11 +15,6 @@ type Property = {
   description: string
   images: string[]
   features: string[]
-  contact: {
-    name: string
-    phone: string
-    email: string
-  }
 }
 
 type PropertyModalsProps = {
