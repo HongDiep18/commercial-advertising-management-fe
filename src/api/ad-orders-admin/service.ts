@@ -31,3 +31,17 @@ export async function getAdminOrdersMetrics(): Promise<AdminOrdersMetricsRespons
   })
   return res
 }
+
+export async function approveAdminOrder(id: string, reason: string): Promise<void> {
+  await api.request(`/admin/ad-orders/${encodeURIComponent(id)}/approve`, {
+    method: "POST",
+    body: { reason },
+  })
+}
+
+export async function rejectAdminOrder(id: string, reason: string): Promise<void> {
+  await api.request(`/admin/ad-orders/${encodeURIComponent(id)}/reject`, {
+    method: "POST",
+    body: { reason },
+  })
+}

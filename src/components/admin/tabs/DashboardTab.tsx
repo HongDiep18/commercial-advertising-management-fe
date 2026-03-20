@@ -1,10 +1,11 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
-import { Building2, Clock, Newspaper, TrendingUp, AlertTriangle } from "lucide-react"
+import { Building2, Clock, TrendingUp, AlertTriangle } from "lucide-react"
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
+import { useCompanyDirectory } from "@/api/companies/hooks"
 
 export function DashboardTab() {
   const { t } = useTranslation()
@@ -13,12 +14,18 @@ export function DashboardTab() {
     (c) => c.status === ProfileRequestStatus.PENDING
   ).length
 
+  const { data: companiesDirectoryData, isLoading: isCompaniesLoading } = useCompanyDirectory(
+    { page: 1, limit: 1, sortBy: "name", sortOrder: "asc" },
+    true
+  )
+  const totalCompanies = companiesDirectoryData?.pagination.total ?? 0
+
   const stats = [
     {
       labelKey: "totalCompanies",
-      value: "3,247",
+      value: isCompaniesLoading ? "..." : totalCompanies.toLocaleString(),
       icon: Building2,
-      trend: "+12%",
+      trend: "",
       color: "text-blue-600",
     },
     {
@@ -28,18 +35,18 @@ export function DashboardTab() {
       trend: "",
       color: "text-amber-600",
     },
-    {
-      labelKey: "newsCount",
-      value: "359",
-      icon: Newspaper,
-      trendKey: "trendToday",
-      color: "text-green-600",
-    },
+    // {
+    //   labelKey: "newsCount",
+    //   value: "359",
+    //   icon: Newspaper,
+    //   trendKey: "trendToday",
+    //   color: "text-green-600",
+    // },
     {
       labelKey: "propertyViews",
       value: "1,302",
       icon: TrendingUp,
-      trend: "+23%",
+      trend: "",
       color: "text-primary",
     },
   ]
@@ -75,7 +82,7 @@ export function DashboardTab() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (

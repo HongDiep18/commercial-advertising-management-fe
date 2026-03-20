@@ -1,6 +1,7 @@
 "use client"
 
 import { useCompanyDirectory } from "@/api/companies/hooks"
+import type { CompanyDirectoryQuery } from "@/api/companies/types"
 import { useDebounce } from "@/hooks/useDebounce"
 import { isDemoUser } from "@/components/login/demo"
 import { mockCompanies } from "@/data/mockCompanies"
@@ -8,7 +9,12 @@ import { Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { MEMBERSHIP_THRESHOLDS, MembershipTier, UserRole, useUser } from "../../contexts/user-context"
+import {
+  MEMBERSHIP_THRESHOLDS,
+  MembershipTier,
+  UserRole,
+  useUser,
+} from "../../contexts/user-context"
 import { maskCompanyName } from "../../utils/companyHelpers"
 import { Pagination } from "../ui/Pagination"
 
@@ -67,37 +73,26 @@ export function DirectoryResults({
     !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
-  const filterKey = `${selectedCategories.join(",")}-${debouncedSearchTerm}`
-  const [pageState, setPageState] = useState<{ key: string; page: number }>({
-    key: filterKey,
-    page: 1,
-  })
-
-  if (pageState.key !== filterKey) {
-    setPageState({ key: filterKey, page: 1 })
-  }
-
-  const currentPage = pageState.page
-  const setCurrentPage = (page: number) => setPageState((prev) => ({ ...prev, page }))
+  const [currentPage, setCurrentPage] = useState(1)
 
   const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
-  const { data, isLoading, isError } = useCompanyDirectory(
-    isDemo
-      ? {
-          page: 1,
-          limit: ITEMS_PER_PAGE,
-          sortBy: "name",
-          sortOrder: "asc",
-        }
-      : {
-          search: debouncedSearchTerm || undefined,
-          industry: industryParam,
-          page: currentPage,
-          limit: ITEMS_PER_PAGE,
-          sortBy: "name",
-          sortOrder: "asc",
-        }
-  )
+  const directoryQuery: CompanyDirectoryQuery = isDemo
+    ? {
+        page: 1,
+        limit: ITEMS_PER_PAGE,
+        sortBy: "name" as const,
+        sortOrder: "asc" as const,
+      }
+    : {
+        search: debouncedSearchTerm || undefined,
+        industry: industryParam,
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        sortBy: "name" as const,
+        sortOrder: "asc" as const,
+      }
+
+  const { data, isLoading, isError } = useCompanyDirectory(directoryQuery, !isDemo)
 
   const rawCompanies = isDemo
     ? Object.values(mockCompanies).map((c) => ({

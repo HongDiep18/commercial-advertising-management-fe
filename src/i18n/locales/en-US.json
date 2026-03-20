@@ -5,7 +5,9 @@
     "search": "Search",
     "about": "About",
     "contact": "Contact",
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel",
+    "required": "Required"
   },
   "header": {
     "aboutUs": "About Us",
@@ -841,6 +843,7 @@
     "introduction": "Company Introduction",
     "relatedCompanies": "Related Companies",
     "viewMore": "View More",
+    "noRelatedCompanies": "No related companies",
     "regions": {
       "寶島台灣": "Taiwan",
       "台灣": "Taiwan",
@@ -919,6 +922,11 @@
       "furniture": "Wood, Bamboo, Rattan, Furniture & Tools",
       "construction": "Construction Engineering & Building Materials (Including Environmental)",
       "electronics": "Electronics, Electrical & Communication Equipment",
+      "Trading": "Trading",
+      "E-commerce and Technology": "E-commerce and Technology",
+      "Manufacturing": "Manufacturing",
+      "Technology": "Technology",
+      "Logistics": "Logistics",
       "machinery": "Machinery, Electromechanical & Industrial Products",
       "plastic": "Plastic, Rubber Processing & Chemical Industry",
       "agriculture": "Agriculture, Forestry, Fishing & Animal Husbandry",
@@ -1089,7 +1097,7 @@
       "propertyViews": "Property Views",
       "trendToday": "+8 today",
       "attentionRequired": "Attention Required",
-      "pendingAlert": "{{count}} company applications pending, 1 news source paused.",
+      "pendingAlert": "{{count}} company applications pending.",
       "recentActivity": "Recent Activity",
       "activityNewCompany": "New company application",
       "activityCompanyDetail": "Fuhua Plastic submitted company registration",
@@ -1273,7 +1281,14 @@
       "estimatedAmount": "Estimated Amount",
       "designService": "Design service",
       "sendEmail": "Send Email",
-      "call": "Call"
+      "call": "Call",
+      "confirmApprove": "Approve this advertising order?",
+      "confirmReject": "Reject this advertising order?",
+      "approvedSuccess": "Advertising order approved.",
+      "rejectedSuccess": "Advertising order rejected.",
+      "updateError": "Failed to update advertising order.",
+      "approveNote": "Approval note",
+      "rejectReason": "Rejection reason"
     },
     "property": {
       "listingsCount": "{{count}} listings",

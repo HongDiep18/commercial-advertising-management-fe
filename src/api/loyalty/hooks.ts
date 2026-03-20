@@ -17,10 +17,11 @@ export function usePointsBalance() {
   })
 }
 
-export function useTierInfo() {
+export function useTierInfo(enabled: boolean = true) {
   return useQuery({
     queryKey: loyaltyKeys.tierInfo(),
     queryFn: getTierInfo,
+    enabled,
   })
 }
 

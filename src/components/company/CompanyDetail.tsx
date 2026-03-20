@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -13,7 +13,6 @@ import {
   Globe,
   User,
   Building2,
-  Heart,
   Share2,
   ArrowLeft,
   Copy,
@@ -23,15 +22,11 @@ import {
   Crown,
   FileText,
 } from "lucide-react"
-import {
-  useUser,
-  MEMBERSHIP_THRESHOLDS,
-  UserRole,
-  MembershipTier,
-} from "../../contexts/user-context"
+import { useUser, UserRole, MembershipTier } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
 import { isDemoUser } from "@/components/login/demo"
-import { useCompanyDetail } from "@/api/companies/hooks"
+import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
+import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import {
   maskCompanyName,
@@ -44,13 +39,21 @@ interface CompanyDetailProps {
   companyId: string
 }
 
+function getDeterministicHash(seed: string): number {
+  let h = 0
+  for (let i = 0; i < seed.length; i += 1) {
+    h = (h * 31 + seed.charCodeAt(i)) | 0
+  }
+  return Math.abs(h)
+}
+
 export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const searchParams = useSearchParams()
   const fromCategory = searchParams.get("fromCategory")
   const { t, i18n } = useTranslation()
-  const { user, isLoggedIn, getTotalPoints } = useUser()
+  const { user, isLoggedIn } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
-  const [isFavorite, setIsFavorite] = useState(false)
+  // const [isFavorite, setIsFavorite] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
 
@@ -62,7 +65,45 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     data: apiCompany,
     isLoading: isCompanyLoading,
     isError: isCompanyError,
-  } = useCompanyDetail(companyId, !isDemo)
+  } = useCompanyDetail(companyId, true)
+  const isAdmin = !!user && user.role === UserRole.Admin
+  const {
+    data: tierInfo,
+    isLoading: isTierLoading,
+    isError: isTierError,
+  } = useTierInfo(isLoggedIn && !isAdmin)
+
+  const relatedIndustry = apiCompany?.industry
+
+  const { data: relatedDirectoryData } = useCompanyDirectory(
+    {
+      industry: relatedIndustry,
+      page: 1,
+      limit: 60,
+      sortBy: "name",
+      sortOrder: "asc",
+    },
+    Boolean(relatedIndustry)
+  )
+
+  const relatedCompanies = useMemo<
+    Array<{ id: string; name: string; logoUrl: string | null }>
+  >(() => {
+    const candidates = relatedDirectoryData?.companies ?? []
+    return candidates
+      .filter((c) => c.id !== companyId)
+      .sort(
+        (a, b) =>
+          getDeterministicHash(`${companyId}-${a.id}`) -
+          getDeterministicHash(`${companyId}-${b.id}`)
+      )
+      .slice(0, 6)
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        logoUrl: c.logoUrl ?? "/placeholder.svg",
+      }))
+  }, [companyId, relatedDirectoryData])
 
   if (!isDemo && isCompanyLoading) {
     return (
@@ -113,21 +154,27 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const categoryId = categoryNameToIdMap[company.category] || ""
   const translatedCategory = categoryId ? t(`directory.categories.${categoryId}`) : company.category
 
-  const totalPoints = getTotalPoints()
-
-  const isAdmin = !!user && user.role === UserRole.Admin
-  const isGuest =
-    !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
-  const isBronze =
-    isLoggedIn &&
-    user &&
-    !isAdmin &&
-    totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE] &&
-    totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER]
+  const effectiveTier = isAdmin
+    ? MembershipTier.DIAMOND
+    : (tierInfo?.currentTier ?? MembershipTier.GUEST)
+  const isResolvingTier = isLoggedIn && !isAdmin && isTierLoading && !isTierError && !tierInfo
+  const isGuest = !isAdmin && effectiveTier === MembershipTier.GUEST
+  const isBronze = !isAdmin && effectiveTier === MembershipTier.BRONZE
   const isSilverOrAbove =
-    isLoggedIn && user && (isAdmin || totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER])
+    isAdmin ||
+    effectiveTier === MembershipTier.SILVER ||
+    effectiveTier === MembershipTier.GOLD ||
+    effectiveTier === MembershipTier.DIAMOND
 
   const isFreeUser = !isSilverOrAbove
+
+  if (isResolvingTier) {
+    return (
+      <div className="bg-body-bg-dark py-16 text-center">
+        <p className="text-muted-foreground">{t("directory.loading") || "Loading..."}</p>
+      </div>
+    )
+  }
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText(company.email)
@@ -438,7 +485,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         {t("companyDetail.contactCompany") || "聯絡公司"}
                       </a>
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outline"
                       onClick={() => setIsFavorite(!isFavorite)}
                       className={
@@ -451,7 +498,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       {isFavorite
                         ? t("companyDetail.favorited") || "已收藏"
                         : t("companyDetail.addToFavorites") || "加入收藏"}
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outline"
                       onClick={handleShare}
@@ -584,30 +631,35 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 {t("companyDetail.viewMore") || "查看更多"}
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => {
-                const relatedCompanyName = companyNameCn.replace(/\d+/, String(i + 10))
-                return (
+            {relatedCompanies.length === 0 ? (
+              <p className="text-muted-foreground text-center">
+                {t("companyDetail.noRelatedCompanies") || "No related companies"}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+                {relatedCompanies.map((relatedCompany) => (
                   <Link
-                    key={i}
-                    href={`/directory/${companyId.split("-")[0]}-${i + 10}${fromCategory ? `?fromCategory=${encodeURIComponent(fromCategory)}` : ""}`}
+                    key={relatedCompany.id}
+                    href={`/directory/${relatedCompany.id}${fromCategory ? `?fromCategory=${encodeURIComponent(fromCategory)}` : ""}`}
                     className="group"
                   >
                     <div className="bg-muted relative mb-2 aspect-square overflow-hidden rounded-lg">
                       <Image
-                        src="/assets/images/companies/product-design-concept.png"
-                        alt={`相關企業 ${i}`}
+                        src={relatedCompany.logoUrl || "/placeholder.svg"}
+                        alt={`相關企業 ${relatedCompany.id}`}
                         fill
-                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${isFreeUser ? "blur-[3px]" : ""}`}
+                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+                          isFreeUser ? "blur-[3px]" : ""
+                        }`}
                       />
                     </div>
                     <p className="group-hover:text-primary line-clamp-2 text-xs font-medium transition-colors">
-                      {isFreeUser ? maskCompanyName(relatedCompanyName) : relatedCompanyName}
+                      {isFreeUser ? maskCompanyName(relatedCompany.name) : relatedCompany.name}
                     </p>
                   </Link>
-                )
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </section>
