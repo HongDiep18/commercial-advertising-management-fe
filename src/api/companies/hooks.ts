@@ -27,7 +27,10 @@ const companiesKeys = {
   featured: () => [...companiesKeys.all, "featured"] as const,
 }
 
-export function useCompanyDirectory(query: CompanyDirectoryQuery): {
+export function useCompanyDirectory(
+  query: CompanyDirectoryQuery,
+  enabled: boolean = true
+): {
   data?: CompanyDirectoryResponse
   isLoading: boolean
   isError: boolean
@@ -35,6 +38,7 @@ export function useCompanyDirectory(query: CompanyDirectoryQuery): {
   const { data, isLoading, isError } = useQuery({
     queryKey: companiesKeys.directory(query),
     queryFn: () => getCompanyDirectory(query),
+    enabled,
   })
 
   return { data, isLoading, isError }
