@@ -13,7 +13,6 @@ import {
   Globe,
   User,
   Building2,
-  Heart,
   Share2,
   ArrowLeft,
   Copy,
@@ -54,7 +53,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
-  const [isFavorite, setIsFavorite] = useState(false)
+  // const [isFavorite, setIsFavorite] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
 
@@ -486,7 +485,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         {t("companyDetail.contactCompany") || "聯絡公司"}
                       </a>
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outline"
                       onClick={() => setIsFavorite(!isFavorite)}
                       className={
@@ -499,7 +498,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       {isFavorite
                         ? t("companyDetail.favorited") || "已收藏"
                         : t("companyDetail.addToFavorites") || "加入收藏"}
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outline"
                       onClick={handleShare}

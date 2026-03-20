@@ -1081,7 +1081,7 @@
       "propertyViews": "物業瀏覽",
       "trendToday": "+8 今日",
       "attentionRequired": "需要注意",
-      "pendingAlert": "有 {{count}} 個企業申請待審核，1 個新聞來源已暫停爬蟲。",
+      "pendingAlert": "有 {{count}} 個企業申請待審核。",
       "recentActivity": "近期活動",
       "activityNewCompany": "新企業申請",
       "activityCompanyDetail": "富華塑膠工業 提交企業登錄申請",
