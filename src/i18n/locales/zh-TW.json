@@ -1311,6 +1311,32 @@
     }
   },
   "property": {
+     "province": {
+      "binhDuong": "平陽省",
+      "dongNai": "同奈省"
+    },
+    "mock": {
+      "prop1": {
+        "title": "平陽省標準廠房",
+        "description": "全新廠房，配備消防與排水系統。",
+        "features": {
+          "fire": "消防系統",
+          "water": "排水系統",
+          "security": "24小時保全",
+          "dorm": "員工宿舍"
+        }
+      },
+      "prop2": {
+        "title": "同奈省工業用地",
+        "description": "基礎設施完善，適合建廠。",
+        "features": {
+          "infrastructure": "基礎設施完善",
+          "usage": "50年使用權",
+          "license": "可辦證",
+          "transport": "交通便利"
+        }
+      }
+    },
     "heroTitle": "物業地產",
     "heroDescription": "越南工業用地、廠房、倉庫、辦公室及住宅物業資訊。協助台商尋找最適合的投資及生活空間。",
     "searchPlaceholder": "搜尋物業名稱、地區...",
@@ -1344,6 +1370,9 @@
       "yourName": "您的姓名",
       "yourEmail": "您的 Email",
       "message": "留言內容（選填）",
+      "emailRequired": "請填寫您的 Email",
+      "emailInvalid": "請填寫有效的 Email 格式",
+      "nameRequired": "請填寫您的姓名",
       "submit": "送出詢問",
       "submitSuccess": "詢問已送出（示範）",
       "area": "面積",

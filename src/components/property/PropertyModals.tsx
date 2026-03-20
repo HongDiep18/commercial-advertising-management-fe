@@ -1,8 +1,9 @@
 "use client"
 
-import { MapPin, Ruler, Phone, Mail, X } from "lucide-react"
+import { MapPin, Ruler, Phone, X } from "lucide-react"
 import Button from "@/components/ui/Button"
 import { useTranslation } from "react-i18next"
+import { useState } from "react"
 
 type Property = {
   id: string
@@ -41,8 +42,52 @@ export default function PropertyModals({
   onOpenContact,
 }: PropertyModalsProps) {
   const { t } = useTranslation()
+
+  const [showToast, setShowToast] = useState(false)
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  })
+
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+  })
+
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  const handleSubmit = () => {
+    const newErrors = {
+      name: form.name.trim()
+        ? ""
+        : t("property.modals.nameRequired"),
+
+      email: form.email.trim()
+        ? isValidEmail(form.email)
+          ? ""
+          : t("property.modals.emailInvalid")
+        : t("property.modals.emailRequired"),
+    }
+
+    setErrors(newErrors)
+
+    if (newErrors.name || newErrors.email) return
+
+    setShowToast(true)
+    onCloseContact()
+
+    setTimeout(() => setShowToast(false), 4000)
+
+    setForm({ name: "", email: "", message: "" })
+  }
+
   return (
     <>
+      {/* CONTACT MODAL */}
       {contactProperty && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
@@ -61,40 +106,82 @@ export default function PropertyModals({
               {t("property.modals.contactSeller")}
             </h3>
             <p className="text-sm text-muted-foreground mb-6">
-              {contactProperty.title}
+              {t(contactProperty.title)}
             </p>
 
-              {/* Inquiry Form */}
-              <div className="space-y-3">
+            <div className="space-y-3">
+              {/* NAME */}
+              <div>
                 <input
                   type="text"
+                  value={form.name}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setForm((prev) => ({ ...prev, name: value }))
+                    setErrors((prev) => ({
+                      ...prev,
+                      name: value.trim() ? "" : t("property.modals.nameRequired"),
+                    }))
+                  }}
                   placeholder={t("property.modals.yourName")}
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-body-bg-dark text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-body-bg-dark text-sm"
                 />
+                {errors.name && (
+                  <p className="text-sm text-red-500 mt-1">{errors.name}</p>
+                )}
+              </div>
+
+              {/* EMAIL */}
+              <div>
                 <input
                   type="email"
-                  placeholder={t("property.modals.yourEmail")}
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-body-bg-dark text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-                <textarea
-                  rows={3}
-                  placeholder={t("property.modals.message")}
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-body-bg-dark text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
-                />
-                <Button
-                  className="w-full !bg-header-red-dark"
-                  onClick={() => {
-                    alert(t("property.modals.submitSuccess"))
-                    onCloseContact()
+                  value={form.email}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setForm((prev) => ({ ...prev, email: value }))
+                    setErrors((prev) => ({
+                      ...prev,
+                      email: value.trim()
+                        ? isValidEmail(value)
+                          ? ""
+                          : t("property.modals.emailInvalid")
+                        : t("property.modals.emailRequired"),
+                    }))
                   }}
-                >
-                  {t("property.modals.submit")}
-                </Button>
+                  placeholder={t("property.modals.yourEmail")}
+                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-body-bg-dark text-sm"
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                )}
               </div>
+
+              {/* MESSAGE */}
+              <textarea
+                rows={3}
+                value={form.message}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    message: e.target.value,
+                  }))
+                }
+                placeholder={t("property.modals.message")}
+                className="w-full px-3 py-2.5 border border-border rounded-lg bg-body-bg-dark text-sm resize-none"
+              />
+
+              <Button
+                className="w-full !bg-header-red-dark"
+                onClick={handleSubmit}
+              >
+                {t("property.modals.submit")}
+              </Button>
+            </div>
           </div>
         </div>
       )}
 
+      {/* DETAIL MODAL */}
       {detailProperty && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
@@ -128,12 +215,12 @@ export default function PropertyModals({
 
             <div className="p-6">
               <h2 className="text-xl font-bold text-foreground mb-2">
-                {detailProperty.title}
+                {t(detailProperty.title)}
               </h2>
 
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
                 <MapPin className="w-4 h-4" />
-                <span>{detailProperty.provinceName}</span>
+                <span>{t(detailProperty.provinceName)}</span>
               </div>
 
               <div className="mb-6">
@@ -154,7 +241,7 @@ export default function PropertyModals({
                 {t("property.modals.description")}
               </h3>
               <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                {detailProperty.description}
+                {t(detailProperty.description)}
               </p>
 
               <h3 className="font-semibold text-foreground mb-2">
@@ -166,7 +253,7 @@ export default function PropertyModals({
                     key={f}
                     className="px-3 py-1.5 text-sm bg-primary/10 text-primary rounded-full"
                   >
-                    {f}
+                    {t(f)}
                   </span>
                 ))}
               </div>
@@ -188,6 +275,30 @@ export default function PropertyModals({
                 {t("property.modals.contactForDetail")}
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showToast && (
+        <div className="fixed top-[100px] right-6 z-[999]">
+          <div className="relative flex items-start gap-3 bg-[#EAF7EF] border text-black px-4 py-3 rounded-xl shadow-md max-w-sm overflow-hidden">
+
+            <div className="absolute left-0 top-0 h-full w-1 bg-green-600 rounded-l-xl" />
+
+            <div className="mt-0.5 flex items-center justify-center w-5 h-5 min-w-[20px] min-h-[20px] rounded-full border-2 border-green-600 text-green-600 text-[10px] flex-shrink-0">
+              ✔
+            </div>
+
+            <div className="text-sm font-semibold leading-snug pr-6">
+              {t("property.modals.submitSuccess")}
+            </div>
+
+            <button
+              onClick={() => setShowToast(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg font-bold"
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
