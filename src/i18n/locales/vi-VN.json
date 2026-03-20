@@ -1372,6 +1372,32 @@
     }
   },
   "property": {
+    "province": {
+      "binhDuong": "Bình Dương",
+      "dongNai": "Đồng Nai"
+    },
+    "mock": {
+      "prop1": {
+        "title": "Nhà xưởng tiêu chuẩn tại KCN Bình Dương",
+        "description": "Nhà xưởng mới, đầy đủ hệ thống PCCC và thoát nước. Phù hợp sản xuất nhẹ.",
+        "features": {
+          "fire": "Hệ thống PCCC",
+          "water": "Thoát nước",
+          "security": "Bảo vệ 24/7",
+          "dorm": "Ký túc xá"
+        }
+      },
+      "prop2": {
+        "title": "Đất công nghiệp Đồng Nai",
+        "description": "Đã hoàn thiện hạ tầng, phù hợp xây nhà máy lớn.",
+        "features": {
+          "infrastructure": "Hạ tầng hoàn chỉnh",
+          "usage": "50 năm sử dụng",
+          "license": "Có giấy phép",
+          "transport": "Giao thông thuận lợi"
+        }
+      }
+    },
     "heroTitle": "Bất động sản",
     "heroDescription": "Thông tin về đất công nghiệp, nhà máy, kho bãi, văn phòng và nhà ở tại Việt Nam. Hỗ trợ các doanh nghiệp Đài Loan tìm kiếm không gian đầu tư và sinh sống phù hợp.",
     "searchPlaceholder": "Tìm tên bất động sản hoặc khu vực...",
@@ -1405,6 +1431,9 @@
       "yourName": "Họ tên của bạn",
       "yourEmail": "Email của bạn",
       "message": "Nội dung lời nhắn (tùy chọn)",
+      "nameRequired": "Vui lòng điền họ tên của bạn",
+      "emailRequired": "Vui lòng điền email của bạn",
+      "emailInvalid": "Định dạng email không hợp lệ",
       "submit": "Gửi yêu cầu",
       "submitSuccess": "Yêu cầu đã được gửi (minh họa)! Người bán sẽ liên hệ với bạn sớm nhất có thể.",
       "area": "Diện tích",
