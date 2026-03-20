@@ -3,8 +3,8 @@ import type { LucideIcon } from "lucide-react"
 import {
   LayoutDashboard,
   Building2,
-  ShoppingBag,
-  Newspaper,
+  // ShoppingBag,
+  // Newspaper,
   Megaphone,
   MapPin,
   UserCog,
@@ -24,8 +24,8 @@ export const PROFILE_REQUEST_FILTERS: Array<{
 export const ADMIN_TABS: Array<{ id: string; icon: LucideIcon }> = [
   { id: "dashboard", icon: LayoutDashboard },
   { id: "companies", icon: Building2 },
-  { id: "store", icon: ShoppingBag },
-  { id: "news", icon: Newspaper },
+  // { id: "store", icon: ShoppingBag },
+  // { id: "news", icon: Newspaper },
   { id: "advertising", icon: Megaphone },
   { id: "property", icon: MapPin },
   { id: "users", icon: UserCog },

@@ -273,7 +273,7 @@ export const getDurationMonths = (duration: string): number => {
   if (d.includes("6個月") || d.includes("6 month") || d.includes("6 tháng")) return 6
   if (d.includes("3個月") || d.includes("3 month") || d.includes("3 tháng")) return 3
   if (d.includes("1個月") || d.includes("1 month") || d.includes("1 tháng")) return 1
-  if (d.includes("annual") || d.includes("年度") || d.includes("năm")) return 12
+  if (d.includes("12個月") || d.includes("12 month") || d.includes("12 tháng")) return 12
   return 0
 }
 

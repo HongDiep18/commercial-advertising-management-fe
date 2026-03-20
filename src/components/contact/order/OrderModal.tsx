@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { X, Send } from "lucide-react"
 import Button from "@/components/ui/Button"
@@ -16,6 +16,8 @@ import { hasOverlapWithExistingOrders, type NewOrderItem } from "@/api/ad-orders
 import type { CreateAdOrderInput } from "@/types/types"
 import { type AdOrderAssetToUpload, getMyPendingOrderItems } from "@/api/ad-orders/service"
 import { isValidPhone } from "@/utils/validation/phone"
+import { useUser } from "@/contexts/user-context"
+import { getProfile } from "@/api/profile"
 
 type OrderForm = {
   company: string
@@ -76,6 +78,40 @@ export default function OrderModal({
   const [openCalendar, setOpenCalendar] = useState<string | null>(null)
 
   const [phoneError, setPhoneError] = useState<string | null>(null)
+
+  const { isLoggedIn, isAuthReady } = useUser()
+  const didPrefillRef = useRef(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      didPrefillRef.current = false
+      return
+    }
+    if (!isLoggedIn || !isAuthReady) return
+    if (didPrefillRef.current) return
+
+    didPrefillRef.current = true
+
+    void (async () => {
+      try {
+        const profile = await getProfile()
+        if (!profile) return
+
+        const companyValue =
+          i18n.language === "zh-TW" ? profile.companyNameCn : profile.companyNameVi
+
+        setOrderForm((prev) => ({
+          ...prev,
+          company: prev.company || companyValue,
+          contact: prev.contact || profile.contactName,
+          phone: prev.phone || profile.contactPhone || profile.phone,
+          email: prev.email || profile.email,
+        }))
+      } catch {
+        // Ignore profile fetch failures; user can fill manually.
+      }
+    })()
+  }, [i18n.language, isAuthReady, isLoggedIn, isOpen])
 
   const handleStartDateChange = (itemId: string, date: Date | undefined, duration: string) => {
     if (!date) return
