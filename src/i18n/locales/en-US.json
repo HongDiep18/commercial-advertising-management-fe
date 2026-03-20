@@ -1327,6 +1327,32 @@
     }
   },
   "property": {
+     "province": {
+      "binhDuong": "Binh Duong",
+      "dongNai": "Dong Nai"
+    },
+    "mock": {
+      "prop1": {
+        "title": "Standard factory in Binh Duong",
+        "description": "New factory with full fire and drainage system.",
+        "features": {
+          "fire": "Fire system",
+          "water": "Drainage",
+          "security": "24/7 security",
+          "dorm": "Dormitory"
+        }
+      },
+      "prop2": {
+        "title": "Industrial land in Dong Nai",
+        "description": "Fully developed infrastructure, suitable for factories.",
+        "features": {
+          "infrastructure": "Infrastructure ready",
+          "usage": "50-year usage",
+          "license": "Licensed",
+          "transport": "Good transport"
+        }
+      }
+    },
     "heroTitle": "Property",
     "heroDescription": "Information about industrial land, factories, warehouses, offices, and residential properties in Vietnam. Supporting Taiwanese businesses in finding suitable investment and living spaces.",
     "searchPlaceholder": "Search property name or location...",
@@ -1360,6 +1386,9 @@
       "yourName": "Your Name",
       "yourEmail": "Your Email",
       "message": "Message (Optional)",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "nameRequired": "Name is required",
       "submit": "Submit Inquiry",
       "submitSuccess": "Inquiry submitted (Demo)! The seller will contact you as soon as possible.",
       "area": "Area",
