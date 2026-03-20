@@ -13,7 +13,6 @@ import {
   Globe,
   User,
   Building2,
-  Heart,
   Share2,
   ArrowLeft,
   Copy,
@@ -23,15 +22,11 @@ import {
   Crown,
   FileText,
 } from "lucide-react"
-import {
-  useUser,
-  MEMBERSHIP_THRESHOLDS,
-  UserRole,
-  MembershipTier,
-} from "../../contexts/user-context"
+import { useUser, UserRole, MembershipTier } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
 import { isDemoUser } from "@/components/login/demo"
 import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
+import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import {
   maskCompanyName,
@@ -56,9 +51,9 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const searchParams = useSearchParams()
   const fromCategory = searchParams.get("fromCategory")
   const { t, i18n } = useTranslation()
-  const { user, isLoggedIn, getTotalPoints } = useUser()
+  const { user, isLoggedIn } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
-  const [isFavorite, setIsFavorite] = useState(false)
+  // const [isFavorite, setIsFavorite] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
 
@@ -71,6 +66,12 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     isLoading: isCompanyLoading,
     isError: isCompanyError,
   } = useCompanyDetail(companyId, true)
+  const isAdmin = !!user && user.role === UserRole.Admin
+  const {
+    data: tierInfo,
+    isLoading: isTierLoading,
+    isError: isTierError,
+  } = useTierInfo(isLoggedIn && !isAdmin)
 
   const relatedIndustry = apiCompany?.industry
 
@@ -153,21 +154,27 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const categoryId = categoryNameToIdMap[company.category] || ""
   const translatedCategory = categoryId ? t(`directory.categories.${categoryId}`) : company.category
 
-  const totalPoints = getTotalPoints()
-
-  const isAdmin = !!user && user.role === UserRole.Admin
-  const isGuest =
-    !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
-  const isBronze =
-    isLoggedIn &&
-    user &&
-    !isAdmin &&
-    totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE] &&
-    totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER]
+  const effectiveTier = isAdmin
+    ? MembershipTier.DIAMOND
+    : (tierInfo?.currentTier ?? MembershipTier.GUEST)
+  const isResolvingTier = isLoggedIn && !isAdmin && isTierLoading && !isTierError && !tierInfo
+  const isGuest = !isAdmin && effectiveTier === MembershipTier.GUEST
+  const isBronze = !isAdmin && effectiveTier === MembershipTier.BRONZE
   const isSilverOrAbove =
-    isLoggedIn && user && (isAdmin || totalPoints >= MEMBERSHIP_THRESHOLDS[MembershipTier.SILVER])
+    isAdmin ||
+    effectiveTier === MembershipTier.SILVER ||
+    effectiveTier === MembershipTier.GOLD ||
+    effectiveTier === MembershipTier.DIAMOND
 
   const isFreeUser = !isSilverOrAbove
+
+  if (isResolvingTier) {
+    return (
+      <div className="bg-body-bg-dark py-16 text-center">
+        <p className="text-muted-foreground">{t("directory.loading") || "Loading..."}</p>
+      </div>
+    )
+  }
 
   const handleCopyEmail = async () => {
     await navigator.clipboard.writeText(company.email)
@@ -478,7 +485,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         {t("companyDetail.contactCompany") || "聯絡公司"}
                       </a>
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outline"
                       onClick={() => setIsFavorite(!isFavorite)}
                       className={
@@ -491,7 +498,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       {isFavorite
                         ? t("companyDetail.favorited") || "已收藏"
                         : t("companyDetail.addToFavorites") || "加入收藏"}
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="outline"
                       onClick={handleShare}
