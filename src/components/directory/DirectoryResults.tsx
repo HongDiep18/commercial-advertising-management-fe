@@ -73,18 +73,7 @@ export function DirectoryResults({
     !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
-  const filterKey = `${selectedCategories.join(",")}-${debouncedSearchTerm}`
-  const [pageState, setPageState] = useState<{ key: string; page: number }>({
-    key: filterKey,
-    page: 1,
-  })
-
-  if (pageState.key !== filterKey) {
-    setPageState({ key: filterKey, page: 1 })
-  }
-
-  const currentPage = pageState.page
-  const setCurrentPage = (page: number) => setPageState((prev) => ({ ...prev, page }))
+  const [currentPage, setCurrentPage] = useState(1)
 
   const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
   const directoryQuery: CompanyDirectoryQuery = isDemo
