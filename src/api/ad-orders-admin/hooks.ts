@@ -1,6 +1,12 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { getAdminOrdersMetrics, listAdminOrders } from "./service"
+import {
+  approveAdminOrder,
+  getAdminOrdersMetrics,
+  listAdminOrders,
+  rejectAdminOrder,
+} from "./service"
+
 import type {
   AdminListOrdersQuery,
   AdminListOrdersResponse,
@@ -45,4 +51,24 @@ export function useAdminOrdersMetrics(): {
   })
 
   return { data, isLoading, isError }
+}
+
+export function useApproveAdminOrder(): {
+  approve: (args: { id: string; note: string }) => Promise<void>
+  isPending: boolean
+} {
+  const mutation = useMutation({
+    mutationFn: ({ id, note }: { id: string; note: string }) => approveAdminOrder(id, note),
+  })
+  return { approve: mutation.mutateAsync, isPending: mutation.isPending }
+}
+
+export function useRejectAdminOrder(): {
+  reject: (args: { id: string; reason: string }) => Promise<void>
+  isPending: boolean
+} {
+  const mutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => rejectAdminOrder(id, reason),
+  })
+  return { reject: mutation.mutateAsync, isPending: mutation.isPending }
 }
