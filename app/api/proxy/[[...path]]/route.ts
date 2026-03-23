@@ -4,7 +4,7 @@ const getBackendBase = () =>
   (process.env.API_BASE_URL ?? "").replace(/\/$/, "") +
   (process.env.API_BASE_PATH ?? "/api/v1").replace(/^\//, "/")
 
-const FORWARD_HEADERS = ["authorization", "content-type"] as const
+const FORWARD_HEADERS = ["authorization", "content-type", "cookie"] as const
 
 export async function GET(request: NextRequest) {
   return forward(request)
@@ -46,5 +46,13 @@ async function forward(request: NextRequest) {
   const res = await fetch(backendUrl, fetchOpts)
 
   const data = await res.json().catch(() => ({}))
-  return NextResponse.json(data, { status: res.status })
+
+  // Forward Set-Cookie headers from backend to client
+  const response = NextResponse.json(data, { status: res.status })
+  const setCookie = res.headers.get("set-cookie")
+  if (setCookie) {
+    response.headers.set("set-cookie", setCookie)
+  }
+
+  return response
 }
