@@ -100,7 +100,7 @@ export default function PricingSection({
 
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p key={i18n.language} className="font-700 text-sm text-amber-800">
-            <p>{t("adContact.note")}</p>
+            {t("adContact.note")}
           </p>
         </div>
       </div>
