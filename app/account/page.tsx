@@ -2,12 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import {
-  useUser,
-  UserRole,
-  MembershipTier,
-  MEMBERSHIP_CONFIG,
-} from "@/contexts/user-context"
+import { useUser, UserRole, MembershipTier, MEMBERSHIP_CONFIG } from "@/contexts/user-context"
 import { useTranslation } from "react-i18next"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
@@ -334,10 +329,7 @@ export default function AccountPage() {
       setLogo((prev) => {
         if (prev.url?.startsWith("blob:")) URL.revokeObjectURL(prev.url)
         queueMicrotask(() => {
-          showToast(
-            t("account.logoUpdated") || "Logo 更新成功！",
-            "success"
-          )
+          showToast(t("account.logoUpdated") || "Logo 更新成功！", "success")
         })
         return {
           ...prev,

@@ -1,8 +1,17 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { CheckCircle2, Eye, Trash2, X, XCircle, ToggleLeft, ToggleRight } from "lucide-react"
+import {
+  CheckCircle2,
+  Eye,
+  Pencil,
+  Trash2,
+  X,
+  XCircle,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import {
@@ -12,6 +21,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog"
+import { AccountProfileModal } from "@/components/account"
+import { useUser } from "@/contexts/user-context"
 import { StatusBadge } from "../StatusBadge"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { PROFILE_REQUEST_FILTERS } from "../constants"
@@ -23,11 +34,17 @@ import {
   type ProfileRequestRow,
   ProfileRequestStatus,
 } from "@/types/admin"
+import { companyDetailToRequestRow } from "@/api/companies/adminCompany.mapper"
+import { getCompanyDetail } from "@/api/companies/service"
 import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
 import { formatDateTimeForLocale } from "@/utils/datetime"
+import { isAdminRole } from "@/utils/adminRole"
+import { useCompanyEdit } from "./useCompanyEdit"
 
 export function CompaniesTab() {
   const { t, i18n } = useTranslation()
+  const { user } = useUser()
+  const canEditCompanyProfile = isAdminRole(user?.role)
   const {
     companyRequests,
     companyRequestsLoading,
@@ -35,20 +52,40 @@ export function CompaniesTab() {
     updateCompanyRequestStatus,
     updateUserActive,
     deleteCompany,
+    refetchCompanyRequests,
   } = useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [selectedRequest, setSelectedRequest] = useState<ProfileRequestRow | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [viewOpening, setViewOpening] = useState(false)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: "",
     variant: "info",
     visible: false,
   })
 
+  const [companyEmailById, setCompanyEmailById] = useState<Record<string, string>>({})
+
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
+
+  const companyEdit = useCompanyEdit({
+    canEditCompanyProfile,
+    language: i18n.language,
+    t,
+    onShowToast: showToast,
+    onRefetchCompanyRequests: refetchCompanyRequests,
+    onCompanyEmailResolved: (companyId, email) => {
+      setCompanyEmailById((prev) => {
+        const next = { ...prev }
+        if (email) next[companyId] = email
+        else delete next[companyId]
+        return next
+      })
+    },
+  })
 
   const resolveUserIdForRow = async (row: ProfileRequestRow): Promise<string | null> => {
     if (row.userId) return row.userId
@@ -109,10 +146,84 @@ export function CompaniesTab() {
       .finally(() => setUpdatingId(null))
   }
 
+  const openCompanyView = async (row: ProfileRequestRow) => {
+    setViewOpening(true)
+    try {
+      const companyId = row.companyId?.trim()
+      if (!companyId) {
+        setSelectedRequest(row)
+        setIsDetailOpen(true)
+        return
+      }
+      try {
+        const detail = await getCompanyDetail(companyId)
+        if (detail && typeof detail === "object") {
+          const mapped = companyDetailToRequestRow(detail as Record<string, unknown>, row)
+          setSelectedRequest(mapped)
+          if (typeof detail.email === "string" && detail.email.trim()) {
+            setCompanyEmailById((prev) => ({ ...prev, [companyId]: detail.email.trim() }))
+          }
+        } else {
+          setSelectedRequest(row)
+        }
+      } catch {
+        setSelectedRequest(row)
+      }
+      setIsDetailOpen(true)
+    } finally {
+      setViewOpening(false)
+    }
+  }
+
   const { statusCounts, filtered } = useMemo(
     () => getProfileRequestFilterState(companyRequests, filter),
     [companyRequests, filter]
   )
+
+  useEffect(() => {
+    let cancelled = false
+    const loadCompanyEmails = async () => {
+      const companyIds = filtered
+        .map((r) => r.companyId)
+        .filter((id): id is string => typeof id === "string" && id.trim().length > 0)
+
+      if (companyIds.length === 0) return
+
+      const distinct = Array.from(new Set(companyIds))
+      const idsToFetch = distinct.filter((id) => !companyEmailById[id])
+      if (idsToFetch.length === 0) return
+
+      const pairs = await Promise.all(
+        idsToFetch.map(async (id) => {
+          try {
+            const detail = await getCompanyDetail(id)
+            return typeof detail?.email === "string" && detail.email.trim()
+              ? ([id, detail.email] as const)
+              : null
+          } catch {
+            return null
+          }
+        })
+      )
+
+      if (cancelled) return
+
+      setCompanyEmailById((prev) => {
+        const next = { ...prev }
+        for (const pair of pairs) {
+          if (!pair) continue
+          const [id, email] = pair
+          next[id] = email
+        }
+        return next
+      })
+    }
+
+    void loadCompanyEmails()
+    return () => {
+      cancelled = true
+    }
+  }, [filtered, companyEmailById])
 
   if (companyRequestsLoading) {
     return (
@@ -187,7 +298,11 @@ export function CompaniesTab() {
                   >
                     <td className="px-4 py-3">
                       <p className="text-foreground text-sm font-medium">{row.companyName}</p>
-                      <p className="text-muted-foreground text-xs">{row.email}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {row.companyId && companyEmailById[row.companyId]
+                          ? companyEmailById[row.companyId]
+                          : row.email}
+                      </p>
                     </td>
                     <td className="px-4 py-3 text-sm">{row.contactName}</td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">{row.industry}</td>
@@ -287,15 +402,25 @@ export function CompaniesTab() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         )}
+                        {row.status === ProfileRequestStatus.APPROVED && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hover:!bg-primary h-8 hover:!text-white"
+                            aria-label={t("admin.companies.edit", "Edit")}
+                            disabled={!!updatingId || companyEdit.state.editOpening}
+                            onClick={() => companyEdit.actions.openCompanyEdit(row)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
                           className="hover:!bg-primary h-8 hover:!text-white"
                           aria-label={t("common.view", "View")}
-                          onClick={() => {
-                            setSelectedRequest(row)
-                            setIsDetailOpen(true)
-                          }}
+                          disabled={viewOpening}
+                          onClick={() => void openCompanyView(row)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -326,7 +451,7 @@ export function CompaniesTab() {
                 <DialogTitle>{selectedRequest.companyName}</DialogTitle>
                 <DialogDescription>
                   {t("admin.companies.submittedOn")}{" "}
-                    {formatDateTimeForLocale(selectedRequest.submittedAt, i18n.language)}
+                  {formatDateTimeForLocale(selectedRequest.submittedAt, i18n.language)}
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-4 px-5">
@@ -337,7 +462,11 @@ export function CompaniesTab() {
                   </div>
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
                     <p className="text-muted-foreground text-xs">{t("admin.companies.email")}</p>
-                    <p className="text-sm font-medium">{selectedRequest.email}</p>
+                    <p className="text-sm font-medium">
+                      {selectedRequest.companyId && companyEmailById[selectedRequest.companyId]
+                        ? companyEmailById[selectedRequest.companyId]
+                        : selectedRequest.email}
+                    </p>
                   </div>
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
                     <p className="text-muted-foreground text-xs">{t("admin.companies.industry")}</p>
@@ -357,6 +486,28 @@ export function CompaniesTab() {
           )}
         </DialogContent>
       </Dialog>
+
+      {companyEdit.state.editModalOpen && (
+        <AccountProfileModal
+          open
+          onClose={companyEdit.actions.closeCompanyEdit}
+          profileData={companyEdit.state.editProfile}
+          onProfileChange={companyEdit.actions.handleEditProfileChange}
+          fieldErrors={companyEdit.state.editFieldErrors}
+          companyLogo={companyEdit.state.editLogo.url}
+          onLogoUpload={companyEdit.actions.handleEditLogoUpload}
+          fileInputRef={companyEdit.ui.editFileInputRef}
+          logoUploaded={companyEdit.state.editLogo.uploaded}
+          onSave={() => void companyEdit.actions.handleSaveCompanyEdit()}
+          isSaving={companyEdit.state.editSaving}
+          countries={companyEdit.ui.countries}
+          availableRegions={companyEdit.ui.availableRegions}
+          regionValue={companyEdit.ui.regionValue}
+          hasCountry={companyEdit.ui.hasCountry}
+          readOnly={!canEditCompanyProfile}
+          t={t}
+        />
+      )}
     </div>
   )
 }

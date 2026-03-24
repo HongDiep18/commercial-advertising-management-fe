@@ -108,7 +108,7 @@ export default function OrderModal({
           email: prev.email || profile.email,
         }))
       } catch {
-        // Ignore profile fetch failures; user can fill manually.
+        console.error("[OrderModal] Failed to prefill order form")
       }
     })()
   }, [i18n.language, isAuthReady, isLoggedIn, isOpen])

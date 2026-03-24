@@ -77,3 +77,23 @@ export type CompanyDetail = {
   website?: string | null
   contactName: string
 }
+
+export type AdminCompanyResponse = {
+  id: string
+  email: string
+  membershipTier?: string
+  role?: string
+  logoUrl?: string | null
+  companyNameVi?: string
+  companyNameCn?: string
+  phone?: string
+  address?: string
+  description?: string
+  taxId?: string
+  country?: string
+  region?: string
+  industry?: string
+  website?: string
+  contactName?: string
+  contactPhone?: string
+}
