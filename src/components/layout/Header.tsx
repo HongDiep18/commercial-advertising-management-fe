@@ -10,7 +10,11 @@ import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import LanguageSelector from "./LanguageSelector"
 
-export default function Header() {
+type HeaderProps = {
+  showSiteNav?: boolean
+}
+
+export default function Header({ showSiteNav = true }: HeaderProps) {
   const { t } = useTranslation()
   const { user, isLoggedIn, logout, canUseFeature } = useUser()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -46,46 +50,50 @@ export default function Header() {
             />
           </Link>
 
-          <nav className="mx-auto hidden items-center gap-5 lg:flex xl:gap-6">
-            <Link
-              href="/about"
-              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
-            >
-              {t("header.aboutUs")}
-            </Link>
-            <Link
-              href="/directory"
-              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
-            >
-              {t("header.directory")}
-            </Link>
-            <Link
-              href={process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"}
-              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
-            >
-              {t("header.store")}
-            </Link>
-            <Link
-              href="/news"
-              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
-            >
-              {t("header.news")}
-            </Link>
-            <Link
-              href="/property"
-              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
-            >
-              {t("header.property")}
-            </Link>
-            <Link
-              href="/contact"
-              className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
-            >
-              {t("header.adContact")}
-            </Link>
-          </nav>
+          {showSiteNav && (
+            <nav className="mx-auto hidden items-center gap-5 lg:flex xl:gap-6">
+              <Link
+                href="/about"
+                className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+              >
+                {t("header.aboutUs")}
+              </Link>
+              <Link
+                href="/directory"
+                className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+              >
+                {t("header.directory")}
+              </Link>
+              <Link
+                href={process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"}
+                className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+              >
+                {t("header.store")}
+              </Link>
+              <Link
+                href="/news"
+                className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+              >
+                {t("header.news")}
+              </Link>
+              <Link
+                href="/property"
+                className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+              >
+                {t("header.property")}
+              </Link>
+              <Link
+                href="/contact"
+                className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
+              >
+                {t("header.adContact")}
+              </Link>
+            </nav>
+          )}
 
-          <div className="hidden items-center gap-1 md:flex lg:gap-1">
+          <div
+            className={`hidden items-center gap-1 md:flex lg:gap-1 ${showSiteNav ? "" : "ml-auto"}`}
+          >
             <LanguageSelector variant="desktop" />
 
             {isLoggedIn && user ? (
@@ -150,60 +158,68 @@ export default function Header() {
             )}
           </div>
 
-          <button
-            className="p-2 text-white md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {(showSiteNav || isLoggedIn) && (
+            <button
+              className="p-2 text-white md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          )}
         </div>
 
         {isMenuOpen && (
           <div className="border-t border-white/20 py-4 md:hidden">
             <nav className="flex flex-col gap-3">
-              <Link
-                href="/about"
-                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={closeMobileMenu}
-              >
-                {t("header.aboutUs")}
-              </Link>
-              <Link
-                href="/directory"
-                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={closeMobileMenu}
-              >
-                {t("header.directory")}
-              </Link>
-              <Link
-                href={process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"}
-                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={closeMobileMenu}
-              >
-                {t("header.store")}
-              </Link>
-              <Link
-                href="/news"
-                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={closeMobileMenu}
-              >
-                {t("header.news")}
-              </Link>
-              <Link
-                href="/property"
-                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={closeMobileMenu}
-              >
-                {t("header.property")}
-              </Link>
-              <Link
-                href="/contact"
-                className="py-2 text-sm font-medium transition-colors hover:text-white/80"
-                onClick={closeMobileMenu}
-              >
-                {t("header.adContact")}
-              </Link>
+              {showSiteNav && (
+                <>
+                  <Link
+                    href="/about"
+                    className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                    onClick={closeMobileMenu}
+                  >
+                    {t("header.aboutUs")}
+                  </Link>
+                  <Link
+                    href="/directory"
+                    className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                    onClick={closeMobileMenu}
+                  >
+                    {t("header.directory")}
+                  </Link>
+                  <Link
+                    href={
+                      process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"
+                    }
+                    className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                    onClick={closeMobileMenu}
+                  >
+                    {t("header.store")}
+                  </Link>
+                  <Link
+                    href="/news"
+                    className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                    onClick={closeMobileMenu}
+                  >
+                    {t("header.news")}
+                  </Link>
+                  <Link
+                    href="/property"
+                    className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                    onClick={closeMobileMenu}
+                  >
+                    {t("header.property")}
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="py-2 text-sm font-medium transition-colors hover:text-white/80"
+                    onClick={closeMobileMenu}
+                  >
+                    {t("header.adContact")}
+                  </Link>
+                </>
+              )}
               <div className="flex flex-col gap-2 border-t border-white/20 pt-4">
                 <LanguageSelector variant="mobile" />
                 {isLoggedIn && user ? (

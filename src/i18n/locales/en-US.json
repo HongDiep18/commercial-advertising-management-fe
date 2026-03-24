@@ -1140,6 +1140,14 @@
       "submittedOn": "Submitted on",
       "closeDialog": "Close",
       "status": "Status",
+      "edit": "Edit",
+      "editSaveNotImplemented": "Saving is not connected on this screen yet. Wire the admin API when ready.",
+      "companyIdRequired": "Company ID not available for this row.",
+      "profileUpdatedSuccess": "Company profile updated",
+      "profileUpdateError": "Failed to update company profile.",
+      "emailConflict409": "This email is already in use.",
+      "companyNotFound404": "Company or linked user was not found.",
+      "forbidden403": "You are not allowed to update this company.",
       "actions": "Actions"
     },
     "store": {

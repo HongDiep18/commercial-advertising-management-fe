@@ -53,7 +53,6 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
-  // const [isFavorite, setIsFavorite] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
 
