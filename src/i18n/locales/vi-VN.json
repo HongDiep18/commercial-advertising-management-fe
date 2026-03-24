@@ -1442,5 +1442,32 @@
       "addressNotice": "Để bảo vệ thông tin bất động sản, địa chỉ chi tiết chỉ được cung cấp sau khi liên hệ với người bán.",
       "contactForDetail": "Liên hệ người bán để nhận thông tin đầy đủ về địa chỉ và các chi tiết khác."
     }
+  },
+  "chatbot": {
+    "title": "Trợ lý hỗ trợ",
+    "subtitle": "Thường trả lời trong vài phút",
+    "placeholder": "Nhập câu hỏi của bạn...",
+    "newChat": "Refresh",
+    "send": "Gửi",
+    "quickQuestions": "Câu hỏi nhanh",
+    "quickQ1": "Cách đăng ký công ty?",
+    "quickQ2": "Danh mục có những ngành nào?",
+    "quickQ3": "Có những gói thành viên nào?",
+    "quickQ4": "VN Buyer Guide là gì?",
+    "quickQ5": "Liên hệ hỗ trợ?",
+    "quickQ6": "Làm thế nào để quảng cáo trên nền tảng?",
+    "quickQ7": "Làm thế nào để tìm nhà cung cấp tại Việt Nam?",
+    "quickQ8": "Tôi quên mật khẩu, phải làm gì?",
+    "quickQ9": "Có những gói quảng cáo nào?",
+    "quickQ10": "Các hạng Bronze, Silver, Gold và Diamond khác nhau thế nào?",
+    "greeting": "Xin chào! Tôi là trợ lý hỗ trợ của Vietnam Buyer's Guide. Tôi có thể giúp gì cho bạn?",
+    "errorGeneric": "Đã xảy ra lỗi, vui lòng thử lại",
+    "errorRateLimit": "Quá nhiều tin nhắn, vui lòng chờ",
+    "errorSpam": "Bạn gửi cùng một tin nhắn quá nhiều lần. Vui lòng chờ {{time}} trước khi thử lại.",
+    "errorEmpty": "Không nhận được phản hồi, vui lòng thử lại",
+    "aiDisclaimer": "Trả lời tự động bởi AI · có thể không hoàn toàn chính xác",
+    "charOver": "Vượt quá {{over}} ký tự cho phép",
+    "waitForReply": "Vui lòng chờ phản hồi hoàn tất",
+    "tooltipMessage": "👋 Bạn có câu hỏi về VN Buyer's Guide? Hỏi AI của chúng tôi!"
   }
 }

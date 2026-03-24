@@ -1397,5 +1397,32 @@
       "addressNotice": "To protect property information, the detailed address will only be provided after contacting the seller.",
       "contactForDetail": "Contact the seller for complete information"
     }
+  },
+  "chatbot": {
+    "title": "Customer Service",
+    "subtitle": "Usually replies in minutes",
+    "placeholder": "Type your question...",
+    "newChat": "Refresh",
+    "send": "Send",
+    "quickQuestions": "Quick questions",
+    "quickQ1": "How do I register my company?",
+    "quickQ2": "What industries are in the directory?",
+    "quickQ3": "What membership plans are available?",
+    "quickQ4": "What is VN Buyer Guide?",
+    "quickQ5": "How to contact support?",
+    "quickQ6": "How do I advertise on the platform?",
+    "quickQ7": "How do I search for suppliers in Vietnam?",
+    "quickQ8": "I forgot my password, what should I do?",
+    "quickQ9": "What advertising packages are available?",
+    "quickQ10": "How do Bronze, Silver, Gold & Diamond differ?",
+    "greeting": "Hello! I am the customer service assistant for Vietnam Buyer's Guide. How can I help you?",
+    "errorGeneric": "Something went wrong, please try again",
+    "errorRateLimit": "Too many messages, please wait",
+    "errorSpam": "You're sending the same message too many times. Please wait {{time}} before trying again.",
+    "errorEmpty": "No reply received, please retry",
+    "aiDisclaimer": "AI-generated replies · may not always be accurate",
+    "charOver": "{{over}} characters over the limit",
+    "waitForReply": "Please wait for the reply to finish",
+    "tooltipMessage": "👋 Questions about VN Buyer's Guide? Ask our AI!"
   }
 }
