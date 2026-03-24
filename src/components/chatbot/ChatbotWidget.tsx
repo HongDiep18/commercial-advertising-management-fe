@@ -3,7 +3,7 @@
 import { AUTH_TOKEN_KEY } from "@/lib/storage-keys"
 import { useUser } from "@/contexts/user-context"
 import { Bot, MessageCircle, Send, X, RotateCcw, Copy, Check, Zap } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import ReactMarkdown from "react-markdown"
 
@@ -76,18 +76,20 @@ export default function ChatbotWidget() {
     t("chatbot.quickQ10"),
   ]
 
-  // Pick 5 random questions — re-randomise each time the panel opens or language changes
-  const quickQuestions = useMemo(() => {
-    const shuffled = [...allQuickQuestions].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, 5)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, i18n.language])
+  const [quickQuestions, setQuickQuestions] = useState<string[]>([])
 
   // Entrance: slide up after first paint
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 100)
     return () => clearTimeout(t)
   }, [])
+
+  // Pick 5 random questions — client-only to avoid SSR/hydration mismatch
+  useEffect(() => {
+    const shuffled = [...allQuickQuestions].sort(() => Math.random() - 0.5)
+    setQuickQuestions(shuffled.slice(0, 5))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, i18n.language])
 
   // Tooltip: appear after 3.5s (once per session); ping stops after 10s
   useEffect(() => {
@@ -397,7 +399,7 @@ export default function ChatbotWidget() {
       {/* Chat Panel — sits directly above the FAB */}
       {open && (
         <div
-          className="fixed right-4 z-[60] flex w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
+          className="fixed right-4 z-[60] flex w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
           style={{ bottom: "76px", height: "clamp(520px, 75vh, 780px)", maxHeight: "calc(100vh - 5rem)" }}
         >
           {/* ── Header ── */}
@@ -721,6 +723,7 @@ export default function ChatbotWidget() {
             className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#d10a22] to-[#a20519] shadow-xl transition-transform hover:scale-105 active:scale-95"
             style={isWiggling ? { animation: "wiggle 0.7s ease-in-out" } : undefined}
             aria-label={t("chatbot.title")}
+            suppressHydrationWarning
           >
             {open ? (
               <X className="h-6 w-6 text-white" />
