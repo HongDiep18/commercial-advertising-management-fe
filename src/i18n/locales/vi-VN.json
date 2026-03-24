@@ -617,6 +617,9 @@
       "selectCountryFirst": "Vui lòng chọn quốc gia trước",
       "membershipTier": "Chọn hạng thành viên"
     },
+    "hints": {
+      "websiteFormat": "Ví dụ: https://your-company.com hoặc http://your-company.com"
+    },
     "noRegions": "Không có khu vực nào",
     "errors": {
       "requiredField": "Trường này là bắt buộc.",
@@ -625,7 +628,9 @@
       "invalidPhone": "Vui lòng nhập số điện thoại hợp lệ (ít nhất 8 chữ số).",
       "invalidRegion": "Vui lòng chọn quốc gia trước, sau đó chọn khu vực trong danh sách.",
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
-      "submit": "Đăng ký thất bại, vui lòng thử lại sau"
+      "submit": "Đăng ký thất bại, vui lòng thử lại sau",
+      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ.",
+      "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó."
     }
   },
   "login": {
