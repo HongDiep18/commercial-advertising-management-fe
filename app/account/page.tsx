@@ -11,6 +11,7 @@ import {
   AccountUpgradeCard,
   AccountPointsHistory,
   AccountCommercialHistory,
+  AccountAdOrdersSection,
   AccountUpgradeModal,
   AccountProfileModal,
   AccountBenefitsModal,
@@ -91,6 +92,7 @@ export default function AccountPage() {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn, getMemberTier } = useUser()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const adOrdersSectionRef = useRef<HTMLDivElement>(null)
 
   const [modals, setModals] = useState<Modals>({
     upgrade: false,
@@ -343,6 +345,10 @@ export default function AccountPage() {
     e.target.value = ""
   }
 
+  const scrollToAdOrdersSection = () => {
+    adOrdersSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
   if (!isLoggedIn || !user) {
     return null
   }
@@ -381,7 +387,15 @@ export default function AccountPage() {
 
             {user.role !== UserRole.Admin && <AccountPointsHistory />}
 
-            {user.commercialPoints > 0 && <AccountCommercialHistory t={t} />}
+            {user.role !== UserRole.Admin && (
+              <AccountCommercialHistory t={t} onViewAll={scrollToAdOrdersSection} />
+            )}
+
+            {user.role !== UserRole.Admin && (
+              <div ref={adOrdersSectionRef} className="h-fit lg:col-span-2">
+                <AccountAdOrdersSection />
+              </div>
+            )}
           </div>
         </div>
       </div>
