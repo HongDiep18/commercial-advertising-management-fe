@@ -4,23 +4,14 @@ import { MapPin, Ruler, Phone, X } from "lucide-react"
 import Button from "@/components/ui/Button"
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
-
-type Property = {
-  id: string
-  title: string
-  type: string
-  provinceName: string
-  area: string
-  areaUnit: string
-  description: string
-  images: string[]
-  features: string[]
-}
+import type { TFunction } from "i18next"
+import { useCreatePropertyContactInquiry } from "@/api/properties/hooks"
+import type { PropertyResponse } from "@/api/properties/types"
 
 type PropertyModalsProps = {
-  contactProperty: Property | null
-  detailProperty: Property | null
-  getTypeName: (type: string, t: any) => string
+  contactProperty: PropertyResponse | null
+  detailProperty: PropertyResponse | null
+  getTypeName: (type: string, t: TFunction) => string
   getTypeColor: (type: string) => string
   onCloseContact: () => void
   onCloseDetail: () => void
@@ -37,8 +28,10 @@ export default function PropertyModals({
   onOpenContact,
 }: PropertyModalsProps) {
   const { t } = useTranslation()
+  const { create, isPending } = useCreatePropertyContactInquiry()
 
   const [showToast, setShowToast] = useState(false)
+  const [submitError, setSubmitError] = useState("")
 
   const [form, setForm] = useState({
     name: "",
@@ -55,7 +48,9 @@ export default function PropertyModals({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!contactProperty) return
+
     const newErrors = {
       name: form.name.trim()
         ? ""
@@ -72,12 +67,42 @@ export default function PropertyModals({
 
     if (newErrors.name || newErrors.email) return
 
-    setShowToast(true)
-    onCloseContact()
+    try {
+      setSubmitError("")
+      await create({
+        id: contactProperty.id,
+        payload: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          message: form.message.trim() || undefined,
+        },
+      })
 
-    setTimeout(() => setShowToast(false), 4000)
+      setShowToast(true)
+      onCloseContact()
+      setTimeout(() => setShowToast(false), 4000)
+      setForm({ name: "", email: "", message: "" })
+    } catch (error) {
+      const status =
+        typeof error === "object" && error && "status" in error
+          ? Number((error as { status?: number }).status)
+          : undefined
 
-    setForm({ name: "", email: "", message: "" })
+      if (status === 401 || status === 403) {
+        setSubmitError(
+          t("property.modals.authRequired", {
+            defaultValue: "Please sign in to send a contact inquiry.",
+          })
+        )
+        return
+      }
+
+      setSubmitError(
+        t("property.modals.submitError", {
+          defaultValue: "Failed to submit inquiry. Please try again.",
+        })
+      )
+    }
   }
 
   return (
@@ -101,7 +126,7 @@ export default function PropertyModals({
               {t("property.modals.contactSeller")}
             </h3>
             <p className="text-sm text-muted-foreground mb-6">
-              {t(contactProperty.title)}
+              {contactProperty.title}
             </p>
 
             <div className="space-y-3">
@@ -168,9 +193,16 @@ export default function PropertyModals({
               <Button
                 className="w-full !bg-header-red-dark"
                 onClick={handleSubmit}
+                disabled={isPending}
               >
-                {t("property.modals.submit")}
+                {isPending
+                  ? t("property.modals.submitting", { defaultValue: "Submitting..." })
+                  : t("property.modals.submit")}
               </Button>
+
+              {submitError ? (
+                <p className="text-sm text-red-500 mt-1">{submitError}</p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -210,12 +242,12 @@ export default function PropertyModals({
 
             <div className="p-6">
               <h2 className="text-xl font-bold text-foreground mb-2">
-                {t(detailProperty.title)}
+                {detailProperty.title}
               </h2>
 
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
                 <MapPin className="w-4 h-4" />
-                <span>{t(detailProperty.provinceName)}</span>
+                <span>{detailProperty.provinceName || detailProperty.province}</span>
               </div>
 
               <div className="mb-6">
@@ -226,7 +258,7 @@ export default function PropertyModals({
                       {t("property.modals.area")}
                     </p>
                     <p className="font-bold text-foreground">
-                      {detailProperty.area} {detailProperty.areaUnit}
+                      {new Intl.NumberFormat().format(detailProperty.areaValue)} {detailProperty.areaUnit}
                     </p>
                   </div>
                 </div>
@@ -236,7 +268,7 @@ export default function PropertyModals({
                 {t("property.modals.description")}
               </h3>
               <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                {t(detailProperty.description)}
+                {detailProperty.description}
               </p>
 
               <h3 className="font-semibold text-foreground mb-2">
@@ -248,7 +280,7 @@ export default function PropertyModals({
                     key={f}
                     className="px-3 py-1.5 text-sm bg-primary/10 text-primary rounded-full"
                   >
-                    {t(f)}
+                    {f}
                   </span>
                 ))}
               </div>

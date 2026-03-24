@@ -3,15 +3,36 @@
 import { useMemo, useState } from "react"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import { useDebounce } from "@/hooks/useDebounce"
+import { usePublishedProperties, usePublishedPropertyDetail } from "@/api/properties/hooks"
+import type { PropertiesListQuery, PropertyResponse, PropertyType } from "@/api/properties/types"
 
 import PropertyHero from "@/components/property/PropertyHero"
 import PropertyFilter from "@/components/property/PropertyFilter"
 import PropertyGrid, {
-  mockProperties,
   getTypeName,
   getTypeColor,
 } from "@/components/property/PropertyGrid"
 import PropertyModals from "@/components/property/PropertyModals"
+
+const EMPTY_PROPERTIES: PropertyResponse[] = []
+
+function mapSelectedTypeToApiType(selectedType: string): PropertyType | undefined {
+  switch (selectedType) {
+    case "land":
+      return "LAND"
+    case "factory":
+      return "FACTORY"
+    case "warehouse":
+      return "WAREHOUSE"
+    case "house":
+      return "HOUSE"
+    case "office":
+      return "OFFICE"
+    default:
+      return undefined
+  }
+}
 
 export default function PropertyPage() {
   const [selectedType, setSelectedType] = useState("all")
@@ -20,29 +41,44 @@ export default function PropertyPage() {
 
   const [contactId, setContactId] = useState<string | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
-  const filteredProperties = useMemo(() => {
-    return mockProperties.filter((p) => {
-      const matchType = selectedType === "all" || p.type === selectedType
-      const matchProvince = selectedProvince === "all" || p.province === selectedProvince
-      const matchSearch =
-        !searchTerm ||
-        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.provinceName.includes(searchTerm)
+  const query = useMemo<PropertiesListQuery>(
+    () => ({
+      page: 1,
+      limit: 100,
+      search: debouncedSearchTerm.trim() || undefined,
+      type: mapSelectedTypeToApiType(selectedType),
+      province: selectedProvince === "all" ? undefined : selectedProvince,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    }),
+    [debouncedSearchTerm, selectedProvince, selectedType]
+  )
 
-      return matchType && matchProvince && matchSearch
-    })
-  }, [selectedType, selectedProvince, searchTerm])
+  const {
+    data: propertiesData,
+    isLoading: isLoadingProperties,
+    isError: isPropertiesError,
+    refetch: refetchProperties,
+  } = usePublishedProperties(query)
+
+  const properties = propertiesData?.properties ?? EMPTY_PROPERTIES
+
+  const { data: detailPropertyData } = usePublishedPropertyDetail(detailId ?? "", Boolean(detailId))
 
   const contactProperty = useMemo(
-    () => mockProperties.find((p) => p.id === contactId) || null,
-    [contactId]
+    () =>
+      (contactId &&
+        (properties.find((p) => p.id === contactId) ||
+          (detailPropertyData?.id === contactId ? detailPropertyData : null))) ||
+      null,
+    [contactId, detailPropertyData, properties]
   )
 
   const detailProperty = useMemo(
-    () => mockProperties.find((p) => p.id === detailId) || null,
-    [detailId]
+    () => detailPropertyData || properties.find((p) => p.id === detailId) || null,
+    [detailId, detailPropertyData, properties]
   )
 
   return (
@@ -62,7 +98,12 @@ export default function PropertyPage() {
         />
 
         <PropertyGrid
-          properties={filteredProperties}
+          properties={properties}
+          isLoading={isLoadingProperties}
+          isError={isPropertiesError}
+          onRetry={() => {
+            void refetchProperties()
+          }}
           onContact={(id) => setContactId(id)}
           onDetail={(id) => setDetailId(id)}
           onClearFilter={() => {

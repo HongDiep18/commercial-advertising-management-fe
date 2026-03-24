@@ -17,11 +17,21 @@ interface Message {
   isGreeting?: boolean
 }
 
+function generateUUID(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID()
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16)
+  })
+}
+
 function getOrCreateGuestId(): string {
   if (typeof window === "undefined") return ""
   let id = localStorage.getItem(GUEST_ID_KEY)
   if (!id) {
-    id = crypto.randomUUID()
+    id = generateUUID()
     localStorage.setItem(GUEST_ID_KEY, id)
   }
   return id
@@ -387,7 +397,7 @@ export default function ChatbotWidget() {
       {/* Chat Panel — sits directly above the FAB */}
       {open && (
         <div
-          className="fixed right-4 z-50 flex w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
+          className="fixed right-4 z-[60] flex w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
           style={{ bottom: "76px", height: "clamp(520px, 75vh, 780px)", maxHeight: "calc(100vh - 5rem)" }}
         >
           {/* ── Header ── */}
@@ -652,7 +662,7 @@ export default function ChatbotWidget() {
 
       {/* ── Floating toggle button + tooltip ── */}
       <div
-        className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2 transition-all duration-500 ease-out"
+        className="fixed right-4 bottom-4 z-[60] flex flex-col items-end gap-2 transition-all duration-500 ease-out"
         style={{ transform: mounted ? "translateY(0)" : "translateY(80px)", opacity: mounted ? 1 : 0 }}
       >
         {/* Bot reply preview bubble */}

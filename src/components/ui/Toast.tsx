@@ -64,6 +64,7 @@ export function Toast({
   return (
     <div
       role="alert"
+      aria-live="polite"
       className="animate-in fade-in slide-in-from-right-4 fixed top-16 right-4 z-[100] w-full max-w-xs duration-300 sm:top-[4.5rem] sm:right-6"
     >
       <div
