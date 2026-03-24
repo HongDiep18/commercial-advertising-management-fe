@@ -75,6 +75,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       updateCompanyRequestStatus,
       updateUserActive,
       deleteCompany: deleteCompanyApi,
+      refetchCompanyRequests,
     }),
     [
       companyRequests,
@@ -83,6 +84,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       updateCompanyRequestStatus,
       updateUserActive,
       deleteCompanyApi,
+      refetchCompanyRequests,
     ]
   )
   return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>

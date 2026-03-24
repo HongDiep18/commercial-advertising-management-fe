@@ -573,6 +573,9 @@
       "selectCountryFirst": "Please select country first",
       "membershipTier": "Select membership level"
     },
+    "hints": {
+      "websiteFormat": "Example: https://your-company.com or http://your-company.com"
+    },
     "noRegions": "No regions available",
     "errors": {
       "requiredField": "This field is required.",
@@ -580,8 +583,10 @@
       "invalidEmail": "Please enter a valid email address.",
       "invalidPhone": "Please enter a valid phone number (at least 8 digits).",
       "invalidRegion": "Please select a country first, then choose a region from the list.",
+      "invalidWebsite": "Please enter a valid website URL.",
       "captcha": "Invalid captcha, please try again",
-      "submit": "Registration failed, please try again later"
+      "submit": "Registration failed, please try again later",
+      "duplicate409": "This account has already submitted a registration request."
     }
   },
   "login": {
@@ -1140,6 +1145,14 @@
       "submittedOn": "Submitted on",
       "closeDialog": "Close",
       "status": "Status",
+      "edit": "Edit",
+      "editSaveNotImplemented": "Saving is not connected on this screen yet. Wire the admin API when ready.",
+      "companyIdRequired": "Company ID not available for this row.",
+      "profileUpdatedSuccess": "Company profile updated",
+      "profileUpdateError": "Failed to update company profile.",
+      "emailConflict409": "This email is already in use.",
+      "companyNotFound404": "Company or linked user was not found.",
+      "forbidden403": "You are not allowed to update this company.",
       "actions": "Actions"
     },
     "store": {

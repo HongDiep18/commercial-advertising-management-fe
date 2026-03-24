@@ -126,7 +126,16 @@ export default function RegisterForm() {
           : undefined
       console.error("[Register] Error:", { status, data, fullError: err })
       const msg = getErrorMessage(err)
-      showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
+      if (status === 409) {
+        showToast(
+          msg ||
+            t("register.errors.duplicate409") ||
+            "This account has already submitted a registration request.",
+          "error"
+        )
+      } else {
+        showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -316,14 +325,20 @@ export default function RegisterForm() {
               </FieldWithError>
 
               <FieldWithError error={fieldErrors.website}>
-                <Input
-                  placeholder={t("register.placeholders.website") || "網站 *"}
-                  value={formData.website}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleInputChange("website", e.target.value)
-                  }
-                  required
-                />
+                <div className="space-y-1">
+                  <Input
+                    placeholder={t("register.placeholders.website") || "網站 *"}
+                    value={formData.website}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      handleInputChange("website", e.target.value)
+                    }
+                    required
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    {t("register.hints.websiteFormat") ||
+                      "Example: https://your-company.com or your-company.com"}
+                  </p>
+                </div>
               </FieldWithError>
 
               <FieldWithError error={fieldErrors.introduction}>
