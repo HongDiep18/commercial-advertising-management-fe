@@ -1381,5 +1381,32 @@
       "addressNotice": "為保護物業資訊安全，詳細地址僅在聯繫賣家後提供。",
       "contactForDetail": "聯繫賣家取得完整資訊"
     }
+  },
+  "chatbot": {
+    "title": "客服助理",
+    "subtitle": "通常在幾分鐘內回覆",
+    "placeholder": "輸入您的問題...",
+    "newChat": "新對話",
+    "send": "傳送",
+    "quickQuestions": "快速詢問",
+    "quickQ1": "如何登錄我的公司？",
+    "quickQ2": "名錄包含哪些產業？",
+    "quickQ3": "有哪些會員方案？",
+    "quickQ4": "越南華商採購網是什麼？",
+    "quickQ5": "如何聯繫客服？",
+    "quickQ6": "如何在平台上刊登廣告？",
+    "quickQ7": "如何在越南搜尋供應商？",
+    "quickQ8": "我忘記密碼了，該怎麼辦？",
+    "quickQ9": "有哪些廣告方案可供選擇？",
+    "quickQ10": "銅牌、銀牌、金牌和鑽石會員有什麼差異？",
+    "greeting": "您好！我是越南華商採購名錄的客服助理。請問有什麼可以為您服務的嗎？",
+    "errorGeneric": "發生錯誤，請稍後再試",
+    "errorRateLimit": "訊息過多，請稍候",
+    "errorSpam": "您重複傳送相同訊息過多次。請等待 {{time}} 後再試。",
+    "errorEmpty": "無法取得回覆，請重試",
+    "aiDisclaimer": "AI 自動回覆 · 內容僅供參考，不保證完全準確",
+    "charOver": "超出限制 {{over}} 個字元",
+    "waitForReply": "請等待回覆完成",
+    "tooltipMessage": "👋 對越南華商採購網有疑問？來問我們的 AI！"
   }
 }
