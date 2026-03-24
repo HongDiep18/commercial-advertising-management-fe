@@ -124,7 +124,9 @@ export const api = {
                 if (retryRes.ok) {
                   resolve(retryData as T)
                 } else {
-                  reject(new Error((retryData as { message?: string }).message ?? retryRes.statusText))
+                  reject(
+                    new Error((retryData as { message?: string }).message ?? retryRes.statusText)
+                  )
                 }
               } catch (error) {
                 reject(error)

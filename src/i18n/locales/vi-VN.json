@@ -1185,6 +1185,14 @@
       "submittedOn": "Gửi ngày",
       "closeDialog": "Đóng",
       "status": "Trạng thái",
+      "edit": "Chỉnh sửa",
+      "editSaveNotImplemented": "Lưu chưa được kết nối trên màn hình này. Kết nối API quản trị khi sẵn sàng.",
+      "companyIdRequired": "Không có ID công ty cho dòng này.",
+      "profileUpdatedSuccess": "Đã cập nhật hồ sơ công ty",
+      "profileUpdateError": "Không thể cập nhật hồ sơ công ty.",
+      "emailConflict409": "Email này đã được sử dụng.",
+      "companyNotFound404": "Không tìm thấy công ty hoặc người dùng liên kết.",
+      "forbidden403": "Bạn không được phép cập nhật công ty này.",
       "actions": "Thao tác"
     },
     "store": {

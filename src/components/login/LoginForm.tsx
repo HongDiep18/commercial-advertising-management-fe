@@ -12,7 +12,7 @@ import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
 import { login as loginApi } from "@/api/auth"
 import { useUser, UserRole } from "@/contexts/user-context"
-import { DemoLoginButtons, DEMO_USERS, DEMO_ACCOUNTS } from "./demo"
+import { DEMO_USERS, DEMO_ACCOUNTS } from "./demo"
 import { getProfile, type ProfileResponse } from "@/api/profile"
 import {
   type LoginResponse,
@@ -227,7 +227,7 @@ export default function LoginForm() {
                 </Button>
               </form>
 
-              <DemoLoginButtons disabled={isLoading} />
+              {/* <DemoLoginButtons disabled={isLoading} /> */}
 
               <div className="text-muted-foreground text-center text-sm">
                 {t("login.noAccount") || "還沒有帳號？"}{" "}
