@@ -9,6 +9,9 @@ export type UiSelectedAdItem = {
   quantity?: number
   packageId?: string
   pricingId?: string
+  packageType?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 export type UiAdItemDetails = {

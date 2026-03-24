@@ -1335,6 +1335,7 @@
       "approvedSuccess": "Advertising order approved.",
       "rejectedSuccess": "Advertising order rejected.",
       "updateError": "Failed to update advertising order.",
+      "slotNotAvailable": "This ad slot is fully booked for the requested date range.",
       "approveNote": "Approval note",
       "rejectReason": "Rejection reason"
     },
