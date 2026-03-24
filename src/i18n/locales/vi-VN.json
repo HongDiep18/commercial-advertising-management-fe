@@ -1380,6 +1380,7 @@
       "approvedSuccess": "Đã duyệt đơn quảng cáo.",
       "rejectedSuccess": "Đã từ chối đơn quảng cáo.",
       "updateError": "Không thể cập nhật đơn quảng cáo.",
+      "slotNotAvailable": "Vị trí quảng cáo này đã được đặt hết trong khoảng thời gian yêu cầu.",
       "approveNote": "Ghi chú duyệt",
       "rejectReason": "Lý do từ chối"
     },

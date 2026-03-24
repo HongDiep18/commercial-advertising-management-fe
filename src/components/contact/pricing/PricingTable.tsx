@@ -101,7 +101,7 @@ export default function PricingTable({
                   onClick={() => onItemToggle(item.id)}
                 >
                   {columns.select && (
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
                         onCheckedChange={() => onItemToggle(item.id)}

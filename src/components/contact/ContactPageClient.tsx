@@ -34,6 +34,9 @@ export interface SelectedItem {
   quantity: number
   packageId?: string
   pricingId?: string
+  packageType?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 export default function ContactPageClient() {
@@ -143,6 +146,9 @@ export default function ContactPageClient() {
           quantity: byId[item.id],
           packageId: item.packageId,
           pricingId: item.pricingId,
+          packageType: item.packageType,
+          durationValue: item.durationValue,
+          durationUnit: item.durationUnit,
         })
       })
     } else {
@@ -240,6 +246,10 @@ export default function ContactPageClient() {
       setShowOrderModal(false)
       setSelectedItems([])
     } catch (err) {
+      const apiErr = err as { data?: { code?: string } }
+      if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
+        throw err
+      }
       console.error("[handleOrderSubmit] Order submission failed", err)
       const message =
         err instanceof Error ? err.message : t("adContact.orderError") || "Order failed."
