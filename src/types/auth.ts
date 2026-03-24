@@ -47,6 +47,12 @@ export type RegisterResponse = {
   data?: unknown
 }
 
+function normalizeWebsiteForPayload(website: string): string {
+  const raw = website.trim()
+  if (!raw) return raw
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+}
+
 export function formDataToRegisterPayload(form: {
   companyNameVi: string
   companyNameCn: string
@@ -74,7 +80,7 @@ export function formDataToRegisterPayload(form: {
     country: form.country,
     region: "other-region",
     industry: form.industry,
-    website: form.website,
+    website: normalizeWebsiteForPayload(form.website),
     introduction: form.introduction,
     captcha: form.captcha,
   }
