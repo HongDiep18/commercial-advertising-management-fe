@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Figtree } from "next/font/google"
 import { Toaster } from "../src/components/ui/sonner"
 import "../src/index.css"
+import "yet-another-react-lightbox/styles.css"
 import { Providers } from "./providers"
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" })
