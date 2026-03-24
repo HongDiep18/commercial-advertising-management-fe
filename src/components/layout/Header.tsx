@@ -35,7 +35,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-header-red-dark fixed top-0 right-0 left-0 z-50 text-white shadow-md">
+    <header className="bg-header-red-dark fixed top-0 right-0 left-0 z-[70] text-white shadow-md">
       <div className="container mx-auto px-2 lg:px-2">
         <div className="flex h-16 items-center">
           <Link href="/" className="flex items-center gap-3">
