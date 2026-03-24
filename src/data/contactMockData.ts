@@ -283,6 +283,26 @@ export const addMonths = (dateStr: string, months: number): string => {
   return date.toISOString().split("T")[0]
 }
 
+export const addDuration = (date: Date, durationValue: number, durationUnit: string): Date => {
+  const result = new Date(date)
+  const unit = durationUnit.toUpperCase()
+  if (unit === "DAY") {
+    result.setDate(result.getDate() + durationValue)
+  } else if (unit === "WEEK") {
+    result.setDate(result.getDate() + durationValue * 7)
+  } else if (unit === "MONTH") {
+    result.setMonth(result.getMonth() + durationValue)
+  } else if (unit === "YEAR") {
+    result.setFullYear(result.getFullYear() + durationValue)
+  }
+  return result
+}
+
+export const addDurationToDateStr = (dateStr: string, durationValue: number, durationUnit: string): string => {
+  const end = addDuration(new Date(dateStr), durationValue, durationUnit)
+  return end.toISOString().split("T")[0]
+}
+
 export const isDateBooked = (itemId: string, dateStr: string): boolean => {
   const booked = bookedDates[itemId] || []
   return booked.includes(dateStr)

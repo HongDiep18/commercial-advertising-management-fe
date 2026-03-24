@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { X, Send } from "lucide-react"
 import Button from "@/components/ui/Button"
@@ -8,7 +9,7 @@ import Input from "@/components/ui/Input"
 import Textarea from "@/components/ui/Textarea"
 import Label from "@/components/ui/Label"
 import AdItemForm from "./AdItemForm"
-import { getDurationMonths, addMonths } from "@/data/contactMockData"
+import { getDurationMonths, addMonths, addDurationToDateStr } from "@/data/contactMockData"
 import { format } from "date-fns"
 import type { UiAdItemDetails, UiSelectedAdItem } from "@/api/ad-orders/builders"
 import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
@@ -43,6 +44,9 @@ type SelectedItem = {
   duration?: string
   price: string
   quantity?: number
+  packageType?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 type OrderModalProps = {
@@ -78,7 +82,9 @@ export default function OrderModal({
   const [openCalendar, setOpenCalendar] = useState<string | null>(null)
 
   const [phoneError, setPhoneError] = useState<string | null>(null)
+  const [slotError, setSlotError] = useState<string | null>(null)
 
+  const queryClient = useQueryClient()
   const { isLoggedIn, isAuthReady } = useUser()
   const didPrefillRef = useRef(false)
 
@@ -113,13 +119,25 @@ export default function OrderModal({
     })()
   }, [i18n.language, isAuthReady, isLoggedIn, isOpen])
 
-  const handleStartDateChange = (itemId: string, date: Date | undefined, duration: string) => {
+  const handleStartDateChange = (
+    itemId: string,
+    date: Date | undefined,
+    duration: string,
+    durationValue?: number | null,
+    durationUnit?: string | null
+  ) => {
     if (!date) return
 
     const startDate = format(date, "yyyy-MM-dd")
-    const months = getDurationMonths(duration)
-    const endDate = months > 0 ? addMonths(startDate, months) : startDate
+    let endDate: string
+    if (durationValue && durationUnit) {
+      endDate = addDurationToDateStr(startDate, durationValue, durationUnit)
+    } else {
+      const months = getDurationMonths(duration)
+      endDate = months > 0 ? addMonths(startDate, months) : startDate
+    }
 
+    setSlotError(null)
     setItemDetails((prev) => ({
       ...prev,
       [itemId]: {
@@ -225,7 +243,18 @@ export default function OrderModal({
       await onSubmit(input, { subtotal, assets })
       setOrderForm({ company: "", contact: "", phone: "", email: "", notes: "" })
       setItemDetails({})
-    } catch {
+      setSlotError(null)
+    } catch (err) {
+      const apiErr = err as { data?: { code?: string; message?: string } }
+      if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
+        setSlotError(
+          t("adContact.slotNotAvailable") ||
+            apiErr.data?.message ||
+            "This ad slot is fully booked for the requested date range."
+        )
+        void queryClient.invalidateQueries({ queryKey: ["ads", "booked-dates"] })
+        return
+      }
       console.error("[OrderModal] Failed to submit order")
     }
   }
@@ -233,7 +262,7 @@ export default function OrderModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black/50 p-4">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-black/50 p-4">
       <div className="bg-background relative max-h-[90vh] w-full max-w-2xl overflow-x-hidden overflow-y-auto rounded-lg">
         <div className="bg-body-bg-light border-border sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
           <h2 key={i18n.language} className="text-xl font-bold">
@@ -335,12 +364,19 @@ export default function OrderModal({
                     itemDetails={mergedDetails}
                     openCalendar={openCalendar}
                     onStartDateChange={(date) =>
-                      handleStartDateChange(item.id, date, item.duration || "")
+                      handleStartDateChange(
+                        item.id,
+                        date,
+                        item.duration || "",
+                        item.durationValue,
+                        item.durationUnit
+                      )
                     }
                     onDetailChange={(field, value) => handleItemDetailChange(item.id, field, value)}
                     onFileChange={(e) => handleFileChange(item.id, e)}
                     onRemoveFile={(index) => removeFile(item.id, index)}
                     onCalendarOpenChange={(open) => setOpenCalendar(open ? item.id : null)}
+                    slotError={slotError}
                   />
                 )
               })}

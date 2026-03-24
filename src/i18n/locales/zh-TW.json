@@ -1319,6 +1319,7 @@
       "approvedSuccess": "廣告訂單已核准。",
       "rejectedSuccess": "廣告訂單已拒絕。",
       "updateError": "更新廣告訂單失敗。",
+      "slotNotAvailable": "此廣告版位在所要求的日期範圍內已全數預訂。",
       "approveNote": "核准備註",
       "rejectReason": "拒絕原因"
     },
