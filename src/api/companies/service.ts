@@ -1,11 +1,14 @@
 import { api } from "@/lib/api"
+import { profileFormDataToAdminCompanyPatchBody } from "./adminCompany.mapper"
 import type {
+  AdminCompanyResponse,
   CompanyCategoriesResponse,
   CompanyDirectoryQuery,
   CompanyDirectoryResponse,
   CompanyDetail,
   FeaturedCompaniesResponse,
 } from "./types"
+import type { ProfileFormData } from "@/types/account"
 
 type QueryValue = string | number | boolean | undefined | Array<string | number | boolean>
 
@@ -55,4 +58,31 @@ export async function getCompanyDetail(id: string): Promise<CompanyDetail> {
     method: "GET",
   })
   return res
+}
+
+export async function patchAdminCompany(
+  companyId: string,
+  body: Record<string, string>
+): Promise<AdminCompanyResponse> {
+  return api.request<AdminCompanyResponse>(`/admin/companies/${encodeURIComponent(companyId)}`, {
+    method: "PATCH",
+    body,
+  })
+}
+
+export async function patchAdminCompanyWithLogo(
+  companyId: string,
+  data: ProfileFormData,
+  logoFile: File
+): Promise<AdminCompanyResponse> {
+  const form = new FormData()
+  const fields = profileFormDataToAdminCompanyPatchBody(data)
+  for (const [key, value] of Object.entries(fields)) {
+    form.append(key, value)
+  }
+  form.append("logo_url", logoFile, logoFile.name)
+  return api.request<AdminCompanyResponse>(`/admin/companies/${encodeURIComponent(companyId)}`, {
+    method: "PATCH",
+    body: form,
+  })
 }

@@ -1124,6 +1124,14 @@
       "submittedOn": "提交於",
       "closeDialog": "關閉",
       "status": "狀態",
+      "edit": "編輯",
+      "editSaveNotImplemented": "此畫面尚未連接儲存功能，請於後續接上管理員 API。",
+      "companyIdRequired": "此列無法取得公司 ID。",
+      "profileUpdatedSuccess": "已更新公司資料",
+      "profileUpdateError": "更新公司資料失敗。",
+      "emailConflict409": "此電子郵件已被使用。",
+      "companyNotFound404": "找不到公司或關聯使用者。",
+      "forbidden403": "您沒有權限更新此公司。",
       "actions": "操作"
     },
     "store": {

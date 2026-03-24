@@ -61,18 +61,18 @@ export function AdminDashboardContent() {
 
   return (
     <main className="bg-body-bg-dark min-h-screen">
-      <Header />
+      <Header showSiteNav={false} />
 
       <div className="pt-14">
-        <section className="from-primary to-primary/80 text-primary-foreground bg-gradient-to-r py-6">
+        <section className="from-primary to-primary/80 text-primary-foreground py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/20">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/20 text-black">
                 <Shield className="h-6 w-6" />
               </div>
-              <div>
+              <div className="text-black">
                 <h1 className="text-2xl font-bold">{t("admin.title")}</h1>
-                <p className="text-primary-foreground/80 text-sm">{t("admin.subtitle")}</p>
+                <p className="text-sm text-black">{t("admin.subtitle")}</p>
               </div>
             </div>
           </div>
