@@ -3,69 +3,20 @@
 import { MapPin, Ruler, Building2, Phone, Factory, Warehouse, Home, Landmark, TreePine } from "lucide-react"
 import Button from "@/components/ui/Button"
 import { useTranslation } from "react-i18next"
+import type { TFunction } from "i18next"
+import type { PropertyResponse } from "@/api/properties/types"
 
-export const propertyTypes = [
-  { id: "all", name: "全部類型" },
-  { id: "land", name: "土地" },
-  { id: "factory", name: "廠房" },
-  { id: "warehouse", name: "倉庫" },
-  { id: "house", name: "住宅" },
-  { id: "office", name: "辦公室" },
-]
+function normalizeType(type: string) {
+  return type.toLowerCase()
+}
 
-export const provinces = [
-  { id: "all", name: "全部地區" },
-  { id: "hcm", name: "胡志明市" },
-  { id: "hanoi", name: "河內" },
-  { id: "binh-duong", name: "平陽省" },
-  { id: "dong-nai", name: "同奈省" },
-  { id: "long-an", name: "隆安省" },
-  { id: "ba-ria", name: "巴地頭頓省" },
-]
-
-export const mockProperties = [
-  {
-    id: "prop-1",
-    title: "property.mock.prop1.title",
-    type: "factory",
-    province: "binh-duong",
-    provinceName: "property.province.binhDuong",
-    area: "5,000",
-    areaUnit: "m²",
-    description: "property.mock.prop1.description",
-    images: ["assets/images/sticky-bottom/modern-manufacturing-facility.png"],
-    features: [
-      "property.mock.prop1.features.fire",
-      "property.mock.prop1.features.water",
-      "property.mock.prop1.features.security",
-      "property.mock.prop1.features.dorm",
-    ],
-  },
-  {
-    id: "prop-2",
-    title: "property.mock.prop2.title",
-    type: "land",
-    province: "dong-nai",
-    provinceName: "property.province.dongNai",
-    area: "20,000",
-    areaUnit: "m²",
-    description: "property.mock.prop2.description",
-    images: ["assets/images/sticky-bottom/solar-panels-green-energy.jpg"],
-    features: [
-      "property.mock.prop2.features.infrastructure",
-      "property.mock.prop2.features.usage",
-      "property.mock.prop2.features.license",
-      "property.mock.prop2.features.transport",
-    ],
-  },
-]
-
-export function getTypeName(type: string, t: any) {
-  return t(`property.types.${type}`)
+export function getTypeName(type: string, t: TFunction) {
+  const key = normalizeType(type)
+  return t(`property.types.${key}`, { defaultValue: key })
 }
 
 export function getTypeColor(type: string) {
-  switch (type) {
+  switch (normalizeType(type)) {
     case "land":
       return "bg-green-100 text-green-700"
     case "factory":
@@ -82,7 +33,7 @@ export function getTypeColor(type: string) {
 }
 
 export function getTypeIcon(type: string) {
-  switch (type) {
+  switch (normalizeType(type)) {
     case "land":
       return TreePine
     case "factory":
@@ -99,7 +50,10 @@ export function getTypeIcon(type: string) {
 }
 
 type PropertyGridProps = {
-  properties: typeof mockProperties
+  properties: PropertyResponse[]
+  isLoading?: boolean
+  isError?: boolean
+  onRetry?: () => void
   onContact: (id: string) => void
   onDetail: (id: string) => void
   onClearFilter: () => void
@@ -107,11 +61,57 @@ type PropertyGridProps = {
 
 export default function PropertyGrid({
   properties,
+  isLoading = false,
+  isError = false,
+  onRetry,
   onContact,
   onDetail,
   onClearFilter,
 }: PropertyGridProps) {
   const { t } = useTranslation()
+
+  if (isLoading) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center py-16">
+          <div className="w-16 h-16 rounded-full bg-[#E8E6E1] flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <p className="text-muted-foreground">
+            {t("property.grid.loading", { defaultValue: "Loading properties..." })}
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  if (isError) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center py-16">
+          <div className="w-16 h-16 rounded-full bg-[#E8E6E1] flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <p className="text-muted-foreground mb-4">
+            {t("property.grid.loadError", {
+              defaultValue: "Failed to load properties. Please try again.",
+            })}
+          </p>
+          {onRetry ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRetry}
+              className="!border-gray-300 hover:!bg-header-red-dark hover:!text-white"
+            >
+              {t("property.grid.retry", { defaultValue: "Retry" })}
+            </Button>
+          ) : null}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -165,25 +165,25 @@ export default function PropertyGrid({
 
                 <div className="p-4">
                   <h3 className="font-bold text-foreground mb-2 line-clamp-2">
-                    {t(property.title)}
+                    {property.title}
                   </h3>
 
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-3">
                     <MapPin className="w-3.5 h-3.5 shrink-0" />
-                    <span>{t(property.provinceName)}</span>
+                    <span>{property.provinceName || property.province}</span>
                   </div>
 
                   <div className="flex items-center gap-4 mb-3">
                     <div className="flex items-center gap-1.5 text-sm">
                       <Ruler className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="font-medium text-foreground">
-                        {property.area} {t("property.grid.areaUnit")}
+                        {new Intl.NumberFormat().format(property.areaValue)} {property.areaUnit}
                       </span>
                     </div>
                   </div>
 
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                    {t(property.description)}
+                    {property.description}
                   </p>
 
                   <div className="flex flex-wrap gap-1.5 mb-4">
@@ -192,7 +192,7 @@ export default function PropertyGrid({
                         key={f}
                         className="px-2 py-0.5 text-xs bg-[#E8E6E1] text-muted-foreground rounded"
                       >
-                        {t(f)}
+                        {f}
                       </span>
                     ))}
                   </div>
