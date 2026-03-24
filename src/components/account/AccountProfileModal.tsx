@@ -310,12 +310,18 @@ export function AccountProfileModal({
             </div>
 
             <FieldWithError error={fieldErrors.website}>
-              <Input
-                placeholder="Website"
-                value={profileData.website}
-                onChange={(e) => onProfileChange("website", e.target.value)}
-                disabled={readOnly}
-              />
+              <div className="space-y-1">
+                <Input
+                  placeholder="Website"
+                  value={profileData.website}
+                  onChange={(e) => onProfileChange("website", e.target.value)}
+                  disabled={readOnly}
+                />
+                <p className="text-muted-foreground text-xs">
+                  {t("register.hints.websiteFormat") ||
+                    "Example: https://your-company.com or your-company.com"}
+                </p>
+              </div>
             </FieldWithError>
             <FieldWithError error={fieldErrors.description}>
               <Textarea

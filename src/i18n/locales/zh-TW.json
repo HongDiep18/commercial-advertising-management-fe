@@ -571,6 +571,9 @@
       "selectCountryFirst": "請先選擇國家",
       "membershipTier": "選擇會員等級"
     },
+    "hints": {
+      "websiteFormat": "範例：https://your-company.com 或 http://your-company.com"
+    },
     "noRegions": "無可用地區",
     "errors": {
       "requiredField": "此欄位為必填。",
@@ -579,7 +582,9 @@
       "invalidPhone": "請輸入有效的電話號碼（至少 8 位數字）。",
       "invalidRegion": "請先選擇國家，再從列表中選擇地區。",
       "captcha": "驗證碼錯誤，請重新輸入",
-      "submit": "註冊失敗，請稍後再試"
+      "submit": "註冊失敗，請稍後再試",
+      "invalidWebsite": "請輸入有效的網站網址。",
+      "duplicate409": "此帳號已提交過註冊申請。"
     }
   },
   "login": {

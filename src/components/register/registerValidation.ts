@@ -4,6 +4,7 @@ import { isValidPhone } from "@/utils/validation/phone"
 
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
 const EMAIL_FIELD = "email" as const
+const WEBSITE_FIELD = "website" as const
 const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "companyNameVi",
   "companyNameCn",
@@ -44,7 +45,12 @@ function isEmail(value: string): boolean {
   return EMAIL_REGEX.test(value.trim())
 }
 
-export type RegisterErrorKind = "required" | "invalidEmail" | "invalidPhone" | "invalidRegion"
+export type RegisterErrorKind =
+  | "required"
+  | "invalidEmail"
+  | "invalidPhone"
+  | "invalidRegion"
+  | "invalidWebsite"
 
 export type RegisterValidationResult =
   | { valid: true }
@@ -59,6 +65,7 @@ export const REGISTER_ERROR_KEYS: Record<RegisterErrorKind, string> = {
   invalidEmail: "register.errors.invalidEmail",
   invalidPhone: "register.errors.invalidPhone",
   invalidRegion: "register.errors.invalidRegion",
+  invalidWebsite: "register.errors.invalidWebsite",
 }
 
 export const PROFILE_ERROR_KEYS = REGISTER_ERROR_KEYS
@@ -79,6 +86,25 @@ function runValidation(
     const val = data[key]
     if (filled(val) && !isValidPhone(String(val))) {
       errors.push({ field: key, kind: "invalidPhone" })
+    }
+  }
+  const websiteVal = data[WEBSITE_FIELD]
+  if (filled(websiteVal)) {
+    const raw = String(websiteVal).trim()
+    const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+    let isValid = false
+    try {
+      const url = new URL(candidate)
+      isValid = url.protocol === "http:" || url.protocol === "https:"
+      if (isValid) {
+        const host = url.hostname.trim()
+        isValid = host.includes(".") && !host.startsWith(".") && !host.endsWith(".")
+      }
+    } catch {
+      isValid = false
+    }
+    if (!isValid) {
+      errors.push({ field: WEBSITE_FIELD, kind: "invalidWebsite" })
     }
   }
   return errors
