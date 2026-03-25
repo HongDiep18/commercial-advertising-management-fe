@@ -275,7 +275,7 @@ export default function OrderModal({
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-hidden bg-black/50 p-4">
-      <div className="bg-background relative max-h-[90vh] w-full max-w-2xl overflow-x-hidden overflow-y-auto rounded-lg">
+      <div className="bg-background relative mt-12 max-h-[90vh] w-full max-w-2xl overflow-x-hidden overflow-y-auto rounded-lg">
         <div className="bg-body-bg-light border-border sticky top-0 z-10 flex items-center justify-between border-b px-6 py-4">
           <h2 key={i18n.language} className="text-xl font-bold">
             {t("adContact.orderTitle")}

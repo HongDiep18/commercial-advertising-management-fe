@@ -48,7 +48,7 @@ export default function ContactContentSection({
               </div>
             </div>
 
-            <div className="w-full sm:w-auto">
+            {/* <div className="w-full sm:w-auto">
               <Button
                 size="sm"
                 variant="outline"
@@ -58,7 +58,7 @@ export default function ContactContentSection({
                 <MessageCircle className="mr-2 h-4 w-4" />
                 {t("adContact.inquiryCustom")}
               </Button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
