@@ -18,7 +18,7 @@ import {
   MembershipTier,
   UserRole,
 } from "@/types"
-import { USER_STORAGE_KEY } from "@/lib/storage-keys"
+import { AUTH_TOKEN_KEY, USER_STORAGE_KEY } from "@/lib/storage-keys"
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 
 export { MembershipTier, UserRole } from "@/types"
@@ -309,44 +309,52 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const loginWithEmail = (email: string, password: string) => {
     const bronzeUser: User = {
       id: `user-email-${Date.now()}`,
+      companyId: null,
       email,
       name: email.split("@")[0] ?? "User",
       role: UserRole.Free,
-      contributionPoints: 50000,
-      commercialPoints: 0,
-      createdAt: new Date().toISOString().slice(0, 10),
+      membershipTier: MembershipTier.BRONZE,
+      primaryIndustry: null,
+      selectedIndustries: [],
     }
     setUser(bronzeUser)
   }
 
   const loginWithRegisteredUser = (email: string, name: string, membershipTier: MembershipTier) => {
-    const minPoints = MEMBERSHIP_THRESHOLDS[membershipTier]
     const role: UserRole = membershipTier === MembershipTier.BRONZE ? UserRole.Free : UserRole.Paid
     const newUser: User = {
       id: `user-reg-${Date.now()}`,
+      companyId: null,
       email,
       name: name || email.split("@")[0],
       role,
-      contributionPoints: minPoints,
-      commercialPoints: 0,
-      createdAt: new Date().toISOString().slice(0, 10),
+      membershipTier,
+      primaryIndustry: null,
+      selectedIndustries: [],
     }
     setUser(newUser)
   }
 
   const logout = () => {
     setUser(null)
+    // Clear the authentication token from localStorage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(AUTH_TOKEN_KEY)
+      // Redirect to login page
+      window.location.href = "/login"
+    }
   }
 
   const getTotalPoints = () => {
-    if (!user) return 0
-    return user.contributionPoints + user.commercialPoints
+    // Points tracking removed - tier is now determined by backend
+    return 0
   }
 
   const getMemberTier = (): MembershipTier => {
     if (!user) return MembershipTier.GUEST
     if (user.role === UserRole.Admin) return MembershipTier.DIAMOND
-    return getMembershipTier(getTotalPoints())
+    // Return the membership tier from the user object (set by backend)
+    return user.membershipTier
   }
 
   const getNextTier = () => {

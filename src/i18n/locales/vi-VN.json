@@ -5,7 +5,10 @@
     "search": "Tìm kiếm",
     "about": "Về chúng tôi",
     "contact": "Liên hệ",
-    "close": "Đóng"
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saving": "Đang lưu..."
   },
   "header": {
     "aboutUs": "Về chúng tôi",
@@ -895,7 +898,19 @@
     "of": "của",
     "previousPage": "Trước",
     "nextPage": "Tiếp",
-    "closeModal": "Đóng"
+    "closeModal": "Đóng",
+    "industrySelectionSaved": "Đã lưu lựa chọn ngành!",
+    "industrySelection": {
+      "cardTitle": "Cài đặt lựa chọn ngành",
+      "cardDescription": "Thành viên Vàng có thể chọn 3 ngành",
+      "manageButton": "Quản lý lựa chọn ngành →",
+      "title": "Chọn ngành",
+      "selectedTitle": "Các ngành đã chọn",
+      "selectedDescription": "Bạn đã chọn 3 ngành sau",
+      "additionalIndustries": "Chọn 3 ngành",
+      "selectedCount": "Đã chọn {{count}}/3",
+      "exactlyThreeRequired": "Vui lòng chọn đúng 3 ngành"
+    }
   },
   "adContactForm": {
     "title": "Quản trị",
@@ -932,6 +947,7 @@
     "adTypeProduct": "Sản phẩm"
   },
   "companyDetail": {
+    "loading": "Đang tải...",
     "upgradeBanner": {
       "guest": "Bạn hiện đang là khách và chỉ có thể xem tên công ty và khu vực một phần",
       "bronze": "Bạn hiện là thành viên Đồng. Nâng cấp để xem thông tin đầy đủ bao gồm trang web, điện thoại và địa chỉ",

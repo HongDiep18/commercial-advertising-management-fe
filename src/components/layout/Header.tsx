@@ -2,11 +2,11 @@
 
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
 import Button from "@/components/ui/Button"
-import { useUser } from "@/contexts/user-context"
+import { useUser, MembershipTier, UserRole } from "@/contexts/user-context"
 import { FeatureKey } from "@/types"
 import { ChevronDown, LogOut, Menu, Shield, User, X } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import LanguageSelector from "./LanguageSelector"
 
@@ -20,6 +20,27 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Generate directory URL based on user tier
+  const directoryUrl = useMemo(() => {
+    if (!user) return "/directory"
+
+    const tier = user.membershipTier
+    const role = user.role
+
+    // Diamond and Admin get full access - no filter needed
+    if (tier === MembershipTier.DIAMOND || role === UserRole.Admin) {
+      return "/directory"
+    }
+
+    // Bronze, Silver, Gold users should be redirected to their primary industry
+    if (user.primaryIndustry) {
+      return `/directory?industry=${user.primaryIndustry}`
+    }
+
+    // Default to unfiltered if no primary industry set
+    return "/directory"
+  }, [user])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,7 +80,7 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                 {t("header.aboutUs")}
               </Link>
               <Link
-                href="/directory"
+                href={directoryUrl}
                 className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
               >
                 {t("header.directory")}
@@ -182,7 +203,7 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                     {t("header.aboutUs")}
                   </Link>
                   <Link
-                    href="/directory"
+                    href={directoryUrl}
                     className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                     onClick={closeMobileMenu}
                   >

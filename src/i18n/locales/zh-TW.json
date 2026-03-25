@@ -5,7 +5,10 @@
     "search": "搜尋",
     "about": "關於",
     "contact": "聯絡",
-    "close": "關閉"
+    "close": "關閉",
+    "cancel": "取消",
+    "save": "儲存",
+    "saving": "儲存中..."
   },
   "header": {
     "aboutUs": "關於我們",
@@ -809,7 +812,19 @@
     "of": "共",
     "previousPage": "上一頁",
     "nextPage": "下一頁",
-    "closeModal": "關閉"
+    "closeModal": "關閉",
+    "industrySelectionSaved": "產業選擇已儲存！",
+    "industrySelection": {
+      "cardTitle": "產業選擇設定",
+      "cardDescription": "金牌會員可選擇3個產業",
+      "manageButton": "管理產業選擇 →",
+      "title": "選擇產業",
+      "selectedTitle": "已選擇的產業",
+      "selectedDescription": "您已選擇以下3個產業",
+      "additionalIndustries": "選擇3個產業",
+      "selectedCount": "已選擇 {{count}}/3",
+      "exactlyThreeRequired": "請選擇正好3個產業"
+    }
   },
   "adContactForm": {
     "title": "管理後台",
@@ -846,6 +861,7 @@
     "adTypeProduct": "商品銷售"
   },
   "companyDetail": {
+    "loading": "載入中...",
     "upgradeBanner": {
       "guest": "您目前為訪客，僅可查看部分公司名稱與地區",
       "bronze": "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊",
