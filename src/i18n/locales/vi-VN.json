@@ -777,12 +777,30 @@
       "diamond": "Chi tiêu 530.000 VND"
     },
     "tierBenefits": {
-      "NONE": ["Tên công ty (một phần)", "Khu vực"],
-      "guest": ["Tên công ty (một phần)", "Khu vực"],
-      "BRONZE": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
-      "bronze": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
-      "SILVER": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
-      "silver": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
+      "NONE": [
+        "Tên công ty (một phần)",
+        "Khu vực"
+      ],
+      "guest": [
+        "Tên công ty (một phần)",
+        "Khu vực"
+      ],
+      "BRONZE": [
+        "Ngành cơ bản",
+        "Tên công ty, mã số thuế, khu vực"
+      ],
+      "bronze": [
+        "Ngành cơ bản",
+        "Tên công ty, mã số thuế, khu vực"
+      ],
+      "SILVER": [
+        "Ngành đầy đủ",
+        "Mở khóa trang web, điện thoại, địa chỉ, email"
+      ],
+      "silver": [
+        "Ngành đầy đủ",
+        "Mở khóa trang web, điện thoại, địa chỉ, email"
+      ],
       "GOLD": [
         "Ngành của bạn + 3 ngành liên quan (đầy đủ)",
         "Mở khóa ngành của bạn + 3 ngành thượng/hạ nguồn"
@@ -803,10 +821,18 @@
       ]
     },
     "tierRestrictions": {
-      "NONE": ["Không có trang web, điện thoại, địa chỉ, mã số thuế"],
-      "guest": ["Không có trang web, điện thoại, địa chỉ, mã số thuế"],
-      "BRONZE": ["Không có trang web, điện thoại hoặc địa chỉ"],
-      "bronze": ["Không có trang web, điện thoại hoặc địa chỉ"],
+      "NONE": [
+        "Không có trang web, điện thoại, địa chỉ, mã số thuế"
+      ],
+      "guest": [
+        "Không có trang web, điện thoại, địa chỉ, mã số thuế"
+      ],
+      "BRONZE": [
+        "Không có trang web, điện thoại hoặc địa chỉ"
+      ],
+      "bronze": [
+        "Không có trang web, điện thoại hoặc địa chỉ"
+      ],
       "SILVER": [],
       "silver": [],
       "GOLD": [],
@@ -1197,7 +1223,36 @@
       "activityUserReg": "Đăng ký người dùng",
       "activityUserDetail": "Người dùng mới Mr. Li đã đăng ký",
       "activitySystem": "Lịch hệ thống",
-      "activitySystemDetail": "Đã khởi chạy thu thập tin hàng ngày"
+      "activitySystemDetail": "Đã khởi chạy thu thập tin hàng ngày",
+      "recentActivityLogs": {
+        "actions": {
+          "adOrderCreated": "Đã tạo đơn quảng cáo",
+          "companyUpdatedByAdmin": "Quản trị viên đã cập nhật công ty",
+          "profileRequestSubmitted": "Đã gửi yêu cầu đăng ký",
+          "userPasswordChanged": "Người dùng đã đổi mật khẩu",
+          "setPasswordCompleted": "Đã hoàn tất thiết lập mật khẩu",
+          "loyaltyPointsAwarded": "Đã cộng điểm khách hàng thân thiết",
+          "loyaltyTierRecalculated": "Đã tính lại hạng thành viên",
+          "profileRequestApproved": "Đã duyệt yêu cầu đăng ký",
+          "profileRequestStatusChanged": "Đã thay đổi trạng thái yêu cầu đăng ký",
+          "userStatusChanged": "Đã thay đổi trạng thái người dùng",
+          "userSoftDeleted": "Đã xóa mềm người dùng"
+        },
+        "contents": {
+          "adOrderCreated": "Đã tạo đơn quảng cáo {{orderId}}.",
+          "companyUpdatedByAdmin": "Đã cập nhật hồ sơ công ty cho {{target}}.",
+          "profileRequestSubmitted": "Có yêu cầu đăng ký mới từ {{target}}.",
+          "userPasswordChanged": "Đã cập nhật mật khẩu cho {{target}}.",
+          "setPasswordCompleted": "Đã hoàn tất đặt mật khẩu cho {{target}}.",
+          "loyaltyPointsAwarded": "Điểm của {{target}} đã được cập nhật thành {{points}}.",
+          "loyaltyTierRecalculated": "{{target}}",
+          "profileRequestApproved": "Đã duyệt đăng ký cho {{target}}.",
+          "profileRequestStatusChanged": "{{target}} - đổi từ {{fromStatus}} sang {{toStatus}}",
+          "userStatusChanged": "{{target}} đã được {{status}}.",
+          "userSoftDeleted": "{{target}} đã bị xóa mềm."
+        }
+      },
+      "recentActivityLoadError": "Hiện không thể tải hoạt động gần đây."
     },
     "companies": {
       "all": "Tất cả",

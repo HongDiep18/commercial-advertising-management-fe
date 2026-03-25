@@ -731,22 +731,62 @@
       "diamond": "消費 53 萬 VND"
     },
     "tierBenefits": {
-      "NONE": ["公司名（部分）", "地區"],
-      "guest": ["公司名（部分）", "地區"],
-      "BRONZE": ["本業 - 基礎版", "公司名、稅號、地區"],
-      "bronze": ["本業 - 基礎版", "公司名、稅號、地區"],
-      "SILVER": ["本業 - 完整版", "解鎖官網、電話、地址、Email"],
-      "silver": ["本業 - 完整版", "解鎖官網、電話、地址、Email"],
-      "GOLD": ["本業 + 跨 3 產業 - 完整版", "解鎖自家產業 + 自選 3 個上下游產業"],
-      "gold": ["本業 + 跨 3 產業 - 完整版", "解鎖自家產業 + 自選 3 個上下游產業"],
-      "DIAMOND": ["全站所有產業 - 完整版", "取代紙本名錄", "解鎖所有產業、所有欄位（含手機）"],
-      "diamond": ["全站所有產業 - 完整版", "取代紙本名錄", "解鎖所有產業、所有欄位（含手機）"]
+      "NONE": [
+        "公司名（部分）",
+        "地區"
+      ],
+      "guest": [
+        "公司名（部分）",
+        "地區"
+      ],
+      "BRONZE": [
+        "本業 - 基礎版",
+        "公司名、稅號、地區"
+      ],
+      "bronze": [
+        "本業 - 基礎版",
+        "公司名、稅號、地區"
+      ],
+      "SILVER": [
+        "本業 - 完整版",
+        "解鎖官網、電話、地址、Email"
+      ],
+      "silver": [
+        "本業 - 完整版",
+        "解鎖官網、電話、地址、Email"
+      ],
+      "GOLD": [
+        "本業 + 跨 3 產業 - 完整版",
+        "解鎖自家產業 + 自選 3 個上下游產業"
+      ],
+      "gold": [
+        "本業 + 跨 3 產業 - 完整版",
+        "解鎖自家產業 + 自選 3 個上下游產業"
+      ],
+      "DIAMOND": [
+        "全站所有產業 - 完整版",
+        "取代紙本名錄",
+        "解鎖所有產業、所有欄位（含手機）"
+      ],
+      "diamond": [
+        "全站所有產業 - 完整版",
+        "取代紙本名錄",
+        "解鎖所有產業、所有欄位（含手機）"
+      ]
     },
     "tierRestrictions": {
-      "NONE": ["無官網、無電話、無地址、無稅號"],
-      "guest": ["無官網、無電話、無地址、無稅號"],
-      "BRONZE": ["無官網、無電話、無地址"],
-      "bronze": ["無官網、無電話、無地址"],
+      "NONE": [
+        "無官網、無電話、無地址、無稅號"
+      ],
+      "guest": [
+        "無官網、無電話、無地址、無稅號"
+      ],
+      "BRONZE": [
+        "無官網、無電話、無地址"
+      ],
+      "bronze": [
+        "無官網、無電話、無地址"
+      ],
       "SILVER": [],
       "silver": [],
       "GOLD": [],
@@ -1136,7 +1176,36 @@
       "activityUserReg": "用戶註冊",
       "activityUserDetail": "新用戶 李先生 完成註冊",
       "activitySystem": "系統排程",
-      "activitySystemDetail": "每日新聞爬蟲排程已啟動"
+      "activitySystemDetail": "每日新聞爬蟲排程已啟動",
+      "recentActivityLogs": {
+        "actions": {
+          "adOrderCreated": "已建立廣告訂單",
+          "companyUpdatedByAdmin": "管理員已更新公司資料",
+          "profileRequestSubmitted": "已送出註冊申請",
+          "userPasswordChanged": "使用者已變更密碼",
+          "setPasswordCompleted": "密碼設定已完成",
+          "loyaltyPointsAwarded": "已發放忠誠點數",
+          "loyaltyTierRecalculated": "忠誠等級已重新計算",
+          "profileRequestApproved": "註冊申請已核准",
+          "profileRequestStatusChanged": "註冊申請狀態已變更",
+          "userStatusChanged": "使用者狀態已變更",
+          "userSoftDeleted": "使用者已軟刪除"
+        },
+        "contents": {
+          "adOrderCreated": "已建立廣告訂單 {{orderId}}。",
+          "companyUpdatedByAdmin": "已更新 {{target}} 的公司資料。",
+          "profileRequestSubmitted": "收到來自 {{target}} 的新註冊申請。",
+          "userPasswordChanged": "已更新 {{target}} 的密碼。",
+          "setPasswordCompleted": "{{target}} 已完成密碼設定。",
+          "loyaltyPointsAwarded": "{{target}} 的點數已更新為 {{points}}。",
+          "loyaltyTierRecalculated": "{{target}}",
+          "profileRequestApproved": "已核准 {{target}} 的註冊申請。",
+          "profileRequestStatusChanged": "{{target}} - 狀態由 {{fromStatus}} 變更為 {{toStatus}}",
+          "userStatusChanged": "{{target}} 已{{status}}。",
+          "userSoftDeleted": "{{target}} 已被軟刪除。"
+        }
+      },
+      "recentActivityLoadError": "目前無法載入近期活動。"
     },
     "companies": {
       "all": "全部",
