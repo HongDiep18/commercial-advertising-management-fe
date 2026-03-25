@@ -3,23 +3,50 @@
 @import "shadcn/tailwind.css";
 
 @keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes messageSlideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes wiggle {
-  0%,100% { transform: rotate(0deg); }
-  15%     { transform: rotate(-12deg); }
-  30%     { transform: rotate(12deg); }
-  45%     { transform: rotate(-8deg); }
-  60%     { transform: rotate(8deg); }
-  75%     { transform: rotate(-4deg); }
-  90%     { transform: rotate(4deg); }
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(-12deg);
+  }
+  30% {
+    transform: rotate(12deg);
+  }
+  45% {
+    transform: rotate(-8deg);
+  }
+  60% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-4deg);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -42,6 +69,7 @@
   --color-amber-600: oklch(66.6% 0.179 58.318);
   --color-admin-yellow: #faf6ea;
   --color-admin-yellow-border: #fee685;
+  --breakpoint-3xl: 120rem;
 }
 
 .registration-form input,
