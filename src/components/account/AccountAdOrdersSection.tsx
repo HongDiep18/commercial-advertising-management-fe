@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog"
-import { formatDateTimeForLocale } from "@/utils/datetime"
+import { formatDate, formatDateTimeForLocale } from "@/utils/datetime"
 import type { TFunction } from "i18next"
 
 type StatusFilter = "ALL" | "DRAFT" | "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED"
@@ -225,9 +225,7 @@ export function AccountAdOrdersSection() {
                         })}
                         :
                       </span>
-                      {orderStartDate
-                        ? formatDateTimeForLocale(orderStartDate, i18n.language)
-                        : "-"}
+                      {orderStartDate ? formatDate(orderStartDate, i18n.language) : "-"}
                     </p>
                     <p>
                       <span className="text-muted-foreground">
@@ -362,7 +360,7 @@ export function AccountAdOrdersSection() {
                           {t("account.adOrdersDetailItemStartDate", {
                             defaultValue: "Start date",
                           })}
-                          : {formatDateTimeForLocale(item.startDate, i18n.language)}
+                          : {formatDate(item.startDate, i18n.language)}
                         </p>
                         <p>
                           {t("account.adOrdersDetailItemAssets", { defaultValue: "Assets" })}:{" "}

@@ -51,12 +51,22 @@ export type FeaturedCompanyItem = {
   contactName: string
   phone: string
   industry: string
+  country?: string | null
   address: string
   description: string
   featuredHighlight?: boolean
   companyInfoHighlight?: boolean
   adLinkUrl?: string
-  metadata?: Record<string, unknown>
+  metadata?: {
+    activeAdAssets?: Array<{
+      adId: string
+      packageType: string
+      assets: Array<{
+        fileUrl: string
+        assetType: string
+      }>
+    }>
+  }
   sortPriority?: number
 }
 
