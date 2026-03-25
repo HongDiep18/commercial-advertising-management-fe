@@ -2,17 +2,19 @@
 
 import { useTranslation } from "react-i18next"
 
-import { Building2, Clock, AlertTriangle, Newspaper } from "lucide-react"
+import { AlertTriangle, Building2, Clock, Newspaper } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
 
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
 import { useCompanyDirectory } from "@/api/companies/hooks"
 import { usePublishedProperties } from "@/api/properties/hooks"
+import { DashboardNotificationsCard } from "./DashboardNotificationsCard"
 
 export function DashboardTab() {
   const { t } = useTranslation()
   const { companyRequests } = useAdminData()
+
   const pendingCount = companyRequests.filter(
     (c) => c.status === ProfileRequestStatus.PENDING
   ).length
@@ -25,6 +27,7 @@ export function DashboardTab() {
     { page: 1, limit: 1, sortBy: "createdAt", sortOrder: "desc" },
     true
   )
+
   const totalCompanies = companiesDirectoryData?.pagination.total ?? 0
   const totalProperties = propertiesData?.pagination.total ?? 0
 
@@ -93,6 +96,8 @@ export function DashboardTab() {
           </div>
         </CardContent>
       </Card>
+
+      <DashboardNotificationsCard />
     </div>
   )
 }

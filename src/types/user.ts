@@ -17,6 +17,7 @@ export type User = {
   membershipTier: MembershipTier
   primaryIndustry: string | null
   selectedIndustries: string[]
+  createdAt?: string // TODO: check why remove createdAt from User type causes issue
 }
 
 export type SetUserFn = (user: User | null) => void
