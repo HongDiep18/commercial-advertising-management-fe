@@ -6,6 +6,7 @@ export { AccountAdOrdersSection } from "./AccountAdOrdersSection"
 export { AccountUpgradeModal } from "./AccountUpgradeModal"
 export { AccountProfileModal } from "./AccountProfileModal"
 export { AccountBenefitsModal } from "./AccountBenefitsModal"
+export { AccountIndustrySelectionModal } from "./AccountIndustrySelectionModal"
 export {
   REGION_KEYS_BY_COUNTRY,
   CONTRIBUTION_TYPE_CONFIG,

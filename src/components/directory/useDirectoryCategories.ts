@@ -11,6 +11,7 @@ export type DirectoryCategoryMode = "guest" | "real" | "demo"
 
 export function useDirectoryCategories(mode: DirectoryCategoryMode): {
   categories: DirectoryCategoryRow[]
+  hasAllAccess: boolean
   isLoading: boolean
   isError: boolean
 } {
@@ -41,5 +42,10 @@ export function useDirectoryCategories(mode: DirectoryCategoryMode): {
       .map((id) => ({ id, count: countsByIndustry[id] ?? 0 }))
   }, [data, useApi])
 
-  return { categories, isLoading, isError }
+  const hasAllAccess = useMemo(() => {
+    if (!useApi) return true // Demo mode shows all
+    return data?.hasAllAccess ?? true // Default to true if API hasn't loaded
+  }, [data, useApi])
+
+  return { categories, hasAllAccess, isLoading, isError }
 }

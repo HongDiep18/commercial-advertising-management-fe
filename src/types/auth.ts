@@ -8,9 +8,10 @@ export type AuthUserFromApi = {
   email: string
   name?: string
   role?: string
-  contributionPoints?: number
-  commercialPoints?: number
-  createdAt?: string
+  membershipTier?: string
+  companyId?: string | null
+  primaryIndustry?: string | null
+  selectedIndustries?: string[]
 }
 
 export type LoginResponse = {

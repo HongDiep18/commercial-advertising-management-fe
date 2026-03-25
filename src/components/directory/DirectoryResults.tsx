@@ -15,7 +15,6 @@ import {
   UserRole,
   useUser,
 } from "../../contexts/user-context"
-import { maskCompanyName } from "../../utils/companyHelpers"
 import { Pagination } from "../ui/Pagination"
 
 interface DirectoryResultsProps {
@@ -64,13 +63,14 @@ export function DirectoryResults({
   setSearchTerm,
 }: DirectoryResultsProps) {
   const { t, i18n } = useTranslation()
-  const { user, isLoggedIn, getTotalPoints } = useUser()
+  const { user, isLoggedIn, getMemberTier } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
   const isAdmin = !!user && user.role === UserRole.Admin
 
-  const totalPoints = getTotalPoints()
-  const isGuest =
-    !isAdmin && (!isLoggedIn || !user || totalPoints < MEMBERSHIP_THRESHOLDS[MembershipTier.BRONZE])
+  const userTier = getMemberTier()
+  const shouldBlurLogo =
+    !isAdmin &&
+    (userTier === MembershipTier.GUEST || userTier === MembershipTier.BRONZE)
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const [currentPage, setCurrentPage] = useState(1)
@@ -78,36 +78,36 @@ export function DirectoryResults({
   const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
   const directoryQuery: CompanyDirectoryQuery = isDemo
     ? {
-        page: 1,
-        limit: ITEMS_PER_PAGE,
-        sortBy: "name" as const,
-        sortOrder: "asc" as const,
-      }
+      page: 1,
+      limit: ITEMS_PER_PAGE,
+      sortBy: "name" as const,
+      sortOrder: "asc" as const,
+    }
     : {
-        search: debouncedSearchTerm || undefined,
-        industry: industryParam,
-        page: currentPage,
-        limit: ITEMS_PER_PAGE,
-        sortBy: "name" as const,
-        sortOrder: "asc" as const,
-      }
+      search: debouncedSearchTerm || undefined,
+      industry: industryParam,
+      page: currentPage,
+      limit: ITEMS_PER_PAGE,
+      sortBy: "name" as const,
+      sortOrder: "asc" as const,
+    }
 
   const { data, isLoading, isError } = useCompanyDirectory(directoryQuery, !isDemo)
 
   const rawCompanies = isDemo
     ? Object.values(mockCompanies).map((c) => ({
-        id: c.id,
-        name: c.nameEn || c.nameCn,
-        logoUrl: c.logo,
-        email: c.email,
-        contactName: c.contactPerson,
-        phone: c.phone,
-        industry: c.id.split("-")[0] || "other",
-        address: c.address,
-        description: c.introduction,
-        companyInfoHighlight: false,
-        sortPriority: 0,
-      }))
+      id: c.id,
+      name: c.nameEn || c.nameCn,
+      logoUrl: c.logo,
+      email: c.email,
+      contactName: c.contactPerson,
+      phone: c.phone,
+      industry: c.id.split("-")[0] || "other",
+      address: c.address,
+      description: c.introduction,
+      companyInfoHighlight: false,
+      sortPriority: 0,
+    }))
     : (data?.companies ?? [])
   const searchValue = debouncedSearchTerm?.trim() ?? ""
   const isSearching = searchValue.length > 0
@@ -144,8 +144,8 @@ export function DirectoryResults({
             ? t("directory.allCategories", { defaultValue: "All" })
             : selectedCategories.length === 1
               ? t(`directory.categories.${selectedCategories[0]}`, {
-                  defaultValue: selectedCategories[0],
-                })
+                defaultValue: selectedCategories[0],
+              })
               : `${selectedCategories.length} ${t("directory.industryCategory")}`}
         </h2>
         <span className="text-muted-foreground text-sm">
@@ -155,9 +155,7 @@ export function DirectoryResults({
 
       {isLoading ? (
         <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            {t("directory.loading", { defaultValue: "Loading..." })}
-          </p>
+          <p className="text-muted-foreground">{t("companyDetail.loading") || "Loading..."}</p>
         </div>
       ) : isError ? (
         <div className="py-12 text-center">
@@ -175,28 +173,26 @@ export function DirectoryResults({
             {displayedCompanies.map((company) => (
               <Link
                 key={company.id}
-                href={`/directory/${company.id}${
-                  selectedCategories.length === 1
-                    ? `?fromCategory=${encodeURIComponent(selectedCategories[0])}`
-                    : ""
-                }`}
+                href={`/directory/${company.id}${selectedCategories.length === 1
+                  ? `?fromCategory=${encodeURIComponent(selectedCategories[0])}`
+                  : ""
+                  }`}
                 className="group"
               >
                 <div
-                  className={`bg-muted relative mb-2 aspect-4/3 overflow-hidden rounded-sm border ${
-                    company.companyInfoHighlight
-                      ? "border-3 border-yellow-400"
-                      : "border-transparent"
-                  }`}
+                  className={`bg-muted relative mb-2 aspect-4/3 overflow-hidden rounded-sm border ${company.companyInfoHighlight
+                    ? "border-3 border-yellow-400"
+                    : "border-transparent"
+                    }`}
                 >
                   <img
                     src={company.logoUrl || "/placeholder.svg"}
                     alt={company.name}
-                    className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${isGuest ? "blur-[3px]" : ""}`}
+                    className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${shouldBlurLogo ? "blur-[3px]" : ""}`}
                   />
                 </div>
                 <h3 className="line-clamp-2 text-xs font-medium group-hover:underline">
-                  <span>{isGuest ? maskCompanyName(company.name) : company.name}</span>
+                  <span>{company.name}</span>
                 </h3>
               </Link>
             ))}
