@@ -138,6 +138,7 @@ export default function LoginForm() {
           companyId: null,
           primaryIndustry: null,
           selectedIndustries: [],
+          createdAt: undefined, // TODO: check why remove createdAt from User type causes issue
         })
       }
 

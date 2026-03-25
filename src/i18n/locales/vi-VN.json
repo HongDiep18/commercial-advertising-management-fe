@@ -1269,7 +1269,22 @@
           "userSoftDeleted": "{{target}} đã bị xóa mềm."
         }
       },
-      "recentActivityLoadError": "Hiện không thể tải hoạt động gần đây."
+      "recentActivityLoadError": "Hiện không thể tải hoạt động gần đây.",
+      "notificationsTitle": "Thông báo quản trị",
+      "notificationsDescription": "Bạn có {{count}} thông báo chưa đọc.",
+      "notificationsUnreadOnly": "Bộ lọc chưa đọc",
+      "notificationsFilterAll": "Tất cả thông báo",
+      "notificationsFilterUnread": "Chỉ chưa đọc",
+      "notificationsEventType": "Loại sự kiện",
+      "notificationsEventTypeAll": "Tất cả loại sự kiện",
+      "notificationsLoading": "Đang tải thông báo...",
+      "notificationsLoadError": "Hiện không thể tải thông báo.",
+      "notificationsEmpty": "Không có thông báo nào.",
+      "notificationsUnread": "Chưa đọc",
+      "notificationsMarkAsRead": "Đánh dấu đã đọc",
+      "notificationsMarkAllAsRead": "Đánh dấu tất cả đã đọc",
+      "notificationsMarkAsReadError": "Không thể đánh dấu thông báo này là đã đọc.",
+      "notificationsMarkAllAsReadError": "Không thể đánh dấu tất cả thông báo là đã đọc."
     },
     "companies": {
       "all": "Tất cả",
