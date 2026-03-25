@@ -1106,6 +1106,7 @@
     "subtitle": "Vietnam Buyer Guide Admin System",
     "tabs": {
       "dashboard": "Overview",
+      "recentActivity": "Recent Activity",
       "companies": "Company Management",
       "store": "Online Store",
       "news": "News Crawler",
