@@ -1090,6 +1090,7 @@
     "subtitle": "越南華商經貿總彙 管理系統",
     "tabs": {
       "dashboard": "總覽",
+      "recentActivity": "近期活動",
       "companies": "企業管理",
       "store": "網路商店",
       "news": "新聞爬蟲",

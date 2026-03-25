@@ -9,6 +9,7 @@ import { ADMIN_TABS } from "./constants"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import {
   DashboardTab,
+  RecentActivityTab,
   CompaniesTab,
   StoreTab,
   NewsTab,
@@ -42,6 +43,8 @@ export function AdminDashboardContent() {
     switch (activeTab) {
       case "dashboard":
         return <DashboardTab />
+      case "recentActivity":
+        return <RecentActivityTab />
       case "companies":
         return <CompaniesTab />
       case "store":
