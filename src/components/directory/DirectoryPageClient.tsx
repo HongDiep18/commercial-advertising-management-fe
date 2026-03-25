@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useMemo, useState } from "react"
+import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import { DirectoryResults } from "./DirectoryResults"
 import { DirectorySidebar } from "./DirectorySidebar"
 import Footer from "../layout/Footer"
@@ -44,12 +44,14 @@ function DirectoryContent() {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>(() => urlSelected)
   const [searchTerm, setSearchTerm] = useState(() => qParam)
+  const isSyncingFromUrlRef = useRef(false)
 
   useEffect(() => {
     setSearchTerm(qParam)
   }, [qParam])
 
   useEffect(() => {
+    isSyncingFromUrlRef.current = true
     setSelectedCategories((prev) => {
       const prevKey = [...prev].sort().join(",")
       if (prevKey === urlIndustryKey) return prev
@@ -58,6 +60,10 @@ function DirectoryContent() {
   }, [urlIndustryKey, urlSelected])
 
   useEffect(() => {
+    if (isSyncingFromUrlRef.current) {
+      isSyncingFromUrlRef.current = false
+      return
+    }
     const selectedKey = [...selectedCategories].sort().join(",")
     if (selectedKey === urlIndustryKey) return
 

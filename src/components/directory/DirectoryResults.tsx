@@ -155,7 +155,9 @@ export function DirectoryResults({
 
       {isLoading ? (
         <div className="py-12 text-center">
-          <p className="text-muted-foreground">{t("directory.loading") || "Loading..."}</p>
+          <p className="text-muted-foreground">
+            {t("directory.loading", { defaultValue: "Loading..." })}
+          </p>
         </div>
       ) : isError ? (
         <div className="py-12 text-center">
