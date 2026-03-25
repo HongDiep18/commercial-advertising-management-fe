@@ -171,6 +171,7 @@ export default function AccountPage() {
           .catch(() => {})
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modals.profile])
 
   const applyApiProfile = (apiProfile: ProfileResponse, currentEmail?: string) => {
