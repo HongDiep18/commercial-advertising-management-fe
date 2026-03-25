@@ -48,14 +48,22 @@ export default function ContactPageClient() {
   const [selectedItems, setSelectedItems] = useState<SelectedEntry[]>([])
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
-  const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
+  const [toast, setToast] = useState<{
+    message: string
+    variant: ToastVariant
+    visible: boolean
+    action?: { label: string; href: string }
+  }>({
     message: "",
     variant: "info",
     visible: false,
   })
 
-  const showToast = (message: string, variant: ToastVariant = "info") =>
-    setToast({ message, variant, visible: true })
+  const showToast = (
+    message: string,
+    variant: ToastVariant = "info",
+    action?: { label: string; href: string }
+  ) => setToast({ message, variant, visible: true, action })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
 
   const activeTab = useMemo<TabType>(() => {
@@ -242,7 +250,10 @@ export default function ContactPageClient() {
         )
         throw assetError
       }
-      showToast(t("adContact.orderSuccess", { count: totalQuantity }), "success")
+      showToast(t("adContact.orderSuccess", { count: totalQuantity }), "success", {
+        label: t("adContact.viewOrders", { defaultValue: "View orders" }),
+        href: "/account",
+      })
       setShowOrderModal(false)
       setSelectedItems([])
     } catch (err) {
@@ -328,6 +339,7 @@ export default function ContactPageClient() {
         visible={toast.visible}
         onClose={hideToast}
         duration={4500}
+        action={toast.action}
       />
     </main>
   )
