@@ -622,7 +622,7 @@
       "membershipTier": "Chọn hạng thành viên"
     },
     "hints": {
-      "websiteFormat": "Ví dụ: https://your-company.com hoặc http://your-company.com"
+      "websiteFormat": "Ví dụ: https://your-company hoặc http://your-company"
     },
     "noRegions": "Không có khu vực nào",
     "errors": {
