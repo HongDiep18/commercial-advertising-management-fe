@@ -1182,7 +1182,22 @@
           "userSoftDeleted": "{{target}} 已被軟刪除。"
         }
       },
-      "recentActivityLoadError": "目前無法載入近期活動。"
+      "recentActivityLoadError": "目前無法載入近期活動。",
+      "notificationsTitle": "管理通知",
+      "notificationsDescription": "您有 {{count}} 則未讀通知。",
+      "notificationsUnreadOnly": "未讀篩選",
+      "notificationsFilterAll": "全部通知",
+      "notificationsFilterUnread": "僅未讀",
+      "notificationsEventType": "事件類型",
+      "notificationsEventTypeAll": "全部事件類型",
+      "notificationsLoading": "通知載入中...",
+      "notificationsLoadError": "目前無法載入通知。",
+      "notificationsEmpty": "目前沒有通知。",
+      "notificationsUnread": "未讀",
+      "notificationsMarkAsRead": "標記為已讀",
+      "notificationsMarkAllAsRead": "全部標記為已讀",
+      "notificationsMarkAsReadError": "無法將此通知標記為已讀。",
+      "notificationsMarkAllAsReadError": "無法將全部通知標記為已讀。"
     },
     "companies": {
       "all": "全部",

@@ -1197,7 +1197,22 @@
           "userSoftDeleted": "{{target}} was soft deleted."
         }
       },
-      "recentActivityLoadError": "Unable to load recent activity right now."
+      "recentActivityLoadError": "Unable to load recent activity right now.",
+      "notificationsTitle": "Admin Notifications",
+      "notificationsDescription": "You have {{count}} unread notifications.",
+      "notificationsUnreadOnly": "Unread filter",
+      "notificationsFilterAll": "All notifications",
+      "notificationsFilterUnread": "Unread only",
+      "notificationsEventType": "Event type",
+      "notificationsEventTypeAll": "All event types",
+      "notificationsLoading": "Loading notifications...",
+      "notificationsLoadError": "Unable to load notifications right now.",
+      "notificationsEmpty": "No notifications found.",
+      "notificationsUnread": "Unread",
+      "notificationsMarkAsRead": "Mark as read",
+      "notificationsMarkAllAsRead": "Mark all as read",
+      "notificationsMarkAsReadError": "Unable to mark this notification as read.",
+      "notificationsMarkAllAsReadError": "Unable to mark all notifications as read."
     },
     "companies": {
       "all": "All",
