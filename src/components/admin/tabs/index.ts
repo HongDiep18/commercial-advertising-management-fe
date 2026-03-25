@@ -1,4 +1,5 @@
 export { DashboardTab } from "./DashboardTab"
+export { RecentActivityTab } from "./RecentActivityTab"
 export { CompaniesTab } from "./CompaniesTab"
 export { StoreTab } from "./StoreTab"
 export { NewsTab } from "./NewsTab"

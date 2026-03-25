@@ -1150,6 +1150,7 @@
     "subtitle": "Hệ thống quản trị Vietnam Buyer Guide",
     "tabs": {
       "dashboard": "Tổng quan",
+      "recentActivity": "Hoạt động gần đây",
       "companies": "Quản lý doanh nghiệp",
       "store": "Cửa hàng trực tuyến",
       "news": "Thu thập tin tức",
