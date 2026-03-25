@@ -71,7 +71,7 @@ export default function PopupPriorityCompanyModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         showCloseButton={false}
-        className="bg-card border-border shadow-10xl 3xl:max-w-5xl z-10000! w-full max-w-2xl gap-2 overflow-hidden rounded-xl border p-0 2xl:max-w-3xl"
+        className="bg-card border-border shadow-10xl 3xl:max-w-6xl z-10000! flex max-h-[90vh] w-full max-w-2xl flex-col gap-2 overflow-hidden rounded-xl border p-0 2xl:max-w-4xl"
       >
         <VisuallyHidden.Root>
           <DialogTitle>{company.name}</DialogTitle>
@@ -85,7 +85,7 @@ export default function PopupPriorityCompanyModal() {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="bg-muted relative overflow-hidden">
+        <div className="bg-muted relative aspect-video max-h-[55vh] w-full shrink-0 overflow-hidden">
           <img src={heroImageUrl} alt={company.name} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute right-4 bottom-4 left-4">
