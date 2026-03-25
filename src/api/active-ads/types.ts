@@ -1,3 +1,14 @@
+export type ActiveAdAssetItem = {
+  fileUrl: string
+  assetType: string
+}
+
+export type ActiveAdAssetsGroup = {
+  adId: string
+  packageType: string
+  assets: ActiveAdAssetItem[]
+}
+
 export type PopupCompanyItem = {
   id: string
   name: string
@@ -10,7 +21,11 @@ export type PopupCompanyItem = {
   description: string
   featuredHighlight?: boolean
   companyInfoHighlight?: boolean
+  showDetailsButton?: boolean
   adLinkUrl?: string
+  metadata?: {
+    activeAdAssets?: ActiveAdAssetsGroup[]
+  }
   sortPriority?: number
 }
 
