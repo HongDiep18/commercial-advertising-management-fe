@@ -1,10 +1,12 @@
-import { getDurationMonths, addMonths } from "@/data/contactMockData"
+import { addDuration } from "@/data/contactMockData"
 
 export type ExistingOrderItem = {
   packageName: string
   pricingName: string
   startDate: string
   pricingId?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 export type NewOrderItem = {
@@ -15,14 +17,6 @@ export type NewOrderItem = {
   pricingId?: string
 }
 
-function normalizedSlotKey(packageName: string, pricingName: string): string {
-  return `${String(packageName).trim().toLowerCase()}|${String(pricingName).trim().toLowerCase()}`
-}
-
-function getEndDateFromPricingName(startDate: string, pricingName: string): string {
-  const months = getDurationMonths(pricingName)
-  return months > 0 ? addMonths(startDate, months) : startDate
-}
 
 function toMs(dateStr: string): number {
   const ms = Date.parse(dateStr)
@@ -42,16 +36,15 @@ function isSameSlot(newItem: NewOrderItem, existing: ExistingOrderItem): boolean
   ) {
     return newItem.pricingId === existing.pricingId
   }
-  return (
-    normalizedSlotKey(newItem.packageName, newItem.pricingName) ===
-    normalizedSlotKey(existing.packageName, existing.pricingName)
-  )
+  return String(newItem.packageName).trim().toLowerCase() === String(existing.packageName).trim().toLowerCase()
 }
 
 export function hasOverlapWithExistingOrders(
   existingItems: ExistingOrderItem[],
   newItems: NewOrderItem[]
-): boolean {
+): { overlap: boolean; suggestedDate?: Date } {
+  let latestConflictEnd = 0
+
   for (const newItem of newItems) {
     if (!newItem.startDate?.trim()) continue
     const newStart = toMs(newItem.startDate)
@@ -63,11 +56,20 @@ export function hasOverlapWithExistingOrders(
       if (!isSameSlot(newItem, existing)) continue
 
       const existingStart = toMs(existing.startDate)
-      const existingEnd = toMs(getEndDateFromPricingName(existing.startDate, existing.pricingName))
+      const existingEnd =
+        existing.durationValue && existing.durationUnit
+          ? addDuration(new Date(existing.startDate), existing.durationValue, existing.durationUnit).getTime()
+          : existingStart
       if (existingStart === 0) continue
 
-      if (rangesOverlap(newStart, newEnd, existingStart, existingEnd)) return true
+      if (rangesOverlap(newStart, newEnd, existingStart, existingEnd)) {
+        if (existingEnd > latestConflictEnd) latestConflictEnd = existingEnd
+      }
     }
   }
-  return false
+
+  if (latestConflictEnd > 0) {
+    return { overlap: true, suggestedDate: new Date(latestConflictEnd) }
+  }
+  return { overlap: false }
 }

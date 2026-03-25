@@ -20,6 +20,7 @@ export interface CalendarProps {
   className?: string
   initialFocus?: boolean
   localeCode?: string
+  defaultMonth?: Date
 }
 
 const localeMap: Record<string, Locale> = {
@@ -42,8 +43,9 @@ const Calendar = ({
   modifiersClassNames,
   className = "",
   localeCode = "en-US",
+  defaultMonth,
 }: CalendarProps) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [currentMonth, setCurrentMonth] = useState(defaultMonth ?? new Date())
   const locale = localeMap[localeCode] ?? localeMap[localeCode?.split("-")[0] ?? ""] ?? enUS
 
   const monthLabel = useMemo(

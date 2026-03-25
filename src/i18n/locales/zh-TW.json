@@ -202,7 +202,7 @@
     "orderTitle": "廣告下單",
     "startDateRequired": "請為每一個廣告項目選擇開始日期。",
     "demoOrderInfo": "此為示範帳號，這裡的下單僅供體驗，並不會實際送出。",
-    "overlapWarning": "您已有此廣告方案與相同時段的重複訂單。請選擇其他日期或移除重複項目。",
+    "overlapWarning": "您已有此廣告方案與相同時段的重複訂單。請選擇其他日期。",
     "companyInfo": "公司資訊",
     "companyName": "公司名稱",
     "contactPerson": "聯絡人",
@@ -434,6 +434,7 @@
       "note4": "截稿日期為 2024 年 10 月 31 日。"
     },
     "orderSuccess": "感謝您的訂單！\n\n已選擇 {{count}} 個廣告項目\n我們將盡快與您聯繫確認詳情。",
+    "viewOrders": "查看訂單",
     "orderError": "訂單無法完成，請再試一次。",
     "inquirySuccess": "感謝您的諮詢，我們將盡快回覆您！",
     "mustLoginToOrder": "請先登入才能下單"
