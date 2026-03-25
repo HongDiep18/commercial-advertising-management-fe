@@ -576,7 +576,7 @@
       "membershipTier": "選擇會員等級"
     },
     "hints": {
-      "websiteFormat": "範例：https://your-company.com 或 http://your-company.com"
+      "websiteFormat": "範例：https://your-company 或 http://your-company"
     },
     "noRegions": "無可用地區",
     "errors": {
