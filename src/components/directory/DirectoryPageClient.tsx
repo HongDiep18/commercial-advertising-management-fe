@@ -20,7 +20,22 @@ function DirectoryContent() {
   const { user, isLoggedIn } = useUser()
   const mode: DirectoryCategoryMode =
     !isLoggedIn || !user ? "guest" : isDemoUser(user) ? "demo" : "real"
-  const { categories } = useDirectoryCategories(mode)
+  const { categories, hasAllAccess } = useDirectoryCategories(mode)
+
+  // Redirect Bronze/Silver/Gold users to their primary industry if no category selected
+  useEffect(() => {
+    if (!hasAllAccess && categories.length > 0 && !categoryParam && industryParams.length === 0) {
+      // User has restricted access and no category filter applied
+      // Redirect to their accessible categories
+      const accessibleIndustries = categories.map((cat) => cat.id)
+      if (accessibleIndustries.length > 0) {
+        const params = new URLSearchParams()
+        accessibleIndustries.forEach((id) => params.append("industry", id))
+        if (qParam) params.set("q", qParam)
+        router.replace(`/directory?${params.toString()}`)
+      }
+    }
+  }, [hasAllAccess, categories, categoryParam, industryParams.length, router, qParam])
 
   const urlIndustryKey = useMemo(() => {
     if (industryParams.length > 0) {
@@ -92,6 +107,7 @@ function DirectoryContent() {
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
               categories={categories}
+              hasAllAccess={hasAllAccess}
             />
 
             <div className="min-w-0 flex-1">

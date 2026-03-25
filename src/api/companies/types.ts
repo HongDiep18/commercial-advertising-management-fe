@@ -41,6 +41,7 @@ export type CompanyCategoryItem = {
 
 export type CompanyCategoriesResponse = {
   categories: CompanyCategoryItem[]
+  hasAllAccess: boolean
 }
 
 export type FeaturedCompanyItem = {

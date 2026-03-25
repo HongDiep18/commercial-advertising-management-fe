@@ -11,8 +11,8 @@ import Label from "../ui/Label"
 import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
 import { login as loginApi } from "@/api/auth"
-import { useUser, UserRole } from "@/contexts/user-context"
 import { DEMO_USERS, DEMO_ACCOUNTS } from "./demo"
+import { useUser, UserRole, MembershipTier } from "@/contexts/user-context"
 import { getProfile, type ProfileResponse } from "@/api/profile"
 import {
   type LoginResponse,
@@ -134,9 +134,10 @@ export default function LoginForm() {
           email,
           name: email.split("@")[0] ?? "User",
           role: UserRole.Free,
-          contributionPoints: 0,
-          commercialPoints: 0,
-          createdAt: new Date().toISOString().slice(0, 10),
+          membershipTier: MembershipTier.GUEST,
+          companyId: null,
+          primaryIndustry: null,
+          selectedIndustries: [],
         })
       }
 
