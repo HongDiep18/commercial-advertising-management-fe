@@ -91,14 +91,18 @@ function runValidation(
   const websiteVal = data[WEBSITE_FIELD]
   if (filled(websiteVal)) {
     const raw = String(websiteVal).trim()
-    const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
     let isValid = false
     try {
-      const url = new URL(candidate)
+      if (!/^https?:\/\//i.test(raw)) {
+        throw new Error("missing_protocol")
+      }
+
+      const url = new URL(raw)
       isValid = url.protocol === "http:" || url.protocol === "https:"
       if (isValid) {
         const host = url.hostname.trim()
-        isValid = host.includes(".") && !host.startsWith(".") && !host.endsWith(".")
+        isValid =
+          host.length > 0 && !host.startsWith(".") && !host.endsWith(".") && /[a-z0-9]/i.test(host)
       }
     } catch {
       isValid = false

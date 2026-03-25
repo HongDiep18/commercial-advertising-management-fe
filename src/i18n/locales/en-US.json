@@ -577,7 +577,7 @@
       "membershipTier": "Select membership level"
     },
     "hints": {
-      "websiteFormat": "Example: https://your-company.com or http://your-company.com"
+      "websiteFormat": "Example: https://your-company or http://your-company"
     },
     "noRegions": "No regions available",
     "errors": {
@@ -735,30 +735,12 @@
       "diamond": "Spend 530,000 VND"
     },
     "tierBenefits": {
-      "NONE": [
-        "Company name (partial)",
-        "Region"
-      ],
-      "guest": [
-        "Company name (partial)",
-        "Region"
-      ],
-      "BRONZE": [
-        "Base industry info",
-        "Company name, tax ID, region"
-      ],
-      "bronze": [
-        "Base industry info",
-        "Company name, tax ID, region"
-      ],
-      "SILVER": [
-        "Full industry info",
-        "Unlock website, phone, address, email"
-      ],
-      "silver": [
-        "Full industry info",
-        "Unlock website, phone, address, email"
-      ],
+      "NONE": ["Company name (partial)", "Region"],
+      "guest": ["Company name (partial)", "Region"],
+      "BRONZE": ["Base industry info", "Company name, tax ID, region"],
+      "bronze": ["Base industry info", "Company name, tax ID, region"],
+      "SILVER": ["Full industry info", "Unlock website, phone, address, email"],
+      "silver": ["Full industry info", "Unlock website, phone, address, email"],
       "GOLD": [
         "Own industry + 3 cross-industries (full)",
         "Unlock own industry + 3 upstream/downstream industries"
@@ -779,18 +761,10 @@
       ]
     },
     "tierRestrictions": {
-      "NONE": [
-        "No website, phone, address, or tax ID"
-      ],
-      "guest": [
-        "No website, phone, address, or tax ID"
-      ],
-      "BRONZE": [
-        "No website, phone, or address"
-      ],
-      "bronze": [
-        "No website, phone, or address"
-      ],
+      "NONE": ["No website, phone, address, or tax ID"],
+      "guest": ["No website, phone, address, or tax ID"],
+      "BRONZE": ["No website, phone, or address"],
+      "bronze": ["No website, phone, or address"],
       "SILVER": [],
       "silver": [],
       "GOLD": [],
