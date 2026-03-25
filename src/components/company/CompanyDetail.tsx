@@ -107,7 +107,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   if (!isDemo && isCompanyLoading) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
-        <p className="text-muted-foreground">{t("directory.loading") || "Loading..."}</p>
+        <p className="text-muted-foreground">{t("directory.loading", { defaultValue: "Loading..." })}</p>
       </div>
     )
   }
@@ -170,7 +170,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   if (isResolvingTier) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
-        <p className="text-muted-foreground">{t("directory.loading") || "Loading..."}</p>
+        <p className="text-muted-foreground">{t("directory.loading", { defaultValue: "Loading..." })}</p>
       </div>
     )
   }

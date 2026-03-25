@@ -1018,6 +1018,7 @@
   "directory": {
     "searchPlaceholder": "Tìm kiếm tên công ty, từ khóa...",
     "clear": "Xóa",
+    "loading": "Đang tải...",
     "selectCategory": "Vui lòng Chọn Danh mục",
     "selectCategoryDescription": "Vui lòng chọn một danh mục công ty từ bên trái, hoặc sử dụng hộp tìm kiếm ở trên để tìm các công ty cụ thể.",
     "results": "kết quả",

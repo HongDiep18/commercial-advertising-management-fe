@@ -37,7 +37,7 @@ export default function FeaturedCompanies() {
 
         {isLoading ? (
           <div className="text-muted-foreground py-8 text-sm">
-            {t("directory.loading") || "Loading..."}
+            {t("directory.loading", { defaultValue: "Loading..." })}
           </div>
         ) : isError ? (
           <div className="text-muted-foreground py-8 text-sm">

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Ban, CheckCircle2, Pencil } from "lucide-react"
+import { Ban, CheckCircle2 } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { StatusBadge } from "../StatusBadge"
@@ -80,9 +80,6 @@ export function UsersTab() {
                     {t("admin.users.name")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                    {t("admin.users.company")}
-                  </th>
-                  <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                     {t("admin.users.role")}
                   </th>
                   <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
@@ -108,7 +105,6 @@ export function UsersTab() {
                       </p>
                       <p className="text-muted-foreground text-xs">{u.email}</p>
                     </td>
-                    <td className="text-muted-foreground px-4 py-3 text-sm">{u.company}</td>
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -134,13 +130,6 @@ export function UsersTab() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:!bg-header-red-dark h-8 hover:!text-white"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
