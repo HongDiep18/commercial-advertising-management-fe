@@ -1,11 +1,14 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
-import { Building2, Clock, TrendingUp } from "lucide-react"
+
+import { Building2, Clock, AlertTriangle, Newspaper } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
+
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
 import { useCompanyDirectory } from "@/api/companies/hooks"
+import { usePublishedProperties } from "@/api/properties/hooks"
 
 export function DashboardTab() {
   const { t } = useTranslation()
@@ -18,7 +21,12 @@ export function DashboardTab() {
     { page: 1, limit: 1, sortBy: "name", sortOrder: "asc" },
     true
   )
+  const { data: propertiesData, isLoading: isPropertiesLoading } = usePublishedProperties(
+    { page: 1, limit: 1, sortBy: "createdAt", sortOrder: "desc" },
+    true
+  )
   const totalCompanies = companiesDirectoryData?.pagination.total ?? 0
+  const totalProperties = propertiesData?.pagination.total ?? 0
 
   const stats = [
     {
@@ -35,17 +43,10 @@ export function DashboardTab() {
       trend: "",
       color: "text-amber-600",
     },
-    // {
-    //   labelKey: "newsCount",
-    //   value: "359",
-    //   icon: Newspaper,
-    //   trendKey: "trendToday",
-    //   color: "text-green-600",
-    // },
     {
       labelKey: "propertyViews",
-      value: "1,302",
-      icon: TrendingUp,
+      value: isPropertiesLoading ? "..." : totalProperties.toLocaleString(),
+      icon: Newspaper,
       trend: "",
       color: "text-primary",
     },
@@ -78,6 +79,20 @@ export function DashboardTab() {
           )
         })}
       </div>
+
+      <Card className="!bg-admin-yellow !border-admin-yellow-border">
+        <CardContent className="p-4 pt-7">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <div>
+              <p className="font-medium text-amber-800">{t("admin.dashboard.attentionRequired")}</p>
+              <p className="mt-1 text-sm text-amber-700">
+                {t("admin.dashboard.pendingAlert", { count: pendingCount })}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

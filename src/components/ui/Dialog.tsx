@@ -69,7 +69,7 @@ export function DialogContent({ className, children, ...props }: DialogContentPr
           aria-modal="true"
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
-          className={`bg-background border-border max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border shadow-xl ${className || ""}`}
+          className={`bg-background border-border mt-12 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border shadow-xl ${className || ""}`}
           {...props}
         >
           {children}
