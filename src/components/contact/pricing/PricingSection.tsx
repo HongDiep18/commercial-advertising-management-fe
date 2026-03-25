@@ -171,7 +171,7 @@ export default function PricingSection({
                     }`}
                     onClick={() => onItemToggle(item.id)}
                   >
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
                         onCheckedChange={() => onItemToggle(item.id)}
@@ -286,7 +286,7 @@ export default function PricingSection({
                     }`}
                     onClick={() => onItemToggle(item.id)}
                   >
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedItems.includes(item.id)}
                         onCheckedChange={() => onItemToggle(item.id)}

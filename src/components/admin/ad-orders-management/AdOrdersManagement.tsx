@@ -93,11 +93,21 @@ export function AdOrdersManagement() {
           : t("admin.advertising.rejectedSuccess") || "Advertising order rejected.",
         "success"
       )
-    } catch {
-      showToast(
-        t("admin.advertising.updateError") || "Failed to update advertising order.",
-        "error"
-      )
+    } catch (err) {
+      const apiErr = err as { data?: { code?: string; message?: string } }
+      if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
+        showToast(
+          t("admin.advertising.slotNotAvailable") ||
+            apiErr.data?.message ||
+            "This ad slot is fully booked for the requested date range.",
+          "error"
+        )
+      } else {
+        showToast(
+          t("admin.advertising.updateError") || "Failed to update advertising order.",
+          "error"
+        )
+      }
     } finally {
       setUpdatingOrderId(null)
     }

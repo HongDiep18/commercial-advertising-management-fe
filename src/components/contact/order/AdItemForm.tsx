@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
+import { useEffect, useRef, useMemo } from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Upload, X } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
@@ -9,7 +10,9 @@ import Input from "@/components/ui/Input"
 import Label from "@/components/ui/Label"
 import Checkbox from "@/components/ui/Checkbox"
 import Calendar from "@/components/ui/Calendar"
-import { isDateDisabled, getDisabledDates } from "@/data/contactMockData"
+import { isDateDisabled, getDisabledDates, addDuration } from "@/data/contactMockData"
+import { useBookedDates } from "@/api/active-ads/hooks"
+import { isSlotPackageType } from "@/api/active-ads/bookedDates"
 
 interface AdItemFormProps {
   item: {
@@ -19,6 +22,9 @@ interface AdItemFormProps {
     duration?: string
     price: string
     quantity?: number
+    packageType?: string
+    durationValue?: number | null
+    durationUnit?: string | null
   }
   itemDetails: {
     startDate: string
@@ -34,6 +40,8 @@ interface AdItemFormProps {
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onRemoveFile: (index: number) => void
   onCalendarOpenChange: (open: boolean) => void
+  slotError?: string | null
+  calendarDefaultMonth?: Date
 }
 
 export default function AdItemForm({
@@ -45,14 +53,48 @@ export default function AdItemForm({
   onFileChange,
   onRemoveFile,
   onCalendarOpenChange,
+  slotError,
+  calendarDefaultMonth,
 }: AdItemFormProps) {
   const { t, i18n } = useTranslation()
+  const slotErrorRef = useRef<HTMLParagraphElement>(null)
+  const isSlot = isSlotPackageType(item.packageType)
+
+  useEffect(() => {
+    if (slotError && slotErrorRef.current) {
+      slotErrorRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }, [slotError])
+  const { data: bookedDatesData } = useBookedDates(item.packageType)
 
   const formatDate = (date: Date) => {
     if (i18n.language === "zh-TW") return format(date, "yyyy年M月d日")
     if (i18n.language === "vi-VN") return format(date, "dd/MM/yyyy")
     return format(date, "MMM d, yyyy")
   }
+
+  const isDateDisabledBySlot = (date: Date): boolean => {
+    if (!bookedDatesData?.fullyBookedRanges?.length) return false
+    if (!item.durationValue || !item.durationUnit) return false
+    const endDate = addDuration(date, item.durationValue, item.durationUnit)
+    return bookedDatesData.fullyBookedRanges.some((range) => {
+      const rangeStart = new Date(range.startDate)
+      const rangeEnd = range.endDate ? new Date(range.endDate) : null
+      return (rangeEnd === null || date < rangeEnd) && endDate > rangeStart
+    })
+  }
+
+  const firstAvailableDate = useMemo(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    for (let i = 0; i < 365; i++) {
+      const date = new Date(today)
+      date.setDate(today.getDate() + i)
+      const disabled = isSlot ? isDateDisabledBySlot(date) : isDateDisabled(item.id, date)
+      if (!disabled) return date
+    }
+    return today
+  }, [bookedDatesData, item.id, isSlot]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="bg-card rounded-lg p-5 shadow-sm">
@@ -85,7 +127,7 @@ export default function AdItemForm({
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="z-[60] w-[280px] p-0"
+              className="z-[90] w-[280px] p-0"
               align="start"
               sideOffset={5}
               collisionPadding={20}
@@ -96,15 +138,17 @@ export default function AdItemForm({
                 </p>
               </div>
               <Calendar
+                key={(calendarDefaultMonth ?? firstAvailableDate).toISOString()}
                 mode="single"
                 selected={itemDetails.startDate ? new Date(itemDetails.startDate) : undefined}
                 onSelect={onStartDateChange}
                 disabled={(date) => {
                   if (date < new Date(new Date().setHours(0, 0, 0, 0))) return true
+                  if (isSlot) return isDateDisabledBySlot(date)
                   return isDateDisabled(item.id, date)
                 }}
                 modifiers={{
-                  booked: getDisabledDates(item.id),
+                  booked: isSlot ? [] : getDisabledDates(item.id),
                 }}
                 modifiersClassNames={{
                   booked: "bg-muted text-muted-foreground line-through",
@@ -112,9 +156,13 @@ export default function AdItemForm({
                 className="w-full"
                 initialFocus
                 localeCode={i18n.language}
+                defaultMonth={calendarDefaultMonth ?? firstAvailableDate}
               />
             </PopoverContent>
           </Popover>
+          {slotError && (
+            <p ref={slotErrorRef} className="text-sm text-red-500">{slotError}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label>{t("adContact.endDate")}</Label>

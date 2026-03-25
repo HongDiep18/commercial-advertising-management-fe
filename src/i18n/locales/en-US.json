@@ -436,6 +436,7 @@
       "note4": "Deadline: October 31, 2024."
     },
     "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details.",
+    "viewOrders": "View orders",
     "orderError": "Your order could not be completed. Please try again.",
     "inquirySuccess": "Thank you for your inquiry, we will reply to you as soon as possible!",
     "mustLoginToOrder": "You must login to order"
@@ -1391,6 +1392,7 @@
       "approvedSuccess": "Advertising order approved.",
       "rejectedSuccess": "Advertising order rejected.",
       "updateError": "Failed to update advertising order.",
+      "slotNotAvailable": "This ad slot is fully booked for the requested date range.",
       "approveNote": "Approval note",
       "rejectReason": "Rejection reason"
     },
