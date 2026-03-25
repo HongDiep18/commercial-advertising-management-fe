@@ -12,6 +12,8 @@ export type MyAdOrderItem = {
   adLinkUrl: string
   assetsCount: number
   pricingId?: string
+  durationValue?: number | null
+  durationUnit?: string | null
 }
 
 export type MyAdOrder = {
@@ -46,18 +48,12 @@ export async function getMyAdOrders(params?: {
   return api.request<MyAdOrdersResponse>(`/ad-orders/my-orders${qs ? `?${qs}` : ""}`)
 }
 
-export async function getMyPendingOrderItems(): Promise<ExistingOrderItem[]> {
+async function fetchAllOrderItemsByStatus(status: string): Promise<ExistingOrderItem[]> {
   const items: ExistingOrderItem[] = []
   let page = 1
   let totalPages = 1
   do {
-    const res = await getMyAdOrders({
-      status: "PENDING",
-      page,
-      limit: 100,
-      sortBy: "createdAt",
-      sortOrder: "desc",
-    })
+    const res = await getMyAdOrders({ status, page, limit: 100, sortBy: "createdAt", sortOrder: "desc" })
     res.orders.forEach((o) =>
       o.items.forEach((it) =>
         items.push({
@@ -65,6 +61,8 @@ export async function getMyPendingOrderItems(): Promise<ExistingOrderItem[]> {
           pricingName: it.pricingName,
           startDate: it.startDate,
           pricingId: it.pricingId,
+          durationValue: it.durationValue,
+          durationUnit: it.durationUnit,
         })
       )
     )
@@ -72,6 +70,15 @@ export async function getMyPendingOrderItems(): Promise<ExistingOrderItem[]> {
     page++
   } while (page <= totalPages)
   return items
+}
+
+export async function getMyPendingOrderItems(): Promise<ExistingOrderItem[]> {
+  const results = await Promise.all([
+    fetchAllOrderItemsByStatus("PENDING"),
+    fetchAllOrderItemsByStatus("SUBMITTED"),
+    fetchAllOrderItemsByStatus("APPROVED"),
+  ])
+  return results.flat()
 }
 
 function toCreateOrderPayload(input: CreateAdOrderInput): Record<string, unknown> {
