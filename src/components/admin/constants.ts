@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react"
 import {
   LayoutDashboard,
   Building2,
+  Activity,
   // ShoppingBag,
   // Newspaper,
   Megaphone,
@@ -29,4 +30,5 @@ export const ADMIN_TABS: Array<{ id: string; icon: LucideIcon }> = [
   { id: "advertising", icon: Megaphone },
   { id: "property", icon: MapPin },
   { id: "users", icon: UserCog },
+  { id: "recentActivity", icon: Activity },
 ]

@@ -733,12 +733,30 @@
       "diamond": "Spend 530,000 VND"
     },
     "tierBenefits": {
-      "NONE": ["Company name (partial)", "Region"],
-      "guest": ["Company name (partial)", "Region"],
-      "BRONZE": ["Base industry info", "Company name, tax ID, region"],
-      "bronze": ["Base industry info", "Company name, tax ID, region"],
-      "SILVER": ["Full industry info", "Unlock website, phone, address, email"],
-      "silver": ["Full industry info", "Unlock website, phone, address, email"],
+      "NONE": [
+        "Company name (partial)",
+        "Region"
+      ],
+      "guest": [
+        "Company name (partial)",
+        "Region"
+      ],
+      "BRONZE": [
+        "Base industry info",
+        "Company name, tax ID, region"
+      ],
+      "bronze": [
+        "Base industry info",
+        "Company name, tax ID, region"
+      ],
+      "SILVER": [
+        "Full industry info",
+        "Unlock website, phone, address, email"
+      ],
+      "silver": [
+        "Full industry info",
+        "Unlock website, phone, address, email"
+      ],
       "GOLD": [
         "Own industry + 3 cross-industries (full)",
         "Unlock own industry + 3 upstream/downstream industries"
@@ -759,10 +777,18 @@
       ]
     },
     "tierRestrictions": {
-      "NONE": ["No website, phone, address, or tax ID"],
-      "guest": ["No website, phone, address, or tax ID"],
-      "BRONZE": ["No website, phone, or address"],
-      "bronze": ["No website, phone, or address"],
+      "NONE": [
+        "No website, phone, address, or tax ID"
+      ],
+      "guest": [
+        "No website, phone, address, or tax ID"
+      ],
+      "BRONZE": [
+        "No website, phone, or address"
+      ],
+      "bronze": [
+        "No website, phone, or address"
+      ],
       "SILVER": [],
       "silver": [],
       "GOLD": [],
@@ -1106,6 +1132,7 @@
     "subtitle": "Vietnam Buyer Guide Admin System",
     "tabs": {
       "dashboard": "Overview",
+      "recentActivity": "Recent Activity",
       "companies": "Company Management",
       "store": "Online Store",
       "news": "News Crawler",
@@ -1151,7 +1178,36 @@
       "activityUserReg": "User registration",
       "activityUserDetail": "New user Mr. Li registered",
       "activitySystem": "System schedule",
-      "activitySystemDetail": "Daily news crawl started"
+      "activitySystemDetail": "Daily news crawl started",
+      "recentActivityLogs": {
+        "actions": {
+          "adOrderCreated": "Ad order created",
+          "companyUpdatedByAdmin": "Company updated by admin",
+          "profileRequestSubmitted": "Profile request submitted",
+          "userPasswordChanged": "User password changed",
+          "setPasswordCompleted": "Set password completed",
+          "loyaltyPointsAwarded": "Loyalty points awarded",
+          "loyaltyTierRecalculated": "Loyalty tier recalculated",
+          "profileRequestApproved": "Profile request approved",
+          "profileRequestStatusChanged": "Profile request status changed",
+          "userStatusChanged": "User status changed",
+          "userSoftDeleted": "User soft deleted"
+        },
+        "contents": {
+          "adOrderCreated": "Created ad order {{orderId}}.",
+          "companyUpdatedByAdmin": "Updated company profile for {{target}}.",
+          "profileRequestSubmitted": "New registration request from {{target}}.",
+          "userPasswordChanged": "Password updated for {{target}}.",
+          "setPasswordCompleted": "Set-password completed for {{target}}.",
+          "loyaltyPointsAwarded": "{{target}} points updated to {{points}}.",
+          "loyaltyTierRecalculated": "{{target}}",
+          "profileRequestApproved": "Approved registration for {{target}}.",
+          "profileRequestStatusChanged": "{{target}} - changed from {{fromStatus}} to {{toStatus}}",
+          "userStatusChanged": "{{target}} was {{status}}.",
+          "userSoftDeleted": "{{target}} was soft deleted."
+        }
+      },
+      "recentActivityLoadError": "Unable to load recent activity right now."
     },
     "companies": {
       "all": "All",

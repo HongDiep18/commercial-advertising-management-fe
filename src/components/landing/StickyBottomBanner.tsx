@@ -1,6 +1,7 @@
 "use client"
 
 import { usePopupRotationalCompanies } from "@/api/active-ads/hooks"
+import { getFirstActiveAdAssetImageUrl } from "@/lib/ad-assets"
 import { ArrowRight, Building2, ChevronDown, ChevronUp } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -14,6 +15,7 @@ interface BannerItem {
   image?: string
   link: string
   tag: string
+  showDetailsButton: boolean
 }
 
 const STORAGE_KEY = "sticky-banner-hidden-date"
@@ -27,17 +29,18 @@ export default function StickyBottomBanner() {
   const [isPaused, setIsPaused] = useState(false)
 
   const bannerItems = useMemo<BannerItem[]>(() => {
-    const companies = popupCompanies ?? []
+    const companies = (popupCompanies ?? []).slice(0, 4)
     return companies.map((company) => ({
       id: company.id,
       type: "company",
       title: company.name,
       subtitle: company.description,
-      image: company.logoUrl ?? undefined,
+      image: getFirstActiveAdAssetImageUrl(company, company.logoUrl || "/placeholder.svg"),
       link: company.adLinkUrl || `/directory/${company.id}`,
-      tag: t("stickyBanner.tags.featuredCompany"),
+      tag: "",
+      showDetailsButton: Boolean(company.showDetailsButton),
     }))
-  }, [popupCompanies, t])
+  }, [popupCompanies])
 
   useEffect(() => {
     const hiddenDate = localStorage.getItem(STORAGE_KEY)
@@ -54,7 +57,7 @@ export default function StickyBottomBanner() {
       if (bannerItems.length === 0) return
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % bannerItems.length)
-      }, 7000)
+      }, 3000)
       return () => clearInterval(interval)
     }
   }, [isPaused, isExpanded, isVisible, bannerItems.length])
@@ -93,11 +96,11 @@ export default function StickyBottomBanner() {
             <ChevronDown className="text-muted-foreground h-4 w-4" />
           </button>
 
-          <div className="relative p-4 pt-6">
+          <div className="relative p-5 pt-7">
             <div className="flex items-center gap-4">
               <div className="shrink-0">
                 {currentItem.image ? (
-                  <div className="relative h-20 w-20 overflow-hidden rounded-lg">
+                  <div className="relative h-28 w-40 overflow-hidden rounded-lg">
                     <img
                       src={currentItem.image || "/placeholder.svg"}
                       alt={currentItem.title}
@@ -105,37 +108,34 @@ export default function StickyBottomBanner() {
                     />
                   </div>
                 ) : (
-                  <div className="bg-primary/10 flex h-20 w-20 items-center justify-center rounded-lg">
-                    <Building2 className="text-primary h-8 w-8" />
+                  <div className="bg-primary/10 flex h-28 w-40 items-center justify-center rounded-lg">
+                    <Building2 className="text-primary h-11 w-11" />
                   </div>
                 )}
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="mb-1 flex items-center gap-2">
-                  <span className="bg-primary text-primary-foreground inline-flex items-center rounded px-2 py-0.5 text-xs font-medium">
-                    {currentItem.tag}
-                  </span>
-                </div>
-                <h3 className="text-foreground truncate text-lg font-semibold">
+                <h3 className="text-foreground truncate text-xl font-semibold">
                   {currentItem.title}
                 </h3>
-                <p className="text-muted-foreground truncate text-sm">{currentItem.subtitle}</p>
+                <p className="text-muted-foreground truncate text-base">{currentItem.subtitle}</p>
               </div>
 
-              <div className="shrink-0">
-                <Button
-                  asChild
-                  size="sm"
-                  variant="primary"
-                  className="hover:bg-header-red-light gap-1 text-white"
-                >
-                  <a href={currentItem.link}>
-                    {t("stickyBanner.viewDetails")}
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </a>
-                </Button>
-              </div>
+              {currentItem.showDetailsButton ? (
+                <div className="shrink-0">
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="primary"
+                    className="hover:bg-header-red-light gap-1 text-base text-white"
+                  >
+                    <a href={currentItem.link}>
+                      {t("stickyBanner.viewDetails")}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </a>
+                  </Button>
+                </div>
+              ) : null}
             </div>
 
             <div className="mt-4 flex items-center justify-center gap-1.5">

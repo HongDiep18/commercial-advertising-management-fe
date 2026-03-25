@@ -3,6 +3,7 @@
 import { usePopupPriorityCompanies } from "@/api/active-ads/hooks"
 import Button from "@/components/ui/Button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/shadcn-dialog/dialog"
+import { getFirstActiveAdAssetImageUrl } from "@/lib/ad-assets"
 import { Building2, ExternalLink, X } from "lucide-react"
 import Link from "next/link"
 import { VisuallyHidden } from "radix-ui"
@@ -11,6 +12,8 @@ import { useTranslation } from "react-i18next"
 
 const ROTATION_INTERVAL_MS = 10_000
 const STORAGE_KEY = "popup-priority-hidden-date"
+const DEFAULT_HERO_IMAGE_URL =
+  "/assets/images/professional-business-conference-with-people-netwo.jpg"
 
 function getTodayKey(): string {
   return new Date().toDateString()
@@ -28,7 +31,8 @@ export default function PopupPriorityCompanyModal() {
     return hiddenDate === getTodayKey()
   })
 
-  const safeCompanyIndex = companies.length === 0 ? 0 : Math.min(activeCompanyIndex, companies.length - 1)
+  const safeCompanyIndex =
+    companies.length === 0 ? 0 : Math.min(activeCompanyIndex, companies.length - 1)
 
   useEffect(() => {
     if (companies.length === 0) return
@@ -41,7 +45,8 @@ export default function PopupPriorityCompanyModal() {
     if (!open) return
     if (companies.length <= 1) return
     const timer = window.setInterval(() => {
-      setActiveCompanyIndex((prevIndex) => (prevIndex + 1) % companies.length)
+      // setActiveCompanyIndex((prevIndex) => (prevIndex + 1) % companies.length)
+      setActiveCompanyIndex(0)
     }, ROTATION_INTERVAL_MS)
     return () => window.clearInterval(timer)
   }, [companies.length, open])
@@ -58,6 +63,7 @@ export default function PopupPriorityCompanyModal() {
   if (!company || isHiddenToday) return null
 
   const href = company.adLinkUrl || `/directory/${company.id}`
+  const heroImageUrl = getFirstActiveAdAssetImageUrl(company, DEFAULT_HERO_IMAGE_URL)
 
   if (!open) return null
 
@@ -65,7 +71,7 @@ export default function PopupPriorityCompanyModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         showCloseButton={false}
-        className="bg-card border-border w-full max-w-lg gap-2 overflow-hidden rounded-xl border p-0 shadow-2xl"
+        className="bg-card border-border shadow-10xl 3xl:max-w-6xl z-10000! flex max-h-[90vh] w-full max-w-2xl flex-col gap-2 overflow-hidden rounded-xl border p-0 2xl:max-w-4xl"
       >
         <VisuallyHidden.Root>
           <DialogTitle>{company.name}</DialogTitle>
@@ -79,17 +85,10 @@ export default function PopupPriorityCompanyModal() {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="bg-muted relative aspect-[4/3] overflow-hidden">
-          <img
-            src={"/assets/images/professional-business-conference-with-people-netwo.jpg"}
-            alt={company.name}
-            className="h-full w-full object-cover"
-          />
+        <div className="bg-muted relative aspect-video max-h-[55vh] w-full shrink-0 overflow-hidden">
+          <img src={heroImageUrl} alt={company.name} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute right-4 bottom-4 left-4">
-            <span className="bg-primary text-primary-foreground mb-2 inline-block rounded px-2 py-1 text-xs font-medium">
-              {t("popupPriority.heroBadge")}
-            </span>
             <h3 className="mb-1 text-xl font-bold text-white">{t("popupPriority.heroTitle")}</h3>
             <p className="text-sm text-white/80">{t("popupPriority.heroDescription")}</p>
           </div>
@@ -122,12 +121,14 @@ export default function PopupPriorityCompanyModal() {
           <p className="text-muted-foreground line-clamp-3 text-sm">{company.description}</p>
 
           <div className="mt-4 flex gap-2">
-            <Button variant="primary" className="flex-1" asChild>
-              <Link href={href} target={company.adLinkUrl ? "_blank" : undefined}>
-                {t("popupPriority.view")}
-                <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-              </Link>
-            </Button>
+            {company.showDetailsButton && (
+              <Button variant="primary" className="flex-1" asChild>
+                <Link href={href} target={company.adLinkUrl ? "_blank" : undefined}>
+                  {t("popupPriority.view")}
+                  <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" className="flex-1" onClick={handleClose}>
               {t("popupPriority.close")}
             </Button>

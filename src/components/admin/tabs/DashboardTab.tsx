@@ -1,11 +1,14 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
-import { Building2, Clock, TrendingUp, AlertTriangle } from "lucide-react"
-import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
+
+import { Building2, Clock, AlertTriangle, Newspaper } from "lucide-react"
+import Card, { CardContent } from "@/components/ui/Card"
+
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
 import { useCompanyDirectory } from "@/api/companies/hooks"
+import { usePublishedProperties } from "@/api/properties/hooks"
 
 export function DashboardTab() {
   const { t } = useTranslation()
@@ -18,7 +21,12 @@ export function DashboardTab() {
     { page: 1, limit: 1, sortBy: "name", sortOrder: "asc" },
     true
   )
+  const { data: propertiesData, isLoading: isPropertiesLoading } = usePublishedProperties(
+    { page: 1, limit: 1, sortBy: "createdAt", sortOrder: "desc" },
+    true
+  )
   const totalCompanies = companiesDirectoryData?.pagination.total ?? 0
+  const totalProperties = propertiesData?.pagination.total ?? 0
 
   const stats = [
     {
@@ -35,48 +43,12 @@ export function DashboardTab() {
       trend: "",
       color: "text-amber-600",
     },
-    // {
-    //   labelKey: "newsCount",
-    //   value: "359",
-    //   icon: Newspaper,
-    //   trendKey: "trendToday",
-    //   color: "text-green-600",
-    // },
     {
       labelKey: "propertyViews",
-      value: "1,302",
-      icon: TrendingUp,
+      value: isPropertiesLoading ? "..." : totalProperties.toLocaleString(),
+      icon: Newspaper,
       trend: "",
       color: "text-primary",
-    },
-  ]
-
-  const recentActivities = [
-    {
-      time: "14:30",
-      actionKey: "activityNewCompany",
-      detailKey: "activityCompanyDetail",
-      type: "company",
-    },
-    {
-      time: "13:15",
-      actionKey: "activityNewsCrawl",
-      detailKey: "activityNewsDetail",
-      type: "news",
-    },
-    { time: "12:00", actionKey: "activityAdOrder", detailKey: "activityAdDetail", type: "ad" },
-    {
-      time: "10:45",
-      actionKey: "activityPropertyUpdate",
-      detailKey: "activityPropertyDetail",
-      type: "property",
-    },
-    { time: "09:30", actionKey: "activityUserReg", detailKey: "activityUserDetail", type: "user" },
-    {
-      time: "08:00",
-      actionKey: "activitySystem",
-      detailKey: "activitySystemDetail",
-      type: "system",
     },
   ]
 
@@ -118,32 +90,6 @@ export function DashboardTab() {
                 {t("admin.dashboard.pendingAlert", { count: pendingCount })}
               </p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">{t("admin.dashboard.recentActivity")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {recentActivities.map((activity, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span className="text-muted-foreground w-12 shrink-0 pt-0.5 text-xs">
-                  {activity.time}
-                </span>
-                <div className="bg-primary mt-1.5 h-2 w-2 shrink-0 rounded-full" />
-                <div>
-                  <p className="text-foreground text-sm font-medium">
-                    {t(`admin.dashboard.${activity.actionKey}`)}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    {t(`admin.dashboard.${activity.detailKey}`)}
-                  </p>
-                </div>
-              </div>
-            ))}
           </div>
         </CardContent>
       </Card>
