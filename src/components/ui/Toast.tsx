@@ -1,9 +1,15 @@
 "use client"
 
 import { useEffect } from "react"
-import { CheckCircle2, XCircle, AlertCircle, X } from "lucide-react"
+import { CheckCircle2, XCircle, AlertCircle, X, ArrowRight } from "lucide-react"
+import Link from "next/link"
 
 export type ToastVariant = "success" | "error" | "warning" | "info"
+
+export type ToastAction = {
+  label: string
+  href: string
+}
 
 export type ToastProps = {
   message: string
@@ -11,6 +17,7 @@ export type ToastProps = {
   visible: boolean
   onClose: () => void
   duration?: number
+  action?: ToastAction
 }
 
 const variantStyles: Record<
@@ -49,6 +56,7 @@ export function Toast({
   visible,
   onClose,
   duration = 4000,
+  action,
 }: ToastProps) {
   const style = variantStyles[variant]
   const Icon = style.icon
@@ -68,12 +76,22 @@ export function Toast({
       className="animate-in fade-in slide-in-from-right-4 fixed top-16 right-4 z-[100] w-full max-w-xs duration-300 sm:top-[4.5rem] sm:right-6"
     >
       <div
-        className={`flex items-center gap-3 rounded-xl px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.25)] ${style.accent} ${style.border} dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]`}
+        className={`flex items-start gap-3 rounded-xl px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.25)] ${style.accent} ${style.border} dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]`}
       >
-        <Icon className={`h-5 w-5 flex-shrink-0 ${style.iconColor}`} aria-hidden />
-        <p className="min-w-0 flex-1 text-sm font-semibold text-slate-800 dark:text-slate-100">
-          {message}
-        </p>
+        <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${style.iconColor}`} aria-hidden />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{message}</p>
+          {action && (
+            <Link
+              href={action.href}
+              onClick={onClose}
+              className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-slate-600 underline-offset-2 hover:underline dark:text-slate-300"
+            >
+              {action.label}
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
         <button
           type="button"
           onClick={onClose}

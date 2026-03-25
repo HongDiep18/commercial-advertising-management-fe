@@ -202,7 +202,7 @@
     "orderTitle": "Đặt quảng cáo",
     "startDateRequired": "Vui lòng chọn ngày bắt đầu cho từng mục quảng cáo.",
     "demoOrderInfo": "Đây là tài khoản demo. Đơn hàng chỉ để trải nghiệm và sẽ không được gửi thực tế.",
-    "overlapWarning": "Bạn đã có đơn hàng cho gói quảng cáo này với thời gian trùng lặp. Vui lòng chọn ngày khác hoặc bỏ đơn trùng.",
+    "overlapWarning": "Bạn đã có đơn hàng cho gói quảng cáo này với thời gian trùng lặp. Vui lòng chọn ngày khác.",
     "companyInfo": "Thông tin công ty",
     "companyName": "Tên công ty",
     "contactPerson": "Người liên hệ",
@@ -480,6 +480,7 @@
       "note4": "Hạn chót: 31 tháng 10 năm 2024."
     },
     "orderSuccess": "Cảm ơn bạn đã đặt hàng!\n\nĐã chọn {{count}} mục quảng cáo\nChúng tôi sẽ liên hệ với bạn sớm để xác nhận chi tiết.",
+    "viewOrders": "Xem đơn hàng",
     "orderError": "Đơn hàng của bạn không thể hoàn tất. Vui lòng thử lại.",
     "inquirySuccess": "Cảm ơn bạn đã tư vấn, chúng tôi sẽ trả lời bạn sớm nhất có thể!",
     "mustLoginToOrder": "Bạn cần đăng nhập để đặt hàng"

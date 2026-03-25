@@ -80,6 +80,7 @@ export default function OrderModal({
 
   const [itemDetails, setItemDetails] = useState<Record<string, ItemDetail>>({})
   const [openCalendar, setOpenCalendar] = useState<string | null>(null)
+  const [calendarDefaultMonth, setCalendarDefaultMonth] = useState<Date | undefined>(undefined)
 
   const [phoneError, setPhoneError] = useState<string | null>(null)
   const [slotError, setSlotError] = useState<string | null>(null)
@@ -118,6 +119,13 @@ export default function OrderModal({
       }
     })()
   }, [i18n.language, isAuthReady, isLoggedIn, isOpen])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSlotError(null)
+      setCalendarDefaultMonth(undefined)
+    }
+  }, [isOpen])
 
   const handleStartDateChange = (
     itemId: string,
@@ -218,11 +226,15 @@ export default function OrderModal({
 
     try {
       const existingItems = await getMyPendingOrderItems()
-      if (hasOverlapWithExistingOrders(existingItems, newItems)) {
-        alert(
+      const { overlap, suggestedDate } = hasOverlapWithExistingOrders(existingItems, newItems)
+      if (overlap) {
+        setSlotError(
           t("adContact.overlapWarning") ||
             "You already have an order for this advertising package with overlapping dates. Please choose different dates."
         )
+        if (suggestedDate) {
+          setCalendarDefaultMonth(suggestedDate)
+        }
         return
       }
     } catch (err) {
@@ -377,6 +389,7 @@ export default function OrderModal({
                     onRemoveFile={(index) => removeFile(item.id, index)}
                     onCalendarOpenChange={(open) => setOpenCalendar(open ? item.id : null)}
                     slotError={slotError}
+                    calendarDefaultMonth={calendarDefaultMonth}
                   />
                 )
               })}

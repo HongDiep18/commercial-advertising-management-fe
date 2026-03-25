@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
+import { useEffect, useRef, useMemo } from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Upload, X } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
@@ -40,6 +41,7 @@ interface AdItemFormProps {
   onRemoveFile: (index: number) => void
   onCalendarOpenChange: (open: boolean) => void
   slotError?: string | null
+  calendarDefaultMonth?: Date
 }
 
 export default function AdItemForm({
@@ -52,9 +54,17 @@ export default function AdItemForm({
   onRemoveFile,
   onCalendarOpenChange,
   slotError,
+  calendarDefaultMonth,
 }: AdItemFormProps) {
   const { t, i18n } = useTranslation()
+  const slotErrorRef = useRef<HTMLParagraphElement>(null)
   const isSlot = isSlotPackageType(item.packageType)
+
+  useEffect(() => {
+    if (slotError && slotErrorRef.current) {
+      slotErrorRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }, [slotError])
   const { data: bookedDatesData } = useBookedDates(item.packageType)
 
   const formatDate = (date: Date) => {
@@ -73,6 +83,18 @@ export default function AdItemForm({
       return (rangeEnd === null || date < rangeEnd) && endDate > rangeStart
     })
   }
+
+  const firstAvailableDate = useMemo(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    for (let i = 0; i < 365; i++) {
+      const date = new Date(today)
+      date.setDate(today.getDate() + i)
+      const disabled = isSlot ? isDateDisabledBySlot(date) : isDateDisabled(item.id, date)
+      if (!disabled) return date
+    }
+    return today
+  }, [bookedDatesData, item.id, isSlot]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="bg-card rounded-lg p-5 shadow-sm">
@@ -116,6 +138,7 @@ export default function AdItemForm({
                 </p>
               </div>
               <Calendar
+                key={(calendarDefaultMonth ?? firstAvailableDate).toISOString()}
                 mode="single"
                 selected={itemDetails.startDate ? new Date(itemDetails.startDate) : undefined}
                 onSelect={onStartDateChange}
@@ -133,11 +156,12 @@ export default function AdItemForm({
                 className="w-full"
                 initialFocus
                 localeCode={i18n.language}
+                defaultMonth={calendarDefaultMonth ?? firstAvailableDate}
               />
             </PopoverContent>
           </Popover>
-          {slotError && isSlot && (
-            <p className="text-sm text-red-500">{slotError}</p>
+          {slotError && (
+            <p ref={slotErrorRef} className="text-sm text-red-500">{slotError}</p>
           )}
         </div>
         <div className="space-y-2">
