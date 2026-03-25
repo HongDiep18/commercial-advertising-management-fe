@@ -28,14 +28,6 @@ function rangesOverlap(startA: number, endA: number, startB: number, endB: numbe
 }
 
 function isSameSlot(newItem: NewOrderItem, existing: ExistingOrderItem): boolean {
-  if (
-    newItem.pricingId != null &&
-    newItem.pricingId !== "" &&
-    existing.pricingId != null &&
-    existing.pricingId !== ""
-  ) {
-    return newItem.pricingId === existing.pricingId
-  }
   return String(newItem.packageName).trim().toLowerCase() === String(existing.packageName).trim().toLowerCase()
 }
 
