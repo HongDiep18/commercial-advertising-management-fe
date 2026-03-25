@@ -15,6 +15,7 @@ import {
   AccountUpgradeModal,
   AccountProfileModal,
   AccountBenefitsModal,
+  AccountIndustrySelectionModal,
   REGION_KEYS_BY_COUNTRY,
   COUNTRY_NONE,
 } from "@/components/account"
@@ -25,6 +26,7 @@ import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
 import { getDemoProfileForUser } from "@/components/login/demo"
 import { getCountryOptions } from "@/components/register/registerOptions"
+import { api } from "@/lib/api"
 
 function normalizeMembershipTier(value: unknown): MembershipTier | null {
   if (typeof value !== "string") return null
@@ -73,7 +75,7 @@ function apiProfileToFormData(api: ProfileResponse, fallbackEmail?: string): Pro
   }
 }
 
-type Modals = { upgrade: boolean; benefits: boolean; profile: boolean }
+type Modals = { upgrade: boolean; benefits: boolean; profile: boolean; industrySelection: boolean }
 type LogoState = { url: string | null; file: File | null; uploaded: boolean; changed: boolean }
 type ProfileState = { data: ProfileFormData; isSaving: boolean }
 type ToastState = { message: string; variant: ToastVariant; visible: boolean }
@@ -90,7 +92,7 @@ function mapIsoCountryToRegionKey(country: string): string {
 export default function AccountPage() {
   const router = useRouter()
   const { t, i18n } = useTranslation()
-  const { user, isLoggedIn, getMemberTier } = useUser()
+  const { user, isLoggedIn, getMemberTier, setUser } = useUser()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const adOrdersSectionRef = useRef<HTMLDivElement>(null)
 
@@ -98,6 +100,7 @@ export default function AccountPage() {
     upgrade: false,
     benefits: false,
     profile: false,
+    industrySelection: false,
   })
   const [logo, setLogo] = useState<LogoState>({
     url: null,
@@ -168,10 +171,10 @@ export default function AccountPage() {
             if (apiProfile?.uploadLogo)
               setLogo((l) => ({ ...l, url: apiProfile.uploadLogo!, uploaded: true }))
           })
-          .catch(() => {})
+          .catch(() => { })
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modals.profile])
 
   const applyApiProfile = (apiProfile: ProfileResponse, currentEmail?: string) => {
@@ -198,15 +201,15 @@ export default function AccountPage() {
       return
     }
     let cancelled = false
-    ;(async () => {
-      try {
-        const apiProfile = await getProfile()
-        if (!apiProfile || cancelled) return
-        applyApiProfile(apiProfile)
-      } catch (err) {
-        console.error(err)
-      }
-    })()
+      ; (async () => {
+        try {
+          const apiProfile = await getProfile()
+          if (!apiProfile || cancelled) return
+          applyApiProfile(apiProfile)
+        } catch (err) {
+          console.error(err)
+        }
+      })()
     return () => {
       cancelled = true
     }
@@ -220,15 +223,15 @@ export default function AccountPage() {
       return
     }
     let cancelled = false
-    ;(async () => {
-      try {
-        const apiProfile = await getProfile()
-        if (!apiProfile || cancelled) return
-        applyApiProfile(apiProfile, user?.email)
-      } catch (err) {
-        console.error(err)
-      }
-    })()
+      ; (async () => {
+        try {
+          const apiProfile = await getProfile()
+          if (!apiProfile || cancelled) return
+          applyApiProfile(apiProfile, user?.email)
+        } catch (err) {
+          console.error(err)
+        }
+      })()
     return () => {
       cancelled = true
     }
@@ -350,6 +353,43 @@ export default function AccountPage() {
     adOrdersSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
+  const handleSaveIndustrySelection = async (selected: string[]) => {
+    try {
+      const response = await api.request<{
+        message: string
+        user: {
+          id: string
+          email: string
+          membershipTier: string
+          primaryIndustry: string | null
+          selectedIndustries: string[]
+          industriesSelected: boolean
+        }
+      }>('/auth/profile/industries', {
+        method: 'PATCH',
+        body: { selectedIndustries: selected }
+      })
+
+      // Update user context with new selectedIndustries from response
+      if (user && response.user) {
+        setUser({
+          ...user,
+          selectedIndustries: response.user.selectedIndustries
+        })
+      }
+
+      showToast(
+        t("account.industrySelectionSaved") || "產業選擇已儲存！",
+        "success"
+      )
+    } catch (error) {
+      console.error("Failed to save industry selection:", error)
+      const errorMessage = error instanceof Error ? error.message : "儲存失敗，請稍後再試"
+      showToast(errorMessage, "error")
+      throw error
+    }
+  }
+
   if (!isLoggedIn || !user) {
     return null
   }
@@ -385,6 +425,60 @@ export default function AccountPage() {
                 onHowToUpgrade={() => setModals((m) => ({ ...m, upgrade: true }))}
               />
             )}
+
+            {memberTier === MembershipTier.GOLD && user.role !== UserRole.Admin && (() => {
+              const hasSelectedIndustries = (user.selectedIndustries || []).length === 3
+              const canSelectIndustries = !hasSelectedIndustries
+
+              return (
+                <div className="bg-card border-border rounded-lg border p-6">
+                  <h3 className="text-foreground mb-2 text-lg font-semibold">
+                    {hasSelectedIndustries
+                      ? t("account.industrySelection.selectedTitle", {
+                        defaultValue: "已選擇的產業",
+                      })
+                      : t("account.industrySelection.cardTitle", {
+                        defaultValue: "產業選擇設定",
+                      })}
+                  </h3>
+                  {hasSelectedIndustries ? (
+                    <div className="space-y-2">
+                      <p className="text-muted-foreground mb-3 text-sm">
+                        {t("account.industrySelection.selectedDescription", {
+                          defaultValue: "您已選擇以下3個產業",
+                        })}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {user.selectedIndustries.map((industry) => (
+                          <span
+                            key={industry}
+                            className="bg-primary/10 text-primary border-primary inline-flex items-center rounded-md border px-3 py-1 text-sm"
+                          >
+                            {t(`directory.categories.${industry}`, { defaultValue: industry })}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-muted-foreground mb-4 text-sm">
+                        {t("account.industrySelection.cardDescription", {
+                          defaultValue: "金牌會員可選擇3個產業",
+                        })}
+                      </p>
+                      <button
+                        onClick={() => setModals((m) => ({ ...m, industrySelection: true }))}
+                        className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                      >
+                        {t("account.industrySelection.manageButton", {
+                          defaultValue: "管理產業選擇 →",
+                        })}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )
+            })()}
 
             {user.role !== UserRole.Admin && <AccountPointsHistory />}
 
@@ -433,6 +527,15 @@ export default function AccountPage() {
         open={modals.benefits}
         onClose={() => setModals((m) => ({ ...m, benefits: false }))}
         memberTier={memberTier}
+        t={t}
+      />
+
+      <AccountIndustrySelectionModal
+        open={modals.industrySelection}
+        onClose={() => setModals((m) => ({ ...m, industrySelection: false }))}
+        primaryIndustry={user.primaryIndustry}
+        selectedIndustries={user.selectedIndustries || []}
+        onSave={handleSaveIndustrySelection}
         t={t}
       />
 

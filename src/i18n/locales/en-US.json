@@ -7,6 +7,8 @@
     "contact": "Contact",
     "close": "Close",
     "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
     "required": "Required"
   },
   "header": {
@@ -851,7 +853,19 @@
     "of": "of",
     "previousPage": "Previous",
     "nextPage": "Next",
-    "closeModal": "Close"
+    "closeModal": "Close",
+    "industrySelectionSaved": "Industry selection saved!",
+    "industrySelection": {
+      "cardTitle": "Industry Selection Settings",
+      "cardDescription": "Gold members can select 3 industries",
+      "manageButton": "Manage Industry Selection →",
+      "title": "Select Industries",
+      "selectedTitle": "Selected Industries",
+      "selectedDescription": "You have selected the following 3 industries",
+      "additionalIndustries": "Select 3 industries",
+      "selectedCount": "Selected {{count}}/3",
+      "exactlyThreeRequired": "Please select exactly 3 industries"
+    }
   },
   "adContactForm": {
     "title": "Admin Panel",
@@ -888,6 +902,7 @@
     "adTypeProduct": "Product"
   },
   "companyDetail": {
+    "loading": "Loading...",
     "upgradeBanner": {
       "guest": "You are currently a guest and can only view partial company names and regions",
       "bronze": "You are currently a Bronze member. Upgrade to view complete information including website, phone, and address",

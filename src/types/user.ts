@@ -10,13 +10,13 @@ export enum UserRole {
 
 export type User = {
   id: string
-  companyId?: string
+  companyId: string | null
   email: string
-  name: string
+  name?: string
   role: UserRole
-  contributionPoints: number
-  commercialPoints: number
-  createdAt: string
+  membershipTier: MembershipTier
+  primaryIndustry: string | null
+  selectedIndustries: string[]
 }
 
 export type SetUserFn = (user: User | null) => void
