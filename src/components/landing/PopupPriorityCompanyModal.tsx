@@ -71,7 +71,7 @@ export default function PopupPriorityCompanyModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         showCloseButton={false}
-        className="bg-card border-border shadow-10xl 3xl:max-w-6xl z-10000! flex max-h-[90vh] w-full max-w-2xl flex-col gap-2 overflow-hidden rounded-xl border p-0 2xl:max-w-4xl"
+        className="bg-card border-border shadow-10xl 3xl:max-w-6xl flex max-h-[90vh] w-full max-w-2xl flex-col gap-2 overflow-hidden rounded-xl border p-0 2xl:max-w-4xl"
       >
         <VisuallyHidden.Root>
           <DialogTitle>{company.name}</DialogTitle>
