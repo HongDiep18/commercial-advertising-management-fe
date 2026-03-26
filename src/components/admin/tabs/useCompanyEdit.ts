@@ -43,15 +43,6 @@ type UseCompanyEditParams = {
   onCompanyEmailResolved: (companyId: string, email: string | null) => void
 }
 
-function mapIsoCountryToRegionKey(country: string): string {
-  if (!country) return "other"
-  const c = country.trim().toUpperCase()
-  if (c === "VN") return "vietnam"
-  if (c === "TW") return "taiwan"
-  if (c === "CN") return "china"
-  return "other"
-}
-
 const EMPTY_EDIT_LOGO: EditLogoState = {
   url: null,
   file: null,
@@ -105,13 +96,15 @@ export function useCompanyEdit({
     return result
   }, [t])
 
-  const hasCountry = Boolean(editProfile.country?.trim())
-  const regionCountryKey = hasCountry ? mapIsoCountryToRegionKey(editProfile.country) : "other"
-  const availableRegions = hasCountry
-    ? regionsByCountry[regionCountryKey] || regionsByCountry.other
-    : []
-  const regionInList = hasCountry && availableRegions.some((r) => r.value === editProfile.region)
-  const regionValue = hasCountry && regionInList ? editProfile.region : ""
+  const allRegions = useMemo(() => {
+    const byValue = new Map<string, { value: string; label: string }>()
+    for (const list of Object.values(regionsByCountry)) {
+      for (const r of list) {
+        if (!byValue.has(r.value)) byValue.set(r.value, r)
+      }
+    }
+    return Array.from(byValue.values())
+  }, [regionsByCountry])
 
   const closeCompanyEdit = () => {
     if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
@@ -172,7 +165,7 @@ export function useCompanyEdit({
     const nextProfile = (() => {
       if (field === "country") {
         const nextCountry = value === COUNTRY_NONE ? "" : value
-        return { ...editProfile, country: nextCountry, region: "" }
+        return { ...editProfile, country: nextCountry }
       }
       return { ...editProfile, [field]: value }
     })()
@@ -300,9 +293,7 @@ export function useCompanyEdit({
     },
     ui: {
       countries,
-      availableRegions,
-      regionValue,
-      hasCountry,
+      allRegions,
       editFileInputRef,
     },
     actions: {

@@ -563,9 +563,7 @@ export function CompaniesTab() {
           onSave={() => void companyEdit.actions.handleSaveCompanyEdit()}
           isSaving={companyEdit.state.editSaving}
           countries={companyEdit.ui.countries}
-          availableRegions={companyEdit.ui.availableRegions}
-          regionValue={companyEdit.ui.regionValue}
-          hasCountry={companyEdit.ui.hasCountry}
+          allRegions={companyEdit.ui.allRegions}
           readOnly={!canEditCompanyProfile}
           t={t}
         />

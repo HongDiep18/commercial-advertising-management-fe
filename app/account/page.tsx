@@ -80,15 +80,6 @@ type LogoState = { url: string | null; file: File | null; uploaded: boolean; cha
 type ProfileState = { data: ProfileFormData; isSaving: boolean }
 type ToastState = { message: string; variant: ToastVariant; visible: boolean }
 
-function mapIsoCountryToRegionKey(country: string): string {
-  if (!country) return "other"
-  const c = country.trim().toUpperCase()
-  if (c === "VN" || c === "VNM") return "vietnam"
-  if (c === "TW" || c === "TWN") return "taiwan"
-  if (c === "CN" || c === "CHN") return "china"
-  return "other"
-}
-
 export default function AccountPage() {
   const router = useRouter()
   const { t, i18n } = useTranslation()
@@ -142,13 +133,16 @@ export default function AccountPage() {
     return result
   }, [t])
 
-  const hasCountry = Boolean(profileData.country?.trim())
-  const regionCountryKey = hasCountry ? mapIsoCountryToRegionKey(profileData.country) : "other"
-  const availableRegions = hasCountry
-    ? regionsByCountry[regionCountryKey] || regionsByCountry.other
-    : []
-  const regionInList = hasCountry && availableRegions.some((r) => r.value === profileData.region)
-  const regionValue = hasCountry && regionInList ? profileData.region : ""
+  const allRegions = useMemo(() => {
+    const byValue = new Map<string, { value: string; label: string }>()
+    for (const list of Object.values(regionsByCountry)) {
+      if (!Array.isArray(list)) continue
+      for (const r of list) {
+        if (!byValue.has(r.value)) byValue.set(r.value, r)
+      }
+    }
+    return Array.from(byValue.values())
+  }, [regionsByCountry])
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -171,7 +165,7 @@ export default function AccountPage() {
             if (apiProfile?.uploadLogo)
               setLogo((l) => ({ ...l, url: apiProfile.uploadLogo!, uploaded: true }))
           })
-          .catch(() => { })
+          .catch(() => {})
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -201,15 +195,15 @@ export default function AccountPage() {
       return
     }
     let cancelled = false
-      ; (async () => {
-        try {
-          const apiProfile = await getProfile()
-          if (!apiProfile || cancelled) return
-          applyApiProfile(apiProfile)
-        } catch (err) {
-          console.error(err)
-        }
-      })()
+    ;(async () => {
+      try {
+        const apiProfile = await getProfile()
+        if (!apiProfile || cancelled) return
+        applyApiProfile(apiProfile)
+      } catch (err) {
+        console.error(err)
+      }
+    })()
     return () => {
       cancelled = true
     }
@@ -223,15 +217,15 @@ export default function AccountPage() {
       return
     }
     let cancelled = false
-      ; (async () => {
-        try {
-          const apiProfile = await getProfile()
-          if (!apiProfile || cancelled) return
-          applyApiProfile(apiProfile, user?.email)
-        } catch (err) {
-          console.error(err)
-        }
-      })()
+    ;(async () => {
+      try {
+        const apiProfile = await getProfile()
+        if (!apiProfile || cancelled) return
+        applyApiProfile(apiProfile, user?.email)
+      } catch (err) {
+        console.error(err)
+      }
+    })()
     return () => {
       cancelled = true
     }
@@ -365,23 +359,20 @@ export default function AccountPage() {
           selectedIndustries: string[]
           industriesSelected: boolean
         }
-      }>('/auth/profile/industries', {
-        method: 'PATCH',
-        body: { selectedIndustries: selected }
+      }>("/auth/profile/industries", {
+        method: "PATCH",
+        body: { selectedIndustries: selected },
       })
 
       // Update user context with new selectedIndustries from response
       if (user && response.user) {
         setUser({
           ...user,
-          selectedIndustries: response.user.selectedIndustries
+          selectedIndustries: response.user.selectedIndustries,
         })
       }
 
-      showToast(
-        t("account.industrySelectionSaved") || "產業選擇已儲存！",
-        "success"
-      )
+      showToast(t("account.industrySelectionSaved") || "產業選擇已儲存！", "success")
     } catch (error) {
       console.error("Failed to save industry selection:", error)
       const errorMessage = error instanceof Error ? error.message : "儲存失敗，請稍後再試"
@@ -426,59 +417,60 @@ export default function AccountPage() {
               />
             )}
 
-            {memberTier === MembershipTier.GOLD && user.role !== UserRole.Admin && (() => {
-              const hasSelectedIndustries = (user.selectedIndustries || []).length === 3
-              const canSelectIndustries = !hasSelectedIndustries
+            {memberTier === MembershipTier.GOLD &&
+              user.role !== UserRole.Admin &&
+              (() => {
+                const hasSelectedIndustries = (user.selectedIndustries || []).length === 3
 
-              return (
-                <div className="bg-card border-border rounded-lg border p-6">
-                  <h3 className="text-foreground mb-2 text-lg font-semibold">
-                    {hasSelectedIndustries
-                      ? t("account.industrySelection.selectedTitle", {
-                        defaultValue: "已選擇的產業",
-                      })
-                      : t("account.industrySelection.cardTitle", {
-                        defaultValue: "產業選擇設定",
-                      })}
-                  </h3>
-                  {hasSelectedIndustries ? (
-                    <div className="space-y-2">
-                      <p className="text-muted-foreground mb-3 text-sm">
-                        {t("account.industrySelection.selectedDescription", {
-                          defaultValue: "您已選擇以下3個產業",
-                        })}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {user.selectedIndustries.map((industry) => (
-                          <span
-                            key={industry}
-                            className="bg-primary/10 text-primary border-primary inline-flex items-center rounded-md border px-3 py-1 text-sm"
-                          >
-                            {t(`directory.categories.${industry}`, { defaultValue: industry })}
-                          </span>
-                        ))}
+                return (
+                  <div className="bg-card border-border rounded-lg border p-6">
+                    <h3 className="text-foreground mb-2 text-lg font-semibold">
+                      {hasSelectedIndustries
+                        ? t("account.industrySelection.selectedTitle", {
+                            defaultValue: "已選擇的產業",
+                          })
+                        : t("account.industrySelection.cardTitle", {
+                            defaultValue: "產業選擇設定",
+                          })}
+                    </h3>
+                    {hasSelectedIndustries ? (
+                      <div className="space-y-2">
+                        <p className="text-muted-foreground mb-3 text-sm">
+                          {t("account.industrySelection.selectedDescription", {
+                            defaultValue: "您已選擇以下3個產業",
+                          })}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {user.selectedIndustries.map((industry) => (
+                            <span
+                              key={industry}
+                              className="bg-primary/10 text-primary border-primary inline-flex items-center rounded-md border px-3 py-1 text-sm"
+                            >
+                              {t(`directory.categories.${industry}`, { defaultValue: industry })}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-muted-foreground mb-4 text-sm">
-                        {t("account.industrySelection.cardDescription", {
-                          defaultValue: "金牌會員可選擇3個產業",
-                        })}
-                      </p>
-                      <button
-                        onClick={() => setModals((m) => ({ ...m, industrySelection: true }))}
-                        className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
-                      >
-                        {t("account.industrySelection.manageButton", {
-                          defaultValue: "管理產業選擇 →",
-                        })}
-                      </button>
-                    </>
-                  )}
-                </div>
-              )
-            })()}
+                    ) : (
+                      <>
+                        <p className="text-muted-foreground mb-4 text-sm">
+                          {t("account.industrySelection.cardDescription", {
+                            defaultValue: "金牌會員可選擇3個產業",
+                          })}
+                        </p>
+                        <button
+                          onClick={() => setModals((m) => ({ ...m, industrySelection: true }))}
+                          className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                        >
+                          {t("account.industrySelection.manageButton", {
+                            defaultValue: "管理產業選擇 →",
+                          })}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )
+              })()}
 
             {user.role !== UserRole.Admin && <AccountPointsHistory />}
 
@@ -516,9 +508,7 @@ export default function AccountPage() {
         onSave={handleSaveProfile}
         isSaving={profile.isSaving}
         countries={countries}
-        availableRegions={availableRegions}
-        regionValue={regionValue}
-        hasCountry={hasCountry}
+        allRegions={allRegions}
         readOnly={user.role !== UserRole.Admin}
         t={t}
       />
