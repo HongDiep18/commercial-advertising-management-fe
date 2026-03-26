@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next"
 
-import { AlertTriangle, Building2, Clock, Newspaper } from "lucide-react"
+import { Building2, Clock, Newspaper } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
 
 import { useAdminData } from "../AdminDataContext"
@@ -82,20 +82,6 @@ export function DashboardTab() {
           )
         })}
       </div>
-
-      <Card className="!bg-admin-yellow !border-admin-yellow-border">
-        <CardContent className="p-4 pt-7">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-            <div>
-              <p className="font-medium text-amber-800">{t("admin.dashboard.attentionRequired")}</p>
-              <p className="mt-1 text-sm text-amber-700">
-                {t("admin.dashboard.pendingAlert", { count: pendingCount })}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <DashboardNotificationsCard />
     </div>
