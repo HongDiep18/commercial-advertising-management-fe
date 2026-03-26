@@ -9,7 +9,22 @@ export type AdminNotificationItem = {
   entityId: string
   isRead: boolean
   readAt?: string | null
-  metadata?: Record<string, unknown>
+  metadata?: AdminNotificationMetadata
+}
+
+export type AdminNotificationTranslationLocale = "vi" | "en" | "zhTw"
+
+export type AdminNotificationTranslationFields = {
+  title?: Partial<Record<AdminNotificationTranslationLocale, string>>
+  content?: Partial<Record<AdminNotificationTranslationLocale, string>>
+}
+
+export type AdminNotificationMetadata = {
+  source?: string
+  defaultLocale?: AdminNotificationTranslationLocale | string
+  locales?: string[]
+  translations?: AdminNotificationTranslationFields
+  [key: string]: unknown
 }
 
 export type AdminNotificationsPagination = {

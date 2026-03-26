@@ -1197,7 +1197,20 @@
       "notificationsMarkAsRead": "標記為已讀",
       "notificationsMarkAllAsRead": "全部標記為已讀",
       "notificationsMarkAsReadError": "無法將此通知標記為已讀。",
-      "notificationsMarkAllAsReadError": "無法將全部通知標記為已讀。"
+      "notificationsMarkAllAsReadError": "無法將全部通知標記為已讀。",
+      "notificationsEventTypeLabels": {
+        "ad_order_created": "新的廣告訂單",
+        "profile_request_submitted": "新的註冊申請",
+        "profile_request_approved": "註冊申請已核准",
+        "profile_request_status_changed": "註冊申請狀態已變更",
+        "company_updated_by_admin": "管理員已更新公司",
+        "user_status_changed": "使用者狀態已變更",
+        "user_soft_deleted": "使用者已刪除",
+        "set_password_completed": "密碼設定已完成",
+        "user_password_changed": "使用者密碼已變更",
+        "loyalty_points_awarded": "已發放忠誠點數",
+        "loyalty_tier_recalculated": "忠誠等級已重新計算"
+      }
     },
     "companies": {
       "all": "全部",
