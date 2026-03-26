@@ -9,12 +9,7 @@ import { Search } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  MEMBERSHIP_THRESHOLDS,
-  MembershipTier,
-  UserRole,
-  useUser,
-} from "../../contexts/user-context"
+import { MembershipTier, UserRole, useUser } from "../../contexts/user-context"
 import { Pagination } from "../ui/Pagination"
 
 interface DirectoryResultsProps {
@@ -69,8 +64,7 @@ export function DirectoryResults({
 
   const userTier = getMemberTier()
   const shouldBlurLogo =
-    !isAdmin &&
-    (userTier === MembershipTier.GUEST || userTier === MembershipTier.BRONZE)
+    !isAdmin && (userTier === MembershipTier.GUEST || userTier === MembershipTier.BRONZE)
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const [currentPage, setCurrentPage] = useState(1)
@@ -78,36 +72,36 @@ export function DirectoryResults({
   const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
   const directoryQuery: CompanyDirectoryQuery = isDemo
     ? {
-      page: 1,
-      limit: ITEMS_PER_PAGE,
-      sortBy: "name" as const,
-      sortOrder: "asc" as const,
-    }
+        page: 1,
+        limit: ITEMS_PER_PAGE,
+        sortBy: "name" as const,
+        sortOrder: "asc" as const,
+      }
     : {
-      search: debouncedSearchTerm || undefined,
-      industry: industryParam,
-      page: currentPage,
-      limit: ITEMS_PER_PAGE,
-      sortBy: "name" as const,
-      sortOrder: "asc" as const,
-    }
+        search: debouncedSearchTerm || undefined,
+        industry: industryParam,
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        sortBy: "name" as const,
+        sortOrder: "asc" as const,
+      }
 
   const { data, isLoading, isError } = useCompanyDirectory(directoryQuery, !isDemo)
 
   const rawCompanies = isDemo
     ? Object.values(mockCompanies).map((c) => ({
-      id: c.id,
-      name: c.nameEn || c.nameCn,
-      logoUrl: c.logo,
-      email: c.email,
-      contactName: c.contactPerson,
-      phone: c.phone,
-      industry: c.id.split("-")[0] || "other",
-      address: c.address,
-      description: c.introduction,
-      companyInfoHighlight: false,
-      sortPriority: 0,
-    }))
+        id: c.id,
+        name: c.nameEn || c.nameCn,
+        logoUrl: c.logo,
+        email: c.email,
+        contactName: c.contactPerson,
+        phone: c.phone,
+        industry: c.id.split("-")[0] || "other",
+        address: c.address,
+        description: c.introduction,
+        companyInfoHighlight: false,
+        sortPriority: 0,
+      }))
     : (data?.companies ?? [])
   const searchValue = debouncedSearchTerm?.trim() ?? ""
   const isSearching = searchValue.length > 0
@@ -144,8 +138,8 @@ export function DirectoryResults({
             ? t("directory.allCategories", { defaultValue: "All" })
             : selectedCategories.length === 1
               ? t(`directory.categories.${selectedCategories[0]}`, {
-                defaultValue: selectedCategories[0],
-              })
+                  defaultValue: selectedCategories[0],
+                })
               : `${selectedCategories.length} ${t("directory.industryCategory")}`}
         </h2>
         <span className="text-muted-foreground text-sm">
@@ -173,17 +167,19 @@ export function DirectoryResults({
             {displayedCompanies.map((company) => (
               <Link
                 key={company.id}
-                href={`/directory/${company.id}${selectedCategories.length === 1
-                  ? `?fromCategory=${encodeURIComponent(selectedCategories[0])}`
-                  : ""
-                  }`}
+                href={`/directory/${company.id}${
+                  selectedCategories.length === 1
+                    ? `?fromCategory=${encodeURIComponent(selectedCategories[0])}`
+                    : ""
+                }`}
                 className="group"
               >
                 <div
-                  className={`bg-muted relative mb-2 aspect-4/3 overflow-hidden rounded-sm border ${company.companyInfoHighlight
-                    ? "border-3 border-yellow-400"
-                    : "border-transparent"
-                    }`}
+                  className={`bg-muted relative mb-2 aspect-4/3 overflow-hidden rounded-sm border ${
+                    company.companyInfoHighlight
+                      ? "border-3 border-yellow-400"
+                      : "border-transparent"
+                  }`}
                 >
                   <img
                     src={company.logoUrl || "/placeholder.svg"}

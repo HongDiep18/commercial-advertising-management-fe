@@ -7,7 +7,7 @@ import Card, { CardContent } from "@/components/ui/Card"
 
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
-import { useCompanyDirectory } from "@/api/companies/hooks"
+import { useAdminCompaniesStats } from "@/api/admin-companies/hooks"
 import { usePublishedProperties } from "@/api/properties/hooks"
 import { DashboardNotificationsCard } from "./DashboardNotificationsCard"
 
@@ -19,16 +19,13 @@ export function DashboardTab() {
     (c) => c.status === ProfileRequestStatus.PENDING
   ).length
 
-  const { data: companiesDirectoryData, isLoading: isCompaniesLoading } = useCompanyDirectory(
-    { page: 1, limit: 1, sortBy: "name", sortOrder: "asc" },
-    true
-  )
+  const { data: companiesStatsData, isLoading: isCompaniesLoading } = useAdminCompaniesStats(true)
   const { data: propertiesData, isLoading: isPropertiesLoading } = usePublishedProperties(
     { page: 1, limit: 1, sortBy: "createdAt", sortOrder: "desc" },
     true
   )
 
-  const totalCompanies = companiesDirectoryData?.pagination.total ?? 0
+  const totalCompanies = companiesStatsData?.approvedCount ?? 0
   const totalProperties = propertiesData?.pagination.total ?? 0
 
   const stats = [

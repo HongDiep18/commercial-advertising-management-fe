@@ -48,10 +48,19 @@ export type RegisterResponse = {
   data?: unknown
 }
 
+export function normalizeWebsiteHttpScheme(website: string): string {
+  const raw = website.trim()
+  if (!raw) return raw
+  return raw.replace(/^https?:\/\//i, (m) => m.toLowerCase())
+}
+
 function normalizeWebsiteForPayload(website: string): string {
   const raw = website.trim()
   if (!raw) return raw
-  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+  if (/^https?:\/\//i.test(raw)) {
+    return normalizeWebsiteHttpScheme(raw)
+  }
+  return `https://${raw}`
 }
 
 export function formDataToRegisterPayload(form: {
