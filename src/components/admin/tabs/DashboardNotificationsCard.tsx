@@ -21,6 +21,10 @@ import {
   useMarkAdminNotificationAsRead,
   useMarkAllAdminNotificationsAsRead,
 } from "@/api/admin-notifications/hooks"
+import type {
+  AdminNotificationItem,
+  AdminNotificationTranslationLocale,
+} from "@/api/admin-notifications/types"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 
 const EVENT_TYPE_ALL = "__all"
@@ -31,6 +35,61 @@ type AdminTabId =
   | "property"
   | "users"
   | "recentActivity"
+
+const APP_LANGUAGE_TO_NOTIFICATION_LOCALE: Record<string, AdminNotificationTranslationLocale> = {
+  vi: "vi",
+  "vi-vn": "vi",
+  en: "en",
+  "en-us": "en",
+  zh: "zhTw",
+  "zh-tw": "zhTw",
+  "zh-cn": "zhTw",
+}
+
+function toNotificationLocale(language: string): AdminNotificationTranslationLocale {
+  const normalized = language.trim().toLowerCase()
+  return APP_LANGUAGE_TO_NOTIFICATION_LOCALE[normalized] ?? "en"
+}
+
+function normalizeNotificationLocale(locale?: string): AdminNotificationTranslationLocale | null {
+  if (!locale) return null
+  const normalized = locale.trim().replace(/_/g, "-").toLowerCase()
+  if (normalized === "zh-tw" || normalized === "zhtw") return "zhTw"
+  if (normalized === "vi" || normalized === "vi-vn") return "vi"
+  if (normalized === "en" || normalized === "en-us") return "en"
+  return null
+}
+
+function getLocalizedNotificationText(
+  notification: AdminNotificationItem,
+  field: "title" | "content",
+  language: string
+): string {
+  const translations = notification.metadata?.translations?.[field]
+  if (!translations) return notification[field]
+
+  const locale = toNotificationLocale(language)
+  const localeValue = translations[locale]
+  if (typeof localeValue === "string" && localeValue.trim()) {
+    return localeValue
+  }
+
+  const defaultLocale = normalizeNotificationLocale(notification.metadata?.defaultLocale)
+  const defaultValue = defaultLocale ? translations[defaultLocale] : undefined
+  if (typeof defaultValue === "string" && defaultValue.trim()) {
+    return defaultValue
+  }
+
+  const fallbackValue = [translations.vi, translations.en, translations.zhTw].find(
+    (value) => typeof value === "string" && value.trim()
+  )
+
+  return fallbackValue ?? notification[field]
+}
+
+function getEventTypeTranslationKey(eventType: string): string {
+  return eventType.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "")
+}
 
 function getTargetAdminTab(entityType?: string, eventType?: string): AdminTabId {
   const value = `${entityType ?? ""} ${eventType ?? ""}`.toLowerCase()
@@ -104,6 +163,23 @@ export function DashboardNotificationsCard() {
     if (eventTypeFilter !== EVENT_TYPE_ALL) values.push(eventTypeFilter)
     return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b))
   }, [notifications, eventTypeFilter])
+
+  const localizedNotifications = useMemo(
+    () =>
+      notifications.map((notification) => ({
+        ...notification,
+        localizedTitle: getLocalizedNotificationText(notification, "title", i18n.language),
+        localizedContent: getLocalizedNotificationText(notification, "content", i18n.language),
+      })),
+    [notifications, i18n.language]
+  )
+
+  const getEventTypeLabel = (eventType: string) => {
+    const eventTypeKey = getEventTypeTranslationKey(eventType)
+    return t(`admin.dashboard.notificationsEventTypeLabels.${eventTypeKey}`, {
+      defaultValue: eventType,
+    })
+  }
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -230,7 +306,7 @@ export function DashboardNotificationsCard() {
                 </SelectItem>
                 {eventTypeOptions.map((eventType) => (
                   <SelectItem key={eventType} value={eventType}>
-                    {eventType}
+                    {getEventTypeLabel(eventType)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -262,7 +338,7 @@ export function DashboardNotificationsCard() {
 
         {!isNotificationsLoading &&
           !isNotificationsError &&
-          notifications.map((notification) => (
+          localizedNotifications.map((notification) => (
             <div
               key={notification.id}
               className="bg-body-bg-light border-border flex items-start justify-between gap-3 rounded-lg border p-3"
@@ -287,7 +363,7 @@ export function DashboardNotificationsCard() {
                   />
 
                   <p className="text-foreground truncate text-sm font-semibold">
-                    {notification.title}
+                    {notification.localizedTitle}
                   </p>
 
                   {!notification.isRead && (
@@ -297,7 +373,7 @@ export function DashboardNotificationsCard() {
                   )}
                 </div>
 
-                <p className="text-muted-foreground text-sm">{notification.content}</p>
+                <p className="text-muted-foreground text-sm">{notification.localizedContent}</p>
 
                 <p className="text-muted-foreground mt-1 text-xs">
                   {formatDateTimeForLocale(notification.createdAt, i18n.language)}

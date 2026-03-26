@@ -1212,7 +1212,20 @@
       "notificationsMarkAsRead": "Mark as read",
       "notificationsMarkAllAsRead": "Mark all as read",
       "notificationsMarkAsReadError": "Unable to mark this notification as read.",
-      "notificationsMarkAllAsReadError": "Unable to mark all notifications as read."
+      "notificationsMarkAllAsReadError": "Unable to mark all notifications as read.",
+      "notificationsEventTypeLabels": {
+        "ad_order_created": "New ad order",
+        "profile_request_submitted": "New profile request",
+        "profile_request_approved": "Profile request approved",
+        "profile_request_status_changed": "Profile request status changed",
+        "company_updated_by_admin": "Company updated by admin",
+        "user_status_changed": "User status changed",
+        "user_soft_deleted": "User deleted",
+        "set_password_completed": "Password setup completed",
+        "user_password_changed": "User password changed",
+        "loyalty_points_awarded": "Loyalty points awarded",
+        "loyalty_tier_recalculated": "Loyalty tier recalculated"
+      }
     },
     "companies": {
       "all": "All",
