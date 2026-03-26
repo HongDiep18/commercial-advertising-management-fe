@@ -1361,6 +1361,8 @@
       "contact": "聯絡人",
       "amount": "金額",
       "submittedAt": "提交時間",
+      "startTime": "開始時間",
+      "endTime": "結束時間",
       "actions": "操作",
       "loadingOrders": "載入訂單中...",
       "ordersError": "無法載入訂單，請稍後再試。",
