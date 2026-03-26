@@ -4,6 +4,7 @@ import { categories } from "@/components/directory/DirectorySidebar"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import Select from "@/components/ui/Select"
+import { SearchableSelect } from "@/components/ui/SearchableSelect"
 import Textarea from "@/components/ui/Textarea"
 import { CONTRIBUTION_VALUES } from "@/contexts/user-context"
 import type { ProfileFormData } from "@/types/account"
@@ -37,9 +38,7 @@ type AccountProfileModalProps = {
   onSave: () => void
   isSaving: boolean
   countries: CountryOption[]
-  availableRegions: RegionOption[]
-  regionValue: string
-  hasCountry: boolean
+  allRegions: RegionOption[]
   readOnly?: boolean
   t: TFunction
 }
@@ -57,9 +56,7 @@ export function AccountProfileModal({
   onSave,
   isSaving,
   countries,
-  availableRegions,
-  regionValue,
-  hasCountry,
+  allRegions,
   readOnly = false,
   t,
 }: AccountProfileModalProps) {
@@ -217,7 +214,7 @@ export function AccountProfileModal({
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.country}>
-                <Select
+                <SearchableSelect
                   value={profileData.country || COUNTRY_NONE}
                   onValueChange={(value) => onProfileChange("country", value)}
                   disabled={readOnly}
@@ -228,57 +225,22 @@ export function AccountProfileModal({
                     },
                     ...countries,
                   ]}
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={t("register.placeholders.country") || "Select Country *"}
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    <Select.Item value={COUNTRY_NONE} key="country-empty">
-                      {t("register.placeholders.country") || "Select Country *"}
-                    </Select.Item>
-                    {countries.map((c) => (
-                      <Select.Item key={c.value} value={c.value}>
-                        {c.label}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
+                  placeholder={t("register.placeholders.country") || "Select Country *"}
+                  searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                  emptyText={t("common.noResults", { defaultValue: "No results." })}
+                />
               </FieldWithError>
 
               <FieldWithError error={fieldErrors.region}>
-                <Select
-                  key={profileData.country || "__no_country__"}
-                  value={regionValue}
+                <SearchableSelect
+                  value={profileData.region}
                   onValueChange={(value) => onProfileChange("region", value)}
-                  disabled={readOnly || !hasCountry}
-                  options={availableRegions}
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={
-                        !hasCountry
-                          ? t("register.placeholders.selectCountryFirst") ||
-                            "Please select country first"
-                          : t("register.placeholders.region") || "Select Region *"
-                      }
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {availableRegions.length > 0 ? (
-                      availableRegions.map((r) => (
-                        <Select.Item key={r.value} value={r.value}>
-                          {r.label}
-                        </Select.Item>
-                      ))
-                    ) : (
-                      <div className="text-muted-foreground px-2 py-1.5 text-sm">
-                        {t("register.noRegions") || "無可用地區"}
-                      </div>
-                    )}
-                  </Select.Content>
-                </Select>
+                  disabled={readOnly}
+                  options={allRegions}
+                  placeholder={t("register.placeholders.region") || "Select Region *"}
+                  searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                  emptyText={t("common.noResults", { defaultValue: "No results." })}
+                />
               </FieldWithError>
             </div>
 
