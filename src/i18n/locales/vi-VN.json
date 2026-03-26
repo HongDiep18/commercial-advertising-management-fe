@@ -1284,7 +1284,20 @@
       "notificationsMarkAsRead": "Đánh dấu đã đọc",
       "notificationsMarkAllAsRead": "Đánh dấu tất cả đã đọc",
       "notificationsMarkAsReadError": "Không thể đánh dấu thông báo này là đã đọc.",
-      "notificationsMarkAllAsReadError": "Không thể đánh dấu tất cả thông báo là đã đọc."
+      "notificationsMarkAllAsReadError": "Không thể đánh dấu tất cả thông báo là đã đọc.",
+      "notificationsEventTypeLabels": {
+        "ad_order_created": "Đơn quảng cáo mới",
+        "profile_request_submitted": "Yêu cầu đăng ký mới",
+        "profile_request_approved": "Yêu cầu đăng ký đã duyệt",
+        "profile_request_status_changed": "Trạng thái yêu cầu đăng ký thay đổi",
+        "company_updated_by_admin": "Quản trị viên cập nhật công ty",
+        "user_status_changed": "Trạng thái người dùng thay đổi",
+        "user_soft_deleted": "Người dùng đã bị xóa",
+        "set_password_completed": "Thiết lập mật khẩu hoàn tất",
+        "user_password_changed": "Mật khẩu người dùng đã đổi",
+        "loyalty_points_awarded": "Đã cộng điểm loyalty",
+        "loyalty_tier_recalculated": "Đã tính lại hạng loyalty"
+      }
     },
     "companies": {
       "all": "Tất cả",
