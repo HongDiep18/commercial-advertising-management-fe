@@ -1,12 +1,13 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { Bell, Check, CheckCheck } from "lucide-react"
 import Button from "@/components/ui/Button"
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
+import { Pagination } from "@/components/ui/Pagination"
 import {
   Select,
   SelectContent,
@@ -70,6 +71,7 @@ export function DashboardNotificationsCard() {
 
   const [unreadOnlyFilter, setUnreadOnlyFilter] = useState<"all" | "unread">("all")
   const [eventTypeFilter, setEventTypeFilter] = useState(EVENT_TYPE_ALL)
+  const [currentPage, setCurrentPage] = useState(1)
   const [activeNotificationId, setActiveNotificationId] = useState<string | null>(null)
   const [actionErrorKey, setActionErrorKey] = useState<"single" | "all" | null>(null)
 
@@ -79,7 +81,7 @@ export function DashboardNotificationsCard() {
     isError: isNotificationsError,
   } = useAdminNotifications(
     {
-      page: 1,
+      page: currentPage,
       limit: 5,
       unreadOnly: unreadOnlyFilter === "unread" ? true : undefined,
       eventType: eventTypeFilter !== EVENT_TYPE_ALL ? eventTypeFilter : undefined,
@@ -94,6 +96,7 @@ export function DashboardNotificationsCard() {
     () => notificationsData?.notifications ?? [],
     [notificationsData?.notifications]
   )
+  const totalPages = Math.max(1, notificationsData?.pagination.totalPages ?? 1)
   const unreadCount = unreadCountData?.unreadCount ?? 0
 
   const eventTypeOptions = useMemo(() => {
@@ -101,6 +104,22 @@ export function DashboardNotificationsCard() {
     if (eventTypeFilter !== EVENT_TYPE_ALL) values.push(eventTypeFilter)
     return Array.from(new Set(values)).sort((a, b) => a.localeCompare(b))
   }, [notifications, eventTypeFilter])
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
+    }
+  }, [currentPage, totalPages])
+
+  const handleUnreadOnlyFilterChange = (value: "all" | "unread") => {
+    setUnreadOnlyFilter(value)
+    setCurrentPage(1)
+  }
+
+  const handleEventTypeFilterChange = (value: string) => {
+    setEventTypeFilter(value)
+    setCurrentPage(1)
+  }
 
   const handleMarkAsRead = async (id: string) => {
     try {
@@ -183,7 +202,7 @@ export function DashboardNotificationsCard() {
             </p>
             <Select
               value={unreadOnlyFilter}
-              onValueChange={(value) => setUnreadOnlyFilter(value as "all" | "unread")}
+              onValueChange={(value) => handleUnreadOnlyFilterChange(value as "all" | "unread")}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -201,7 +220,7 @@ export function DashboardNotificationsCard() {
             <p className="text-foreground text-xs font-medium">
               {t("admin.dashboard.notificationsEventType")}
             </p>
-            <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
+            <Select value={eventTypeFilter} onValueChange={handleEventTypeFilterChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -299,6 +318,10 @@ export function DashboardNotificationsCard() {
               )}
             </div>
           ))}
+
+        {!isNotificationsLoading && !isNotificationsError && notifications.length > 0 && (
+          <Pagination totalPages={totalPages} currentPage={currentPage} onPageChange={setCurrentPage} />
+        )}
       </CardContent>
     </Card>
   )
