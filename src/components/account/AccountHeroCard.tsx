@@ -62,7 +62,7 @@ export function AccountHeroCard({
             </div>
             <p className="text-muted-foreground">{user.email}</p>
             <p className="text-muted-foreground mt-1 text-sm">
-              {t("account.memberSince") || "會員加入日期"}：{user.createdAt}
+              {t("account.memberSince") || "會員加入日期"}：{user?.createdAt}
             </p>
 
             <div className="border-border mt-4 flex flex-wrap gap-2 border-t pt-4">

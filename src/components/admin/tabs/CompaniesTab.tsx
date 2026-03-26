@@ -65,7 +65,14 @@ export function CompaniesTab() {
     visible: false,
   })
 
-  const [companyEmailById, setCompanyEmailById] = useState<Record<string, string>>({})
+  type CompanyInfoCache = {
+    companyName: string
+    email: string
+    contactName: string
+    industry: string
+  }
+
+  const [companyInfoById, setCompanyInfoById] = useState<Record<string, CompanyInfoCache>>({})
 
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
@@ -77,11 +84,10 @@ export function CompaniesTab() {
     t,
     onShowToast: showToast,
     onRefetchCompanyRequests: refetchCompanyRequests,
-    onCompanyEmailResolved: (companyId, email) => {
-      setCompanyEmailById((prev) => {
+    onCompanyEmailResolved: (companyId) => {
+      setCompanyInfoById((prev) => {
         const next = { ...prev }
-        if (email) next[companyId] = email
-        else delete next[companyId]
+        delete next[companyId]
         return next
       })
     },
@@ -159,10 +165,21 @@ export function CompaniesTab() {
         const detail = await getCompanyDetail(companyId)
         if (detail && typeof detail === "object") {
           const mapped = companyDetailToRequestRow(detail as Record<string, unknown>, row)
-          setSelectedRequest(mapped)
-          if (typeof detail.email === "string" && detail.email.trim()) {
-            setCompanyEmailById((prev) => ({ ...prev, [companyId]: detail.email.trim() }))
+          const resolved = {
+            ...mapped,
+            companyName: detail.companyNameVi || detail.companyNameCn || mapped.companyName,
           }
+          setSelectedRequest(resolved)
+
+          setCompanyInfoById((prev) => ({
+            ...prev,
+            [companyId]: {
+              companyName: resolved.companyName,
+              email: detail.email.trim(),
+              contactName: detail.contactName,
+              industry: detail.industry,
+            },
+          }))
         } else {
           setSelectedRequest(row)
         }
@@ -182,24 +199,49 @@ export function CompaniesTab() {
 
   useEffect(() => {
     let cancelled = false
-    const loadCompanyEmails = async () => {
-      const companyIds = filtered
-        .map((r) => r.companyId)
-        .filter((id): id is string => typeof id === "string" && id.trim().length > 0)
 
+    const loadApprovedCompanyInfo = async () => {
+      const companyRowById: Record<string, ProfileRequestRow> = {}
+
+      for (const r of filtered) {
+        if (r.status !== ProfileRequestStatus.APPROVED) continue
+        const id = r.companyId?.trim()
+        if (!id) continue
+        if (!companyRowById[id]) companyRowById[id] = r
+      }
+
+      const companyIds = Object.keys(companyRowById)
       if (companyIds.length === 0) return
 
-      const distinct = Array.from(new Set(companyIds))
-      const idsToFetch = distinct.filter((id) => !companyEmailById[id])
+      const idsToFetch = companyIds.filter((id) => !companyInfoById[id])
       if (idsToFetch.length === 0) return
 
       const pairs = await Promise.all(
         idsToFetch.map(async (id) => {
           try {
             const detail = await getCompanyDetail(id)
-            return typeof detail?.email === "string" && detail.email.trim()
-              ? ([id, detail.email] as const)
-              : null
+            const fallback = companyRowById[id]
+
+            const companyName =
+              detail.companyNameVi || detail.companyNameCn || fallback?.companyName || ""
+            const email =
+              typeof detail.email === "string" && detail.email.trim()
+                ? detail.email.trim()
+                : fallback?.email || ""
+            const contactName = detail.contactName || fallback?.contactName || ""
+            const industry = detail.industry || fallback?.industry || ""
+
+            if (!email) return null
+
+            return [
+              id,
+              {
+                companyName,
+                email,
+                contactName,
+                industry,
+              },
+            ] as const
           } catch {
             return null
           }
@@ -208,22 +250,22 @@ export function CompaniesTab() {
 
       if (cancelled) return
 
-      setCompanyEmailById((prev) => {
+      setCompanyInfoById((prev) => {
         const next = { ...prev }
         for (const pair of pairs) {
           if (!pair) continue
-          const [id, email] = pair
-          next[id] = email
+          const [id, info] = pair
+          next[id] = info
         }
         return next
       })
     }
 
-    void loadCompanyEmails()
+    void loadApprovedCompanyInfo()
     return () => {
       cancelled = true
     }
-  }, [filtered, companyEmailById])
+  }, [filtered, companyInfoById])
 
   if (companyRequestsLoading) {
     return (
@@ -297,15 +339,35 @@ export function CompaniesTab() {
                     className="border-border hover:bg-muted/20 hover:bg-body-table-dark-hover border-b"
                   >
                     <td className="px-4 py-3">
-                      <p className="text-foreground text-sm font-medium">{row.companyName}</p>
+                      <p className="text-foreground text-sm font-medium">
+                        {row.status === ProfileRequestStatus.APPROVED &&
+                        row.companyId &&
+                        companyInfoById[row.companyId]
+                          ? companyInfoById[row.companyId].companyName
+                          : row.companyName}
+                      </p>
                       <p className="text-muted-foreground text-xs">
-                        {row.companyId && companyEmailById[row.companyId]
-                          ? companyEmailById[row.companyId]
+                        {row.status === ProfileRequestStatus.APPROVED &&
+                        row.companyId &&
+                        companyInfoById[row.companyId]
+                          ? companyInfoById[row.companyId].email
                           : row.email}
                       </p>
                     </td>
-                    <td className="px-4 py-3 text-sm">{row.contactName}</td>
-                    <td className="text-muted-foreground px-4 py-3 text-sm">{row.industry}</td>
+                    <td className="px-4 py-3 text-sm">
+                      {row.status === ProfileRequestStatus.APPROVED &&
+                      row.companyId &&
+                      companyInfoById[row.companyId]
+                        ? companyInfoById[row.companyId].contactName
+                        : row.contactName}
+                    </td>
+                    <td className="text-muted-foreground px-4 py-3 text-sm">
+                      {row.status === ProfileRequestStatus.APPROVED &&
+                      row.companyId &&
+                      companyInfoById[row.companyId]
+                        ? companyInfoById[row.companyId].industry
+                        : row.industry}
+                    </td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">
                       {formatDateTimeForLocale(row.submittedAt, i18n.language)}
                     </td>
@@ -463,8 +525,8 @@ export function CompaniesTab() {
                   <div className="bg-body-bg-dark-foreground rounded-lg p-3">
                     <p className="text-muted-foreground text-xs">{t("admin.companies.email")}</p>
                     <p className="text-sm font-medium">
-                      {selectedRequest.companyId && companyEmailById[selectedRequest.companyId]
-                        ? companyEmailById[selectedRequest.companyId]
+                      {selectedRequest.companyId && companyInfoById[selectedRequest.companyId]
+                        ? companyInfoById[selectedRequest.companyId].email
                         : selectedRequest.email}
                     </p>
                   </div>

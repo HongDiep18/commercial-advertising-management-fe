@@ -5,7 +5,10 @@
     "search": "Tìm kiếm",
     "about": "Về chúng tôi",
     "contact": "Liên hệ",
-    "close": "Đóng"
+    "close": "Đóng",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "saving": "Đang lưu..."
   },
   "header": {
     "aboutUs": "Về chúng tôi",
@@ -619,7 +622,7 @@
       "membershipTier": "Chọn hạng thành viên"
     },
     "hints": {
-      "websiteFormat": "Ví dụ: https://your-company.com hoặc http://your-company.com"
+      "websiteFormat": "Ví dụ: https://your-company hoặc http://your-company"
     },
     "noRegions": "Không có khu vực nào",
     "errors": {
@@ -895,7 +898,19 @@
     "of": "của",
     "previousPage": "Trước",
     "nextPage": "Tiếp",
-    "closeModal": "Đóng"
+    "closeModal": "Đóng",
+    "industrySelectionSaved": "Đã lưu lựa chọn ngành!",
+    "industrySelection": {
+      "cardTitle": "Cài đặt lựa chọn ngành",
+      "cardDescription": "Thành viên Vàng có thể chọn 3 ngành",
+      "manageButton": "Quản lý lựa chọn ngành →",
+      "title": "Chọn ngành",
+      "selectedTitle": "Các ngành đã chọn",
+      "selectedDescription": "Bạn đã chọn 3 ngành sau",
+      "additionalIndustries": "Chọn 3 ngành",
+      "selectedCount": "Đã chọn {{count}}/3",
+      "exactlyThreeRequired": "Vui lòng chọn đúng 3 ngành"
+    }
   },
   "adContactForm": {
     "title": "Quản trị",
@@ -932,6 +947,7 @@
     "adTypeProduct": "Sản phẩm"
   },
   "companyDetail": {
+    "loading": "Đang tải...",
     "upgradeBanner": {
       "guest": "Bạn hiện đang là khách và chỉ có thể xem tên công ty và khu vực một phần",
       "bronze": "Bạn hiện là thành viên Đồng. Nâng cấp để xem thông tin đầy đủ bao gồm trang web, điện thoại và địa chỉ",
@@ -1253,7 +1269,22 @@
           "userSoftDeleted": "{{target}} đã bị xóa mềm."
         }
       },
-      "recentActivityLoadError": "Hiện không thể tải hoạt động gần đây."
+      "recentActivityLoadError": "Hiện không thể tải hoạt động gần đây.",
+      "notificationsTitle": "Thông báo quản trị",
+      "notificationsDescription": "Bạn có {{count}} thông báo chưa đọc.",
+      "notificationsUnreadOnly": "Bộ lọc chưa đọc",
+      "notificationsFilterAll": "Tất cả thông báo",
+      "notificationsFilterUnread": "Chỉ chưa đọc",
+      "notificationsEventType": "Loại sự kiện",
+      "notificationsEventTypeAll": "Tất cả loại sự kiện",
+      "notificationsLoading": "Đang tải thông báo...",
+      "notificationsLoadError": "Hiện không thể tải thông báo.",
+      "notificationsEmpty": "Không có thông báo nào.",
+      "notificationsUnread": "Chưa đọc",
+      "notificationsMarkAsRead": "Đánh dấu đã đọc",
+      "notificationsMarkAllAsRead": "Đánh dấu tất cả đã đọc",
+      "notificationsMarkAsReadError": "Không thể đánh dấu thông báo này là đã đọc.",
+      "notificationsMarkAllAsReadError": "Không thể đánh dấu tất cả thông báo là đã đọc."
     },
     "companies": {
       "all": "Tất cả",
@@ -1417,6 +1448,8 @@
       "contact": "Liên hệ",
       "amount": "Số tiền",
       "submittedAt": "Thời gian gửi",
+      "startTime": "Thời gian bắt đầu",
+      "endTime": "Thời gian kết thúc",
       "actions": "Thao tác",
       "loadingOrders": "Đang tải đơn hàng...",
       "ordersError": "Không tải được đơn hàng. Vui lòng thử lại.",

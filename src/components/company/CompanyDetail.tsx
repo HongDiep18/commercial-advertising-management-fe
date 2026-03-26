@@ -29,9 +29,7 @@ import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
 import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import {
-  maskCompanyName,
   truncateIntroduction,
-  maskIntroductionCompanyNames,
   categoryNameToIdMap,
 } from "../../utils/companyHelpers"
 
@@ -107,7 +105,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   if (!isDemo && isCompanyLoading) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
-        <p className="text-muted-foreground">{t("directory.loading", { defaultValue: "Loading..." })}</p>
+        <p className="text-muted-foreground">{t("companyDetail.loading") || "Loading..."}</p>
       </div>
     )
   }
@@ -125,23 +123,23 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const company = isDemo
     ? getCompanyData(companyId)
     : {
-        id: apiCompany!.id,
-        nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
-        nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
-        logo: apiCompany!.logoUrl ?? "/placeholder.svg",
-        category: apiCompany!.industry,
-        categoryTags: [],
-        address: apiCompany!.address,
-        phone: apiCompany!.phone,
-        email: apiCompany!.email,
-        website: apiCompany!.website ?? "",
-        contactPerson: apiCompany!.contactName,
-        region: apiCompany!.region ?? "",
-        taxId: apiCompany!.taxId ?? "",
-        introduction: apiCompany!.description,
-        services: [],
-        products: [],
-      }
+      id: apiCompany!.id,
+      nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
+      nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
+      logo: apiCompany!.logoUrl ?? "/placeholder.svg",
+      category: apiCompany!.industry,
+      categoryTags: [],
+      address: apiCompany!.address,
+      phone: apiCompany!.phone,
+      email: apiCompany!.email,
+      website: apiCompany!.website ?? "",
+      contactPerson: apiCompany!.contactName,
+      region: apiCompany!.region ?? "",
+      taxId: apiCompany!.taxId ?? "",
+      introduction: apiCompany!.description,
+      services: [],
+      products: [],
+    }
 
   const companyNameCn = t(`companyDetail.companies.${companyId}.nameCn`, {
     defaultValue: company.nameCn,
@@ -165,12 +163,12 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     effectiveTier === MembershipTier.GOLD ||
     effectiveTier === MembershipTier.DIAMOND
 
-  const isFreeUser = !isSilverOrAbove
+  const shouldBlurLogo = isGuest || isBronze
 
   if (isResolvingTier) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
-        <p className="text-muted-foreground">{t("directory.loading", { defaultValue: "Loading..." })}</p>
+        <p className="text-muted-foreground">{t("companyDetail.loading") || "Loading..."}</p>
       </div>
     )
   }
@@ -210,9 +208,9 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <span className="font-medium">
                   {isGuest
                     ? t("companyDetail.upgradeBanner.guest") ||
-                      "您目前為訪客，僅可查看部分公司名稱與地區"
+                    "您目前為訪客，僅可查看部分公司名稱與地區"
                     : t("companyDetail.upgradeBanner.bronze") ||
-                      "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊"}
+                    "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊"}
                 </span>
               </div>
               <Button
@@ -254,7 +252,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     src={company.logo || "/placeholder.svg"}
                     alt={companyNameCn}
                     fill
-                    className={`object-contain p-4 ${isGuest ? "blur-sm" : ""}`}
+                    className={`object-contain p-4 ${shouldBlurLogo ? "blur-sm" : ""}`}
                   />
                 </div>
               </div>
@@ -262,10 +260,10 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
               <div className="lg:w-2/3 lg:p-8">
                 <div className="mb-6">
                   <h1 key={i18n.language} className="text-foreground mb-2 text-3xl font-bold">
-                    {isGuest ? maskCompanyName(companyNameCn) : companyNameCn}
+                    {companyNameCn}
                   </h1>
                   <p key={`${i18n.language}-en`} className="text-muted-foreground mb-1 text-lg">
-                    {isGuest ? maskCompanyName(companyNameEn) : companyNameEn}
+                    {companyNameEn}
                   </p>
                 </div>
 
@@ -288,150 +286,86 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
 
                 <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isFreeUser ? "bg-muted" : "bg-primary/10"}`}
-                    >
-                      {isFreeUser ? (
-                        <Lock className="text-muted-foreground h-5 w-5" />
-                      ) : (
-                        <MapPin className="text-primary h-5 w-5" />
-                      )}
+                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                      <MapPin className="text-primary h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <p className="text-muted-foreground text-sm">
                         {t("companyDetail.address") || "地址"}
                       </p>
-                      <p
-                        className={`text-sm font-medium ${isFreeUser ? "text-muted-foreground/40 blur-[3px] select-none" : ""}`}
-                      >
-                        {company.address}
-                      </p>
+                      <p className="text-sm font-medium">{company.address}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isFreeUser ? "bg-muted" : "bg-primary/10"}`}
-                    >
-                      {isFreeUser ? (
-                        <Lock className="text-muted-foreground h-5 w-5" />
-                      ) : (
-                        <Phone className="text-primary h-5 w-5" />
-                      )}
+                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                      <Phone className="text-primary h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <p className="text-muted-foreground text-sm">
                         {t("companyDetail.phone") || "電話"}
                       </p>
-                      {isFreeUser ? (
-                        <p className="text-muted-foreground/40 text-sm font-medium blur-[3px] select-none">
-                          {company.phone}
-                        </p>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">{company.phone}</p>
-                          <button
-                            onClick={handleCopyPhone}
-                            className="text-muted-foreground hover:text-primary transition-colors"
-                          >
-                            {copiedPhone ? (
-                              <Check className="h-4 w-4" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium">{company.phone}</p>
+                        <button
+                          onClick={handleCopyPhone}
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {copiedPhone ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isFreeUser ? "bg-muted" : "bg-primary/10"}`}
-                    >
-                      {isFreeUser ? (
-                        <Lock className="text-muted-foreground h-5 w-5" />
-                      ) : (
-                        <Mail className="text-primary h-5 w-5" />
-                      )}
+                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                      <Mail className="text-primary h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <p className="text-muted-foreground text-sm">Email</p>
-                      {isFreeUser ? (
-                        <p className="text-muted-foreground/40 text-sm font-medium blur-[3px] select-none">
-                          {company.email}
-                        </p>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">{company.email}</p>
-                          <button
-                            onClick={handleCopyEmail}
-                            className="text-muted-foreground hover:text-primary transition-colors"
-                          >
-                            {copiedEmail ? (
-                              <Check className="h-4 w-4" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium">{company.email}</p>
+                        <button
+                          onClick={handleCopyEmail}
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {copiedEmail ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   {company.website && (
                     <div className="flex items-start gap-3">
-                      <div
-                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isFreeUser ? "bg-muted" : "bg-primary/10"}`}
-                      >
-                        {isFreeUser ? (
-                          <Lock className="text-muted-foreground h-5 w-5" />
-                        ) : (
-                          <Globe className="text-primary h-5 w-5" />
-                        )}
+                      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                        <Globe className="text-primary h-5 w-5" />
                       </div>
                       <div className="flex-1">
                         <p className="text-muted-foreground text-sm">
                           {t("companyDetail.website") || "官網"}
                         </p>
-                        {isFreeUser ? (
-                          <p className="text-muted-foreground/40 text-sm font-medium blur-[3px] select-none">
-                            {company.website}
-                          </p>
-                        ) : (
-                          <a
-                            href={`https://${company.website}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
-                          >
-                            {company.website}
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
+                        <a
+                          href={`https://${company.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
+                        >
+                          {company.website}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
                       </div>
                     </div>
                   )}
 
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isFreeUser ? "bg-muted" : "bg-primary/10"}`}
-                    >
-                      {isFreeUser ? (
-                        <Lock className="text-muted-foreground h-5 w-5" />
-                      ) : (
-                        <User className="text-primary h-5 w-5" />
-                      )}
+                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                      <User className="text-primary h-5 w-5" />
                     </div>
                     <div>
                       <p className="text-muted-foreground text-sm">
                         {t("companyDetail.contactPerson") || "聯絡人"}
                       </p>
-                      <p
-                        className={`text-sm font-medium ${isFreeUser ? "text-muted-foreground/40 blur-[3px] select-none" : ""}`}
-                      >
-                        {company.contactPerson}
-                      </p>
+                      <p className="text-sm font-medium">{company.contactPerson}</p>
                     </div>
                   </div>
 
@@ -453,38 +387,27 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
 
                   {company.taxId && (
                     <div className="flex items-start gap-3">
-                      <div
-                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isSilverOrAbove ? "bg-primary/10" : "bg-muted"}`}
-                      >
-                        {isSilverOrAbove ? (
-                          <FileText className="text-primary h-5 w-5" />
-                        ) : (
-                          <Lock className="text-muted-foreground h-5 w-5" />
-                        )}
+                      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                        <FileText className="text-primary h-5 w-5" />
                       </div>
                       <div>
                         <p className="text-muted-foreground text-sm">
                           {t("companyDetail.taxId") || "稅號"}
                         </p>
-                        <p
-                          className={`text-sm font-medium ${!isSilverOrAbove ? "text-muted-foreground/40 blur-[3px] select-none" : ""}`}
-                        >
-                          {company.taxId}
-                        </p>
+                        <p className="text-sm font-medium">{company.taxId}</p>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {!isFreeUser && (
-                  <div className="flex flex-wrap gap-3">
-                    <Button variant="primary" asChild>
-                      <a href={`mailto:${company.email}`}>
-                        <Mail className="mr-2 h-4 w-4" />
-                        {t("companyDetail.contactCompany") || "聯絡公司"}
-                      </a>
-                    </Button>
-                    {/* <Button
+                <div className="flex flex-wrap gap-3">
+                  <Button variant="primary" asChild>
+                    <a href={`mailto:${company.email}`}>
+                      <Mail className="mr-2 h-4 w-4" />
+                      {t("companyDetail.contactCompany") || "聯絡公司"}
+                    </a>
+                  </Button>
+                  {/* <Button
                       variant="outline"
                       onClick={() => setIsFavorite(!isFavorite)}
                       className={
@@ -498,16 +421,15 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         ? t("companyDetail.favorited") || "已收藏"
                         : t("companyDetail.addToFavorites") || "加入收藏"}
                     </Button> */}
-                    <Button
-                      variant="outline"
-                      onClick={handleShare}
-                      className="hover:!bg-header-red-dark !bg-body-bg-dark border hover:!text-white"
-                    >
-                      <Share2 className="mr-2 h-4 w-4" />
-                      {t("companyDetail.share") || "分享"}
-                    </Button>
-                  </div>
-                )}
+                  <Button
+                    variant="outline"
+                    onClick={handleShare}
+                    className="hover:!bg-header-red-dark !bg-body-bg-dark border hover:!text-white"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    {t("companyDetail.share") || "分享"}
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -534,12 +456,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
               ) : (
                 <div className="relative">
                   <div className="text-muted-foreground leading-relaxed">
-                    {isGuest
-                      ? maskIntroductionCompanyNames(
-                          truncateIntroduction(translatedIntroduction, 50),
-                          companyNameCn
-                        )
-                      : truncateIntroduction(translatedIntroduction, 50)}
+                    {truncateIntroduction(translatedIntroduction, 50)}
                   </div>
                   <div className="relative mt-4">
                     <div className="text-muted-foreground leading-relaxed whitespace-pre-line opacity-50 blur-[4px] select-none">
@@ -647,13 +564,12 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         src={relatedCompany.logoUrl || "/placeholder.svg"}
                         alt={`相關企業 ${relatedCompany.id}`}
                         fill
-                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
-                          isFreeUser ? "blur-[3px]" : ""
-                        }`}
+                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${shouldBlurLogo ? "blur-[3px]" : ""
+                          }`}
                       />
                     </div>
                     <p className="group-hover:text-primary line-clamp-2 text-xs font-medium transition-colors">
-                      {isFreeUser ? maskCompanyName(relatedCompany.name) : relatedCompany.name}
+                      {relatedCompany.name}
                     </p>
                   </Link>
                 ))}

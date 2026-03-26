@@ -6,10 +6,10 @@ export type AuthUserFromApi = {
   email: string
   name?: string
   role?: string
-  contributionPoints?: number
-  commercialPoints?: number
-  createdAt?: string
-  companyId?: string
+  membershipTier?: string
+  companyId?: string | null
+  primaryIndustry?: string | null
+  selectedIndustries?: string[]
 }
 
 export type LoginUserPayload = {
@@ -17,10 +17,10 @@ export type LoginUserPayload = {
   email: string
   name?: string
   role?: string
-  contributionPoints?: number
-  commercialPoints?: number
-  createdAt?: string
-  companyId?: string
+  membershipTier?: string
+  companyId?: string | null
+  primaryIndustry?: string | null
+  selectedIndustries?: string[]
 }
 
 export type LoginResponse = {
@@ -67,20 +67,18 @@ export function mapApiUserToUser(payload: LoginUserPayload, email: string): User
     role = UserRole.Free
   }
 
-  const apiTier = API_TIER_TO_MEMBERSHIP[rawRole]
-  const contributionPoints =
-    payload.contributionPoints ?? (apiTier ? MEMBERSHIP_THRESHOLDS[apiTier] : 0)
-  const commercialPoints = payload.commercialPoints ?? 0
+  const rawTier = (payload.membershipTier ?? "").toUpperCase()
+  const membershipTier = API_TIER_TO_MEMBERSHIP[rawTier] ?? MembershipTier.GUEST
 
   return {
     id: payload.id,
-    companyId: payload.companyId,
+    companyId: payload.companyId ?? null,
     email: payload.email ?? email,
     name: payload.name ?? payload.email?.split("@")[0] ?? email.split("@")[0] ?? "User",
     role,
-    contributionPoints,
-    commercialPoints,
-    createdAt: payload.createdAt ?? new Date().toISOString().slice(0, 10),
+    membershipTier,
+    primaryIndustry: payload.primaryIndustry ?? null,
+    selectedIndustries: payload.selectedIndustries ?? [],
   }
 }
 
@@ -99,9 +97,9 @@ export function extractUserFromLoginResponse(
     email: u.email ?? fallbackEmail,
     name: u.name,
     role: u.role,
-    contributionPoints: u.contributionPoints,
-    commercialPoints: u.commercialPoints,
-    createdAt: u.createdAt,
-    companyId: apiCompanyId,
+    membershipTier: u.membershipTier,
+    companyId: apiCompanyId ?? null,
+    primaryIndustry: u.primaryIndustry ?? null,
+    selectedIndustries: u.selectedIndustries ?? [],
   }
 }

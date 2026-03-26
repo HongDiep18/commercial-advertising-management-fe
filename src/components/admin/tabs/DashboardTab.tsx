@@ -2,17 +2,19 @@
 
 import { useTranslation } from "react-i18next"
 
-import { Building2, Clock, AlertTriangle, Newspaper } from "lucide-react"
+import { Building2, Clock, Newspaper } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
 
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
 import { useCompanyDirectory } from "@/api/companies/hooks"
 import { usePublishedProperties } from "@/api/properties/hooks"
+import { DashboardNotificationsCard } from "./DashboardNotificationsCard"
 
 export function DashboardTab() {
   const { t } = useTranslation()
   const { companyRequests } = useAdminData()
+
   const pendingCount = companyRequests.filter(
     (c) => c.status === ProfileRequestStatus.PENDING
   ).length
@@ -25,6 +27,7 @@ export function DashboardTab() {
     { page: 1, limit: 1, sortBy: "createdAt", sortOrder: "desc" },
     true
   )
+
   const totalCompanies = companiesDirectoryData?.pagination.total ?? 0
   const totalProperties = propertiesData?.pagination.total ?? 0
 
@@ -80,19 +83,7 @@ export function DashboardTab() {
         })}
       </div>
 
-      <Card className="!bg-admin-yellow !border-admin-yellow-border">
-        <CardContent className="p-4 pt-7">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-            <div>
-              <p className="font-medium text-amber-800">{t("admin.dashboard.attentionRequired")}</p>
-              <p className="mt-1 text-sm text-amber-700">
-                {t("admin.dashboard.pendingAlert", { count: pendingCount })}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <DashboardNotificationsCard />
     </div>
   )
 }

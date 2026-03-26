@@ -7,6 +7,8 @@
     "contact": "Contact",
     "close": "Close",
     "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
     "required": "Required"
   },
   "header": {
@@ -575,7 +577,7 @@
       "membershipTier": "Select membership level"
     },
     "hints": {
-      "websiteFormat": "Example: https://your-company.com or http://your-company.com"
+      "websiteFormat": "Example: https://your-company or http://your-company"
     },
     "noRegions": "No regions available",
     "errors": {
@@ -733,30 +735,12 @@
       "diamond": "Spend 530,000 VND"
     },
     "tierBenefits": {
-      "NONE": [
-        "Company name (partial)",
-        "Region"
-      ],
-      "guest": [
-        "Company name (partial)",
-        "Region"
-      ],
-      "BRONZE": [
-        "Base industry info",
-        "Company name, tax ID, region"
-      ],
-      "bronze": [
-        "Base industry info",
-        "Company name, tax ID, region"
-      ],
-      "SILVER": [
-        "Full industry info",
-        "Unlock website, phone, address, email"
-      ],
-      "silver": [
-        "Full industry info",
-        "Unlock website, phone, address, email"
-      ],
+      "NONE": ["Company name (partial)", "Region"],
+      "guest": ["Company name (partial)", "Region"],
+      "BRONZE": ["Base industry info", "Company name, tax ID, region"],
+      "bronze": ["Base industry info", "Company name, tax ID, region"],
+      "SILVER": ["Full industry info", "Unlock website, phone, address, email"],
+      "silver": ["Full industry info", "Unlock website, phone, address, email"],
       "GOLD": [
         "Own industry + 3 cross-industries (full)",
         "Unlock own industry + 3 upstream/downstream industries"
@@ -777,18 +761,10 @@
       ]
     },
     "tierRestrictions": {
-      "NONE": [
-        "No website, phone, address, or tax ID"
-      ],
-      "guest": [
-        "No website, phone, address, or tax ID"
-      ],
-      "BRONZE": [
-        "No website, phone, or address"
-      ],
-      "bronze": [
-        "No website, phone, or address"
-      ],
+      "NONE": ["No website, phone, address, or tax ID"],
+      "guest": ["No website, phone, address, or tax ID"],
+      "BRONZE": ["No website, phone, or address"],
+      "bronze": ["No website, phone, or address"],
       "SILVER": [],
       "silver": [],
       "GOLD": [],
@@ -851,7 +827,19 @@
     "of": "of",
     "previousPage": "Previous",
     "nextPage": "Next",
-    "closeModal": "Close"
+    "closeModal": "Close",
+    "industrySelectionSaved": "Industry selection saved!",
+    "industrySelection": {
+      "cardTitle": "Industry Selection Settings",
+      "cardDescription": "Gold members can select 3 industries",
+      "manageButton": "Manage Industry Selection →",
+      "title": "Select Industries",
+      "selectedTitle": "Selected Industries",
+      "selectedDescription": "You have selected the following 3 industries",
+      "additionalIndustries": "Select 3 industries",
+      "selectedCount": "Selected {{count}}/3",
+      "exactlyThreeRequired": "Please select exactly 3 industries"
+    }
   },
   "adContactForm": {
     "title": "Admin Panel",
@@ -888,6 +876,7 @@
     "adTypeProduct": "Product"
   },
   "companyDetail": {
+    "loading": "Loading...",
     "upgradeBanner": {
       "guest": "You are currently a guest and can only view partial company names and regions",
       "bronze": "You are currently a Bronze member. Upgrade to view complete information including website, phone, and address",
@@ -1208,7 +1197,22 @@
           "userSoftDeleted": "{{target}} was soft deleted."
         }
       },
-      "recentActivityLoadError": "Unable to load recent activity right now."
+      "recentActivityLoadError": "Unable to load recent activity right now.",
+      "notificationsTitle": "Admin Notifications",
+      "notificationsDescription": "You have {{count}} unread notifications.",
+      "notificationsUnreadOnly": "Unread filter",
+      "notificationsFilterAll": "All notifications",
+      "notificationsFilterUnread": "Unread only",
+      "notificationsEventType": "Event type",
+      "notificationsEventTypeAll": "All event types",
+      "notificationsLoading": "Loading notifications...",
+      "notificationsLoadError": "Unable to load notifications right now.",
+      "notificationsEmpty": "No notifications found.",
+      "notificationsUnread": "Unread",
+      "notificationsMarkAsRead": "Mark as read",
+      "notificationsMarkAllAsRead": "Mark all as read",
+      "notificationsMarkAsReadError": "Unable to mark this notification as read.",
+      "notificationsMarkAllAsReadError": "Unable to mark all notifications as read."
     },
     "companies": {
       "all": "All",
@@ -1372,6 +1376,8 @@
       "contact": "Contact",
       "amount": "Amount",
       "submittedAt": "Submitted",
+      "startTime": "Start Time",
+      "endTime": "End Time",
       "actions": "Actions",
       "loadingOrders": "Loading orders...",
       "ordersError": "Failed to load orders. Please try again later.",
