@@ -80,7 +80,7 @@ export function DashboardNotificationsCard() {
   } = useAdminNotifications(
     {
       page: 1,
-      limit: 20,
+      limit: 5,
       unreadOnly: unreadOnlyFilter === "unread" ? true : undefined,
       eventType: eventTypeFilter !== EVENT_TYPE_ALL ? eventTypeFilter : undefined,
     },
