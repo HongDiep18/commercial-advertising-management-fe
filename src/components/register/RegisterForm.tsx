@@ -10,6 +10,7 @@ import Select from "../ui/Select"
 import Textarea from "../ui/Textarea"
 import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
+import { SearchableSelect } from "@/components/ui/SearchableSelect"
 import { register } from "@/api/auth"
 import { formDataToRegisterPayload } from "@/types/auth"
 import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
@@ -280,26 +281,14 @@ export default function RegisterForm() {
 
               <div className="registration-form gap-4 md:grid-cols-2">
                 <FieldWithError error={fieldErrors.country}>
-                  <Select
+                  <SearchableSelect
                     value={formData.country}
-                    onValueChange={(v) => {
-                      handleInputChange("country", v)
-                    }}
-                    required
-                  >
-                    <Select.Trigger className="w-full">
-                      <Select.Value
-                        placeholder={t("register.placeholders.country") || "選擇國家 *"}
-                      />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {countries.map((c) => (
-                        <Select.Item key={c.value} value={c.value}>
-                          {c.label}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
+                    onValueChange={(v) => handleInputChange("country", v)}
+                    options={countries}
+                    placeholder={t("register.placeholders.country") || "Select Country *"}
+                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                    emptyText={t("common.noResults", { defaultValue: "No results." })}
+                  />
                 </FieldWithError>
               </div>
 

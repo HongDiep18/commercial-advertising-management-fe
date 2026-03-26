@@ -2,6 +2,7 @@
 
 import { useCompanyCategories } from "@/api/companies/hooks"
 import { INDUSTRY_CATEGORIES } from "@/constants/categories"
+import { REGION_KEYS_BY_COUNTRY } from "@/constants/location"
 import { isDemoUser } from "@/components/login/demo"
 import { useUser } from "@/contexts/user-context"
 import { ChevronDown, Search, X } from "lucide-react"
@@ -14,8 +15,6 @@ interface FilterTag {
   id: string
   label: string
 }
-
-const locationIds = ["hcm", "hanoi", "binhduong", "dongnai", "danang", "haiphong"]
 
 export default function SearchSection() {
   const { t } = useTranslation()
@@ -64,9 +63,10 @@ export default function SearchSection() {
   }, [companyCategoriesData, isDemo, t])
 
   const allLocations = useMemo(() => {
-    return locationIds.map((id) => ({
+    const ids = REGION_KEYS_BY_COUNTRY.vietnam ?? []
+    return ids.map((id) => ({
       id,
-      name: t(`search.locations.${id}`),
+      name: t(`register.regions.${id}`, { defaultValue: id }),
     }))
   }, [t])
 
@@ -203,16 +203,6 @@ export default function SearchSection() {
                 >
                   {t("search.byCompany")}
                 </button>
-                {/* <button
-                  onClick={() => setSearchMode("product")}
-                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
-                    searchMode === "product"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t("search.byProduct")}
-                </button> */}
               </div>
 
               <div className="relative" ref={industryDropdownRef}>
@@ -281,7 +271,7 @@ export default function SearchSection() {
                         onChange={(e) => setLocationSearch(e.target.value)}
                         className="border-border/60 focus:ring-primary/40 mb-3 h-9 w-full rounded-md border px-3 text-sm outline-none focus:ring-2"
                       />
-                      <div className="space-y-1">
+                      <div className="max-h-40 space-y-1 overflow-y-auto">
                         {filteredLocations.map((location) => (
                           <button
                             key={location.id}
