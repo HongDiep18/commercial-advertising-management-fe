@@ -118,8 +118,8 @@ export function AdOrdersManagement() {
       if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
         showToast(
           t("admin.advertising.slotNotAvailable") ||
-            apiErr.data?.message ||
-            "This ad slot is fully booked for the requested date range.",
+          apiErr.data?.message ||
+          "This ad slot is fully booked for the requested date range.",
           "error"
         )
       } else {
@@ -154,11 +154,10 @@ export function AdOrdersManagement() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`rounded-lg px-3 py-2 text-xs ${
-                statusFilter === s
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
+              className={`rounded-lg px-3 py-2 text-xs ${statusFilter === s
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
+                }`}
             >
               {s === "all"
                 ? t("admin.companies.all")
@@ -195,19 +194,16 @@ export function AdOrdersManagement() {
                       {t("admin.advertising.packageManagementTable.category")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                      {t("admin.advertising.contact")}
+                      {t("admin.advertising.startTime")}
+                    </th>
+                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
+                      {t("admin.advertising.endTime")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.amount")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.submittedAt")}
-                    </th>
-                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                      {t("admin.advertising.startTime")}
-                    </th>
-                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                      {t("admin.advertising.endTime")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.actions")}
@@ -246,22 +242,6 @@ export function AdOrdersManagement() {
                           )
                         })()}
                       </td>
-                      <td className="px-4 py-3 text-sm">
-                        {order.company ? (
-                          <div>
-                            <p className="font-medium">{order.company.contactName}</p>
-                            <p className="text-muted-foreground text-xs">{order.company.email}</p>
-                          </div>
-                        ) : (
-                          <p className="text-muted-foreground text-xs">{order.user.email}</p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm font-medium">
-                        <VndPrice value={order.totalAmount} />
-                      </td>
-                      <td className="text-muted-foreground px-4 py-3 text-sm">
-                        {formatDateTimeForLocale(order.createdAt, i18n.language)}
-                      </td>
                       <td className="text-muted-foreground px-4 py-3 text-sm">
                         {(() => {
                           const firstItem = order.items[0]
@@ -287,6 +267,12 @@ export function AdOrdersManagement() {
                           }
                           return formatDateTimeForLocale(endDate.toISOString(), i18n.language)
                         })()}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium">
+                        <VndPrice value={order.totalAmount} />
+                      </td>
+                      <td className="text-muted-foreground px-4 py-3 text-sm">
+                        {formatDateTimeForLocale(order.createdAt, i18n.language)}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
