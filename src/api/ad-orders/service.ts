@@ -83,7 +83,6 @@ export async function getMyPendingOrderItems(): Promise<ExistingOrderItem[]> {
 
 function toCreateOrderPayload(input: CreateAdOrderInput): Record<string, unknown> {
   return {
-    ...(input.companyId != null && input.companyId !== "" && { companyId: input.companyId }),
     ...(input.notes != null && input.notes !== "" && { notes: input.notes }),
     items: input.items.map((item) => ({
       pricingId: item.pricingId,
