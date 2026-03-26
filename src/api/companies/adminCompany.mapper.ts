@@ -1,5 +1,6 @@
 import type { AdminCompanyResponse } from "./types"
 import type { ProfileFormData } from "@/types/account"
+import { normalizeWebsiteHttpScheme } from "@/types/auth"
 
 type AnyObj = Record<string, unknown>
 type CompanyRowLike = {
@@ -57,7 +58,7 @@ export function profileFormDataToAdminCompanyPatchBody(
     country: data.country ?? "",
     region: data.region ?? "",
     industry: data.industry ?? "",
-    website: data.website ?? "",
+    website: normalizeWebsiteHttpScheme(data.website ?? ""),
     introduction: data.description ?? "",
   }
 }

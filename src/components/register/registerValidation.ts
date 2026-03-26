@@ -1,5 +1,6 @@
 import type { RegisterFormData } from "./registerConstants"
 import type { ProfileFormData } from "@/types/account"
+import { normalizeWebsiteHttpScheme } from "@/types/auth"
 import { isValidPhone } from "@/utils/validation/phone"
 
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
@@ -97,7 +98,8 @@ function runValidation(
         throw new Error("missing_protocol")
       }
 
-      const url = new URL(raw)
+      const normalized = normalizeWebsiteHttpScheme(raw)
+      const url = new URL(normalized)
       isValid = url.protocol === "http:" || url.protocol === "https:"
       if (isValid) {
         const host = url.hostname.trim()
