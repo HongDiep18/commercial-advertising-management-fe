@@ -21,6 +21,7 @@ import { AdOrderStatusActionDialog } from "./AdOrderStatusActionDialog"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 import { useQueryClient } from "@tanstack/react-query"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
+import { addDays, addWeeks, addMonths, addYears } from "date-fns"
 
 type StatusFilter = "all" | AdminOrderStatus
 const ORDER_ACTION = {
@@ -29,6 +30,25 @@ const ORDER_ACTION = {
 } as const
 type ActionType = (typeof ORDER_ACTION)[keyof typeof ORDER_ACTION]
 type ActionModalState = { type: ActionType | null; orderId: string | null; text: string }
+
+function calculateEndDate(startDate: string, durationValue: number | null, durationUnit: string | null): Date | null {
+  if (!startDate || !durationValue || !durationUnit) return null
+
+  const start = new Date(startDate)
+
+  switch (durationUnit.toUpperCase()) {
+    case "DAY":
+      return addDays(start, durationValue)
+    case "WEEK":
+      return addWeeks(start, durationValue)
+    case "MONTH":
+      return addMonths(start, durationValue)
+    case "YEAR":
+      return addYears(start, durationValue)
+    default:
+      return null
+  }
+}
 
 export function AdOrdersManagement() {
   const { t, i18n } = useTranslation()
@@ -184,6 +204,12 @@ export function AdOrdersManagement() {
                       {t("admin.advertising.submittedAt")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
+                      {t("admin.advertising.startTime")}
+                    </th>
+                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
+                      {t("admin.advertising.endTime")}
+                    </th>
+                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.actions")}
                     </th>
                   </tr>
@@ -203,7 +229,7 @@ export function AdOrdersManagement() {
                       <td className="px-4 py-3 text-sm">
                         {(() => {
                           const rawTypes = order.items
-                            .map((item) => item.categoryType)
+                            .map((item) => item.packageType)
                             .filter((type): type is string => Boolean(type))
                           const uniqueTypes = Array.from(new Set(rawTypes))
                           if (uniqueTypes.length === 0)
@@ -213,7 +239,7 @@ export function AdOrdersManagement() {
                             <div className="flex flex-col gap-1">
                               {uniqueTypes.map((type) => (
                                 <TextColorBadge key={type} colorKey={type}>
-                                  {t(`admin.advertising.adCategory.${type}`)}
+                                  {t(`admin.advertising.adPackageType.${type}`)}
                                 </TextColorBadge>
                               ))}
                             </div>
@@ -235,6 +261,32 @@ export function AdOrdersManagement() {
                       </td>
                       <td className="text-muted-foreground px-4 py-3 text-sm">
                         {formatDateTimeForLocale(order.createdAt, i18n.language)}
+                      </td>
+                      <td className="text-muted-foreground px-4 py-3 text-sm">
+                        {(() => {
+                          const firstItem = order.items[0]
+                          if (!firstItem?.startDate) {
+                            return <span className="text-xs">-</span>
+                          }
+                          return formatDateTimeForLocale(firstItem.startDate, i18n.language)
+                        })()}
+                      </td>
+                      <td className="text-muted-foreground px-4 py-3 text-sm">
+                        {(() => {
+                          const firstItem = order.items[0]
+                          if (!firstItem?.startDate) {
+                            return <span className="text-xs">-</span>
+                          }
+                          const endDate = calculateEndDate(
+                            firstItem.startDate,
+                            firstItem.durationValue,
+                            firstItem.durationUnit
+                          )
+                          if (!endDate) {
+                            return <span className="text-xs">-</span>
+                          }
+                          return formatDateTimeForLocale(endDate.toISOString(), i18n.language)
+                        })()}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">

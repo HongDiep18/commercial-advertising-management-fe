@@ -1376,6 +1376,8 @@
       "contact": "Contact",
       "amount": "Amount",
       "submittedAt": "Submitted",
+      "startTime": "Start Time",
+      "endTime": "End Time",
       "actions": "Actions",
       "loadingOrders": "Loading orders...",
       "ordersError": "Failed to load orders. Please try again later.",

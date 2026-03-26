@@ -1448,6 +1448,8 @@
       "contact": "Liên hệ",
       "amount": "Số tiền",
       "submittedAt": "Thời gian gửi",
+      "startTime": "Thời gian bắt đầu",
+      "endTime": "Thời gian kết thúc",
       "actions": "Thao tác",
       "loadingOrders": "Đang tải đơn hàng...",
       "ordersError": "Không tải được đơn hàng. Vui lòng thử lại.",
