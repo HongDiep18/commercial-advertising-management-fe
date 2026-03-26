@@ -20,9 +20,16 @@ import {
   useMarkAdminNotificationAsRead,
   useMarkAllAdminNotificationsAsRead,
 } from "@/api/admin-notifications/hooks"
+import { formatDateTimeForLocale } from "@/utils/datetime"
 
 const EVENT_TYPE_ALL = "__all"
-type AdminTabId = "dashboard" | "companies" | "advertising" | "property" | "users" | "recentActivity"
+type AdminTabId =
+  | "dashboard"
+  | "companies"
+  | "advertising"
+  | "property"
+  | "users"
+  | "recentActivity"
 
 function getTargetAdminTab(entityType?: string, eventType?: string): AdminTabId {
   const value = `${entityType ?? ""} ${eventType ?? ""}`.toLowerCase()
@@ -83,7 +90,10 @@ export function DashboardNotificationsCard() {
   const { markAsRead, isPending: isMarkingOne } = useMarkAdminNotificationAsRead()
   const { markAllAsRead, isPending: isMarkingAll } = useMarkAllAdminNotificationsAsRead()
 
-  const notifications = notificationsData?.notifications ?? []
+  const notifications = useMemo(
+    () => notificationsData?.notifications ?? [],
+    [notificationsData?.notifications]
+  )
   const unreadCount = unreadCountData?.unreadCount ?? 0
 
   const eventTypeOptions = useMemo(() => {
@@ -122,7 +132,11 @@ export function DashboardNotificationsCard() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
   }
 
-  const handleOpenNotification = async (notificationId: string, isRead: boolean, tabId: AdminTabId) => {
+  const handleOpenNotification = async (
+    notificationId: string,
+    isRead: boolean,
+    tabId: AdminTabId
+  ) => {
     try {
       setActionErrorKey(null)
       if (!isRead) {
@@ -176,7 +190,9 @@ export function DashboardNotificationsCard() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("admin.dashboard.notificationsFilterAll")}</SelectItem>
-                <SelectItem value="unread">{t("admin.dashboard.notificationsFilterUnread")}</SelectItem>
+                <SelectItem value="unread">
+                  {t("admin.dashboard.notificationsFilterUnread")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -212,7 +228,9 @@ export function DashboardNotificationsCard() {
         )}
 
         {isNotificationsLoading && (
-          <p className="text-muted-foreground text-sm">{t("admin.dashboard.notificationsLoading")}</p>
+          <p className="text-muted-foreground text-sm">
+            {t("admin.dashboard.notificationsLoading")}
+          </p>
         )}
 
         {isNotificationsError && !isNotificationsLoading && (
@@ -249,7 +267,9 @@ export function DashboardNotificationsCard() {
                     }`}
                   />
 
-                  <p className="text-foreground truncate text-sm font-semibold">{notification.title}</p>
+                  <p className="text-foreground truncate text-sm font-semibold">
+                    {notification.title}
+                  </p>
 
                   {!notification.isRead && (
                     <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
@@ -261,15 +281,7 @@ export function DashboardNotificationsCard() {
                 <p className="text-muted-foreground text-sm">{notification.content}</p>
 
                 <p className="text-muted-foreground mt-1 text-xs">
-                  {new Date(notification.createdAt).toLocaleString(i18n.language, {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  {" • "}
-                  {notification.eventType}
+                  {formatDateTimeForLocale(notification.createdAt, i18n.language)}
                 </p>
               </button>
 
