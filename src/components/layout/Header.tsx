@@ -1,6 +1,7 @@
 "use client"
 
 import { isDemoAdminUser } from "@/components/login/demo/demoUsers"
+import { useAdminNotificationsUnreadCount } from "@/api/admin-notifications/hooks"
 import Button from "@/components/ui/Button"
 import { useUser, MembershipTier, UserRole } from "@/contexts/user-context"
 import { FeatureKey } from "@/types"
@@ -41,6 +42,10 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
     // Default to unfiltered if no primary industry set
     return "/directory"
   }, [user])
+
+  const isAdminUser = !!user && (user.role === UserRole.Admin || user.role === UserRole.SuperAdmin)
+  const { data: unreadCountData } = useAdminNotificationsUnreadCount(isLoggedIn && isAdminUser)
+  const unreadAdminNotificationCount = unreadCountData?.unreadCount ?? 0
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -126,7 +131,14 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                   aria-expanded={isDropdownOpen}
                   aria-haspopup="true"
                 >
-                  <span>{user.name}</span>
+                  <span className="inline-flex items-center gap-2">
+                    <span>{user.name}</span>
+                    {canUseFeature(FeatureKey.AdminPanel) && unreadAdminNotificationCount > 0 && (
+                      <span className="bg-header-red-light rounded-full px-2 py-0.5 text-xs leading-none font-semibold text-white">
+                        {unreadAdminNotificationCount}
+                      </span>
+                    )}
+                  </span>
                   <ChevronDown className="h-4 w-4 text-white/70" />
                 </button>
                 {isDropdownOpen && (
@@ -147,6 +159,11 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                       >
                         <Shield className="h-4 w-4" />
                         {t("header.adminPanel") || "管理後台"}
+                        {unreadAdminNotificationCount > 0 && (
+                          <span className="bg-header-red-light rounded-full px-2 py-0.5 text-xs leading-none font-semibold text-white">
+                            {unreadAdminNotificationCount}
+                          </span>
+                        )}
                       </Link>
                     )}
                     <div className="my-1 border-t border-black/20" />
@@ -245,7 +262,14 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                 <LanguageSelector variant="mobile" />
                 {isLoggedIn && user ? (
                   <>
-                    <div className="py-2 text-sm font-medium text-white/90">{user.name}</div>
+                    <div className="inline-flex items-center gap-2 py-2 text-sm font-medium text-white/90">
+                      <span>{user.name}</span>
+                      {isAdminUser && unreadAdminNotificationCount > 0 && (
+                        <span className="bg-header-red-light text-header-red-dark rounded-full px-2 py-0.5 text-xs leading-none font-semibold">
+                          {unreadAdminNotificationCount}
+                        </span>
+                      )}
+                    </div>
                     <Link
                       href="/account"
                       className="flex items-center gap-2 py-2 text-sm transition-colors hover:text-white/80"
