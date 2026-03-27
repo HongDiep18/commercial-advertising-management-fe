@@ -114,7 +114,7 @@ export default function PropertyModals({
             className="absolute inset-0 bg-black/50"
             onClick={onCloseContact}
           />
-          <div className="relative bg-card rounded-xl border border-border shadow-xl max-w-md w-full p-6">
+          <div className="relative bg-card rounded-xl border border-border shadow-xl max-w-md w-full mt-12 max-h-[85vh] overflow-y-auto p-6">
             <button
               onClick={onCloseContact}
               className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
@@ -215,7 +215,7 @@ export default function PropertyModals({
             className="absolute inset-0 bg-black/50"
             onClick={onCloseDetail}
           />
-          <div className="relative bg-card rounded-xl border border-border shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-card rounded-xl border border-border shadow-xl max-w-2xl w-full mt-12 max-h-[85vh] overflow-y-auto">
             <button
               onClick={onCloseDetail}
               className="absolute top-4 right-4 z-10 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center"

@@ -2,13 +2,13 @@
 
 import { useTranslation } from "react-i18next"
 
-import { Building2, Clock, Newspaper } from "lucide-react"
+import { Building2, Clock, Megaphone } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
 
 import { useAdminData } from "../AdminDataContext"
 import { ProfileRequestStatus } from "@/types/admin"
 import { useAdminCompaniesStats } from "@/api/admin-companies/hooks"
-import { usePublishedProperties } from "@/api/properties/hooks"
+import { useAdminOrders } from "@/api/ad-orders-admin/hooks"
 import { DashboardNotificationsCard } from "./DashboardNotificationsCard"
 
 export function DashboardTab() {
@@ -20,13 +20,14 @@ export function DashboardTab() {
   ).length
 
   const { data: companiesStatsData, isLoading: isCompaniesLoading } = useAdminCompaniesStats(true)
-  const { data: propertiesData, isLoading: isPropertiesLoading } = usePublishedProperties(
-    { page: 1, limit: 1, sortBy: "createdAt", sortOrder: "desc" },
-    true
-  )
+  const { data: pendingOrdersData, isLoading: isAdOrdersLoading } = useAdminOrders({
+    status: "PENDING",
+    page: 1,
+    limit: 1,
+  })
 
   const totalCompanies = companiesStatsData?.approvedCount ?? 0
-  const totalProperties = propertiesData?.pagination.total ?? 0
+  const pendingAdOrders = pendingOrdersData?.pagination.total ?? 0
 
   const stats = [
     {
@@ -44,9 +45,9 @@ export function DashboardTab() {
       color: "text-amber-600",
     },
     {
-      labelKey: "propertyViews",
-      value: isPropertiesLoading ? "..." : totalProperties.toLocaleString(),
-      icon: Newspaper,
+      labelKey: "pendingAdOrders",
+      value: isAdOrdersLoading ? "..." : pendingAdOrders.toLocaleString(),
+      icon: Megaphone,
       trend: "",
       color: "text-primary",
     },
