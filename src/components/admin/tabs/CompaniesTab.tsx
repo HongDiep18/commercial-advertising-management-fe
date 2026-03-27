@@ -1,19 +1,11 @@
 "use client"
 
 import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
-import { companyDetailToRequestRow } from "@/api/companies/adminCompany.mapper"
 import { getCompanyDetail } from "@/api/companies/service"
 import { AccountProfileModal } from "@/components/account"
 import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/Dialog"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { useUser } from "@/contexts/user-context"
 import {
@@ -27,13 +19,11 @@ import { isAdminRole } from "@/utils/adminRole"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 import {
   CheckCircle2,
-  Eye,
   Megaphone,
   Pencil,
   ToggleLeft,
   ToggleRight,
   Trash2,
-  X,
   XCircle,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
@@ -58,9 +48,6 @@ export function CompaniesTab() {
   } = useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
   const [updatingId, setUpdatingId] = useState<string | null>(null)
-  const [selectedRequest, setSelectedRequest] = useState<ProfileRequestRow | null>(null)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
-  const [viewOpening, setViewOpening] = useState(false)
   const [activeAdsRow, setActiveAdsRow] = useState<ProfileRequestRow | null>(null)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: "",
@@ -153,46 +140,6 @@ export function CompaniesTab() {
         showToast(t("admin.companies.deleteCompanyError", "Failed to delete company"), "error")
       )
       .finally(() => setUpdatingId(null))
-  }
-
-  const openCompanyView = async (row: ProfileRequestRow) => {
-    setViewOpening(true)
-    try {
-      const companyId = row.companyId?.trim()
-      if (!companyId) {
-        setSelectedRequest(row)
-        setIsDetailOpen(true)
-        return
-      }
-      try {
-        const detail = await getCompanyDetail(companyId)
-        if (detail && typeof detail === "object") {
-          const mapped = companyDetailToRequestRow(detail as Record<string, unknown>, row)
-          const resolved = {
-            ...mapped,
-            companyName: detail.companyNameVi || detail.companyNameCn || mapped.companyName,
-          }
-          setSelectedRequest(resolved)
-
-          setCompanyInfoById((prev) => ({
-            ...prev,
-            [companyId]: {
-              companyName: resolved.companyName,
-              email: detail.email.trim(),
-              contactName: detail.contactName,
-              industry: detail.industry,
-            },
-          }))
-        } else {
-          setSelectedRequest(row)
-        }
-      } catch {
-        setSelectedRequest(row)
-      }
-      setIsDetailOpen(true)
-    } finally {
-      setViewOpening(false)
-    }
   }
 
   const { statusCounts, filtered } = useMemo(
@@ -491,16 +438,6 @@ export function CompaniesTab() {
                             <Pencil className="h-4 w-4" />
                           </Button>
                         )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:!bg-primary h-8 hover:!text-white"
-                          aria-label={t("common.view", "View")}
-                          disabled={viewOpening}
-                          onClick={() => void openCompanyView(row)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -510,59 +447,6 @@ export function CompaniesTab() {
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="bg-body-bg-dark relative max-h-[90vh] max-w-2xl overflow-y-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-foreground absolute top-3 right-3 h-8 w-8"
-            onClick={() => setIsDetailOpen(false)}
-            aria-label={t("admin.companies.closeDialog")}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          {selectedRequest && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{selectedRequest.companyName}</DialogTitle>
-                <DialogDescription>
-                  {t("admin.companies.submittedOn")}{" "}
-                  {formatDateTimeForLocale(selectedRequest.submittedAt, i18n.language)}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="mt-4 space-y-4 px-5">
-                <div className="border-border grid gap-3 border-b pb-4 sm:grid-cols-2">
-                  <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">{t("admin.companies.contact")}</p>
-                    <p className="text-sm font-medium">{selectedRequest.contactName}</p>
-                  </div>
-                  <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">{t("admin.companies.email")}</p>
-                    <p className="text-sm font-medium">
-                      {selectedRequest.companyId && companyInfoById[selectedRequest.companyId]
-                        ? companyInfoById[selectedRequest.companyId].email
-                        : selectedRequest.email}
-                    </p>
-                  </div>
-                  <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">{t("admin.companies.industry")}</p>
-                    <p className="text-sm font-medium">{selectedRequest.industry}</p>
-                  </div>
-                  <div className="bg-body-bg-dark-foreground rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">{t("admin.companies.country")}</p>
-                    <p className="text-sm font-medium">{selectedRequest.country}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 border-t py-4">
-                  <p className="text-muted-foreground text-xs">{t("admin.companies.status")}</p>
-                  <StatusBadge status={selectedRequest.status} />
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {activeAdsRow?.companyId && (
         <CompanyActiveAdsDialog
