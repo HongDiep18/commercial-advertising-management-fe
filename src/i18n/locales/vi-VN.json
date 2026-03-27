@@ -1500,7 +1500,25 @@
         "pending": "Chờ kích hoạt",
         "expired": "Đã hết hạn",
         "disabled": "Đã tắt"
-      }
+      },
+      "delete": "Xóa",
+      "deleteConfirm": "Xóa vĩnh viễn quảng cáo đang hoạt động này?",
+      "deleteSuccess": "Đã xóa quảng cáo đang hoạt động thành công.",
+      "deleteError": "Không thể xóa quảng cáo đang hoạt động. Vui lòng thử lại.",
+      "saveError": "Không thể lưu thay đổi. Vui lòng thử lại.",
+      "saveSuccess": "Đã lưu thay đổi thành công.",
+      "createSectionTitle": "Thêm quảng cáo bổ sung",
+      "createPackageType": "Loại quảng cáo",
+      "createStartTime": "Bắt đầu",
+      "createEndTime": "Kết thúc",
+      "createAdLink": "URL liên kết quảng cáo",
+      "createAdLinkPlaceholder": "https://…",
+      "createUrlError": "Nhập URL hợp lệ (http hoặc https).",
+      "createSubmit": "Tạo mới",
+      "createSuccess": "Đã tạo quảng cáo đang hoạt động.",
+      "createError": "Không thể tạo quảng cáo. Vui lòng thử lại.",
+      "createInvalidRange": "Thời điểm kết thúc phải sau thời điểm bắt đầu.",
+      "createShowButton": "+ Tạo mới"
     },
     "property": {
       "listingsCount": "{{count}} bất động sản",
