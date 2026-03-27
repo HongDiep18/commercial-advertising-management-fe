@@ -65,7 +65,7 @@
     },
     "locations": {
       "hcm": "Ho Chi Minh City",
-      "hanoi": "Hanoi",
+      "hanoi": "Ha Noi",
       "binhduong": "Binh Duong",
       "dongnai": "Dong Nai",
       "danang": "Da Nang",
@@ -518,7 +518,7 @@
     },
     "regions": {
       "hcm": "Ho Chi Minh City",
-      "hanoi": "Hanoi",
+      "hanoi": "Ha Noi",
       "binhduong": "Binh Duong",
       "dongnai": "Dong Nai",
       "danang": "Da Nang",
@@ -933,7 +933,7 @@
       "新加坡": "Singapore",
       "越南": "Vietnam",
       "胡志明市": "Ho Chi Minh City",
-      "河內": "Hanoi",
+      "河內": "Ha Noi",
       "平陽": "Binh Duong",
       "同奈": "Dong Nai"
     },
@@ -992,6 +992,7 @@
   "directory": {
     "searchPlaceholder": "Search company name, keywords...",
     "clear": "Clear",
+    "clearRegion": "Clear Region",
     "loading": "Loading...",
     "selectCategory": "Please Select Category",
     "selectCategoryDescription": "Please select a company category from the left, or use the search box above to find specific companies.",
@@ -1078,7 +1079,7 @@
     "items": {
       "news-1": {
         "title": "2025 Vietnam Cost of Living Report: Monthly Expense Analysis and Savings Strategies for Taiwanese Families",
-        "excerpt": "According to the latest survey, the cost of living in major Vietnamese cities has increased by approximately 8% over the past year. This report provides a detailed analysis of housing, transportation, dining, and other expenses in areas where Taiwanese businesses are concentrated, such as Ho Chi Minh City, Hanoi, and Binh Duong Province, along with practical savings recommendations.",
+        "excerpt": "According to the latest survey, the cost of living in major Vietnamese cities has increased by approximately 8% over the past year. This report provides a detailed analysis of housing, transportation, dining, and other expenses in areas where Taiwanese businesses are concentrated, such as Ho Chi Minh City, Ha Noi, and Binh Duong Province, along with practical savings recommendations.",
         "readTime": "5 min"
       },
       "news-2": {
@@ -1607,7 +1608,7 @@
     "provinces": {
       "all": "All Areas",
       "hcm": "Ho Chi Minh City",
-      "hanoi": "Hanoi",
+      "hanoi": "Ha Noi",
       "binh-duong": "Binh Duong",
       "dong-nai": "Dong Nai",
       "long-an": "Long An",

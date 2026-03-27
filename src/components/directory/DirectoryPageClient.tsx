@@ -15,6 +15,7 @@ function DirectoryContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const industryParams = searchParams.getAll("industry")
+  const regionParams = searchParams.getAll("region")
   const categoryParam = searchParams.get("category")
   const qParam = searchParams.get("q") ?? ""
   const { user, isLoggedIn } = useUser()
@@ -32,10 +33,23 @@ function DirectoryContent() {
         const params = new URLSearchParams()
         accessibleIndustries.forEach((id) => params.append("industry", id))
         if (qParam) params.set("q", qParam)
+        regionParams.forEach((id) => params.append("region", id))
         router.replace(`/directory?${params.toString()}`)
       }
     }
-  }, [hasAllAccess, categories, categoryParam, industryParams.length, router, qParam])
+  }, [hasAllAccess, categories, categoryParam, industryParams.length, router, qParam, regionParams])
+
+  const selectedRegions = useMemo(() => {
+    const ids = regionParams.map((s) => String(s).trim()).filter((s) => s !== "")
+    return Array.from(new Set(ids))
+  }, [regionParams])
+
+  const handleClearRegions = () => {
+    const next = new URLSearchParams(searchParams.toString())
+    next.delete("region")
+    const nextQs = next.toString()
+    router.replace(`/directory${nextQs ? `?${nextQs}` : ""}`)
+  }
 
   const urlIndustryKey = useMemo(() => {
     if (industryParams.length > 0) {
@@ -113,8 +127,10 @@ function DirectoryContent() {
             <div className="min-w-0 flex-1">
               <DirectoryResults
                 selectedCategories={selectedCategories}
+                selectedRegions={selectedRegions}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                onClearRegions={handleClearRegions}
               />
             </div>
           </div>
