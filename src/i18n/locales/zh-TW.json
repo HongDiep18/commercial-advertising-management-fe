@@ -481,7 +481,7 @@
     "phoneDirectory": "(購買名錄)",
     "mapTitle": "公司位置地圖",
     "copyright": "© 2025 vnbuyerguide.com 版權所有",
-    "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
+    "companyFullName": "建豪贸易服务有限公司"
   },
   "register": {
     "title": "會員註冊",
@@ -617,7 +617,9 @@
       "captcha": "驗證碼錯誤，請重新輸入",
       "submit": "註冊失敗，請稍後再試",
       "invalidWebsite": "請輸入有效的網站網址。",
-      "duplicate409": "此帳號已提交過註冊申請。"
+      "duplicate409": "此帳號已提交過註冊申請。",
+      "invalidTaxId": "稅號只能包含數字",
+      "duplicatePhone": "請輸入與公司電話不同的聯絡人電話號碼"
     }
   },
   "login": {
@@ -1677,5 +1679,55 @@
     "charOver": "超出限制 {{over}} 個字元",
     "waitForReply": "請等待回覆完成",
     "tooltipMessage": "👋 對越南華商採購網有疑問？來問我們的 AI！"
+  },
+  "terms": {
+    "title": "服務條款",
+    "sections": {
+      "acceptance": {
+        "title": "1. 接受條款",
+        "content": "使用 VN Buyer Guide 即表示您同意遵守本條款。如不同意，請勿使用本平台。"
+      },
+      "use": {
+        "title": "2. 服務使用",
+        "content": "VN Buyer Guide 提供越南買家與供應商的媒合平台。用戶在註冊時須提供準確完整的資訊。"
+      },
+      "account": {
+        "title": "3. 帳號責任",
+        "content": "您有責任保管好帳號憑證，並對帳號下發生的所有活動負責。"
+      },
+      "prohibited": {
+        "title": "4. 禁止行為",
+        "content": "用戶不得將本服務用於任何非法目的、發送垃圾郵件或冒充任何個人或組織。"
+      },
+      "termination": {
+        "title": "5. 終止服務",
+        "content": "若用戶違反本條款，我們保留在未事先通知的情況下立即暫停或終止其服務使用權的權利。"
+      }
+    }
+  },
+  "privacy": {
+    "title": "隱私政策",
+    "sections": {
+      "collect": {
+        "title": "1. 我們收集的資訊",
+        "content": "我們收集您在註冊時提供的資訊，包括公司名稱、稅號、聯絡資訊及電子郵件地址。"
+      },
+      "use": {
+        "title": "2. 資訊使用方式",
+        "content": "您的資訊用於提供和改善服務、驗證企業身份，以及促進買家與供應商之間的連結。"
+      },
+      "sharing": {
+        "title": "3. 資料共享",
+        "content": "我們不會出售您的個人資訊。企業檔案資訊可能對平台上的已驗證會員可見。"
+      },
+      "security": {
+        "title": "4. 資料安全",
+        "content": "我們採取適當的安全措施，保護您的資訊免遭未經授權的存取、修改或洩露。"
+      },
+      "contact": {
+        "title": "5. 聯絡我們",
+        "content": "如對本隱私政策有任何疑問，請透過平台與我們聯繫。"
+      }
+    }
   }
 }
