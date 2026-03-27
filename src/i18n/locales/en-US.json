@@ -618,7 +618,9 @@
       "invalidWebsite": "Please enter a valid website URL.",
       "captcha": "Invalid captcha, please try again",
       "submit": "Registration failed, please try again later",
-      "duplicate409": "This account has already submitted a registration request."
+      "duplicate409": "This account has already submitted a registration request.",
+      "invalidTaxId": "Tax ID must contain numbers only",
+      "duplicatePhone": "Contact phone must be different from company phone"
     }
   },
   "login": {
@@ -1692,5 +1694,55 @@
     "charOver": "{{over}} characters over the limit",
     "waitForReply": "Please wait for the reply to finish",
     "tooltipMessage": "👋 Questions about VN Buyer's Guide? Ask our AI!"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "sections": {
+      "acceptance": {
+        "title": "1. Acceptance of Terms",
+        "content": "By accessing and using VN Buyer Guide, you accept and agree to be bound by these terms. If you do not agree, please do not use this platform."
+      },
+      "use": {
+        "title": "2. Use of Service",
+        "content": "VN Buyer Guide provides a platform to connect buyers and suppliers in Vietnam. Users must provide accurate and complete information during registration."
+      },
+      "account": {
+        "title": "3. Account Responsibility",
+        "content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account."
+      },
+      "prohibited": {
+        "title": "4. Prohibited Activities",
+        "content": "Users may not use the service for any unlawful purpose, to transmit spam, or to impersonate any person or entity."
+      },
+      "termination": {
+        "title": "5. Termination",
+        "content": "We reserve the right to terminate or suspend access to our service immediately, without prior notice, for conduct that violates these Terms."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "sections": {
+      "collect": {
+        "title": "1. Information We Collect",
+        "content": "We collect information you provide during registration including company name, tax ID, contact details, and email address."
+      },
+      "use": {
+        "title": "2. How We Use Your Information",
+        "content": "Your information is used to provide and improve our services, verify business identity, and facilitate connections between buyers and suppliers."
+      },
+      "sharing": {
+        "title": "3. Data Sharing",
+        "content": "We do not sell your personal information. Business profile information may be visible to other verified members on the platform."
+      },
+      "security": {
+        "title": "4. Data Security",
+        "content": "We implement appropriate security measures to protect your information against unauthorized access, alteration, or disclosure."
+      },
+      "contact": {
+        "title": "5. Contact Us",
+        "content": "If you have questions about this Privacy Policy, please contact us through the platform."
+      }
+    }
   }
 }
