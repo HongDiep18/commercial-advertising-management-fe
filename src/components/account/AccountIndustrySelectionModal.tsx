@@ -64,7 +64,7 @@ export function AccountIndustrySelectionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-card border-border w-full max-w-2xl rounded-lg border shadow-xl">
+      <div className="bg-card border-border mt-12 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg border shadow-xl">
         <div className="border-border flex items-center justify-between border-b p-6">
           <h2 className="text-foreground text-xl font-semibold">
             {t("account.industrySelection.title", { defaultValue: "選擇產業" })}
@@ -78,7 +78,7 @@ export function AccountIndustrySelectionModal({
           </button>
         </div>
 
-        <div className="max-h-[60vh] space-y-6 overflow-y-auto p-6">
+        <div className="space-y-6 p-6">
           {/* Industry Selection */}
           <div>
             <label className="text-foreground mb-2 block text-sm font-medium">
