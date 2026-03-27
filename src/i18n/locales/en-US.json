@@ -1447,6 +1447,15 @@
       "approveNote": "Approval note",
       "rejectReason": "Rejection reason"
     },
+    "activeAds": {
+      "dialogDescription": "Active ads for this company",
+      "status": {
+        "activating": "Active",
+        "pending": "Pending",
+        "expired": "Expired",
+        "disabled": "Disabled"
+      }
+    },
     "property": {
       "listingsCount": "{{count}} listings",
       "addProperty": "Add Property",

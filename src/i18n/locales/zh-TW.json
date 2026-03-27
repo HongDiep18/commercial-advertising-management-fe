@@ -1432,6 +1432,15 @@
       "approveNote": "核准備註",
       "rejectReason": "拒絕原因"
     },
+    "activeAds": {
+      "dialogDescription": "此公司的啟用廣告",
+      "status": {
+        "activating": "啟用中",
+        "pending": "待啟用",
+        "expired": "已到期",
+        "disabled": "已停用"
+      }
+    },
     "property": {
       "listingsCount": "{{count}} 筆物業",
       "addProperty": "新增物業",
