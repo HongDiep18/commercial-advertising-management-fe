@@ -663,7 +663,9 @@
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
       "submit": "Đăng ký thất bại, vui lòng thử lại sau",
       "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ.",
-      "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó."
+      "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó.",
+      "invalidTaxId": "Mã số thuế chỉ được chứa chữ số",
+      "duplicatePhone": "Vui lòng nhập số điện thoại của người liên hệ khác với số điện thoại công ty"
     }
   },
   "login": {
@@ -1738,5 +1740,55 @@
     "charOver": "Vượt quá {{over}} ký tự cho phép",
     "waitForReply": "Vui lòng chờ phản hồi hoàn tất",
     "tooltipMessage": "👋 Bạn có câu hỏi về VN Buyer's Guide? Hỏi AI của chúng tôi!"
+  },
+  "terms": {
+    "title": "Điều Khoản Dịch Vụ",
+    "sections": {
+      "acceptance": {
+        "title": "1. Chấp Nhận Điều Khoản",
+        "content": "Khi truy cập và sử dụng VN Buyer Guide, bạn đồng ý tuân theo các điều khoản này. Nếu không đồng ý, vui lòng không sử dụng nền tảng."
+      },
+      "use": {
+        "title": "2. Sử Dụng Dịch Vụ",
+        "content": "VN Buyer Guide cung cấp nền tảng kết nối người mua và nhà cung cấp tại Việt Nam. Người dùng phải cung cấp thông tin chính xác khi đăng ký."
+      },
+      "account": {
+        "title": "3. Trách Nhiệm Tài Khoản",
+        "content": "Bạn chịu trách nhiệm bảo mật thông tin đăng nhập và mọi hoạt động xảy ra dưới tài khoản của mình."
+      },
+      "prohibited": {
+        "title": "4. Hành Vi Bị Cấm",
+        "content": "Người dùng không được sử dụng dịch vụ cho mục đích bất hợp pháp, gửi spam hoặc mạo danh bất kỳ cá nhân hay tổ chức nào."
+      },
+      "termination": {
+        "title": "5. Chấm Dứt Dịch Vụ",
+        "content": "Chúng tôi có quyền đình chỉ hoặc chấm dứt quyền truy cập ngay lập tức, không cần thông báo trước, nếu người dùng vi phạm các điều khoản này."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Chính Sách Bảo Mật",
+    "sections": {
+      "collect": {
+        "title": "1. Thông Tin Chúng Tôi Thu Thập",
+        "content": "Chúng tôi thu thập thông tin bạn cung cấp khi đăng ký bao gồm tên công ty, mã số thuế, thông tin liên hệ và địa chỉ email."
+      },
+      "use": {
+        "title": "2. Cách Chúng Tôi Sử Dụng Thông Tin",
+        "content": "Thông tin của bạn được dùng để cung cấp và cải thiện dịch vụ, xác minh danh tính doanh nghiệp và kết nối người mua với nhà cung cấp."
+      },
+      "sharing": {
+        "title": "3. Chia Sẻ Dữ Liệu",
+        "content": "Chúng tôi không bán thông tin cá nhân của bạn. Thông tin hồ sơ doanh nghiệp có thể hiển thị cho các thành viên đã xác minh trên nền tảng."
+      },
+      "security": {
+        "title": "4. Bảo Mật Dữ Liệu",
+        "content": "Chúng tôi áp dụng các biện pháp bảo mật phù hợp để bảo vệ thông tin của bạn khỏi truy cập, sửa đổi hoặc tiết lộ trái phép."
+      },
+      "contact": {
+        "title": "5. Liên Hệ",
+        "content": "Nếu bạn có câu hỏi về Chính Sách Bảo Mật này, vui lòng liên hệ với chúng tôi qua nền tảng."
+      }
+    }
   }
 }
