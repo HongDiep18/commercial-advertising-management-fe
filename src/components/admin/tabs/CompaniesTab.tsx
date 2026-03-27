@@ -1,17 +1,10 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { useTranslation } from "react-i18next"
-import {
-  CheckCircle2,
-  Eye,
-  Pencil,
-  Trash2,
-  X,
-  XCircle,
-  ToggleLeft,
-  ToggleRight,
-} from "lucide-react"
+import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
+import { companyDetailToRequestRow } from "@/api/companies/adminCompany.mapper"
+import { getCompanyDetail } from "@/api/companies/service"
+import { AccountProfileModal } from "@/components/account"
+import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import {
@@ -21,12 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/Dialog"
-import { AccountProfileModal } from "@/components/account"
-import { useUser } from "@/contexts/user-context"
-import { StatusBadge } from "../StatusBadge"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
-import { PROFILE_REQUEST_FILTERS } from "../constants"
-import { useAdminData } from "../AdminDataContext"
+import { useUser } from "@/contexts/user-context"
 import {
   getProfileRequestFilterState,
   isCompanyActive,
@@ -34,11 +23,24 @@ import {
   type ProfileRequestRow,
   ProfileRequestStatus,
 } from "@/types/admin"
-import { companyDetailToRequestRow } from "@/api/companies/adminCompany.mapper"
-import { getCompanyDetail } from "@/api/companies/service"
-import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
-import { formatDateTimeForLocale } from "@/utils/datetime"
 import { isAdminRole } from "@/utils/adminRole"
+import { formatDateTimeForLocale } from "@/utils/datetime"
+import {
+  CheckCircle2,
+  Eye,
+  Megaphone,
+  Pencil,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  X,
+  XCircle,
+} from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useAdminData } from "../AdminDataContext"
+import { PROFILE_REQUEST_FILTERS } from "../constants"
+import { StatusBadge } from "../StatusBadge"
 import { useCompanyEdit } from "./useCompanyEdit"
 
 export function CompaniesTab() {
@@ -59,6 +61,7 @@ export function CompaniesTab() {
   const [selectedRequest, setSelectedRequest] = useState<ProfileRequestRow | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [viewOpening, setViewOpening] = useState(false)
+  const [activeAdsRow, setActiveAdsRow] = useState<ProfileRequestRow | null>(null)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: "",
     variant: "info",
@@ -464,6 +467,18 @@ export function CompaniesTab() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         )}
+                        {row.status === ProfileRequestStatus.APPROVED && row.companyId && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hover:bg-primary! h-8 hover:text-white!"
+                            aria-label={t("admin.activeAds.dialogDescription", "Active ads")}
+                            disabled={!!updatingId}
+                            onClick={() => setActiveAdsRow(row)}
+                          >
+                            <Megaphone className="h-4 w-4" />
+                          </Button>
+                        )}
                         {row.status === ProfileRequestStatus.APPROVED && (
                           <Button
                             variant="ghost"
@@ -549,6 +564,17 @@ export function CompaniesTab() {
         </DialogContent>
       </Dialog>
 
+      {activeAdsRow?.companyId && (
+        <CompanyActiveAdsDialog
+          companyId={activeAdsRow.companyId}
+          companyName={activeAdsRow.companyName}
+          open={!!activeAdsRow}
+          onOpenChange={(open) => {
+            if (!open) setActiveAdsRow(null)
+          }}
+        />
+      )}
+
       {companyEdit.state.editModalOpen && (
         <AccountProfileModal
           open
@@ -563,9 +589,7 @@ export function CompaniesTab() {
           onSave={() => void companyEdit.actions.handleSaveCompanyEdit()}
           isSaving={companyEdit.state.editSaving}
           countries={companyEdit.ui.countries}
-          availableRegions={companyEdit.ui.availableRegions}
-          regionValue={companyEdit.ui.regionValue}
-          hasCountry={companyEdit.ui.hasCountry}
+          allRegions={companyEdit.ui.allRegions}
           readOnly={!canEditCompanyProfile}
           t={t}
         />

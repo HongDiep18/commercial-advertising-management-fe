@@ -568,6 +568,35 @@
       "dongnai": "Đồng Nai",
       "danang": "Đà Nẵng",
       "haiphong": "Hải Phòng",
+      "cantho": "Cần Thơ",
+      "hue": "Huế",
+      "angiang": "An Giang",
+      "bacninh": "Bắc Ninh",
+      "camau": "Cà Mau",
+      "caobang": "Cao Bằng",
+      "dienbien": "Điện Biên",
+      "daklak": "Đắk Lắk",
+      "dongthap": "Đồng Tháp",
+      "gialai": "Gia Lai",
+      "hatinh": "Hà Tĩnh",
+      "hungyen": "Hưng Yên",
+      "khanhhoa": "Khánh Hòa",
+      "laichau": "Lai Châu",
+      "langson": "Lạng Sơn",
+      "laocai": "Lào Cai",
+      "lamdong": "Lâm Đồng",
+      "nghean": "Nghệ An",
+      "ninhbinh": "Ninh Bình",
+      "phutho": "Phú Thọ",
+      "quangngai": "Quảng Ngãi",
+      "quangninh": "Quảng Ninh",
+      "quangtri": "Quảng Trị",
+      "sonla": "Sơn La",
+      "tayninh": "Tây Ninh",
+      "thainguyen": "Thái Nguyên",
+      "thanhhoa": "Thanh Hóa",
+      "tuyenquang": "Tuyên Quang",
+      "vinhlong": "Vĩnh Long",
       "other-vn": "Khác",
       "taipei": "Đài Bắc",
       "taichung": "Đài Trung",
@@ -612,7 +641,7 @@
       "contactPhone": "Số điện thoại người liên hệ",
       "companyAddress": "Địa chỉ Công ty",
       "email": "E-Mail",
-      "country": "Chọn Quốc gia *",
+      "country": "Chọn xuất xứ *",
       "region": "Chọn Khu vực *",
       "industry": "Chọn ngành nghề *",
       "website": "Trang web *",
@@ -780,30 +809,12 @@
       "diamond": "Chi tiêu 530.000 VND"
     },
     "tierBenefits": {
-      "NONE": [
-        "Tên công ty (một phần)",
-        "Khu vực"
-      ],
-      "guest": [
-        "Tên công ty (một phần)",
-        "Khu vực"
-      ],
-      "BRONZE": [
-        "Ngành cơ bản",
-        "Tên công ty, mã số thuế, khu vực"
-      ],
-      "bronze": [
-        "Ngành cơ bản",
-        "Tên công ty, mã số thuế, khu vực"
-      ],
-      "SILVER": [
-        "Ngành đầy đủ",
-        "Mở khóa trang web, điện thoại, địa chỉ, email"
-      ],
-      "silver": [
-        "Ngành đầy đủ",
-        "Mở khóa trang web, điện thoại, địa chỉ, email"
-      ],
+      "NONE": ["Tên công ty (một phần)", "Khu vực"],
+      "guest": ["Tên công ty (một phần)", "Khu vực"],
+      "BRONZE": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
+      "bronze": ["Ngành cơ bản", "Tên công ty, mã số thuế, khu vực"],
+      "SILVER": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
+      "silver": ["Ngành đầy đủ", "Mở khóa trang web, điện thoại, địa chỉ, email"],
       "GOLD": [
         "Ngành của bạn + 3 ngành liên quan (đầy đủ)",
         "Mở khóa ngành của bạn + 3 ngành thượng/hạ nguồn"
@@ -824,18 +835,10 @@
       ]
     },
     "tierRestrictions": {
-      "NONE": [
-        "Không có trang web, điện thoại, địa chỉ, mã số thuế"
-      ],
-      "guest": [
-        "Không có trang web, điện thoại, địa chỉ, mã số thuế"
-      ],
-      "BRONZE": [
-        "Không có trang web, điện thoại hoặc địa chỉ"
-      ],
-      "bronze": [
-        "Không có trang web, điện thoại hoặc địa chỉ"
-      ],
+      "NONE": ["Không có trang web, điện thoại, địa chỉ, mã số thuế"],
+      "guest": ["Không có trang web, điện thoại, địa chỉ, mã số thuế"],
+      "BRONZE": ["Không có trang web, điện thoại hoặc địa chỉ"],
+      "bronze": ["Không có trang web, điện thoại hoặc địa chỉ"],
       "SILVER": [],
       "silver": [],
       "GOLD": [],
@@ -1034,6 +1037,7 @@
   "directory": {
     "searchPlaceholder": "Tìm kiếm tên công ty, từ khóa...",
     "clear": "Xóa",
+    "clearRegion": "Xóa khu vực",
     "loading": "Đang tải...",
     "selectCategory": "Vui lòng Chọn Danh mục",
     "selectCategoryDescription": "Vui lòng chọn một danh mục công ty từ bên trái, hoặc sử dụng hộp tìm kiếm ở trên để tìm các công ty cụ thể.",
@@ -1225,6 +1229,7 @@
       "pendingApplications": "Đơn chờ duyệt",
       "newsCount": "Số tin tức",
       "propertyViews": "Lượt xem bất động sản",
+      "pendingAdOrders": "Đơn quảng cáo chờ duyệt",
       "trendToday": "+8 hôm nay",
       "attentionRequired": "Cần chú ý",
       "pendingAlert": "{{count}} đơn đăng ký doanh nghiệp chờ duyệt.",
@@ -1487,6 +1492,33 @@
       "slotNotAvailable": "Vị trí quảng cáo này đã được đặt hết trong khoảng thời gian yêu cầu.",
       "approveNote": "Ghi chú duyệt",
       "rejectReason": "Lý do từ chối"
+    },
+    "activeAds": {
+      "dialogDescription": "Quảng cáo đã được kích hoạt của công ty này",
+      "status": {
+        "activating": "Đang kích hoạt",
+        "pending": "Chờ kích hoạt",
+        "expired": "Đã hết hạn",
+        "disabled": "Đã tắt"
+      },
+      "delete": "Xóa",
+      "deleteConfirm": "Xóa vĩnh viễn quảng cáo đang hoạt động này?",
+      "deleteSuccess": "Đã xóa quảng cáo đang hoạt động thành công.",
+      "deleteError": "Không thể xóa quảng cáo đang hoạt động. Vui lòng thử lại.",
+      "saveError": "Không thể lưu thay đổi. Vui lòng thử lại.",
+      "saveSuccess": "Đã lưu thay đổi thành công.",
+      "createSectionTitle": "Thêm quảng cáo bổ sung",
+      "createPackageType": "Loại quảng cáo",
+      "createStartTime": "Bắt đầu",
+      "createEndTime": "Kết thúc",
+      "createAdLink": "URL liên kết quảng cáo",
+      "createAdLinkPlaceholder": "https://…",
+      "createUrlError": "Nhập URL hợp lệ (http hoặc https).",
+      "createSubmit": "Tạo mới",
+      "createSuccess": "Đã tạo quảng cáo đang hoạt động.",
+      "createError": "Không thể tạo quảng cáo. Vui lòng thử lại.",
+      "createInvalidRange": "Thời điểm kết thúc phải sau thời điểm bắt đầu.",
+      "createShowButton": "+ Tạo mới"
     },
     "property": {
       "listingsCount": "{{count}} bất động sản",

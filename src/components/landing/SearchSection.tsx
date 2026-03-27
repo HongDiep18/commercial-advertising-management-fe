@@ -2,6 +2,7 @@
 
 import { useCompanyCategories } from "@/api/companies/hooks"
 import { INDUSTRY_CATEGORIES } from "@/constants/categories"
+import { REGION_KEYS_BY_COUNTRY } from "@/constants/location"
 import { isDemoUser } from "@/components/login/demo"
 import { useUser } from "@/contexts/user-context"
 import { ChevronDown, Search, X } from "lucide-react"
@@ -14,8 +15,6 @@ interface FilterTag {
   id: string
   label: string
 }
-
-const locationIds = ["hcm", "hanoi", "binhduong", "dongnai", "danang", "haiphong"]
 
 export default function SearchSection() {
   const { t } = useTranslation()
@@ -64,9 +63,10 @@ export default function SearchSection() {
   }, [companyCategoriesData, isDemo, t])
 
   const allLocations = useMemo(() => {
-    return locationIds.map((id) => ({
+    const ids = REGION_KEYS_BY_COUNTRY.vietnam ?? []
+    return ids.map((id) => ({
       id,
-      name: t(`search.locations.${id}`),
+      name: t(`register.regions.${id}`, { defaultValue: id }),
     }))
   }, [t])
 
@@ -152,8 +152,10 @@ export default function SearchSection() {
 
   const handleSearchSubmit = () => {
     const params = new URLSearchParams()
-    if (searchValue.trim()) params.set("q", searchValue.trim())
+    const typed = searchValue.trim()
+    if (typed) params.set("q", typed)
     selectedIndustries.forEach((id) => params.append("industry", id))
+    selectedLocations.forEach((id) => params.append("region", id))
     router.push(`/directory${params.toString() ? `?${params.toString()}` : ""}`)
   }
 
@@ -203,16 +205,6 @@ export default function SearchSection() {
                 >
                   {t("search.byCompany")}
                 </button>
-                {/* <button
-                  onClick={() => setSearchMode("product")}
-                  className={`rounded px-4 py-1.5 text-sm font-medium transition-all ${
-                    searchMode === "product"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t("search.byProduct")}
-                </button> */}
               </div>
 
               <div className="relative" ref={industryDropdownRef}>
@@ -281,7 +273,7 @@ export default function SearchSection() {
                         onChange={(e) => setLocationSearch(e.target.value)}
                         className="border-border/60 focus:ring-primary/40 mb-3 h-9 w-full rounded-md border px-3 text-sm outline-none focus:ring-2"
                       />
-                      <div className="space-y-1">
+                      <div className="max-h-40 space-y-1 overflow-y-auto">
                         {filteredLocations.map((location) => (
                           <button
                             key={location.id}
@@ -322,23 +314,6 @@ export default function SearchSection() {
               {t("search.searchButton")}
             </Button>
           </div>
-
-          {/* <div className="mt-6 text-center">
-            <span className="text-muted-foreground mr-3 text-sm">
-              {t("search.popularSearches")}
-            </span>
-            <div className="mt-2 inline-flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handlePopularTagClick(category.name)}
-                  className="border-border text-foreground hover:border-primary hover:text-primary rounded-md border bg-white px-3 py-1 text-xs font-normal transition-colors"
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </div> */}
         </div>
       </div>
     </section>
