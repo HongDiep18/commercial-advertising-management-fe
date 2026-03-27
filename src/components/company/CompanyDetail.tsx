@@ -28,10 +28,8 @@ import { isDemoUser } from "@/components/login/demo"
 import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
 import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
-import {
-  truncateIntroduction,
-  categoryNameToIdMap,
-} from "../../utils/companyHelpers"
+import { truncateIntroduction, categoryNameToIdMap } from "../../utils/companyHelpers"
+import { translateRegionLabel } from "@/utils/regionSearch"
 
 interface CompanyDetailProps {
   companyId: string
@@ -48,6 +46,7 @@ function getDeterministicHash(seed: string): number {
 export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const searchParams = useSearchParams()
   const fromCategory = searchParams.get("fromCategory")
+  const backParam = searchParams.get("back")
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
@@ -123,23 +122,23 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const company = isDemo
     ? getCompanyData(companyId)
     : {
-      id: apiCompany!.id,
-      nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
-      nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
-      logo: apiCompany!.logoUrl ?? "/placeholder.svg",
-      category: apiCompany!.industry,
-      categoryTags: [],
-      address: apiCompany!.address,
-      phone: apiCompany!.phone,
-      email: apiCompany!.email,
-      website: apiCompany!.website ?? "",
-      contactPerson: apiCompany!.contactName,
-      region: apiCompany!.region ?? "",
-      taxId: apiCompany!.taxId ?? "",
-      introduction: apiCompany!.description,
-      services: [],
-      products: [],
-    }
+        id: apiCompany!.id,
+        nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
+        nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
+        logo: apiCompany!.logoUrl ?? "/placeholder.svg",
+        category: apiCompany!.industry,
+        categoryTags: [],
+        address: apiCompany!.address,
+        phone: apiCompany!.phone,
+        email: apiCompany!.email,
+        website: apiCompany!.website ?? "",
+        contactPerson: apiCompany!.contactName,
+        region: apiCompany!.region ?? "",
+        taxId: apiCompany!.taxId ?? "",
+        introduction: apiCompany!.description,
+        services: [],
+        products: [],
+      }
 
   const companyNameCn = t(`companyDetail.companies.${companyId}.nameCn`, {
     defaultValue: company.nameCn,
@@ -147,6 +146,13 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const companyNameEn = t(`companyDetail.companies.${companyId}.nameEn`, {
     defaultValue: company.nameEn,
   })
+  const translatedRegion = translateRegionLabel(company.region, t, i18n)
+  const fallbackBackToDirectory = fromCategory
+    ? `/directory?category=${encodeURIComponent(fromCategory)}`
+    : "/directory"
+  const backToDirectoryHref =
+    backParam && backParam.startsWith("/directory") ? backParam : fallbackBackToDirectory
+  const encodedBackToDirectory = encodeURIComponent(backToDirectoryHref)
 
   const categoryId = categoryNameToIdMap[company.category] || ""
   const translatedCategory = categoryId ? t(`directory.categories.${categoryId}`) : company.category
@@ -208,9 +214,9 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <span className="font-medium">
                   {isGuest
                     ? t("companyDetail.upgradeBanner.guest") ||
-                    "您目前為訪客，僅可查看部分公司名稱與地區"
+                      "您目前為訪客，僅可查看部分公司名稱與地區"
                     : t("companyDetail.upgradeBanner.bronze") ||
-                    "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊"}
+                      "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊"}
                 </span>
               </div>
               <Button
@@ -232,9 +238,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
 
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         <Link
-          href={
-            fromCategory ? `/directory?category=${encodeURIComponent(fromCategory)}` : "/directory"
-          }
+          href={backToDirectoryHref}
           className="text-muted-foreground hover:text-primary inline-flex items-center text-sm transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -311,7 +315,11 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                           onClick={handleCopyPhone}
                           className="text-muted-foreground hover:text-primary transition-colors"
                         >
-                          {copiedPhone ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          {copiedPhone ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -329,7 +337,11 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                           onClick={handleCopyEmail}
                           className="text-muted-foreground hover:text-primary transition-colors"
                         >
-                          {copiedEmail ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          {copiedEmail ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -377,11 +389,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       <p className="text-muted-foreground text-sm">
                         {t("companyDetail.region") || "地區"}
                       </p>
-                      <p className="text-sm font-medium">
-                        {t(`companyDetail.regions.${company.region}`, {
-                          defaultValue: company.region,
-                        })}
-                      </p>
+                      <p className="text-sm font-medium">{translatedRegion}</p>
                     </div>
                   </div>
 
@@ -536,11 +544,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 {t("companyDetail.relatedCompanies") || "相關企業"}
               </h2>
               <Link
-                href={
-                  fromCategory
-                    ? `/directory?category=${encodeURIComponent(fromCategory)}`
-                    : "/directory"
-                }
+                href={backToDirectoryHref}
                 className="text-primary text-sm hover:underline"
                 onClick={() => window.scrollTo(0, 0)}
               >
@@ -556,7 +560,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 {relatedCompanies.map((relatedCompany) => (
                   <Link
                     key={relatedCompany.id}
-                    href={`/directory/${relatedCompany.id}${fromCategory ? `?fromCategory=${encodeURIComponent(fromCategory)}` : ""}`}
+                    href={`/directory/${relatedCompany.id}?back=${encodedBackToDirectory}`}
                     className="group"
                   >
                     <div className="bg-muted relative mb-2 aspect-square overflow-hidden rounded-lg">
@@ -564,8 +568,9 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         src={relatedCompany.logoUrl || "/placeholder.svg"}
                         alt={`相關企業 ${relatedCompany.id}`}
                         fill
-                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${shouldBlurLogo ? "blur-[3px]" : ""
-                          }`}
+                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+                          shouldBlurLogo ? "blur-[3px]" : ""
+                        }`}
                       />
                     </div>
                     <p className="group-hover:text-primary line-clamp-2 text-xs font-medium transition-colors">

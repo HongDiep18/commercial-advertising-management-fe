@@ -5,17 +5,24 @@ import type { CompanyDirectoryQuery } from "@/api/companies/types"
 import { useDebounce } from "@/hooks/useDebounce"
 import { isDemoUser } from "@/components/login/demo"
 import { mockCompanies } from "@/data/mockCompanies"
+import {
+  companyDirectoryRowMatchesSearch,
+  getDirectorySearchAndRegionParams,
+  translateRegionLabel,
+} from "@/utils/regionSearch"
 import { Search } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { MembershipTier, UserRole, useUser } from "../../contexts/user-context"
 import { Pagination } from "../ui/Pagination"
 
 interface DirectoryResultsProps {
   selectedCategories: string[]
+  selectedRegions: string[]
   searchTerm: string
   setSearchTerm: (term: string) => void
+  onClearRegions: () => void
 }
 
 const ITEMS_PER_PAGE = 20
@@ -54,8 +61,10 @@ function SearchBar({
 
 export function DirectoryResults({
   selectedCategories,
+  selectedRegions,
   searchTerm,
   setSearchTerm,
+  onClearRegions,
 }: DirectoryResultsProps) {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn, getMemberTier } = useUser()
@@ -70,6 +79,12 @@ export function DirectoryResults({
   const [currentPage, setCurrentPage] = useState(1)
 
   const industryParam = selectedCategories.length > 0 ? selectedCategories : undefined
+  const trimmedSearch = debouncedSearchTerm?.trim() ?? ""
+  const { search: searchParam, region: regionParam } = useMemo(
+    () => getDirectorySearchAndRegionParams(trimmedSearch, selectedRegions, i18n),
+    [trimmedSearch, selectedRegions, i18n]
+  )
+
   const directoryQuery: CompanyDirectoryQuery = isDemo
     ? {
         page: 1,
@@ -78,8 +93,9 @@ export function DirectoryResults({
         sortOrder: "asc" as const,
       }
     : {
-        search: debouncedSearchTerm || undefined,
+        search: searchParam,
         industry: industryParam,
+        region: regionParam,
         page: currentPage,
         limit: ITEMS_PER_PAGE,
         sortBy: "name" as const,
@@ -97,6 +113,7 @@ export function DirectoryResults({
         contactName: c.contactPerson,
         phone: c.phone,
         industry: c.id.split("-")[0] || "other",
+        region: "",
         address: c.address,
         description: c.introduction,
         companyInfoHighlight: false,
@@ -110,18 +127,38 @@ export function DirectoryResults({
     if (selectedCategories.length > 0 && !selectedCategories.includes(c.industry)) return false
     if (!isSearching) return true
 
-    const haystack = [c.name, c.industry, c.address, c.description, c.contactName, c.email, c.phone]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase()
-
-    return haystack.includes(searchValue.toLowerCase())
+    return companyDirectoryRowMatchesSearch(
+      {
+        name: c.name,
+        industry: c.industry,
+        region: c.region,
+        address: c.address,
+        description: c.description,
+        contactName: c.contactName,
+        email: c.email,
+        phone: c.phone,
+      },
+      searchValue,
+      i18n
+    )
   })
 
   const usesClientFiltering = isSearching || selectedCategories.length > 0
   const totalPages = isDemo || usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
   const displayTotalResults =
     isDemo || usesClientFiltering ? displayedCompanies.length : (data?.pagination.total ?? 0)
+  const selectedRegionLabels = selectedRegions.map((key) => translateRegionLabel(key, t, i18n))
+  const backToDirectoryQuery = useMemo(() => {
+    const params = new URLSearchParams()
+    selectedCategories.forEach((id) => params.append("industry", id))
+    selectedRegions.forEach((id) => params.append("region", id))
+    const q = searchTerm.trim()
+    if (q) params.set("q", q)
+    if (currentPage > 1) params.set("page", String(currentPage))
+    const qs = params.toString()
+    return `/directory${qs ? `?${qs}` : ""}`
+  }, [selectedCategories, selectedRegions, searchTerm, currentPage])
+  const encodedBackToDirectory = encodeURIComponent(backToDirectoryQuery)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -142,9 +179,27 @@ export function DirectoryResults({
                 })
               : `${selectedCategories.length} ${t("directory.industryCategory")}`}
         </h2>
-        <span className="text-muted-foreground text-sm">
-          {displayTotalResults.toLocaleString()} {t("directory.results")}
-        </span>
+        <div className="flex items-end gap-3">
+          {selectedRegionLabels.length > 0 && (
+            <div className="text-muted-foreground text-right text-sm">
+              <span className="font-medium">
+                {t("companyDetail.region", { defaultValue: "Region" })}:
+              </span>{" "}
+              <span>{selectedRegionLabels.join(", ")}</span>
+            </div>
+          )}
+          {selectedRegionLabels.length > 0 && (
+            <button
+              onClick={onClearRegions}
+              className="text-primary !bg-header-red-light hover:!bg-header-red-dark rounded-lg px-2 py-1 text-sm font-medium text-white"
+            >
+              {t("directory.clearRegion", { defaultValue: "Clear Region" })}
+            </button>
+          )}
+          <span className="text-muted-foreground text-sm">
+            {displayTotalResults.toLocaleString()} {t("directory.results")}
+          </span>
+        </div>
       </div>
 
       {isLoading ? (
@@ -167,11 +222,7 @@ export function DirectoryResults({
             {displayedCompanies.map((company) => (
               <Link
                 key={company.id}
-                href={`/directory/${company.id}${
-                  selectedCategories.length === 1
-                    ? `?fromCategory=${encodeURIComponent(selectedCategories[0])}`
-                    : ""
-                }`}
+                href={`/directory/${company.id}?back=${encodedBackToDirectory}`}
                 className="group"
               >
                 <div
