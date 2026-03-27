@@ -85,12 +85,16 @@ export function DirectorySidebar({
             {shouldShowAllCategory && (
               <button
                 onClick={() => setSelectedCategories([])}
-                className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${isAllSelected
-                  ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                  }`}
+                className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${
+                  isAllSelected
+                    ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                }`}
               >
-                <span className="line-clamp-1 text-sm">
+                <span
+                  className="line-clamp-1 text-sm"
+                  title={t("directory.allCategories", { defaultValue: "All" })}
+                >
                   {t("directory.allCategories", { defaultValue: "All" })}
                 </span>
               </button>
@@ -98,18 +102,22 @@ export function DirectorySidebar({
             {shouldShowIndividualCategories &&
               categories.map((category) => {
                 const isSelected = selectedCategories.includes(category.id)
+                const categoryLabel = t(`directory.categories.${category.id}`, {
+                  defaultValue: category.id,
+                })
 
                 return (
                   <button
                     key={category.id}
                     onClick={() => toggleCategory(category.id)}
-                    className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${isSelected
-                      ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
-                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                      }`}
+                    className={`group flex w-full items-center justify-between px-3 py-2.5 text-left transition-all duration-200 ${
+                      isSelected
+                        ? "bg-primary/10 text-primary border-primary border-l-2 font-medium"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                    }`}
                   >
-                    <span className="line-clamp-1 text-sm">
-                      {t(`directory.categories.${category.id}`, { defaultValue: category.id })}
+                    <span className="line-clamp-1 text-sm" title={categoryLabel}>
+                      {categoryLabel}
                     </span>
                     <span
                       className={`ml-2 shrink-0 text-xs ${isSelected ? "text-primary" : "text-muted-foreground/60"}`}
