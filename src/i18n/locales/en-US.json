@@ -1454,7 +1454,25 @@
         "pending": "Pending",
         "expired": "Expired",
         "disabled": "Disabled"
-      }
+      },
+      "delete": "Delete",
+      "deleteConfirm": "Delete this active ad permanently?",
+      "deleteSuccess": "Active ad deleted successfully.",
+      "deleteError": "Failed to delete active ad. Please try again.",
+      "saveError": "Failed to save changes. Please try again.",
+      "saveSuccess": "Changes saved successfully.",
+      "createSectionTitle": "Add popup add-on",
+      "createPackageType": "Ad type",
+      "createStartTime": "Start",
+      "createEndTime": "End",
+      "createAdLink": "Ad link URL",
+      "createAdLinkPlaceholder": "https://…",
+      "createUrlError": "Enter a valid http(s) URL.",
+      "createSubmit": "Create ad",
+      "createSuccess": "Active ad created.",
+      "createError": "Could not create active ad. Please try again.",
+      "createInvalidRange": "End must be after start.",
+      "createShowButton": "+ Create"
     },
     "property": {
       "listingsCount": "{{count}} listings",
