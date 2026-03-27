@@ -977,6 +977,7 @@
   "directory": {
     "searchPlaceholder": "搜尋企業名稱、關鍵字...",
     "clear": "清除",
+    "clearRegion": "清除地區",
     "loading": "載入中…",
     "selectCategory": "請選擇分類",
     "selectCategoryDescription": "請從左側選擇一個企業分類，或使用上方搜尋框查找特定企業。",
