@@ -16,7 +16,7 @@ type HeaderProps = {
 }
 
 export default function Header({ showSiteNav = true }: HeaderProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user, isLoggedIn, logout, canUseFeature } = useUser()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -42,6 +42,30 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
     // Default to unfiltered if no primary industry set
     return "/directory"
   }, [user])
+
+  // Generate store URL based on current language
+  const storeUrl = useMemo(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"
+    const currentLanguage = i18n.language
+
+    // English is default, no suffix needed
+    if (currentLanguage === "en-US") {
+      return baseUrl
+    }
+
+    // Vietnamese: append "vi"
+    if (currentLanguage === "vi-VN") {
+      return `${baseUrl}vi`
+    }
+
+    // Chinese (Traditional): append "zh"
+    if (currentLanguage === "zh-TW") {
+      return `${baseUrl}zh`
+    }
+
+    // Default to base URL for any other language
+    return baseUrl
+  }, [i18n.language])
 
   const isAdminUser = !!user && (user.role === UserRole.Admin || user.role === UserRole.SuperAdmin)
   const { data: unreadCountData } = useAdminNotificationsUnreadCount(isLoggedIn && isAdminUser)
@@ -91,7 +115,7 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                 {t("header.directory")}
               </Link>
               <Link
-                href={process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"}
+                href={storeUrl}
                 className="text-sm font-medium whitespace-nowrap transition-colors hover:text-white/80"
               >
                 {t("header.store")}
@@ -227,9 +251,7 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
                     {t("header.directory")}
                   </Link>
                   <Link
-                    href={
-                      process.env.NEXT_PUBLIC_STORE_URL || "https://vn-buyer-guide.myshopify.com/"
-                    }
+                    href={storeUrl}
                     className="py-2 text-sm font-medium transition-colors hover:text-white/80"
                     onClick={closeMobileMenu}
                   >
