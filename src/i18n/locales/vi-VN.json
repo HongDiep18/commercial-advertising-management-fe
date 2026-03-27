@@ -1493,6 +1493,15 @@
       "approveNote": "Ghi chú duyệt",
       "rejectReason": "Lý do từ chối"
     },
+    "activeAds": {
+      "dialogDescription": "Quảng cáo đã được kích hoạt của công ty này",
+      "status": {
+        "activating": "Đang kích hoạt",
+        "pending": "Chờ kích hoạt",
+        "expired": "Đã hết hạn",
+        "disabled": "Đã tắt"
+      }
+    },
     "property": {
       "listingsCount": "{{count}} bất động sản",
       "addProperty": "Thêm bất động sản",
