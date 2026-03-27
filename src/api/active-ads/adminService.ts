@@ -48,3 +48,26 @@ export async function saveActiveAd(
     body: { assets },
   })
 }
+
+export async function deleteActiveAd(activeAdId: string): Promise<void> {
+  await api.request(`/admin/active-ads/${encodeURIComponent(activeAdId)}`, {
+    method: "DELETE",
+  })
+}
+
+export type CreateCompanyPopupAddonPayload = {
+  companyId: string
+  packageType: "POPUP_VIEW_DETAILS_LINK" | "POPUP_RANKING_ADJUSTMENT"
+  startDate: string
+  endDate: string | null
+  adLinkUrl: string
+}
+
+export async function createCompanyPopupAddon(
+  payload: CreateCompanyPopupAddonPayload
+): Promise<void> {
+  await api.request(`/admin/active-ads/company/popup-addon`, {
+    method: "POST",
+    body: payload,
+  })
+}
