@@ -992,6 +992,7 @@
   "directory": {
     "searchPlaceholder": "Search company name, keywords...",
     "clear": "Clear",
+    "clearRegion": "Clear Region",
     "loading": "Loading...",
     "selectCategory": "Please Select Category",
     "selectCategoryDescription": "Please select a company category from the left, or use the search box above to find specific companies.",

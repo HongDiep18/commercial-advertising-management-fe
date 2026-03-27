@@ -152,8 +152,10 @@ export default function SearchSection() {
 
   const handleSearchSubmit = () => {
     const params = new URLSearchParams()
-    if (searchValue.trim()) params.set("q", searchValue.trim())
+    const typed = searchValue.trim()
+    if (typed) params.set("q", typed)
     selectedIndustries.forEach((id) => params.append("industry", id))
+    selectedLocations.forEach((id) => params.append("region", id))
     router.push(`/directory${params.toString() ? `?${params.toString()}` : ""}`)
   }
 
@@ -312,23 +314,6 @@ export default function SearchSection() {
               {t("search.searchButton")}
             </Button>
           </div>
-
-          {/* <div className="mt-6 text-center">
-            <span className="text-muted-foreground mr-3 text-sm">
-              {t("search.popularSearches")}
-            </span>
-            <div className="mt-2 inline-flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handlePopularTagClick(category.name)}
-                  className="border-border text-foreground hover:border-primary hover:text-primary rounded-md border bg-white px-3 py-1 text-xs font-normal transition-colors"
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </div> */}
         </div>
       </div>
     </section>

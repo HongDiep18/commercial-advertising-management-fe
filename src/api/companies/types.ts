@@ -4,6 +4,7 @@ export type CompanyDirectorySortOrder = "asc" | "desc"
 export type CompanyDirectoryQuery = {
   search?: string
   industry?: string | string[]
+  region?: string | string[]
   page?: number
   limit?: number
   sortBy?: CompanyDirectorySortBy
@@ -18,6 +19,7 @@ export type CompanyDirectoryItem = {
   contactName: string
   phone: string
   industry: string
+  region?: string
   address: string
   description: string
   companyInfoHighlight: boolean
