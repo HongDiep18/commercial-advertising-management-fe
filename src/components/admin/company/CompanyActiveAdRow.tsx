@@ -7,14 +7,8 @@ import { CompanyActiveAdDisplayRow } from "./CompanyActiveAdDisplayRow"
 import { CompanyActiveAdEditRow } from "./CompanyActiveAdEditRow"
 import type { AssetEntry, CompanyActiveAdRowProps } from "./company-active-ads.types"
 
-export function CompanyActiveAdRow({
-  ad,
-  companyId,
-  locale,
-  lang,
-}: CompanyActiveAdRowProps) {
+export function CompanyActiveAdRow({ ad, companyId, locale, lang }: CompanyActiveAdRowProps) {
   const [editing, setEditing] = useState(false)
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const { mutateAsync: saveAd, isPending: saving } = useSaveActiveAd(companyId)
   const { mutateAsync: deleteAd, isPending: deleting } = useDeleteActiveAd(companyId)
 
@@ -59,7 +53,6 @@ export function CompanyActiveAdRow({
 
   const handleDelete = async () => {
     await deleteAd(ad.id)
-    setDeleteConfirmOpen(false)
     setEditing(false)
   }
 
@@ -69,8 +62,6 @@ export function CompanyActiveAdRow({
         ad={ad}
         locale={locale}
         deleting={deleting}
-        deleteConfirmOpen={deleteConfirmOpen}
-        onDeleteConfirmOpenChange={setDeleteConfirmOpen}
         onDelete={handleDelete}
         onEdit={() => setEditing(true)}
       />
