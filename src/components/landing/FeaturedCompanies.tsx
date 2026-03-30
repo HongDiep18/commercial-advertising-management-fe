@@ -1,4 +1,5 @@
 import { useFeaturedCompanies } from "@/api/companies/hooks"
+import type { FeaturedCompanyItem } from "@/api/companies/types"
 import { getFirstActiveAdAssetImageUrl } from "@/lib/ad-assets"
 import { Award, MapPin, Phone } from "lucide-react"
 import Link from "next/link"
@@ -14,10 +15,17 @@ import {
   CarouselPrevious,
 } from "../ui/carousel"
 
-export default function FeaturedCompanies() {
+type Props = {
+  overrideData?: FeaturedCompanyItem[]
+}
+
+export default function FeaturedCompanies({ overrideData }: Props = {}) {
   const { t } = useTranslation()
   const { data, isLoading, isError } = useFeaturedCompanies()
-  const companies = useMemo(() => (data ?? []).slice(0, 4), [data])
+  const companies = useMemo(
+    () => (overrideData ?? data ?? []).slice(0, 4),
+    [overrideData, data]
+  )
 
   return (
     <section id="featured" className="bg-body-bg-light py-20">

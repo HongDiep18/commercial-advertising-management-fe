@@ -1,6 +1,7 @@
 "use client"
 
 import { usePopupRotationalCompanies } from "@/api/active-ads/hooks"
+import type { PopupCompanyItem } from "@/api/active-ads/types"
 import { getFirstActiveAdAssetImageUrl } from "@/lib/ad-assets"
 import { ArrowRight, Building2, ChevronDown, ChevronUp } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -20,16 +21,21 @@ interface BannerItem {
 
 const STORAGE_KEY = "sticky-banner-hidden-date"
 
-export default function StickyBottomBanner() {
+type Props = {
+  overrideData?: PopupCompanyItem[]
+  forceVisible?: boolean
+}
+
+export default function StickyBottomBanner({ overrideData, forceVisible }: Props = {}) {
   const { t } = useTranslation()
   const { data: popupCompanies } = usePopupRotationalCompanies()
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(forceVisible ?? false)
   const [isExpanded, setIsExpanded] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
   const bannerItems = useMemo<BannerItem[]>(() => {
-    const companies = (popupCompanies ?? []).slice(0, 4)
+    const companies = (overrideData ?? popupCompanies ?? []).slice(0, 4)
     return companies.map((company) => ({
       id: company.id,
       type: "company",
@@ -43,6 +49,7 @@ export default function StickyBottomBanner() {
   }, [popupCompanies])
 
   useEffect(() => {
+    if (forceVisible) return
     const hiddenDate = localStorage.getItem(STORAGE_KEY)
     const today = new Date().toDateString()
 
@@ -50,7 +57,7 @@ export default function StickyBottomBanner() {
       const timer = setTimeout(() => setIsVisible(true), 1000)
       return () => clearTimeout(timer)
     }
-  }, [])
+  }, [forceVisible])
 
   useEffect(() => {
     if (!isPaused && isExpanded && isVisible) {

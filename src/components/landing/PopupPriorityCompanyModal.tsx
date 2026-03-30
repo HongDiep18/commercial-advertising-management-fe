@@ -1,6 +1,7 @@
 "use client"
 
 import { usePopupPriorityCompanies } from "@/api/active-ads/hooks"
+import type { PopupCompanyItem } from "@/api/active-ads/types"
 import Button from "@/components/ui/Button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/shadcn-dialog/dialog"
 import { getFirstActiveAdAssetImageUrl } from "@/lib/ad-assets"
@@ -19,13 +20,19 @@ function getTodayKey(): string {
   return new Date().toDateString()
 }
 
-export default function PopupPriorityCompanyModal() {
+type Props = {
+  overrideData?: PopupCompanyItem[]
+  forceOpen?: boolean
+}
+
+export default function PopupPriorityCompanyModal({ overrideData, forceOpen }: Props = {}) {
   const { t } = useTranslation()
   const { data } = usePopupPriorityCompanies()
-  const companies = useMemo(() => data ?? [], [data])
+  const companies = useMemo(() => overrideData ?? data ?? [], [overrideData, data])
   const [activeCompanyIndex, setActiveCompanyIndex] = useState<number>(0)
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(forceOpen ?? false)
   const [isHiddenToday, setIsHiddenToday] = useState<boolean>(() => {
+    if (forceOpen) return false
     if (typeof window === "undefined") return false
     const hiddenDate = window.localStorage.getItem(STORAGE_KEY)
     return hiddenDate === getTodayKey()
@@ -35,11 +42,12 @@ export default function PopupPriorityCompanyModal() {
     companies.length === 0 ? 0 : Math.min(activeCompanyIndex, companies.length - 1)
 
   useEffect(() => {
+    if (forceOpen) return
     if (companies.length === 0) return
     if (isHiddenToday) return
     const timer = window.setTimeout(() => setOpen(true), 500)
     return () => window.clearTimeout(timer)
-  }, [companies.length, isHiddenToday])
+  }, [companies.length, forceOpen, isHiddenToday])
 
   useEffect(() => {
     if (!open) return
