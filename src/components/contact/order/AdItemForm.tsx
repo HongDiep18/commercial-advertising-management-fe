@@ -1,18 +1,18 @@
 "use client"
 
-import { useTranslation } from "react-i18next"
-import { useEffect, useRef, useMemo } from "react"
+import { isSlotPackageType } from "@/api/active-ads/bookedDates"
+import { useBookedDates } from "@/api/active-ads/hooks"
+import Button from "@/components/ui/Button"
+import Calendar from "@/components/ui/Calendar"
+import Checkbox from "@/components/ui/Checkbox"
+import Input from "@/components/ui/Input"
+import { Label } from "@/components/ui/Label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
+import { addDuration, getDisabledDates, isDateDisabled } from "@/data/contactMockData"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Upload, X } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
-import Button from "@/components/ui/Button"
-import Input from "@/components/ui/Input"
-import Label from "@/components/ui/Label"
-import Checkbox from "@/components/ui/Checkbox"
-import Calendar from "@/components/ui/Calendar"
-import { isDateDisabled, getDisabledDates, addDuration } from "@/data/contactMockData"
-import { useBookedDates } from "@/api/active-ads/hooks"
-import { isSlotPackageType } from "@/api/active-ads/bookedDates"
+import { useEffect, useMemo, useRef } from "react"
+import { useTranslation } from "react-i18next"
 
 interface AdItemFormProps {
   item: {
@@ -161,7 +161,9 @@ export default function AdItemForm({
             </PopoverContent>
           </Popover>
           {slotError && (
-            <p ref={slotErrorRef} className="text-sm text-red-500">{slotError}</p>
+            <p ref={slotErrorRef} className="text-sm text-red-500">
+              {slotError}
+            </p>
           )}
         </div>
         <div className="space-y-2">
