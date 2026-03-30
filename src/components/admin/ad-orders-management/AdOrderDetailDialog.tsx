@@ -15,6 +15,7 @@ import { VndPrice } from "@/components/VndPrice"
 import { CheckCircle2, Link2, Mail, Paperclip, Phone, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { formatDateTimeForLocale } from "@/utils/datetime"
+import { addDuration } from "@/data/contactMockData"
 
 type AdOrderDetailDialogProps = {
   order: AdminOrderDto | null
@@ -175,7 +176,22 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
                       />
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      {getItemPricingLabel(item, t)} • {item.startDate}
+                      {getItemPricingLabel(item, t)}
+                      {item.startDate && (
+                        <>
+                          {" • "}
+                          {formatDateTimeForLocale(item.startDate, i18n.language)}
+                          {item.durationValue && item.durationUnit && (
+                            <>
+                              {" → "}
+                              {formatDateTimeForLocale(
+                                addDuration(new Date(item.startDate), item.durationValue, item.durationUnit).toISOString(),
+                                i18n.language
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
                       {item.designServiceRequired
                         ? ` • ${t("admin.advertising.designService")}`
                         : ""}

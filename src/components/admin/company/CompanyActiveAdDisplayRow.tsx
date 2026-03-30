@@ -1,6 +1,7 @@
 "use client"
 
 import type { CompanyActiveAdItem } from "@/api/active-ads/adminService"
+import { AdPackageLabel } from "@/components/admin/advertising/AdPackageLabel"
 import Button from "@/components/ui/Button"
 import {
   Popover as ShadcnPopover,
@@ -40,7 +41,7 @@ export function CompanyActiveAdDisplayRow({
     <div className="bg-body-bg-dark-foreground mb-2 space-y-2 rounded-lg p-3">
       <div className="flex items-center justify-between gap-2">
         <TextColorBadge colorKey={ad.packageType} className="text-xs">
-          {t(`admin.advertising.adPackageType.${ad.packageType}`)}
+          <AdPackageLabel packageType={ad.packageType} fallbackLabel={ad.packageType} />
         </TextColorBadge>
         <div className="flex items-center gap-2">
           <CompanyActiveAdStatusBadge status={ad.status} />
