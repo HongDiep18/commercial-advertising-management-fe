@@ -6,22 +6,25 @@ import {
   useRejectAdminOrder,
 } from "@/api/ad-orders-admin/hooks"
 import type { AdminOrderDto, AdminOrderStatus } from "@/api/ad-orders-admin/types"
+import { AdPackageLabel } from "@/components/admin/advertising/AdPackageLabel"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
 import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
 import { useDebounce } from "@/hooks/useDebounce"
-import { CheckCircle2, Eye, Mail, Search, XCircle } from "lucide-react"
-import React, { useState } from "react"
+import { addDuration } from "@/data/contactMockData"
+import { formatDate, formatDateTimeForLocale } from "@/utils/datetime"
+import { CalendarDays, CheckCircle2, Eye, Mail, MoreVertical, Pencil, Search, XCircle } from "lucide-react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { useQueryClient } from "@tanstack/react-query"
 import { StatusBadge } from "../StatusBadge"
 import { AdOrderDetailDialog } from "./AdOrderDetailDialog"
+import { AdOrderEditDialog } from "./AdOrderEditDialog"
 import { AdOrderStatusActionDialog } from "./AdOrderStatusActionDialog"
-import { formatDateTimeForLocale } from "@/utils/datetime"
-import { useQueryClient } from "@tanstack/react-query"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
-import { addDays, addWeeks, addMonths, addYears } from "date-fns"
 
 type StatusFilter = "all" | AdminOrderStatus
 const ORDER_ACTION = {
@@ -31,23 +34,133 @@ const ORDER_ACTION = {
 type ActionType = (typeof ORDER_ACTION)[keyof typeof ORDER_ACTION]
 type ActionModalState = { type: ActionType | null; orderId: string | null; text: string }
 
-function calculateEndDate(startDate: string, durationValue: number | null, durationUnit: string | null): Date | null {
-  if (!startDate || !durationValue || !durationUnit) return null
+type ActionMenuProps = {
+  order: AdminOrderDto
+  isUpdating: boolean
+  onEdit: () => void
+  onApprove: () => void
+  onReject: () => void
+  onView: () => void
+}
 
-  const start = new Date(startDate)
+function ActionMenu({ order, isUpdating, onEdit, onApprove, onReject, onView }: ActionMenuProps) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
 
-  switch (durationUnit.toUpperCase()) {
-    case "DAY":
-      return addDays(start, durationValue)
-    case "WEEK":
-      return addWeeks(start, durationValue)
-    case "MONTH":
-      return addMonths(start, durationValue)
-    case "YEAR":
-      return addYears(start, durationValue)
-    default:
-      return null
-  }
+  const close = () => setOpen(false)
+
+  const isPendingOrDraft = order.status === "PENDING" || order.status === "DRAFT"
+  const isPending = order.status === "PENDING"
+
+  const itemCls = "flex w-full items-center gap-2.5 rounded px-3 py-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm" title="Actions">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-44 p-1" align="end">
+        {isPendingOrDraft && (
+          <button
+            className={itemCls}
+            onClick={() => { close(); onEdit() }}
+          >
+            <Pencil className="h-4 w-4 text-blue-500" />
+            {t("admin.advertising.editOrderTitle", { defaultValue: "Edit order" })}
+          </button>
+        )}
+        {isPending && (
+          <>
+            <button
+              className={itemCls}
+              disabled={isUpdating}
+              onClick={() => { close(); onApprove() }}
+            >
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              {t("admin.status.approved")}
+            </button>
+            <button
+              className={itemCls}
+              disabled={isUpdating}
+              onClick={() => { close(); onReject() }}
+            >
+              <XCircle className="h-4 w-4 text-red-600" />
+              {t("admin.status.rejected")}
+            </button>
+          </>
+        )}
+        {(isPendingOrDraft || isPending) && (
+          <div className="bg-border my-1 h-px" />
+        )}
+        <button className={itemCls} onClick={() => { close(); onView() }}>
+          <Eye className="h-4 w-4" />
+          {t("admin.advertising.viewDetail", { defaultValue: "View detail" })}
+        </button>
+        <a
+          href={`mailto:${order.company?.email ?? order.user.email}`}
+          className={itemCls}
+          onClick={close}
+        >
+          <Mail className="h-4 w-4" />
+          {t("admin.advertising.sendEmail", { defaultValue: "Send email" })}
+        </a>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+function OrderDurationCell({ items, locale }: { items: AdminOrderDto["items"]; locale: string }) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+
+  if (items.length === 0) return <span className="text-muted-foreground text-xs">-</span>
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+          <span>
+            {items.length}{" "}
+            {t("admin.advertising.packageCount", {
+              count: items.length,
+              defaultValue: "package(s)",
+            })}
+          </span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-72 p-3"
+        align="start"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        <div className="space-y-2">
+          {items.map((item) => {
+            const end =
+              item.startDate && item.durationValue && item.durationUnit
+                ? addDuration(new Date(item.startDate), item.durationValue, item.durationUnit)
+                : null
+            return (
+              <div key={item.id} className="space-y-0.5">
+                <p className="text-foreground text-xs font-medium">{item.packageName}</p>
+                <p className="text-muted-foreground text-xs">
+                  {item.startDate ? formatDate(item.startDate, locale) : "-"}
+                  {end ? ` → ${formatDate(end.toISOString(), locale)}` : ""}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
 }
 
 export function AdOrdersManagement() {
@@ -57,6 +170,8 @@ export function AdOrdersManagement() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [selectedOrder, setSelectedOrder] = useState<AdminOrderDto | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null)
+  const [isEditOpen, setIsEditOpen] = useState(false)
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
   const [actionModal, setActionModal] = useState<ActionModalState>({
     type: null,
@@ -90,6 +205,13 @@ export function AdOrdersManagement() {
   })
 
   const visibleOrders = data?.orders ?? []
+
+  // Keep selectedOrder in sync when the list refetches (e.g. after an edit)
+  useEffect(() => {
+    if (!selectedOrder) return
+    const updated = data?.orders.find((o) => o.id === selectedOrder.id)
+    if (updated) setSelectedOrder(updated)
+  }, [data?.orders, selectedOrder])
 
   const statusFilterConfig: Partial<Record<StatusFilter, { labelKey: string }>> = {
     all: { labelKey: "all" },
@@ -191,13 +313,10 @@ export function AdOrdersManagement() {
                       {t("admin.advertising.companyName")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                      {t("admin.advertising.packageManagementTable.category")}
+                      {t("admin.advertising.adPackage")}
                     </th>
-                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                      {t("admin.advertising.startTime")}
-                    </th>
-                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
-                      {t("admin.advertising.endTime")}
+                    <th className="text-muted-foreground w-32 px-4 py-3 text-left text-xs font-medium uppercase">
+                      {t("admin.advertising.duration")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.amount")}
@@ -235,38 +354,15 @@ export function AdOrdersManagement() {
                             <div className="flex flex-col gap-1">
                               {uniqueTypes.map((type) => (
                                 <TextColorBadge key={type} colorKey={type}>
-                                  {t(`admin.advertising.adPackageType.${type}`)}
+                                  <AdPackageLabel packageType={type} fallbackLabel={type} />
                                 </TextColorBadge>
                               ))}
                             </div>
                           )
                         })()}
                       </td>
-                      <td className="text-muted-foreground px-4 py-3 text-sm">
-                        {(() => {
-                          const firstItem = order.items[0]
-                          if (!firstItem?.startDate) {
-                            return <span className="text-xs">-</span>
-                          }
-                          return formatDateTimeForLocale(firstItem.startDate, i18n.language)
-                        })()}
-                      </td>
-                      <td className="text-muted-foreground px-4 py-3 text-sm">
-                        {(() => {
-                          const firstItem = order.items[0]
-                          if (!firstItem?.startDate) {
-                            return <span className="text-xs">-</span>
-                          }
-                          const endDate = calculateEndDate(
-                            firstItem.startDate,
-                            firstItem.durationValue,
-                            firstItem.durationUnit
-                          )
-                          if (!endDate) {
-                            return <span className="text-xs">-</span>
-                          }
-                          return formatDateTimeForLocale(endDate.toISOString(), i18n.language)
-                        })()}
+                      <td className="px-4 py-3">
+                        <OrderDurationCell items={order.items} locale={i18n.language} />
                       </td>
                       <td className="px-4 py-3 text-sm font-medium">
                         <VndPrice value={order.totalAmount} />
@@ -275,49 +371,14 @@ export function AdOrdersManagement() {
                         {formatDateTimeForLocale(order.createdAt, i18n.language)}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
-                          {order.status === "PENDING" && (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                disabled={
-                                  updatingOrderId === order.id || isApproving || isRejecting
-                                }
-                                title={t("admin.status.approved")}
-                                onClick={() => openActionModal(ORDER_ACTION.APPROVE, order.id)}
-                              >
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                disabled={
-                                  updatingOrderId === order.id || isApproving || isRejecting
-                                }
-                                title={t("admin.status.rejected")}
-                                onClick={() => openActionModal(ORDER_ACTION.REJECT, order.id)}
-                              >
-                                <XCircle className="h-4 w-4 text-red-600" />
-                              </Button>
-                            </>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedOrder(order)
-                              setIsDetailOpen(true)
-                            }}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm" asChild>
-                            <a href={`mailto:${order.company?.email ?? order.user.email}`}>
-                              <Mail className="h-4 w-4" />
-                            </a>
-                          </Button>
-                        </div>
+                        <ActionMenu
+                          order={order}
+                          isUpdating={updatingOrderId === order.id || isApproving || isRejecting}
+                          onEdit={() => { setEditingOrderId(order.id); setIsEditOpen(true) }}
+                          onApprove={() => openActionModal(ORDER_ACTION.APPROVE, order.id)}
+                          onReject={() => openActionModal(ORDER_ACTION.REJECT, order.id)}
+                          onView={() => { setSelectedOrder(order); setIsDetailOpen(true) }}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -334,6 +395,23 @@ export function AdOrdersManagement() {
         onOpenChange={(open) => {
           setIsDetailOpen(open)
           if (!open) setSelectedOrder(null)
+        }}
+      />
+
+      <AdOrderEditDialog
+        key={editingOrderId ?? "none"}
+        orderId={editingOrderId}
+        open={isEditOpen}
+        onOpenChange={(open) => {
+          setIsEditOpen(open)
+          if (!open) setEditingOrderId(null)
+        }}
+        onSuccess={() => {
+          void queryClient.invalidateQueries({ queryKey: ["admin", "ad-orders"] })
+          showToast(
+            t("admin.advertising.editSuccess", { defaultValue: "Order updated successfully." }),
+            "success"
+          )
         }}
       />
 

@@ -37,6 +37,7 @@ export type AdminOrderDto = {
   id: string
   status: AdminOrderStatus
   totalAmount: number
+  notes: string | null
   createdAt: string
   updatedAt: string
   user: {
@@ -77,5 +78,70 @@ export type AdminOrdersMetricsResponse = {
   currentMonthRevenue: number
   currentMonthOrders: AdminOrdersStatusCounts
   monthlyGrowthPercentage: number
+}
+
+export type AdminEditOrderAssetPayload = {
+  assetType: string
+  fileUrl: string
+  fileSizeKb?: number
+  notes?: string
+}
+
+export type AdminEditOrderItemPayload = {
+  itemId: string
+  adLinkUrl?: string
+  startDate?: string
+  designServiceRequired?: boolean
+  assets?: AdminEditOrderAssetPayload[]
+}
+
+export type AdminNewOrderItemPayload = {
+  pricingId: string
+  startDate: string
+  designServiceRequired: boolean
+  adLinkUrl?: string
+}
+
+export type AdminEditOrderPayload = {
+  notes?: string
+  items?: AdminEditOrderItemPayload[]
+  newItems?: AdminNewOrderItemPayload[]
+  deleteItemIds?: string[]
+}
+
+export type AdminEditOrderResponse = {
+  id: string
+  userId: string
+  companyId: string
+  status: AdminOrderStatus
+  subtotal: number
+  notes: string | null
+  submittedAt: string | null
+  createdAt: string
+  updatedAt: string
+  items: Array<{
+    id: string
+    orderId: string
+    packageId: string
+    pricingId: string
+    durationValue: number | null
+    durationUnit: string | null
+    startDate: string
+    designServiceRequired: boolean
+    adLinkUrl: string | null
+    unitPrice: number
+    quantity: number
+    lineTotal: number
+    createdAt: string
+    assets: Array<{
+      id: string
+      orderItemId: string
+      assetType: string
+      fileUrl: string
+      fileSizeKb: number | null
+      notes: string | null
+      createdAt: string
+    }>
+  }>
 }
 
