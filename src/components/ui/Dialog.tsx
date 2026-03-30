@@ -47,11 +47,31 @@ export function DialogContent({ className, children, ...props }: DialogContentPr
 
   useEffect(() => {
     if (!open) return
+
+    // Store original overflow and padding
+    const originalOverflow = document.body.style.overflow
+    const originalPaddingRight = document.body.style.paddingRight
+
+    // Calculate scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+
+    // Prevent body scroll and compensate for scrollbar
+    document.body.style.overflow = "hidden"
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+    }
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false)
     }
     document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
+
+    return () => {
+      // Restore original styles
+      document.body.style.overflow = originalOverflow
+      document.body.style.paddingRight = originalPaddingRight
+      document.removeEventListener("keydown", onKeyDown)
+    }
   }, [open, setOpen])
 
   if (!open) return null
