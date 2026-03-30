@@ -1,9 +1,10 @@
 "use client"
 
 import { useCreateCompanyPopupAddon } from "@/api/active-ads/hooks"
+import { translateAdPackageType } from "@/components/admin/advertising/AdPackageLabel"
 import Button from "@/components/ui/Button"
 import type { CompanyActiveAdItem } from "@/api/active-ads/adminService"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CompanyActiveAdEditRow } from "./CompanyActiveAdEditRow"
 import type { AssetEntry } from "./company-active-ads.types"
@@ -14,7 +15,6 @@ type PopupAddonPackageType = (typeof POPUP_ADDON_TYPES)[number]
 
 type Props = {
   companyId: string
-  dialogOpen: boolean
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -31,11 +31,11 @@ const CREATE_ROW_AD_PLACEHOLDER: CompanyActiveAdItem = {
   status: "pending",
 }
 
-export function CompanyActiveAdCreateForm({ companyId, dialogOpen, open, onOpenChange }: Props) {
+export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Props) {
   const { t, i18n } = useTranslation()
   const { mutateAsync: createAddon, isPending } = useCreateCompanyPopupAddon(companyId)
   const [packageType, setPackageType] = useState<PopupAddonPackageType>("POPUP_VIEW_DETAILS_LINK")
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+  const [startDate, setStartDate] = useState<Date | undefined>(() => new Date())
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [isActive, setIsActive] = useState(true)
   const [adLinkUrl, setAdLinkUrl] = useState("")
@@ -45,21 +45,8 @@ export function CompanyActiveAdCreateForm({ companyId, dialogOpen, open, onOpenC
   const [isDateRangeValid, setIsDateRangeValid] = useState(true)
   const [isAdLinkValid, setIsAdLinkValid] = useState(false)
 
-  useEffect(() => {
-    if (!dialogOpen || !open) return
-    setPackageType("POPUP_VIEW_DETAILS_LINK")
-    setStartDate(new Date())
-    setEndDate(undefined)
-    setIsActive(true)
-    setAdLinkUrl("")
-    setAssets([])
-    setStartCalOpen(false)
-    setEndCalOpen(false)
-    setIsDateRangeValid(true)
-    setIsAdLinkValid(false)
-  }, [dialogOpen, companyId, open])
-
-  const canSubmit = Boolean(startDate) && isAdLinkValid && isDateRangeValid && !isPending
+  const adLinkRequired = packageType === "POPUP_VIEW_DETAILS_LINK"
+  const canSubmit = Boolean(startDate) && (!adLinkRequired || isAdLinkValid) && isDateRangeValid && !isPending
 
   const handleSubmit = async () => {
     if (!canSubmit) return
@@ -67,7 +54,7 @@ export function CompanyActiveAdCreateForm({ companyId, dialogOpen, open, onOpenC
       packageType,
       startDate: startDate!.toISOString(),
       endDate: endDate ? endDate.toISOString() : null,
-      adLinkUrl: adLinkUrl.trim(),
+      ...(adLinkRequired ? { adLinkUrl: adLinkUrl.trim() } : {}),
     })
     onOpenChange(false)
   }
@@ -100,7 +87,7 @@ export function CompanyActiveAdCreateForm({ companyId, dialogOpen, open, onOpenC
           >
             {POPUP_ADDON_TYPES.map((type) => (
               <option key={type} value={type}>
-                {t(`admin.advertising.adPackageType.${type}`)}
+                {translateAdPackageType(t, type)}
               </option>
             ))}
           </select>
@@ -109,12 +96,12 @@ export function CompanyActiveAdCreateForm({ companyId, dialogOpen, open, onOpenC
       <CompanyActiveAdEditRow
         ad={{ ...CREATE_ROW_AD_PLACEHOLDER, packageType }}
         lang={i18n.language}
-        packageTypeLabelKey={`admin.advertising.adPackageType.${packageType}`}
         showActiveToggle={false}
         showAssets={false}
         disableDateEditing={false}
         showDateRangeValidation
-        showAdLinkValidation
+        showAdLinkField={adLinkRequired}
+        showAdLinkValidation={adLinkRequired}
         saveLabel={t("admin.activeAds.createSubmit")}
         isActive={isActive}
         setIsActive={setIsActive}

@@ -56,8 +56,8 @@ export function CompanyActiveAdsDialog({ companyId, companyName, open, onOpenCha
 
         <div className="mt-4 space-y-2 px-5 pb-5">
           <CompanyActiveAdCreateForm
+            key={`${companyId}:${open ? "dialog-open" : "dialog-closed"}:${isCreateOpen ? "create-open" : "create-closed"}`}
             companyId={companyId}
-            dialogOpen={open}
             open={isCreateOpen}
             onOpenChange={setIsCreateOpen}
           />

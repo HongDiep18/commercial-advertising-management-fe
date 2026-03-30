@@ -60,7 +60,7 @@ export type CreateCompanyPopupAddonPayload = {
   packageType: "POPUP_VIEW_DETAILS_LINK" | "POPUP_RANKING_ADJUSTMENT"
   startDate: string
   endDate: string | null
-  adLinkUrl: string
+  adLinkUrl?: string
 }
 
 export async function createCompanyPopupAddon(

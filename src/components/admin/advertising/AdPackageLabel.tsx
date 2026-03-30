@@ -35,6 +35,14 @@ function buildPrintPlacementKey(metadata: Record<string, unknown> | null | undef
   return keyParts.join("_")
 }
 
+export function translateAdPackageType(t: (key: string) => string, packageType: string): string {
+  const labelKey = t(`admin.advertising.adPackageType.${packageType}._label`)
+  if (labelKey && !labelKey.includes(".")) return labelKey
+  const generic = t(`admin.advertising.adPackageType.${packageType}`)
+  if (generic && typeof generic === "string" && !generic.startsWith("[object")) return generic
+  return packageType
+}
+
 export function getAdPackageLabelText(input: {
   packageType: string
   packageMetadata?: Record<string, unknown> | null
@@ -49,8 +57,12 @@ export function getAdPackageLabelText(input: {
       if (translated) return translated
     }
   }
+  // Try _label sub-key first (for nested types like PRINT_PLACEMENT)
+  const labelKey = t(`admin.advertising.adPackageType.${packageType}._label`)
+  if (labelKey && !labelKey.includes(".")) return labelKey
   const generic = t(`admin.advertising.adPackageType.${packageType}`)
-  return generic || fallbackLabel || packageType
+  if (generic && typeof generic === "string" && !generic.startsWith("[object")) return generic
+  return fallbackLabel || packageType
 }
 
 export function AdPackageLabel({

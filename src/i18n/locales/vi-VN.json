@@ -1430,6 +1430,7 @@
         "PLATFORM_PRINT": "Quảng cáo ấn phẩm",
         "PRODUCT_LISTING": "Danh sách sản phẩm"
       },
+      "adPackage": "Gói quảng cáo",
       "adPackageType": {
         "POPUP_PRIORITY_SLOT": "Hiển thị ưu tiên (vị trí đầu tiên)",
         "POPUP_ROTATION_SLOT": "Luân phiên chung (vị trí 2–5)",
@@ -1444,6 +1445,7 @@
         "LISTING_BOOST_HOMEPAGE": "Đề xuất nổi bật trên trang chủ (boost)",
         "LISTING_BOOST_CATEGORY": "Vị trí đầu trong danh mục (boost)",
         "PRINT_PLACEMENT": {
+          "_label": "Vị trí quảng cáo in ấn",
           "front_cover_full": "Bìa trước",
           "back_cover_full": "Bìa sau",
           "inside_front_cover_left_full": "Mặt trong bìa trước — Trái",
@@ -1468,6 +1470,9 @@
       "contact": "Liên hệ",
       "amount": "Số tiền",
       "submittedAt": "Thời gian gửi",
+      "duration": "Thời hạn",
+      "packageCount_one": "gói",
+      "packageCount_other": "gói",
       "startTime": "Thời gian bắt đầu",
       "endTime": "Thời gian kết thúc",
       "actions": "Thao tác",
@@ -1483,6 +1488,7 @@
       "phone": "Số điện thoại",
       "selectedItems": "Mục đã chọn",
       "estimatedAmount": "Số tiền ước tính",
+      "addOnsSuffix": "(tiện ích bổ sung)",
       "designService": "Dịch vụ thiết kế",
       "sendEmail": "Gửi email",
       "call": "Gọi điện",
@@ -1493,7 +1499,33 @@
       "updateError": "Không thể cập nhật đơn quảng cáo.",
       "slotNotAvailable": "Vị trí quảng cáo này đã được đặt hết trong khoảng thời gian yêu cầu.",
       "approveNote": "Ghi chú duyệt",
-      "rejectReason": "Lý do từ chối"
+      "rejectReason": "Lý do từ chối",
+      "editOrderTitle": "Chỉnh sửa đơn hàng",
+      "editSuccess": "Cập nhật đơn hàng thành công.",
+      "editErrorGeneric": "Không thể cập nhật đơn hàng. Vui lòng thử lại.",
+      "editNotes": "Ghi chú",
+      "editNotesPlaceholder": "Ghi chú tuỳ chọn (tối đa 2000 ký tự)",
+      "editItems": "Các mục đơn hàng",
+      "editAdLink": "URL liên kết quảng cáo",
+      "editAssetsModified": "(đã chỉnh sửa)",
+      "editNoAssets": "Không có tài sản — tài sản hiện tại sẽ bị xóa",
+      "editAssetUrlPlaceholder": "URL tài sản mới",
+      "editClearAssets": "Xóa tất cả",
+      "editAddOns": "Gói bổ sung",
+      "editNewItems": "Thêm gói mới",
+      "editAddOn": "Gói bổ sung",
+      "editAddOnPackage": "Gói / Đơn giá",
+      "editAddAddOn": "Thêm gói bổ sung",
+      "editSave": "Lưu thay đổi",
+      "editError": {
+        "AD_ORDER_NOT_EDITABLE": "Đơn hàng này không thể chỉnh sửa (đã được duyệt hoặc từ chối).",
+        "AD_ORDER_EDIT_ITEM_NOT_FOUND": "Không tìm thấy một hoặc nhiều mục trong đơn hàng này.",
+        "AD_ORDER_ADDON_INVALID_TYPE": "Loại gói bổ sung không hợp lệ.",
+        "AD_ORDER_ADDON_REQUIRES_BASE": "Đơn hàng phải có gói cơ sở Popup trang chủ để thêm gói bổ sung.",
+        "AD_ORDER_INVALID_PRICING": "Một hoặc nhiều tuỳ chọn giá bổ sung không hợp lệ hoặc không còn hoạt động.",
+        "AD_ORDER_CANNOT_BE_EMPTY": "Không thể xóa tất cả các mục khỏi đơn hàng.",
+        "AD_ORDER_NOT_FOUND": "Không tìm thấy đơn hàng."
+      }
     },
     "activeAds": {
       "dialogDescription": "Quảng cáo đã được kích hoạt của công ty này",

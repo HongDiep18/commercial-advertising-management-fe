@@ -1369,6 +1369,7 @@
         "PLATFORM_PRINT": "平台印刷廣告",
         "PRODUCT_LISTING": "商品列表廣告"
       },
+      "adPackage": "廣告方案",
       "adPackageType": {
         "POPUP_PRIORITY_SLOT": "優先曝光（第一順位）",
         "POPUP_ROTATION_SLOT": "一般輪播（第二至第五順位）",
@@ -1383,6 +1384,7 @@
         "LISTING_BOOST_HOMEPAGE": "首頁精選推薦（加強曝光）",
         "LISTING_BOOST_CATEGORY": "分類頁頂端（加強曝光）",
         "PRINT_PLACEMENT": {
+          "_label": "印刷版位廣告",
           "front_cover_full": "封面廣告",
           "back_cover_full": "封底廣告",
           "inside_front_cover_left_full": "封面內頁左側",
@@ -1407,6 +1409,9 @@
       "contact": "聯絡人",
       "amount": "金額",
       "submittedAt": "提交時間",
+      "duration": "期間",
+      "packageCount_one": "個方案",
+      "packageCount_other": "個方案",
       "startTime": "開始時間",
       "endTime": "結束時間",
       "actions": "操作",
@@ -1422,6 +1427,7 @@
       "phone": "電話",
       "selectedItems": "選擇項目",
       "estimatedAmount": "預估金額",
+      "addOnsSuffix": "（附加項目）",
       "designService": "設計服務",
       "sendEmail": "發送郵件",
       "call": "撥打電話",
@@ -1432,7 +1438,33 @@
       "updateError": "更新廣告訂單失敗。",
       "slotNotAvailable": "此廣告版位在所要求的日期範圍內已全數預訂。",
       "approveNote": "核准備註",
-      "rejectReason": "拒絕原因"
+      "rejectReason": "拒絕原因",
+      "editOrderTitle": "編輯訂單",
+      "editSuccess": "訂單更新成功。",
+      "editErrorGeneric": "無法更新訂單，請稍後再試。",
+      "editNotes": "備註",
+      "editNotesPlaceholder": "選填備註（最多 2000 字）",
+      "editItems": "訂單項目",
+      "editAdLink": "廣告連結網址",
+      "editAssetsModified": "（已修改）",
+      "editNoAssets": "無素材 — 現有素材將被清除",
+      "editAssetUrlPlaceholder": "新素材網址",
+      "editClearAssets": "全部清除",
+      "editAddOns": "附加方案",
+      "editNewItems": "新增方案",
+      "editAddOn": "附加方案",
+      "editAddOnPackage": "方案 / 價格",
+      "editAddAddOn": "新增附加方案",
+      "editSave": "儲存變更",
+      "editError": {
+        "AD_ORDER_NOT_EDITABLE": "此訂單無法編輯（已核准或已拒絕）。",
+        "AD_ORDER_EDIT_ITEM_NOT_FOUND": "此訂單中找不到一個或多個項目。",
+        "AD_ORDER_ADDON_INVALID_TYPE": "附加方案類型無效。",
+        "AD_ORDER_ADDON_REQUIRES_BASE": "訂單必須包含首頁彈窗基礎方案才能新增附加方案。",
+        "AD_ORDER_INVALID_PRICING": "一個或多個附加方案價格選項無效或已停用。",
+        "AD_ORDER_CANNOT_BE_EMPTY": "無法移除訂單中的所有項目。",
+        "AD_ORDER_NOT_FOUND": "找不到此訂單。"
+      }
     },
     "activeAds": {
       "dialogDescription": "此公司的啟用廣告",

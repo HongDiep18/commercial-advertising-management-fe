@@ -1,5 +1,6 @@
 "use client"
 
+import { translateAdPackageType } from "@/components/admin/advertising/AdPackageLabel"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import Input from "@/components/ui/Input"
@@ -40,12 +41,12 @@ function isValidHttpUrl(value: string): boolean {
 type Props = {
   ad: CompanyActiveAdItem
   lang: string
-  packageTypeLabelKey?: string
   showActiveToggle?: boolean
   showAssets?: boolean
   disableDateEditing?: boolean
   showDateRangeValidation?: boolean
   showAdLinkValidation?: boolean
+  showAdLinkField?: boolean
   saveLabel?: string
   isActive: boolean
   setIsActive: Dispatch<SetStateAction<boolean>>
@@ -73,12 +74,12 @@ type Props = {
 export function CompanyActiveAdEditRow({
   ad,
   lang,
-  packageTypeLabelKey,
   showActiveToggle = true,
   showAssets = true,
   disableDateEditing = true,
   showDateRangeValidation = false,
   showAdLinkValidation = false,
+  showAdLinkField = true,
   saveLabel,
   isActive,
   setIsActive,
@@ -119,7 +120,7 @@ export function CompanyActiveAdEditRow({
     <div className="mb-2 space-y-3 rounded-lg bg-white p-3 shadow-md">
       <div className="flex items-center justify-between gap-2">
         <TextColorBadge colorKey={ad.packageType} className="text-xs">
-          {t(packageTypeLabelKey ?? `admin.advertising.adPackageType.${ad.packageType}`)}
+          {translateAdPackageType(t, ad.packageType)}
         </TextColorBadge>
         {showActiveToggle && (
           <button
@@ -215,19 +216,21 @@ export function CompanyActiveAdEditRow({
       {showDateRangeValidation && hasInvalidDateRange && (
         <p className="text-destructive text-xs">{t("admin.activeAds.createInvalidRange")}</p>
       )}
-      <div className="space-y-1">
-        <Label className="text-xs">{t("adContact.adLink", "Ad link")}</Label>
-        <Input
-          type="url"
-          placeholder="https://"
-          className={`h-8 text-xs ${hasInvalidAdLink ? "border-red-500" : ""}`}
-          value={adLinkUrl}
-          onChange={(e) => setAdLinkUrl(e.target.value)}
-        />
-        {hasInvalidAdLink && (
-          <p className="text-destructive text-xs">{t("admin.activeAds.createUrlError")}</p>
-        )}
-      </div>
+      {showAdLinkField && (
+        <div className="space-y-1">
+          <Label className="text-xs">{t("adContact.adLink", "Ad link")}</Label>
+          <Input
+            type="url"
+            placeholder="https://"
+            className={`h-8 text-xs ${hasInvalidAdLink ? "border-red-500" : ""}`}
+            value={adLinkUrl}
+            onChange={(e) => setAdLinkUrl(e.target.value)}
+          />
+          {hasInvalidAdLink && (
+            <p className="text-destructive text-xs">{t("admin.activeAds.createUrlError")}</p>
+          )}
+        </div>
+      )}
       {showAssets && (
         <div className="space-y-1">
           <Label className="text-xs">{t("admin.advertising.assets", "Assets")}</Label>
