@@ -1,16 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { useTranslation } from "react-i18next"
-import Header from "@/components/layout/Header"
+import { requestPasswordReset } from "@/api/auth"
 import Footer from "@/components/layout/Footer"
+import Header from "@/components/layout/Header"
+import Button from "@/components/ui/Button"
 import Card from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
-import Label from "@/components/ui/Label"
-import Button from "@/components/ui/Button"
+import { Label } from "@/components/ui/Label"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
-import { requestPasswordReset } from "@/api/auth"
+import Link from "next/link"
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation()
