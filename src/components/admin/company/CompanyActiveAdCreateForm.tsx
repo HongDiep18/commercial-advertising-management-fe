@@ -1,9 +1,9 @@
 "use client"
 
+import type { CompanyActiveAdItem } from "@/api/active-ads/adminService"
 import { useCreateCompanyPopupAddon } from "@/api/active-ads/hooks"
 import { translateAdPackageType } from "@/components/admin/advertising/AdPackageLabel"
 import Button from "@/components/ui/Button"
-import type { CompanyActiveAdItem } from "@/api/active-ads/adminService"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CompanyActiveAdEditRow } from "./CompanyActiveAdEditRow"
@@ -37,15 +37,13 @@ export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Pro
 
   const adLinkRequired = packageType === "POPUP_VIEW_DETAILS_LINK"
 
-  const initialStartDateIso = useMemo(() => new Date().toISOString(), [open])
-
   const rowAd: CompanyActiveAdItem = useMemo(
     () => ({
       ...CREATE_ROW_AD_PLACEHOLDER,
       packageType,
-      startDate: initialStartDateIso,
+      startDate: new Date().toISOString(),
     }),
-    [initialStartDateIso, packageType]
+    [packageType]
   )
 
   const handleSubmit = async (values: {

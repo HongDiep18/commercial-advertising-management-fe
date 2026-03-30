@@ -96,9 +96,7 @@ export function useSaveActiveAd(companyId: string): {
 }
 
 export function useCreateCompanyPopupAddon(companyId: string): {
-  mutateAsync: (
-    payload: Omit<CreateCompanyPopupAddonPayload, "companyId">
-  ) => Promise<void>
+  mutateAsync: (payload: Omit<CreateCompanyPopupAddonPayload, "companyId">) => Promise<void>
   isPending: boolean
 } {
   const { t } = useTranslation()
