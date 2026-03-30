@@ -855,7 +855,8 @@
       "additionalIndustries": "選擇3個產業",
       "selectedCount": "已選擇 {{count}}/3",
       "exactlyThreeRequired": "請選擇正好3個產業"
-    }
+    },
+    "previewOrder": "在網站上預覽"
   },
   "adContactForm": {
     "title": "管理後台",
@@ -1467,7 +1468,8 @@
         "AD_ORDER_INVALID_PRICING": "一個或多個附加方案價格選項無效或已停用。",
         "AD_ORDER_CANNOT_BE_EMPTY": "無法移除訂單中的所有項目。",
         "AD_ORDER_NOT_FOUND": "找不到此訂單。"
-      }
+      },
+      "previewOrder": "預覽"
     },
     "activeAds": {
       "dialogDescription": "此公司的啟用廣告",
@@ -1764,5 +1766,18 @@
         "content": "如對本隱私政策有任何疑問，請透過平台與我們聯繫。"
       }
     }
+  },
+  "previewBanner": {
+    "previewMode": "預覽模式",
+    "order": "訂單",
+    "close": "關閉預覽"
+  },
+  "adPreview": {
+    "notAccessibleTitle": "無法存取預覽",
+    "notAccessibleDesc": "此頁面只能透過預覽按鈕存取。請返回並點擊訂單上的預覽按鈕。",
+    "goBack": "返回",
+    "loading": "正在載入預覽…",
+    "errorTitle": "預覽載入失敗",
+    "errorDesc": "無法載入廣告預覽。您可能沒有查看此訂單的權限。"
   }
 }

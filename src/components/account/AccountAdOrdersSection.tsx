@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight, ExternalLink, Eye, Megaphone, X } from "luci
 import { useTranslation } from "react-i18next"
 import { useMyAdOrders } from "@/api/ad-orders/hooks"
 import type { MyAdOrder } from "@/api/ad-orders/service"
+
+const PREVIEW_KEY = "pendingPreview"
 import { VndPrice } from "@/components/VndPrice"
 import Button from "@/components/ui/Button"
 import Card from "@/components/ui/Card"
@@ -399,6 +401,20 @@ export function AccountAdOrdersSection() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    localStorage.setItem(PREVIEW_KEY, selectedOrder.id)
+                    window.open(`/ad-preview/${selectedOrder.id}`, "_blank")
+                  }}
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  {t("account.previewOrder", { defaultValue: "Preview on website" })}
+                </Button>
               </div>
             </div>
           )}
