@@ -21,6 +21,8 @@ export interface PopoverContentProps {
   sideOffset?: number
   collisionPadding?: number
   className?: string
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 interface PopoverContextType {
@@ -115,6 +117,8 @@ export function PopoverContent({
   sideOffset = 4,
   collisionPadding = 8,
   className = '',
+  onMouseEnter,
+  onMouseLeave,
 }: PopoverContentProps) {
   const context = useContext(PopoverContext)
   if (!context) throw new Error('PopoverContent must be used within Popover')
@@ -225,6 +229,8 @@ export function PopoverContent({
       ref={contentRef}
       className={`fixed z-50 bg-background border border-border rounded-md shadow-lg p-1 ${className}`}
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {children}
     </div>,

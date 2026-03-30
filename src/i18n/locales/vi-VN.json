@@ -663,7 +663,9 @@
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
       "submit": "Đăng ký thất bại, vui lòng thử lại sau",
       "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ.",
-      "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó."
+      "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó.",
+      "invalidTaxId": "Mã số thuế chỉ được chứa chữ số",
+      "duplicatePhone": "Vui lòng nhập số điện thoại của người liên hệ khác với số điện thoại công ty"
     }
   },
   "login": {
@@ -1428,6 +1430,7 @@
         "PLATFORM_PRINT": "Quảng cáo ấn phẩm",
         "PRODUCT_LISTING": "Danh sách sản phẩm"
       },
+      "adPackage": "Gói quảng cáo",
       "adPackageType": {
         "POPUP_PRIORITY_SLOT": "Hiển thị ưu tiên (vị trí đầu tiên)",
         "POPUP_ROTATION_SLOT": "Luân phiên chung (vị trí 2–5)",
@@ -1442,6 +1445,7 @@
         "LISTING_BOOST_HOMEPAGE": "Đề xuất nổi bật trên trang chủ (boost)",
         "LISTING_BOOST_CATEGORY": "Vị trí đầu trong danh mục (boost)",
         "PRINT_PLACEMENT": {
+          "_label": "Vị trí quảng cáo in ấn",
           "front_cover_full": "Bìa trước",
           "back_cover_full": "Bìa sau",
           "inside_front_cover_left_full": "Mặt trong bìa trước — Trái",
@@ -1466,6 +1470,9 @@
       "contact": "Liên hệ",
       "amount": "Số tiền",
       "submittedAt": "Thời gian gửi",
+      "duration": "Thời hạn",
+      "packageCount_one": "gói",
+      "packageCount_other": "gói",
       "startTime": "Thời gian bắt đầu",
       "endTime": "Thời gian kết thúc",
       "actions": "Thao tác",
@@ -1481,6 +1488,7 @@
       "phone": "Số điện thoại",
       "selectedItems": "Mục đã chọn",
       "estimatedAmount": "Số tiền ước tính",
+      "addOnsSuffix": "(tiện ích bổ sung)",
       "designService": "Dịch vụ thiết kế",
       "sendEmail": "Gửi email",
       "call": "Gọi điện",
@@ -1491,7 +1499,33 @@
       "updateError": "Không thể cập nhật đơn quảng cáo.",
       "slotNotAvailable": "Vị trí quảng cáo này đã được đặt hết trong khoảng thời gian yêu cầu.",
       "approveNote": "Ghi chú duyệt",
-      "rejectReason": "Lý do từ chối"
+      "rejectReason": "Lý do từ chối",
+      "editOrderTitle": "Chỉnh sửa đơn hàng",
+      "editSuccess": "Cập nhật đơn hàng thành công.",
+      "editErrorGeneric": "Không thể cập nhật đơn hàng. Vui lòng thử lại.",
+      "editNotes": "Ghi chú",
+      "editNotesPlaceholder": "Ghi chú tuỳ chọn (tối đa 2000 ký tự)",
+      "editItems": "Các mục đơn hàng",
+      "editAdLink": "URL liên kết quảng cáo",
+      "editAssetsModified": "(đã chỉnh sửa)",
+      "editNoAssets": "Không có tài sản — tài sản hiện tại sẽ bị xóa",
+      "editAssetUrlPlaceholder": "URL tài sản mới",
+      "editClearAssets": "Xóa tất cả",
+      "editAddOns": "Gói bổ sung",
+      "editNewItems": "Thêm gói mới",
+      "editAddOn": "Gói bổ sung",
+      "editAddOnPackage": "Gói / Đơn giá",
+      "editAddAddOn": "Thêm gói bổ sung",
+      "editSave": "Lưu thay đổi",
+      "editError": {
+        "AD_ORDER_NOT_EDITABLE": "Đơn hàng này không thể chỉnh sửa (đã được duyệt hoặc từ chối).",
+        "AD_ORDER_EDIT_ITEM_NOT_FOUND": "Không tìm thấy một hoặc nhiều mục trong đơn hàng này.",
+        "AD_ORDER_ADDON_INVALID_TYPE": "Loại gói bổ sung không hợp lệ.",
+        "AD_ORDER_ADDON_REQUIRES_BASE": "Đơn hàng phải có gói cơ sở Popup trang chủ để thêm gói bổ sung.",
+        "AD_ORDER_INVALID_PRICING": "Một hoặc nhiều tuỳ chọn giá bổ sung không hợp lệ hoặc không còn hoạt động.",
+        "AD_ORDER_CANNOT_BE_EMPTY": "Không thể xóa tất cả các mục khỏi đơn hàng.",
+        "AD_ORDER_NOT_FOUND": "Không tìm thấy đơn hàng."
+      }
     },
     "activeAds": {
       "dialogDescription": "Quảng cáo đã được kích hoạt của công ty này",
@@ -1738,5 +1772,55 @@
     "charOver": "Vượt quá {{over}} ký tự cho phép",
     "waitForReply": "Vui lòng chờ phản hồi hoàn tất",
     "tooltipMessage": "👋 Bạn có câu hỏi về VN Buyer's Guide? Hỏi AI của chúng tôi!"
+  },
+  "terms": {
+    "title": "Điều Khoản Dịch Vụ",
+    "sections": {
+      "acceptance": {
+        "title": "1. Chấp Nhận Điều Khoản",
+        "content": "Khi truy cập và sử dụng VN Buyer Guide, bạn đồng ý tuân theo các điều khoản này. Nếu không đồng ý, vui lòng không sử dụng nền tảng."
+      },
+      "use": {
+        "title": "2. Sử Dụng Dịch Vụ",
+        "content": "VN Buyer Guide cung cấp nền tảng kết nối người mua và nhà cung cấp tại Việt Nam. Người dùng phải cung cấp thông tin chính xác khi đăng ký."
+      },
+      "account": {
+        "title": "3. Trách Nhiệm Tài Khoản",
+        "content": "Bạn chịu trách nhiệm bảo mật thông tin đăng nhập và mọi hoạt động xảy ra dưới tài khoản của mình."
+      },
+      "prohibited": {
+        "title": "4. Hành Vi Bị Cấm",
+        "content": "Người dùng không được sử dụng dịch vụ cho mục đích bất hợp pháp, gửi spam hoặc mạo danh bất kỳ cá nhân hay tổ chức nào."
+      },
+      "termination": {
+        "title": "5. Chấm Dứt Dịch Vụ",
+        "content": "Chúng tôi có quyền đình chỉ hoặc chấm dứt quyền truy cập ngay lập tức, không cần thông báo trước, nếu người dùng vi phạm các điều khoản này."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Chính Sách Bảo Mật",
+    "sections": {
+      "collect": {
+        "title": "1. Thông Tin Chúng Tôi Thu Thập",
+        "content": "Chúng tôi thu thập thông tin bạn cung cấp khi đăng ký bao gồm tên công ty, mã số thuế, thông tin liên hệ và địa chỉ email."
+      },
+      "use": {
+        "title": "2. Cách Chúng Tôi Sử Dụng Thông Tin",
+        "content": "Thông tin của bạn được dùng để cung cấp và cải thiện dịch vụ, xác minh danh tính doanh nghiệp và kết nối người mua với nhà cung cấp."
+      },
+      "sharing": {
+        "title": "3. Chia Sẻ Dữ Liệu",
+        "content": "Chúng tôi không bán thông tin cá nhân của bạn. Thông tin hồ sơ doanh nghiệp có thể hiển thị cho các thành viên đã xác minh trên nền tảng."
+      },
+      "security": {
+        "title": "4. Bảo Mật Dữ Liệu",
+        "content": "Chúng tôi áp dụng các biện pháp bảo mật phù hợp để bảo vệ thông tin của bạn khỏi truy cập, sửa đổi hoặc tiết lộ trái phép."
+      },
+      "contact": {
+        "title": "5. Liên Hệ",
+        "content": "Nếu bạn có câu hỏi về Chính Sách Bảo Mật này, vui lòng liên hệ với chúng tôi qua nền tảng."
+      }
+    }
   }
 }

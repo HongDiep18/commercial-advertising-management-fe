@@ -6,6 +6,7 @@ import { isValidPhone } from "@/utils/validation/phone"
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
 const EMAIL_FIELD = "email" as const
 const WEBSITE_FIELD = "website" as const
+const TAX_ID_FIELD = "taxId" as const
 const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "companyNameVi",
   "companyNameCn",
@@ -52,6 +53,8 @@ export type RegisterErrorKind =
   | "invalidPhone"
   | "invalidRegion"
   | "invalidWebsite"
+  | "invalidTaxId"
+  | "duplicatePhone"
 
 export type RegisterValidationResult =
   | { valid: true }
@@ -67,6 +70,8 @@ export const REGISTER_ERROR_KEYS: Record<RegisterErrorKind, string> = {
   invalidPhone: "register.errors.invalidPhone",
   invalidRegion: "register.errors.invalidRegion",
   invalidWebsite: "register.errors.invalidWebsite",
+  invalidTaxId: "register.errors.invalidTaxId",
+  duplicatePhone: "register.errors.duplicatePhone",
 }
 
 export const PROFILE_ERROR_KEYS = REGISTER_ERROR_KEYS
@@ -113,7 +118,21 @@ function runValidation(
       errors.push({ field: WEBSITE_FIELD, kind: "invalidWebsite" })
     }
   }
+  const taxIdVal = data[TAX_ID_FIELD]
+  if (filled(taxIdVal) && !/^\d+$/.test(String(taxIdVal).trim())) {
+    errors.push({ field: TAX_ID_FIELD, kind: "invalidTaxId" })
+  }
+  const phoneVal = data["phone"]
+  const contactPhoneVal = data["contactPhone"]
+  if (
+    filled(phoneVal) &&
+    filled(contactPhoneVal) &&
+    String(phoneVal).trim() === String(contactPhoneVal).trim()
+  ) {
+    errors.push({ field: "contactPhone", kind: "duplicatePhone" })
+  }
   return errors
+  
 }
 
 export function validateRegisterForm(data: RegisterFormData): RegisterValidationResult {

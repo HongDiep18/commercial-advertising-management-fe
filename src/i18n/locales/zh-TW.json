@@ -481,7 +481,7 @@
     "phoneDirectory": "(購買名錄)",
     "mapTitle": "公司位置地圖",
     "copyright": "© 2025 vnbuyerguide.com 版權所有",
-    "companyFullName": "CÔNG TY TNHH TM VÀ DV KIẾN HÀO VII"
+    "companyFullName": "建豪贸易服务有限公司"
   },
   "register": {
     "title": "會員註冊",
@@ -617,7 +617,9 @@
       "captcha": "驗證碼錯誤，請重新輸入",
       "submit": "註冊失敗，請稍後再試",
       "invalidWebsite": "請輸入有效的網站網址。",
-      "duplicate409": "此帳號已提交過註冊申請。"
+      "duplicate409": "此帳號已提交過註冊申請。",
+      "invalidTaxId": "稅號只能包含數字",
+      "duplicatePhone": "請輸入與公司電話不同的聯絡人電話號碼"
     }
   },
   "login": {
@@ -1367,6 +1369,7 @@
         "PLATFORM_PRINT": "平台印刷廣告",
         "PRODUCT_LISTING": "商品列表廣告"
       },
+      "adPackage": "廣告方案",
       "adPackageType": {
         "POPUP_PRIORITY_SLOT": "優先曝光（第一順位）",
         "POPUP_ROTATION_SLOT": "一般輪播（第二至第五順位）",
@@ -1381,6 +1384,7 @@
         "LISTING_BOOST_HOMEPAGE": "首頁精選推薦（加強曝光）",
         "LISTING_BOOST_CATEGORY": "分類頁頂端（加強曝光）",
         "PRINT_PLACEMENT": {
+          "_label": "印刷版位廣告",
           "front_cover_full": "封面廣告",
           "back_cover_full": "封底廣告",
           "inside_front_cover_left_full": "封面內頁左側",
@@ -1405,6 +1409,9 @@
       "contact": "聯絡人",
       "amount": "金額",
       "submittedAt": "提交時間",
+      "duration": "期間",
+      "packageCount_one": "個方案",
+      "packageCount_other": "個方案",
       "startTime": "開始時間",
       "endTime": "結束時間",
       "actions": "操作",
@@ -1420,6 +1427,7 @@
       "phone": "電話",
       "selectedItems": "選擇項目",
       "estimatedAmount": "預估金額",
+      "addOnsSuffix": "（附加項目）",
       "designService": "設計服務",
       "sendEmail": "發送郵件",
       "call": "撥打電話",
@@ -1430,7 +1438,33 @@
       "updateError": "更新廣告訂單失敗。",
       "slotNotAvailable": "此廣告版位在所要求的日期範圍內已全數預訂。",
       "approveNote": "核准備註",
-      "rejectReason": "拒絕原因"
+      "rejectReason": "拒絕原因",
+      "editOrderTitle": "編輯訂單",
+      "editSuccess": "訂單更新成功。",
+      "editErrorGeneric": "無法更新訂單，請稍後再試。",
+      "editNotes": "備註",
+      "editNotesPlaceholder": "選填備註（最多 2000 字）",
+      "editItems": "訂單項目",
+      "editAdLink": "廣告連結網址",
+      "editAssetsModified": "（已修改）",
+      "editNoAssets": "無素材 — 現有素材將被清除",
+      "editAssetUrlPlaceholder": "新素材網址",
+      "editClearAssets": "全部清除",
+      "editAddOns": "附加方案",
+      "editNewItems": "新增方案",
+      "editAddOn": "附加方案",
+      "editAddOnPackage": "方案 / 價格",
+      "editAddAddOn": "新增附加方案",
+      "editSave": "儲存變更",
+      "editError": {
+        "AD_ORDER_NOT_EDITABLE": "此訂單無法編輯（已核准或已拒絕）。",
+        "AD_ORDER_EDIT_ITEM_NOT_FOUND": "此訂單中找不到一個或多個項目。",
+        "AD_ORDER_ADDON_INVALID_TYPE": "附加方案類型無效。",
+        "AD_ORDER_ADDON_REQUIRES_BASE": "訂單必須包含首頁彈窗基礎方案才能新增附加方案。",
+        "AD_ORDER_INVALID_PRICING": "一個或多個附加方案價格選項無效或已停用。",
+        "AD_ORDER_CANNOT_BE_EMPTY": "無法移除訂單中的所有項目。",
+        "AD_ORDER_NOT_FOUND": "找不到此訂單。"
+      }
     },
     "activeAds": {
       "dialogDescription": "此公司的啟用廣告",
@@ -1677,5 +1711,55 @@
     "charOver": "超出限制 {{over}} 個字元",
     "waitForReply": "請等待回覆完成",
     "tooltipMessage": "👋 對越南華商採購網有疑問？來問我們的 AI！"
+  },
+  "terms": {
+    "title": "服務條款",
+    "sections": {
+      "acceptance": {
+        "title": "1. 接受條款",
+        "content": "使用 VN Buyer Guide 即表示您同意遵守本條款。如不同意，請勿使用本平台。"
+      },
+      "use": {
+        "title": "2. 服務使用",
+        "content": "VN Buyer Guide 提供越南買家與供應商的媒合平台。用戶在註冊時須提供準確完整的資訊。"
+      },
+      "account": {
+        "title": "3. 帳號責任",
+        "content": "您有責任保管好帳號憑證，並對帳號下發生的所有活動負責。"
+      },
+      "prohibited": {
+        "title": "4. 禁止行為",
+        "content": "用戶不得將本服務用於任何非法目的、發送垃圾郵件或冒充任何個人或組織。"
+      },
+      "termination": {
+        "title": "5. 終止服務",
+        "content": "若用戶違反本條款，我們保留在未事先通知的情況下立即暫停或終止其服務使用權的權利。"
+      }
+    }
+  },
+  "privacy": {
+    "title": "隱私政策",
+    "sections": {
+      "collect": {
+        "title": "1. 我們收集的資訊",
+        "content": "我們收集您在註冊時提供的資訊，包括公司名稱、稅號、聯絡資訊及電子郵件地址。"
+      },
+      "use": {
+        "title": "2. 資訊使用方式",
+        "content": "您的資訊用於提供和改善服務、驗證企業身份，以及促進買家與供應商之間的連結。"
+      },
+      "sharing": {
+        "title": "3. 資料共享",
+        "content": "我們不會出售您的個人資訊。企業檔案資訊可能對平台上的已驗證會員可見。"
+      },
+      "security": {
+        "title": "4. 資料安全",
+        "content": "我們採取適當的安全措施，保護您的資訊免遭未經授權的存取、修改或洩露。"
+      },
+      "contact": {
+        "title": "5. 聯絡我們",
+        "content": "如對本隱私政策有任何疑問，請透過平台與我們聯繫。"
+      }
+    }
   }
 }

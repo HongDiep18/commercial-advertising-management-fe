@@ -83,11 +83,6 @@ export function AccountHeroCard({
               >
                 <Edit3 className="mr-1.5 h-4 w-4" />
                 {t("account.editProfile") || "編輯會員資料"}
-                {!logoUploaded && (
-                  <span className="bg-primary text-primary-foreground absolute -top-2 -right-2 flex h-5 w-5 animate-pulse items-center justify-center rounded-full text-xs">
-                    !
-                  </span>
-                )}
               </Button>
               {user.role === UserRole.Admin && (
                 <Button

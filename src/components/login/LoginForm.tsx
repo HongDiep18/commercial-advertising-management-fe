@@ -242,11 +242,11 @@ export default function LoginForm() {
 
           <p className="text-muted-foreground mt-4 text-center text-xs">
             {t("login.terms.text") || "登入即表示您同意我們的"}{" "}
-            <Link href="/terms" className="hover:text-foreground underline">
+            <Link href="login/terms" className="hover:text-foreground underline whitespace-nowrap">
               {t("login.terms.service") || "服務條款"}
             </Link>{" "}
             {t("login.terms.and") || "和"}{" "}
-            <Link href="/privacy" className="hover:text-foreground underline">
+            <Link href="login/privacy" className="hover:text-foreground underline whitespace-nowrap">
               {t("login.terms.privacy") || "隱私政策"}
             </Link>
           </p>
