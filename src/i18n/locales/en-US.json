@@ -1384,6 +1384,7 @@
         "PLATFORM_PRINT": "Platform Print",
         "PRODUCT_LISTING": "Product Listing"
       },
+      "adPackage": "Ad Package",
       "adPackageType": {
         "POPUP_PRIORITY_SLOT": "Priority Display (First Position)",
         "POPUP_ROTATION_SLOT": "General Rotation (2nd–5th Positions)",
@@ -1398,6 +1399,7 @@
         "LISTING_BOOST_HOMEPAGE": "Homepage Featured Recommendation (Boost)",
         "LISTING_BOOST_CATEGORY": "Category Top Placement (Boost)",
         "PRINT_PLACEMENT": {
+          "_label": "Print Placement",
           "front_cover_full": "Front Cover",
           "back_cover_full": "Back Cover",
           "inside_front_cover_left_full": "Inside Front Cover — Left",
@@ -1422,6 +1424,9 @@
       "contact": "Contact",
       "amount": "Amount",
       "submittedAt": "Submitted",
+      "duration": "Duration",
+      "packageCount_one": "package",
+      "packageCount_other": "packages",
       "startTime": "Start Time",
       "endTime": "End Time",
       "actions": "Actions",
@@ -1437,6 +1442,7 @@
       "phone": "Phone",
       "selectedItems": "Selected Items",
       "estimatedAmount": "Estimated Amount",
+      "addOnsSuffix": "(add-ons)",
       "designService": "Design service",
       "sendEmail": "Send Email",
       "call": "Call",
@@ -1447,7 +1453,33 @@
       "updateError": "Failed to update advertising order.",
       "slotNotAvailable": "This ad slot is fully booked for the requested date range.",
       "approveNote": "Approval note",
-      "rejectReason": "Rejection reason"
+      "rejectReason": "Rejection reason",
+      "editOrderTitle": "Edit Order",
+      "editSuccess": "Order updated successfully.",
+      "editErrorGeneric": "Failed to update order. Please try again.",
+      "editNotes": "Notes",
+      "editNotesPlaceholder": "Optional notes (max 2000 chars)",
+      "editItems": "Order Items",
+      "editAdLink": "Ad Link URL",
+      "editAssetsModified": "(modified)",
+      "editNoAssets": "No assets — existing assets will be cleared",
+      "editAssetUrlPlaceholder": "New asset URL",
+      "editClearAssets": "Clear all",
+      "editAddOns": "Add-on Packages",
+      "editNewItems": "Add New Packages",
+      "editAddOn": "Add-on",
+      "editAddOnPackage": "Package / Pricing",
+      "editAddAddOn": "Add add-on",
+      "editSave": "Save Changes",
+      "editError": {
+        "AD_ORDER_NOT_EDITABLE": "This order cannot be edited (already approved or rejected).",
+        "AD_ORDER_EDIT_ITEM_NOT_FOUND": "One or more items could not be found in this order.",
+        "AD_ORDER_ADDON_INVALID_TYPE": "Invalid add-on package type.",
+        "AD_ORDER_ADDON_REQUIRES_BASE": "Order must have a Homepage Popup base package to add add-ons.",
+        "AD_ORDER_INVALID_PRICING": "One or more add-on pricing options are invalid or inactive.",
+        "AD_ORDER_CANNOT_BE_EMPTY": "Cannot remove all items from the order.",
+        "AD_ORDER_NOT_FOUND": "Order not found."
+      }
     },
     "activeAds": {
       "dialogDescription": "Active ads for this company",
