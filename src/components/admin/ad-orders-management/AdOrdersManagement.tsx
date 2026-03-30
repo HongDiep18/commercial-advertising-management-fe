@@ -15,8 +15,17 @@ import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
 import { useDebounce } from "@/hooks/useDebounce"
 import { addDuration } from "@/data/contactMockData"
-import { formatDate, formatDateTimeForLocale } from "@/utils/datetime"
-import { CalendarDays, CheckCircle2, Eye, Mail, MoreVertical, Pencil, Search, XCircle } from "lucide-react"
+import { formatDate, formatRecentDateTimeForLocale } from "@/utils/datetime"
+import {
+  CalendarDays,
+  CheckCircle2,
+  Eye,
+  Mail,
+  MoreVertical,
+  Pencil,
+  Search,
+  XCircle,
+} from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useQueryClient } from "@tanstack/react-query"
@@ -52,7 +61,8 @@ function ActionMenu({ order, isUpdating, onEdit, onApprove, onReject, onView }: 
   const isPendingOrDraft = order.status === "PENDING" || order.status === "DRAFT"
   const isPending = order.status === "PENDING"
 
-  const itemCls = "flex w-full items-center gap-2.5 rounded px-3 py-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+  const itemCls =
+    "flex w-full items-center gap-2.5 rounded px-3 py-2 text-left text-sm transition-colors hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -65,7 +75,10 @@ function ActionMenu({ order, isUpdating, onEdit, onApprove, onReject, onView }: 
         {isPendingOrDraft && (
           <button
             className={itemCls}
-            onClick={() => { close(); onEdit() }}
+            onClick={() => {
+              close()
+              onEdit()
+            }}
           >
             <Pencil className="h-4 w-4 text-blue-500" />
             {t("admin.advertising.editOrderTitle", { defaultValue: "Edit order" })}
@@ -76,27 +89,37 @@ function ActionMenu({ order, isUpdating, onEdit, onApprove, onReject, onView }: 
             <button
               className={itemCls}
               disabled={isUpdating}
-              onClick={() => { close(); onApprove() }}
+              onClick={() => {
+                close()
+                onApprove()
+              }}
             >
               <CheckCircle2 className="h-4 w-4 text-green-600" />
-              {t("admin.status.approved")}
+              {t("admin.advertising.approveAction", { defaultValue: "Approve" })}
             </button>
             <button
               className={itemCls}
               disabled={isUpdating}
-              onClick={() => { close(); onReject() }}
+              onClick={() => {
+                close()
+                onReject()
+              }}
             >
               <XCircle className="h-4 w-4 text-red-600" />
-              {t("admin.status.rejected")}
+              {t("admin.advertising.rejectAction", { defaultValue: "Reject" })}
             </button>
           </>
         )}
-        {(isPendingOrDraft || isPending) && (
-          <div className="bg-border my-1 h-px" />
-        )}
-        <button className={itemCls} onClick={() => { close(); onView() }}>
+        {(isPendingOrDraft || isPending) && <div className="bg-border my-1 h-px" />}
+        <button
+          className={itemCls}
+          onClick={() => {
+            close()
+            onView()
+          }}
+        >
           <Eye className="h-4 w-4" />
-          {t("admin.advertising.viewDetail", { defaultValue: "View detail" })}
+          {t("admin.advertising.viewDetails", { defaultValue: "View Details" })}
         </button>
         <a
           href={`mailto:${order.company?.email ?? order.user.email}`}
@@ -160,6 +183,51 @@ function OrderDurationCell({ items, locale }: { items: AdminOrderDto["items"]; l
         </div>
       </PopoverContent>
     </Popover>
+  )
+}
+
+function OrderPackageCell({ items }: { items: AdminOrderDto["items"] }) {
+  const pillClassName =
+    "w-64 justify-center px-2 py-0 text-center text-[11px] leading-5 font-medium"
+
+  const uniqueTypes = Array.from(
+    new Map(
+      items
+        .filter((item) => Boolean(item.packageType))
+        .map((item) => [item.packageType, item] as const)
+    ).values()
+  )
+
+  if (uniqueTypes.length === 0) {
+    return <span className="text-muted-foreground text-xs">-</span>
+  }
+
+  if (uniqueTypes.length === 1) {
+    const item = uniqueTypes[0]
+
+    return (
+      <div className="flex justify-center">
+        <TextColorBadge colorKey={item.packageType} className={pillClassName}>
+          <AdPackageLabel packageType={item.packageType} fallbackLabel={item.packageType} />
+        </TextColorBadge>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto flex w-fit flex-col items-center gap-1">
+      {uniqueTypes.map((item) => (
+        <TextColorBadge
+          key={item.packageType}
+          colorKey={item.packageType}
+          className={pillClassName}
+        >
+          <span className="block truncate">
+            <AdPackageLabel packageType={item.packageType} fallbackLabel={item.packageType} />
+          </span>
+        </TextColorBadge>
+      ))}
+    </div>
   )
 }
 
@@ -240,8 +308,8 @@ export function AdOrdersManagement() {
       if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
         showToast(
           t("admin.advertising.slotNotAvailable") ||
-          apiErr.data?.message ||
-          "This ad slot is fully booked for the requested date range.",
+            apiErr.data?.message ||
+            "This ad slot is fully booked for the requested date range.",
           "error"
         )
       } else {
@@ -276,10 +344,11 @@ export function AdOrdersManagement() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`rounded-lg px-3 py-2 text-xs ${statusFilter === s
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground"
-                }`}
+              className={`rounded-lg px-3 py-2 text-xs ${
+                statusFilter === s
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}
             >
               {s === "all"
                 ? t("admin.companies.all")
@@ -312,13 +381,13 @@ export function AdOrdersManagement() {
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.companyName")}
                     </th>
-                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
+                    <th className="text-muted-foreground px-4 py-3 text-center text-xs font-medium uppercase">
                       {t("admin.advertising.adPackage")}
                     </th>
                     <th className="text-muted-foreground w-32 px-4 py-3 text-left text-xs font-medium uppercase">
                       {t("admin.advertising.duration")}
                     </th>
-                    <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
+                    <th className="text-muted-foreground px-4 py-3 text-center text-xs font-medium uppercase">
                       {t("admin.advertising.amount")}
                     </th>
                     <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium uppercase">
@@ -341,43 +410,32 @@ export function AdOrdersManagement() {
                       <td className="text-foreground px-4 py-3 text-sm font-medium">
                         {order.company?.nameVi ?? order.company?.nameCn ?? order.user.email}
                       </td>
-                      <td className="px-4 py-3 text-sm">
-                        {(() => {
-                          const rawTypes = order.items
-                            .map((item) => item.packageType)
-                            .filter((type): type is string => Boolean(type))
-                          const uniqueTypes = Array.from(new Set(rawTypes))
-                          if (uniqueTypes.length === 0)
-                            return <span className="text-muted-foreground text-xs">-</span>
-
-                          return (
-                            <div className="flex flex-col gap-1">
-                              {uniqueTypes.map((type) => (
-                                <TextColorBadge key={type} colorKey={type}>
-                                  <AdPackageLabel packageType={type} fallbackLabel={type} />
-                                </TextColorBadge>
-                              ))}
-                            </div>
-                          )
-                        })()}
+                      <td className="px-4 py-3 align-middle text-sm">
+                        <OrderPackageCell items={order.items} />
                       </td>
                       <td className="px-4 py-3">
                         <OrderDurationCell items={order.items} locale={i18n.language} />
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">
+                      <td className="px-4 py-3 text-right text-sm font-medium">
                         <VndPrice value={order.totalAmount} />
                       </td>
                       <td className="text-muted-foreground px-4 py-3 text-sm">
-                        {formatDateTimeForLocale(order.createdAt, i18n.language)}
+                        {formatRecentDateTimeForLocale(order.createdAt, i18n.language)}
                       </td>
                       <td className="px-4 py-3">
                         <ActionMenu
                           order={order}
                           isUpdating={updatingOrderId === order.id || isApproving || isRejecting}
-                          onEdit={() => { setEditingOrderId(order.id); setIsEditOpen(true) }}
+                          onEdit={() => {
+                            setEditingOrderId(order.id)
+                            setIsEditOpen(true)
+                          }}
                           onApprove={() => openActionModal(ORDER_ACTION.APPROVE, order.id)}
                           onReject={() => openActionModal(ORDER_ACTION.REJECT, order.id)}
-                          onView={() => { setSelectedOrder(order); setIsDetailOpen(true) }}
+                          onView={() => {
+                            setSelectedOrder(order)
+                            setIsDetailOpen(true)
+                          }}
                         />
                       </td>
                     </tr>
@@ -420,7 +478,11 @@ export function AdOrdersManagement() {
         onOpenChange={(open) => {
           if (!open) closeActionModal()
         }}
-        title={isApproveAction ? t("admin.status.approved") : t("admin.status.rejected")}
+        title={
+          isApproveAction
+            ? t("admin.advertising.approveAction", { defaultValue: "Approve" })
+            : t("admin.advertising.rejectAction", { defaultValue: "Reject" })
+        }
         description={
           isApproveAction
             ? t("admin.advertising.confirmApprove") || "Approve this advertising order?"
@@ -434,7 +496,11 @@ export function AdOrdersManagement() {
         value={actionModal.text}
         maxLength={MAX_TEXT_LEN}
         required={isRejectAction}
-        confirmLabel={isApproveAction ? t("admin.status.approved") : t("admin.status.rejected")}
+        confirmLabel={
+          isApproveAction
+            ? t("admin.advertising.approveAction", { defaultValue: "Approve" })
+            : t("admin.advertising.rejectAction", { defaultValue: "Reject" })
+        }
         cancelLabel={t("common.cancel", { defaultValue: "Cancel" })}
         isSubmitting={isApproving || isRejecting}
         onValueChange={(value) => setActionModal((prev) => ({ ...prev, text: value }))}
