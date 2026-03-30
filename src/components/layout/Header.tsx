@@ -10,12 +10,14 @@ import Link from "next/link"
 import { useEffect, useRef, useState, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import LanguageSelector from "./LanguageSelector"
+import PreviewBanner from "@/components/shared/PreviewBanner"
 
 type HeaderProps = {
   showSiteNav?: boolean
+  previewOrderId?: string
 }
 
-export default function Header({ showSiteNav = true }: HeaderProps) {
+export default function Header({ showSiteNav = true, previewOrderId }: HeaderProps) {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn, logout, canUseFeature } = useUser()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -90,6 +92,7 @@ export default function Header({ showSiteNav = true }: HeaderProps) {
 
   return (
     <header className="bg-header-red-dark fixed top-0 right-0 left-0 z-[70] text-white shadow-md">
+      {previewOrderId && <PreviewBanner orderId={previewOrderId} />}
       <div className="container mx-auto px-2 lg:px-2">
         <div className="flex h-16 items-center">
           <Link href="/" className="flex items-center gap-3">
