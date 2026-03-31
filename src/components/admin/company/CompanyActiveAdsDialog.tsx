@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/shadcn-dialog/dialog"
 import { X } from "lucide-react"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CompanyActiveAdCreateForm } from "./CompanyActiveAdCreateForm"
 import { CompanyActiveAdRow } from "./CompanyActiveAdRow"
@@ -24,18 +23,9 @@ type Props = {
 export function CompanyActiveAdsDialog({ companyId, companyName, open, onOpenChange }: Props) {
   const { t, i18n } = useTranslation()
   const { data, isLoading, isError } = useCompanyActiveAds(open ? companyId : null)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(nextOpen) => {
-        onOpenChange(nextOpen)
-        if (!nextOpen) {
-          setIsCreateOpen(false)
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
         className="bg-body-bg-dark w-full max-w-2xl overflow-y-auto sm:max-w-2xl"
@@ -58,12 +48,7 @@ export function CompanyActiveAdsDialog({ companyId, companyName, open, onOpenCha
         </DialogHeader>
 
         <div className="mt-4 max-h-[70vh] space-y-2 overflow-y-auto pb-5">
-          <CompanyActiveAdCreateForm
-            key={`${companyId}:${open ? "dialog-open" : "dialog-closed"}:${isCreateOpen ? "create-open" : "create-closed"}`}
-            companyId={companyId}
-            open={isCreateOpen}
-            onOpenChange={setIsCreateOpen}
-          />
+          <CompanyActiveAdCreateForm companyId={companyId} />
           {isLoading && (
             <p className="text-muted-foreground text-sm">{t("common.loading", "Loading...")}</p>
           )}
