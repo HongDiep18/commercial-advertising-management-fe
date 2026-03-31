@@ -9,7 +9,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean
 }
 
-function classesFor(variant: Variant, size: Size) {
+export function classesFor(variant: Variant, size: Size) {
   const base =
     "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-black/20 disabled:opacity-50 disabled:pointer-events-none"
 

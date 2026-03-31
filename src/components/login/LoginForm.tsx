@@ -1,27 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { login as loginApi } from "@/api/auth"
+import { getProfile, type ProfileResponse } from "@/api/profile"
+import { MembershipTier, UserRole, useUser } from "@/contexts/user-context"
+import {
+  extractUserFromLoginResponse,
+  getLoginErrorMessage,
+  isLoginSuccess,
+  mapApiUserToUser,
+  type LoginResponse,
+} from "@/types/login"
+import { ArrowRight, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowRight, Eye, EyeOff } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import Button from "../ui/Button"
 import Card from "../ui/Card"
 import Input from "../ui/Input"
-import Label from "../ui/Label"
-import Button from "../ui/Button"
+import { Label } from "../ui/Label"
 import { Toast, type ToastVariant } from "../ui/Toast"
-import { login as loginApi } from "@/api/auth"
-import { DEMO_USERS, DEMO_ACCOUNTS } from "./demo"
-import { useUser, UserRole, MembershipTier } from "@/contexts/user-context"
-import { getProfile, type ProfileResponse } from "@/api/profile"
-import {
-  type LoginResponse,
-  isLoginSuccess,
-  getLoginErrorMessage,
-  extractUserFromLoginResponse,
-  mapApiUserToUser,
-} from "@/types/login"
 import { LOGIN_TAGS, LOGIN_TAG_FALLBACKS } from "./LoginMessages"
+import { DEMO_ACCOUNTS, DEMO_USERS } from "./demo"
 import { INITIAL_LOGIN_FORM, type LoginFormData } from "./loginConstants"
 
 function getErrorMessage(err: unknown): string {
@@ -242,11 +242,14 @@ export default function LoginForm() {
 
           <p className="text-muted-foreground mt-4 text-center text-xs">
             {t("login.terms.text") || "登入即表示您同意我們的"}{" "}
-            <Link href="login/terms" className="hover:text-foreground underline whitespace-nowrap">
+            <Link href="login/terms" className="hover:text-foreground whitespace-nowrap underline">
               {t("login.terms.service") || "服務條款"}
             </Link>{" "}
             {t("login.terms.and") || "和"}{" "}
-            <Link href="login/privacy" className="hover:text-foreground underline whitespace-nowrap">
+            <Link
+              href="login/privacy"
+              className="hover:text-foreground whitespace-nowrap underline"
+            >
               {t("login.terms.privacy") || "隱私政策"}
             </Link>
           </p>
