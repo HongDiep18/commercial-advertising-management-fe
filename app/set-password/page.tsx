@@ -1,23 +1,23 @@
 "use client"
 
-import { useState, Suspense } from "react"
-import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useTranslation } from "react-i18next"
-import { Eye, EyeOff } from "lucide-react"
-import Header from "@/components/layout/Header"
+import { setPassword as setPasswordApi } from "@/api/auth"
 import Footer from "@/components/layout/Footer"
+import Header from "@/components/layout/Header"
+import Button from "@/components/ui/Button"
 import Card from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
-import Label from "@/components/ui/Label"
-import Button from "@/components/ui/Button"
+import { Label } from "@/components/ui/Label"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
-import { setPassword as setPasswordApi } from "@/api/auth"
 import {
-  validateSetPassword,
-  MIN_PASSWORD_LENGTH,
   MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  validateSetPassword,
 } from "@/lib/passwordValidation"
+import { Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 function SetPasswordContent() {
   const { t } = useTranslation()

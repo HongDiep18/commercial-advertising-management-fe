@@ -12,7 +12,7 @@ import {
 import { AdPackageLabel } from "@/components/admin/advertising/AdPackageLabel"
 import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
-import { CheckCircle2, Link2, Mail, Paperclip, Phone, X } from "lucide-react"
+import { CheckCircle2, Eye, Link2, Mail, Paperclip, Phone, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 import { addDuration } from "@/data/contactMockData"
@@ -72,9 +72,16 @@ function getSubmittedAtLabel(order: AdminOrderDto, locale: string): string {
   return formatDateTimeForLocale(order.createdAt, locale)
 }
 
+const PREVIEW_KEY = "pendingPreview"
+
 export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetailDialogProps) {
   const { t, i18n } = useTranslation()
   if (!order) return null
+
+  const handlePreview = () => {
+    localStorage.setItem(PREVIEW_KEY, order.id)
+    window.open(`/ad-preview/${order.id}`, "_blank")
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -237,6 +244,14 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
           </div>
 
           <div className="flex gap-3 border-t py-5">
+            <Button
+              variant="outline"
+              className="flex-1 border border-gray-300!"
+              onClick={handlePreview}
+            >
+              <Eye className="mr-2 h-4 w-4" />
+              {t("admin.advertising.previewOrder") || "Preview"}
+            </Button>
             <Button className="bg-primary flex-1" variant="primary" asChild>
               <a href={`mailto:${order.company?.email ?? order.user.email}`}>
                 <Mail className="mr-2 h-4 w-4" />

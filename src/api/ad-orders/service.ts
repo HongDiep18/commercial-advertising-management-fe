@@ -1,6 +1,16 @@
 import { api } from "@/lib/api"
 import type { CreateAdOrderInput, CreateAdOrderResponse } from "../../types/types"
 import type { ExistingOrderItem } from "./overlap"
+import type { PopupCompanyItem } from "@/api/active-ads/types"
+import type { FeaturedCompanyItem } from "@/api/companies/types"
+
+export type AdOrderPreviewResponse = {
+  orderId: string
+  companyId: string
+  popupPriority: PopupCompanyItem[]
+  popupRotational: PopupCompanyItem[]
+  featuredCompanies: FeaturedCompanyItem[]
+}
 
 export type MyAdOrderItem = {
   id: string
@@ -108,6 +118,10 @@ export type AdOrderAssetToUpload = {
   pricingId: string
   assetType: string
   file: File
+}
+
+export async function getAdOrderPreview(orderId: string): Promise<AdOrderPreviewResponse> {
+  return api.request<AdOrderPreviewResponse>(`/ad-orders/${orderId}/preview`, { method: "GET" })
 }
 
 export async function attachAssetsAndSubmitOrder(

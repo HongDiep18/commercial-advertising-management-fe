@@ -24,7 +24,8 @@
   "error": {
     "failedToLoadOrders": "Không thể tải đơn hàng",
     "failedToLoadOrdersMetrics": "Không thể tải số liệu đơn hàng",
-    "failedToLoadCompanies": "Không thể tải công ty"
+    "failedToLoadCompanies": "Không thể tải công ty",
+    "failedToLoadData": "Không thể tải dữ liệu"
   },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
@@ -915,7 +916,8 @@
       "additionalIndustries": "Chọn 3 ngành",
       "selectedCount": "Đã chọn {{count}}/3",
       "exactlyThreeRequired": "Vui lòng chọn đúng 3 ngành"
-    }
+    },
+    "previewOrder": "Xem trước trên trang web"
   },
   "adContactForm": {
     "title": "Quản trị",
@@ -958,6 +960,14 @@
       "bronze": "Bạn hiện là thành viên Đồng. Nâng cấp để xem thông tin đầy đủ bao gồm trang web, điện thoại và địa chỉ",
       "register": "Đăng ký thành viên",
       "upgrade": "Nâng cấp để mở khóa thông tin đầy đủ"
+    },
+    "errors": {
+      "industryAccessDenied": {
+        "title": "Quyền truy cập bị hạn chế",
+        "message": "Cấp độ hiện tại của bạn không thể truy cập các công ty trong ngành này",
+        "backToHome": "Quay lại Trang chủ",
+        "upgradeButton": "Nâng cấp để mở khóa thông tin"
+      }
     },
     "breadcrumb": "Quay lại danh mục doanh nghiệp",
     "address": "Địa chỉ",
@@ -1528,7 +1538,8 @@
         "AD_ORDER_INVALID_PRICING": "Một hoặc nhiều tuỳ chọn giá bổ sung không hợp lệ hoặc không còn hoạt động.",
         "AD_ORDER_CANNOT_BE_EMPTY": "Không thể xóa tất cả các mục khỏi đơn hàng.",
         "AD_ORDER_NOT_FOUND": "Không tìm thấy đơn hàng."
-      }
+      },
+      "previewOrder": "Xem trước"
     },
     "activeAds": {
       "dialogDescription": "Quảng cáo đã được kích hoạt của công ty này",
@@ -1825,5 +1836,18 @@
         "content": "Nếu bạn có câu hỏi về Chính Sách Bảo Mật này, vui lòng liên hệ với chúng tôi qua nền tảng."
       }
     }
+  },
+  "previewBanner": {
+    "previewMode": "CHẾ ĐỘ XEM TRƯỚC",
+    "order": "Đơn hàng",
+    "close": "Đóng xem trước"
+  },
+  "adPreview": {
+    "notAccessibleTitle": "Không thể truy cập xem trước",
+    "notAccessibleDesc": "Trang này chỉ có thể truy cập qua nút Xem trước. Vui lòng quay lại và nhấn Xem trước trên đơn hàng.",
+    "goBack": "Quay lại",
+    "loading": "Đang tải xem trước…",
+    "errorTitle": "Không thể tải xem trước",
+    "errorDesc": "Không thể tải bản xem trước quảng cáo. Bạn có thể không có quyền xem đơn hàng này."
   }
 }

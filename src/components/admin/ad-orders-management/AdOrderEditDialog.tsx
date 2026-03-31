@@ -2,15 +2,14 @@
 
 import { useAdminOrder, useEditAdminOrder } from "@/api/ad-orders-admin/hooks"
 import type {
-  AdminNewOrderItemPayload,
   AdminEditOrderAssetPayload,
   AdminEditOrderItemPayload,
+  AdminNewOrderItemPayload,
 } from "@/api/ad-orders-admin/types"
 import { useAvailableAdPackages } from "@/api/ads-pricing/hooks"
 import type { PublicAdPackagePricingItem } from "@/api/ads-pricing/types"
 import { uploadFiles } from "@/api/files/service"
 import { AdPackageLabel } from "@/components/admin/advertising/AdPackageLabel"
-import { VndPrice } from "@/components/VndPrice"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import {
@@ -21,11 +20,12 @@ import {
   DialogTitle,
 } from "@/components/ui/Dialog"
 import Input from "@/components/ui/Input"
-import Label from "@/components/ui/Label"
+import { Label } from "@/components/ui/Label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
 import TextColorBadge from "@/components/ui/TextColorBadge"
-import { format } from "date-fns"
+import { VndPrice } from "@/components/VndPrice"
 import { addDuration } from "@/data/contactMockData"
+import { format } from "date-fns"
 import { CalendarIcon, Loader2, Paperclip, Plus, Trash2, Upload, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -121,7 +121,10 @@ export function AdOrderEditDialog({
 }: AdOrderEditDialogProps) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language
-  const { data: order, isLoading: isLoadingOrder } = useAdminOrder(orderId, open && orderId !== null)
+  const { data: order, isLoading: isLoadingOrder } = useAdminOrder(
+    orderId,
+    open && orderId !== null
+  )
   const { data: packages } = useAvailableAdPackages()
   const { edit, isPending: isSubmitting } = useEditAdminOrder()
 
@@ -133,9 +136,7 @@ export function AdOrderEditDialog({
   const [addOnErrors, setAddOnErrors] = useState<Record<number, string>>({})
 
   const existingPricingIds = new Set(
-    order?.items
-      .filter((i) => !deleteItemIds.includes(i.id))
-      .map((i) => i.pricingId) ?? []
+    order?.items.filter((i) => !deleteItemIds.includes(i.id)).map((i) => i.pricingId) ?? []
   )
 
   const addonPricingOptions: AddOnPricingOption[] = (packages ?? []).flatMap((cat) => {
@@ -213,9 +214,7 @@ export function AdOrderEditDialog({
   }
 
   function getAvailableOptionsForDraft(draftIdx: number): AddOnPricingOption[] {
-    const otherIds = new Set(
-      addOnDrafts.filter((_, i) => i !== draftIdx).map((d) => d.pricingId)
-    )
+    const otherIds = new Set(addOnDrafts.filter((_, i) => i !== draftIdx).map((d) => d.pricingId))
     return addonPricingOptions.filter((opt) => !otherIds.has(opt.pricingId))
   }
 
@@ -268,7 +267,9 @@ export function AdOrderEditDialog({
       const needsLink = matchesType(packageType, ["popup_view_details_link"])
       const effectiveAdLinkUrl = normalizeHttpUrl(d.adLinkUrl) ?? fallbackExistingAdLinkUrl
       if (needsLink && !effectiveAdLinkUrl) {
-        errors[idx] = t("admin.advertising.adLinkRequired", { defaultValue: "Ad Link URL is required for this package." })
+        errors[idx] = t("admin.advertising.adLinkRequired", {
+          defaultValue: "Ad Link URL is required for this package.",
+        })
       }
     })
     setAddOnErrors(errors)
@@ -301,33 +302,33 @@ export function AdOrderEditDialog({
       const items: AdminEditOrderItemPayload[] = order.items
         .filter((item) => !deleteItemIds.includes(item.id))
         .map((item) => {
-        const s = itemStates[item.id]
-        const payload: AdminEditOrderItemPayload = {
-          itemId: item.id,
-          adLinkUrl: s.adLinkUrl || undefined,
-          startDate: s.startDate ? format(s.startDate, "yyyy-MM-dd") : undefined,
-          designServiceRequired: s.designServiceRequired,
-        }
-        if (s.assetsTouched) {
-          let uploadIdx = 0
-          const uploadedUrls = itemsWithUploadedUrls[item.id] ?? []
-          payload.assets = s.assets
-            .map((a): AdminEditOrderAssetPayload | null => {
-              if (a.kind === "existing") {
-                // Only re-send existing assets that have a valid HTTP URL.
-                // Non-HTTP values (relative paths, storage keys) are skipped
-                // because the BE validator requires full URLs.
-                return isValidHttpUrl(a.fileUrl)
-                  ? { assetType: a.assetType, fileUrl: a.fileUrl }
-                  : null
-              }
-              // New assets: URL was validated after upload
-              return { assetType: a.assetType, fileUrl: uploadedUrls[uploadIdx++] }
-            })
-            .filter((a): a is AdminEditOrderAssetPayload => a !== null)
-        }
-        return payload
-      })
+          const s = itemStates[item.id]
+          const payload: AdminEditOrderItemPayload = {
+            itemId: item.id,
+            adLinkUrl: s.adLinkUrl || undefined,
+            startDate: s.startDate ? format(s.startDate, "yyyy-MM-dd") : undefined,
+            designServiceRequired: s.designServiceRequired,
+          }
+          if (s.assetsTouched) {
+            let uploadIdx = 0
+            const uploadedUrls = itemsWithUploadedUrls[item.id] ?? []
+            payload.assets = s.assets
+              .map((a): AdminEditOrderAssetPayload | null => {
+                if (a.kind === "existing") {
+                  // Only re-send existing assets that have a valid HTTP URL.
+                  // Non-HTTP values (relative paths, storage keys) are skipped
+                  // because the BE validator requires full URLs.
+                  return isValidHttpUrl(a.fileUrl)
+                    ? { assetType: a.assetType, fileUrl: a.fileUrl }
+                    : null
+                }
+                // New assets: URL was validated after upload
+                return { assetType: a.assetType, fileUrl: uploadedUrls[uploadIdx++] }
+              })
+              .filter((a): a is AdminEditOrderAssetPayload => a !== null)
+          }
+          return payload
+        })
 
       const newItems: AdminNewOrderItemPayload[] = addOnDrafts
         .filter((d) => d.pricingId)
@@ -402,7 +403,6 @@ export function AdOrderEditDialog({
           </div>
         ) : !order ? null : (
           <div className="mt-2 flex-1 space-y-4 overflow-y-auto px-5 pb-5">
-
             {/* Notes */}
             <div className="space-y-1">
               <Label className="text-xs">
@@ -422,7 +422,7 @@ export function AdOrderEditDialog({
 
             {/* Items */}
             <div>
-              <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
+              <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                 {t("admin.advertising.editItems", { defaultValue: "Order Items" })}
               </p>
               <div className="space-y-3">
@@ -456,7 +456,9 @@ export function AdOrderEditDialog({
                         {isAddOn && (
                           <button
                             type="button"
-                            title={t("admin.advertising.deleteItem", { defaultValue: "Remove package" })}
+                            title={t("admin.advertising.deleteItem", {
+                              defaultValue: "Remove package",
+                            })}
                             onClick={() =>
                               setDeleteItemIds((prev) =>
                                 isMarkedForDelete
@@ -492,7 +494,9 @@ export function AdOrderEditDialog({
                             <Calendar
                               mode="single"
                               selected={s.startDate}
-                              onSelect={(d) => updateItem(item.id, { startDate: d, startCalOpen: false })}
+                              onSelect={(d) =>
+                                updateItem(item.id, { startDate: d, startCalOpen: false })
+                              }
                               className="w-full"
                               initialFocus
                               localeCode={lang}
@@ -558,8 +562,10 @@ export function AdOrderEditDialog({
                         <Label className="text-xs">
                           {t("admin.advertising.assets")}
                           {s.assetsTouched && (
-                            <span className="text-amber-500 ml-1 font-normal">
-                              {t("admin.advertising.editAssetsModified", { defaultValue: "(modified)" })}
+                            <span className="ml-1 font-normal text-amber-500">
+                              {t("admin.advertising.editAssetsModified", {
+                                defaultValue: "(modified)",
+                              })}
                             </span>
                           )}
                         </Label>
@@ -575,7 +581,7 @@ export function AdOrderEditDialog({
                                     : ""
                               const label =
                                 asset.kind === "existing"
-                                  ? (asset.fileUrl.split("/").pop() || asset.fileUrl)
+                                  ? asset.fileUrl.split("/").pop() || asset.fileUrl
                                   : asset.file.name
                               return (
                                 <li key={idx} className="bg-body-bg-dark space-y-1.5 rounded p-2">
@@ -609,7 +615,9 @@ export function AdOrderEditDialog({
 
                         {s.assetsTouched && s.assets.length === 0 && (
                           <p className="text-muted-foreground text-xs">
-                            {t("admin.advertising.editNoAssets", { defaultValue: "No assets — existing will be cleared" })}
+                            {t("admin.advertising.editNoAssets", {
+                              defaultValue: "No assets — existing will be cleared",
+                            })}
                           </p>
                         )}
 
@@ -617,7 +625,9 @@ export function AdOrderEditDialog({
                           type="button"
                           className="border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed py-2 text-xs transition-colors"
                           onClick={() =>
-                            (document.getElementById(`asset-upload-${item.id}`) as HTMLInputElement)?.click()
+                            (
+                              document.getElementById(`asset-upload-${item.id}`) as HTMLInputElement
+                            )?.click()
                           }
                         >
                           <Upload className="text-muted-foreground h-3.5 w-3.5" />
@@ -641,7 +651,9 @@ export function AdOrderEditDialog({
                             className="text-destructive flex items-center gap-1 text-xs hover:opacity-70"
                           >
                             <Trash2 className="h-3 w-3" />
-                            {t("admin.advertising.editClearAssets", { defaultValue: "Clear all assets" })}
+                            {t("admin.advertising.editClearAssets", {
+                              defaultValue: "Clear all assets",
+                            })}
                           </button>
                         )}
                       </div>
@@ -654,14 +666,17 @@ export function AdOrderEditDialog({
             {/* Add-on packages */}
             {hasPopupBase && (
               <div>
-                <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
+                <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                   {t("admin.advertising.editAddOns", { defaultValue: "Add-on Packages" })}
                 </p>
 
                 {addOnDrafts.map((draft, idx) => {
                   const packageType = getDraftPackageType(draft)
                   const isViewDetailsLink = matchesType(packageType, ["popup_view_details_link"])
-                  const isAdLinkInvalid = isViewDetailsLink && draft.adLinkUrl.trim() !== "" && !isValidHttpUrl(draft.adLinkUrl)
+                  const isAdLinkInvalid =
+                    isViewDetailsLink &&
+                    draft.adLinkUrl.trim() !== "" &&
+                    !isValidHttpUrl(draft.adLinkUrl)
                   const adLinkRequiredError = addOnErrors[idx]
                   return (
                     <div key={idx} className="mb-3 space-y-3 rounded-lg bg-white p-3 shadow-md">
@@ -671,9 +686,7 @@ export function AdOrderEditDialog({
                         </p>
                         <button
                           type="button"
-                          onClick={() =>
-                            setAddOnDrafts((prev) => prev.filter((_, i) => i !== idx))
-                          }
+                          onClick={() => setAddOnDrafts((prev) => prev.filter((_, i) => i !== idx))}
                           className="text-destructive/70 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -682,18 +695,27 @@ export function AdOrderEditDialog({
 
                       <div className="space-y-1">
                         <Label className="text-xs">
-                          {t("admin.advertising.editAddOnPackage", { defaultValue: "Package / Pricing" })}
+                          {t("admin.advertising.editAddOnPackage", {
+                            defaultValue: "Package / Pricing",
+                          })}
                         </Label>
                         <select
                           className="border-input bg-background text-foreground focus:ring-primary h-9 w-full rounded-md border px-2 text-xs focus:ring-1 focus:outline-none"
                           value={draft.pricingId}
                           onChange={(e) => {
-                            const selected = getAvailableOptionsForDraft(idx).find(o => o.pricingId === e.target.value)
-                            const isSelectedViewDetailsLink = matchesType(selected?.packageType ?? "", ["popup_view_details_link"])
+                            const selected = getAvailableOptionsForDraft(idx).find(
+                              (o) => o.pricingId === e.target.value
+                            )
+                            const isSelectedViewDetailsLink = matchesType(
+                              selected?.packageType ?? "",
+                              ["popup_view_details_link"]
+                            )
                             updateAddOn(idx, {
                               pricingId: e.target.value,
                               packageType: selected?.packageType ?? "",
-                              adLinkUrl: isSelectedViewDetailsLink ? (fallbackExistingAdLinkUrl ?? "") : "",
+                              adLinkUrl: isSelectedViewDetailsLink
+                                ? (fallbackExistingAdLinkUrl ?? "")
+                                : "",
                             })
                           }}
                         >
@@ -747,7 +769,12 @@ export function AdOrderEditDialog({
                             value={draft.adLinkUrl}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                               updateAddOn(idx, { adLinkUrl: e.target.value })
-                              if (addOnErrors[idx]) setAddOnErrors((prev) => { const next = { ...prev }; delete next[idx]; return next })
+                              if (addOnErrors[idx])
+                                setAddOnErrors((prev) => {
+                                  const next = { ...prev }
+                                  delete next[idx]
+                                  return next
+                                })
                             }}
                           />
                           {isAdLinkInvalid && (
@@ -798,12 +825,12 @@ export function AdOrderEditDialog({
                   </p>
                   {(addOnTotal > 0 || deletedTotal > 0) && (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      {t("admin.advertising.estimatedAmount")}: <VndPrice value={order.totalAmount - deletedTotal} />
+                      {t("admin.advertising.estimatedAmount")}:{" "}
+                      <VndPrice value={order.totalAmount - deletedTotal} />
                       {addOnTotal > 0 && (
                         <>
                           {" + "}
-                          <VndPrice value={addOnTotal} />
-                          {" "}{t("admin.advertising.addOnsSuffix")}
+                          <VndPrice value={addOnTotal} /> {t("admin.advertising.addOnsSuffix")}
                         </>
                       )}
                     </p>

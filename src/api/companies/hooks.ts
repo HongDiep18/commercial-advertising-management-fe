@@ -61,14 +61,14 @@ export function useCompanyCategories(enabled: boolean = true): {
 export function useCompanyDetail(
   id: string,
   enabled: boolean = true
-): { data?: CompanyDetail; isLoading: boolean; isError: boolean } {
-  const { data, isLoading, isError } = useQuery({
+): { data?: CompanyDetail; isLoading: boolean; isError: boolean; error: any } {
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: companiesKeys.detail(id),
     queryFn: () => getCompanyDetail(id),
     enabled: enabled && Boolean(id),
   })
 
-  return { data, isLoading, isError }
+  return { data, isLoading, isError, error }
 }
 
 export function useFeaturedCompanies(): {

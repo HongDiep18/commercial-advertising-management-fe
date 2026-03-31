@@ -1,72 +1,82 @@
 "use client"
 
+import type { CompanyActiveAdItem } from "@/api/active-ads/adminService"
 import { useCreateCompanyPopupAddon } from "@/api/active-ads/hooks"
 import { translateAdPackageType } from "@/components/admin/advertising/AdPackageLabel"
 import Button from "@/components/ui/Button"
-import type { CompanyActiveAdItem } from "@/api/active-ads/adminService"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { CompanyActiveAdEditRow } from "./CompanyActiveAdEditRow"
-import type { AssetEntry } from "./company-active-ads.types"
 
 const POPUP_ADDON_TYPES = ["POPUP_VIEW_DETAILS_LINK", "POPUP_RANKING_ADJUSTMENT"] as const
 
 type PopupAddonPackageType = (typeof POPUP_ADDON_TYPES)[number]
 
+function getStartOfDayIsoString(date: Date): string {
+  const value = new Date(date)
+  value.setHours(0, 0, 0, 0)
+  return value.toISOString()
+}
+
+function createActiveAdPlaceholder(): CompanyActiveAdItem {
+  return {
+    id: "new-active-ad",
+    packageType: "POPUP_VIEW_DETAILS_LINK",
+    pricingModel: "ONE_TIME",
+    assets: [],
+    adLinkUrl: null,
+    startDate: getStartOfDayIsoString(new Date()),
+    endDate: null,
+    isActive: true,
+    status: "pending",
+  }
+}
+
 type Props = {
   companyId: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
 }
 
-const CREATE_ROW_AD_PLACEHOLDER: CompanyActiveAdItem = {
-  id: "new-active-ad",
-  packageType: "POPUP_VIEW_DETAILS_LINK",
-  pricingModel: "ONE_TIME",
-  assets: [],
-  adLinkUrl: null,
-  startDate: new Date().toISOString(),
-  endDate: null,
-  isActive: true,
-  status: "pending",
-}
-
-export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Props) {
+export function CompanyActiveAdCreateForm({ companyId }: Props) {
   const { t, i18n } = useTranslation()
   const { mutateAsync: createAddon, isPending } = useCreateCompanyPopupAddon(companyId)
   const [packageType, setPackageType] = useState<PopupAddonPackageType>("POPUP_VIEW_DETAILS_LINK")
-  const [startDate, setStartDate] = useState<Date | undefined>(() => new Date())
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
-  const [isActive, setIsActive] = useState(true)
-  const [adLinkUrl, setAdLinkUrl] = useState("")
-  const [assets, setAssets] = useState<AssetEntry[]>([])
-  const [startCalOpen, setStartCalOpen] = useState(false)
-  const [endCalOpen, setEndCalOpen] = useState(false)
-  const [isDateRangeValid, setIsDateRangeValid] = useState(true)
-  const [isAdLinkValid, setIsAdLinkValid] = useState(false)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const adLinkRequired = packageType === "POPUP_VIEW_DETAILS_LINK"
-  const canSubmit = Boolean(startDate) && (!adLinkRequired || isAdLinkValid) && isDateRangeValid && !isPending
 
-  const handleSubmit = async () => {
-    if (!canSubmit) return
+  const rowAd: CompanyActiveAdItem = useMemo(
+    () => {
+      void isCreateOpen
+      return {
+        ...createActiveAdPlaceholder(),
+        packageType,
+      }
+    },
+    [packageType, isCreateOpen]
+  )
+
+  const handleSubmit = async (values: {
+    startDate: Date | undefined
+    endDate: Date | undefined
+    adLinkUrl: string
+  }): Promise<void> => {
     await createAddon({
       packageType,
-      startDate: startDate!.toISOString(),
-      endDate: endDate ? endDate.toISOString() : null,
-      ...(adLinkRequired ? { adLinkUrl: adLinkUrl.trim() } : {}),
+      startDate: values.startDate!.toISOString(),
+      endDate: values.endDate ? values.endDate.toISOString() : null,
+      ...(adLinkRequired ? { adLinkUrl: values.adLinkUrl.trim() } : {}),
     })
-    onOpenChange(false)
+    setIsCreateOpen(false)
   }
 
   const handleCancel = () => {
-    onOpenChange(false)
+    setIsCreateOpen(false)
   }
 
-  if (!open) {
+  if (!isCreateOpen) {
     return (
       <div className="mb-3 flex justify-end">
-        <Button type="button" size="sm" variant="primary" onClick={() => onOpenChange(true)}>
+        <Button type="button" size="sm" variant="primary" onClick={() => setIsCreateOpen(true)}>
           {t("admin.activeAds.createShowButton", "+ Create")}
         </Button>
       </div>
@@ -94,7 +104,7 @@ export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Pro
         </div>
       </div>
       <CompanyActiveAdEditRow
-        ad={{ ...CREATE_ROW_AD_PLACEHOLDER, packageType }}
+        ad={rowAd}
         lang={i18n.language}
         showActiveToggle={false}
         showAssets={false}
@@ -103,26 +113,10 @@ export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Pro
         showAdLinkField={adLinkRequired}
         showAdLinkValidation={adLinkRequired}
         saveLabel={t("admin.activeAds.createSubmit")}
-        isActive={isActive}
-        setIsActive={setIsActive}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        adLinkUrl={adLinkUrl}
-        setAdLinkUrl={setAdLinkUrl}
-        assets={assets}
-        setAssets={setAssets}
-        startCalOpen={startCalOpen}
-        setStartCalOpen={setStartCalOpen}
-        endCalOpen={endCalOpen}
-        setEndCalOpen={setEndCalOpen}
         saving={isPending}
         deleting={false}
         onCancel={handleCancel}
         onSave={handleSubmit}
-        onDateRangeValidityChange={setIsDateRangeValid}
-        onAdLinkValidityChange={setIsAdLinkValid}
       />
     </div>
   )
