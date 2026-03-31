@@ -36,7 +36,7 @@ function PackageHint({ text }: { text: string }) {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="flex h-5 w-5 animate-pulse cursor-default items-center justify-center rounded-full bg-primary text-[11px] font-black text-white shadow-sm ring-2 ring-primary/30">
+            <span className="flex h-5 w-5 cursor-default items-center justify-center rounded-full bg-primary text-[11px] font-black text-white shadow-sm ring-2 ring-primary/30">
               !
             </span>
           </TooltipTrigger>
