@@ -30,8 +30,12 @@ import { CalendarIcon, Loader2, Paperclip, Plus, Trash2, Upload, X } from "lucid
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-const POPUP_BASE_TYPES = ["popup_priority_slot", "popup_rotation_slot"]
-const POPUP_ADDON_TYPES = ["popup_view_details_link", "popup_ranking_adjustment"]
+const POPUP_ADDON_TYPES = [
+  "popup_rotation_details_link",
+  "popup_priority_details_link",
+  "popup_ranking_adjustment",
+]
+const POPUP_ADDON_NEEDS_LINK_TYPES = ["popup_rotation_details_link", "popup_priority_details_link"]
 
 function matchesType(value: string, targets: string[]): boolean {
   return targets.includes(value.toLowerCase())
@@ -183,9 +187,6 @@ export function AdOrderEditDialog({
     setAddOnErrors({})
   }, [order])
 
-  const hasPopupBase =
-    order?.items.some((item) => matchesType(item.packageType ?? "", POPUP_BASE_TYPES)) ?? false
-
   function updateItem(itemId: string, patch: Partial<ItemEditState>) {
     setItemStates((prev) => ({ ...prev, [itemId]: { ...prev[itemId], ...patch } }))
   }
@@ -239,7 +240,7 @@ export function AdOrderEditDialog({
     const usedIds = new Set(addOnDrafts.map((d) => d.pricingId))
     const firstAvailable = addonPricingOptions.find((opt) => !usedIds.has(opt.pricingId))
     if (!firstAvailable) return
-    const isViewDetailsLink = matchesType(firstAvailable.packageType, ["popup_view_details_link"])
+    const isViewDetailsLink = matchesType(firstAvailable.packageType, POPUP_ADDON_NEEDS_LINK_TYPES)
     setAddOnDrafts((prev) => [
       ...prev,
       {
@@ -264,7 +265,7 @@ export function AdOrderEditDialog({
     const errors: Record<number, string> = {}
     addOnDrafts.forEach((d, idx) => {
       const packageType = getDraftPackageType(d)
-      const needsLink = matchesType(packageType, ["popup_view_details_link"])
+      const needsLink = matchesType(packageType, POPUP_ADDON_NEEDS_LINK_TYPES)
       const effectiveAdLinkUrl = normalizeHttpUrl(d.adLinkUrl) ?? fallbackExistingAdLinkUrl
       if (needsLink && !effectiveAdLinkUrl) {
         errors[idx] = t("admin.advertising.adLinkRequired", {
@@ -334,7 +335,7 @@ export function AdOrderEditDialog({
         .filter((d) => d.pricingId)
         .map((d) => {
           const packageType = getDraftPackageType(d)
-          const needsLink = matchesType(packageType, ["popup_view_details_link"])
+          const needsLink = matchesType(packageType, POPUP_ADDON_NEEDS_LINK_TYPES)
           const effectiveAdLinkUrl = normalizeHttpUrl(d.adLinkUrl) ?? fallbackExistingAdLinkUrl
           const startDate = d.startDate ?? getTodayStart()
           return {
@@ -664,146 +665,144 @@ export function AdOrderEditDialog({
             </div>
 
             {/* Add-on packages */}
-            {hasPopupBase && (
-              <div>
-                <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-                  {t("admin.advertising.editAddOns", { defaultValue: "Add-on Packages" })}
-                </p>
+            <div>
+              <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                {t("admin.advertising.editAddOns", { defaultValue: "Add-on Packages" })}
+              </p>
 
-                {addOnDrafts.map((draft, idx) => {
-                  const packageType = getDraftPackageType(draft)
-                  const isViewDetailsLink = matchesType(packageType, ["popup_view_details_link"])
-                  const isAdLinkInvalid =
-                    isViewDetailsLink &&
-                    draft.adLinkUrl.trim() !== "" &&
-                    !isValidHttpUrl(draft.adLinkUrl)
-                  const adLinkRequiredError = addOnErrors[idx]
-                  return (
-                    <div key={idx} className="mb-3 space-y-3 rounded-lg bg-white p-3 shadow-md">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-medium">
-                          {t("admin.advertising.editAddOn", { defaultValue: "Add-on" })} #{idx + 1}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => setAddOnDrafts((prev) => prev.filter((_, i) => i !== idx))}
-                          className="text-destructive/70 hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
+              {addOnDrafts.map((draft, idx) => {
+                const packageType = getDraftPackageType(draft)
+                const isViewDetailsLink = matchesType(packageType, POPUP_ADDON_NEEDS_LINK_TYPES)
+                const isAdLinkInvalid =
+                  isViewDetailsLink &&
+                  draft.adLinkUrl.trim() !== "" &&
+                  !isValidHttpUrl(draft.adLinkUrl)
+                const adLinkRequiredError = addOnErrors[idx]
+                return (
+                  <div key={idx} className="mb-3 space-y-3 rounded-lg bg-white p-3 shadow-md">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-medium">
+                        {t("admin.advertising.editAddOn", { defaultValue: "Add-on" })} #{idx + 1}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setAddOnDrafts((prev) => prev.filter((_, i) => i !== idx))}
+                        className="text-destructive/70 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
 
+                    <div className="space-y-1">
+                      <Label className="text-xs">
+                        {t("admin.advertising.editAddOnPackage", {
+                          defaultValue: "Package / Pricing",
+                        })}
+                      </Label>
+                      <select
+                        className="border-input bg-background text-foreground focus:ring-primary h-9 w-full rounded-md border px-2 text-xs focus:ring-1 focus:outline-none"
+                        value={draft.pricingId}
+                        onChange={(e) => {
+                          const selected = getAvailableOptionsForDraft(idx).find(
+                            (o) => o.pricingId === e.target.value
+                          )
+                          const isSelectedViewDetailsLink = matchesType(
+                            selected?.packageType ?? "",
+                            POPUP_ADDON_NEEDS_LINK_TYPES
+                          )
+                          updateAddOn(idx, {
+                            pricingId: e.target.value,
+                            packageType: selected?.packageType ?? "",
+                            adLinkUrl: isSelectedViewDetailsLink
+                              ? (fallbackExistingAdLinkUrl ?? "")
+                              : "",
+                          })
+                        }}
+                      >
+                        {getAvailableOptionsForDraft(idx).map((opt) => (
+                          <option key={opt.pricingId} value={opt.pricingId}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-xs">{t("admin.advertising.startTime")}</Label>
+                      <Popover
+                        open={draft.calOpen}
+                        onOpenChange={(v) => updateAddOn(idx, { calOpen: v })}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="h-8 w-full justify-start bg-transparent px-2 text-left text-xs font-normal"
+                          >
+                            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                            {draft.startDate ? formatDateDisplay(draft.startDate, lang) : "—"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="z-90 w-[280px] p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={draft.startDate}
+                            onSelect={(d) => updateAddOn(idx, { startDate: d, calOpen: false })}
+                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                            className="w-full"
+                            initialFocus
+                            localeCode={lang}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {isViewDetailsLink && (
                       <div className="space-y-1">
                         <Label className="text-xs">
-                          {t("admin.advertising.editAddOnPackage", {
-                            defaultValue: "Package / Pricing",
-                          })}
+                          {t("admin.advertising.editAdLink", { defaultValue: "Ad Link URL" })}
                         </Label>
-                        <select
-                          className="border-input bg-background text-foreground focus:ring-primary h-9 w-full rounded-md border px-2 text-xs focus:ring-1 focus:outline-none"
-                          value={draft.pricingId}
-                          onChange={(e) => {
-                            const selected = getAvailableOptionsForDraft(idx).find(
-                              (o) => o.pricingId === e.target.value
-                            )
-                            const isSelectedViewDetailsLink = matchesType(
-                              selected?.packageType ?? "",
-                              ["popup_view_details_link"]
-                            )
-                            updateAddOn(idx, {
-                              pricingId: e.target.value,
-                              packageType: selected?.packageType ?? "",
-                              adLinkUrl: isSelectedViewDetailsLink
-                                ? (fallbackExistingAdLinkUrl ?? "")
-                                : "",
-                            })
+                        <Input
+                          type="url"
+                          placeholder="https://"
+                          className={`h-8 text-xs ${isAdLinkInvalid || adLinkRequiredError ? "border-red-500" : ""}`}
+                          value={draft.adLinkUrl}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            updateAddOn(idx, { adLinkUrl: e.target.value })
+                            if (addOnErrors[idx])
+                              setAddOnErrors((prev) => {
+                                const next = { ...prev }
+                                delete next[idx]
+                                return next
+                              })
                           }}
-                        >
-                          {getAvailableOptionsForDraft(idx).map((opt) => (
-                            <option key={opt.pricingId} value={opt.pricingId}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
+                        />
+                        {isAdLinkInvalid && (
+                          <p className="text-destructive text-xs">
+                            {t("admin.activeAds.createUrlError")}
+                          </p>
+                        )}
+                        {!isAdLinkInvalid && adLinkRequiredError && (
+                          <p className="text-destructive text-xs">{adLinkRequiredError}</p>
+                        )}
                       </div>
+                    )}
+                  </div>
+                )
+              })}
 
-                      <div className="space-y-1">
-                        <Label className="text-xs">{t("admin.advertising.startTime")}</Label>
-                        <Popover
-                          open={draft.calOpen}
-                          onOpenChange={(v) => updateAddOn(idx, { calOpen: v })}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="h-8 w-full justify-start bg-transparent px-2 text-left text-xs font-normal"
-                            >
-                              <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
-                              {draft.startDate ? formatDateDisplay(draft.startDate, lang) : "—"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="z-90 w-[280px] p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={draft.startDate}
-                              onSelect={(d) => updateAddOn(idx, { startDate: d, calOpen: false })}
-                              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                              className="w-full"
-                              initialFocus
-                              localeCode={lang}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {isViewDetailsLink && (
-                        <div className="space-y-1">
-                          <Label className="text-xs">
-                            {t("admin.advertising.editAdLink", { defaultValue: "Ad Link URL" })}
-                          </Label>
-                          <Input
-                            type="url"
-                            placeholder="https://"
-                            className={`h-8 text-xs ${isAdLinkInvalid || adLinkRequiredError ? "border-red-500" : ""}`}
-                            value={draft.adLinkUrl}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              updateAddOn(idx, { adLinkUrl: e.target.value })
-                              if (addOnErrors[idx])
-                                setAddOnErrors((prev) => {
-                                  const next = { ...prev }
-                                  delete next[idx]
-                                  return next
-                                })
-                            }}
-                          />
-                          {isAdLinkInvalid && (
-                            <p className="text-destructive text-xs">
-                              {t("admin.activeAds.createUrlError")}
-                            </p>
-                          )}
-                          {!isAdLinkInvalid && adLinkRequiredError && (
-                            <p className="text-destructive text-xs">{adLinkRequiredError}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addAddOnDraft}
-                  disabled={!canAddMoreAddOns}
-                  className="h-8 text-xs"
-                >
-                  <Plus className="mr-1 h-3.5 w-3.5" />
-                  {t("admin.advertising.editAddAddOn", { defaultValue: "Add add-on" })}
-                </Button>
-              </div>
-            )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addAddOnDraft}
+                disabled={!canAddMoreAddOns}
+                className="h-8 text-xs"
+              >
+                <Plus className="mr-1 h-3.5 w-3.5" />
+                {t("admin.advertising.editAddAddOn", { defaultValue: "Add add-on" })}
+              </Button>
+            </div>
 
             {/* Estimated amount */}
             {(() => {
