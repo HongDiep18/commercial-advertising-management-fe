@@ -9,6 +9,9 @@ You are working in the **frontend** of the VN Buyer Guide project (Next.js app i
   - Prefer **shadcn/ui (Radix, Maia preset)** components from `@/components/ui` whenever a matching primitive exists (button, input, dialog, dropdown, toast, etc.).
   - Follow existing Tailwind design tokens and shadcn class patterns rather than introducing new ad‑hoc styles.
   - Only build custom components when shadcn does not provide a suitable primitive; compose them from shadcn primitives when possible.
+  - For form UI, prefer shadcn Field primitives from `@/components/ui/field` so field layout and errors stay consistent.
+- **Form handling (enforced)**
+  - Use the combo `shadcn-field` (`@/components/ui/field`) + `tanstack-form` (`@tanstack/react-form-nextjs`) + `zod` (`zod`) for new forms: Zod schema validation + TanStack Form state-driven inputs and error rendering.
 - **Data fetching**
   - Use the existing `api.request<T>` wrapper in `src/lib/api.ts` for all HTTP calls.
   - Use **@tanstack/react-query** for data fetching in client components:

@@ -870,7 +870,8 @@
       "additionalIndustries": "Select 3 industries",
       "selectedCount": "Selected {{count}}/3",
       "exactlyThreeRequired": "Please select exactly 3 industries"
-    }
+    },
+    "previewOrder": "Preview on website"
   },
   "adContactForm": {
     "title": "Admin Panel",
@@ -1482,7 +1483,8 @@
         "AD_ORDER_INVALID_PRICING": "One or more add-on pricing options are invalid or inactive.",
         "AD_ORDER_CANNOT_BE_EMPTY": "Cannot remove all items from the order.",
         "AD_ORDER_NOT_FOUND": "Order not found."
-      }
+      },
+      "previewOrder": "Preview"
     },
     "activeAds": {
       "dialogDescription": "Active ads for this company",
@@ -1779,5 +1781,18 @@
         "content": "If you have questions about this Privacy Policy, please contact us through the platform."
       }
     }
+  },
+  "previewBanner": {
+    "previewMode": "PREVIEW MODE",
+    "order": "Order",
+    "close": "Close preview"
+  },
+  "adPreview": {
+    "notAccessibleTitle": "Preview not accessible",
+    "notAccessibleDesc": "This page is only accessible via the Preview button. Please go back and click Preview on the order.",
+    "goBack": "Go back",
+    "loading": "Loading preview…",
+    "errorTitle": "Failed to load preview",
+    "errorDesc": "Could not load the ad preview. You may not have permission to view this order."
   }
 }
