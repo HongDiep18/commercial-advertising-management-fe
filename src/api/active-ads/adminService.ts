@@ -1,5 +1,14 @@
 import { api } from "@/lib/api"
 
+export enum AdPackageType {
+  POPUP_PRIORITY_SLOT = "POPUP_PRIORITY_SLOT",
+  POPUP_ROTATION_SLOT = "POPUP_ROTATION_SLOT",
+  POPUP_VIEW_DETAILS_LINK = "POPUP_VIEW_DETAILS_LINK",
+  POPUP_PRIORITY_DETAILS_LINK = "POPUP_PRIORITY_DETAILS_LINK",
+  POPUP_ROTATION_DETAILS_LINK = "POPUP_ROTATION_DETAILS_LINK",
+  POPUP_RANKING_ADJUSTMENT = "POPUP_RANKING_ADJUSTMENT",
+}
+
 export type CompanyActiveAdItem = {
   id: string
   packageType: string
@@ -57,7 +66,7 @@ export async function deleteActiveAd(activeAdId: string): Promise<void> {
 
 export type CreateCompanyPopupAddonPayload = {
   companyId: string
-  packageType: "POPUP_VIEW_DETAILS_LINK" | "POPUP_RANKING_ADJUSTMENT"
+  packageType: AdPackageType
   startDate: string
   endDate: string | null
   adLinkUrl?: string
