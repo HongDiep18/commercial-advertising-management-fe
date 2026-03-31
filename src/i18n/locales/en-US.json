@@ -261,6 +261,10 @@
       "product": {
         "title": "Product Sales Listing"
       },
+      "packageHints": {
+        "POPUP_PRIORITY_DETAILS_LINK": "Purchase this add-on to show a 'View Details' link on your Priority Slot ad. It will be hidden if not purchased.",
+        "POPUP_ROTATION_DETAILS_LINK": "Purchase this add-on to show a 'View Details' link on your Rotation Slot ad. It will be hidden if not purchased."
+      },
       "adPackageCategory": {
         "HOMEPAGE_POPUP": "Homepage Popup Advertising"
       },
@@ -1399,6 +1403,8 @@
         "POPUP_PRIORITY_SLOT": "Priority Display (First Position)",
         "POPUP_ROTATION_SLOT": "General Rotation (2nd–5th Positions)",
         "POPUP_VIEW_DETAILS_LINK": "'View Details' Link Setting",
+        "POPUP_PRIORITY_DETAILS_LINK": "'View Details' Link (Priority Slot)",
+        "POPUP_ROTATION_DETAILS_LINK": "'View Details' Link (Rotation Slot)",
         "POPUP_RANKING_ADJUSTMENT": "Ranking Adjustment (Promoting Rank)",
         "FEATURED_HOMEPAGE_DISPLAY": "Homepage Featured Company Display",
         "FEATURED_HIGHLIGHT_BOOST": "Featured Company Highlight Boost",

@@ -3,6 +3,7 @@
 import { useTranslation } from "react-i18next"
 import Checkbox from "@/components/ui/Checkbox"
 import Card, { CardContent } from "@/components/ui/Card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 function normalizePackageTypeKey(type: string): string {
   const withUnderscores = type.replace(/-/g, "_").replace(/\s+/g, "_")
@@ -26,6 +27,26 @@ interface PricingItem {
   placementKey?: string
   durationValue?: number | null
   durationUnit?: string | null
+  hint?: string
+}
+
+function PackageHint({ text }: { text: string }) {
+  return (
+    <span className="ml-2 inline-flex items-center align-middle" onClick={(e) => e.stopPropagation()}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="flex h-5 w-5 cursor-default items-center justify-center rounded-full bg-primary text-[11px] font-black text-white shadow-sm ring-2 ring-primary/30">
+              !
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-64 whitespace-normal">
+            {text}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </span>
+  )
 }
 
 interface PricingTableProps {
@@ -110,23 +131,26 @@ export default function PricingTable({
                   )}
                   {columns.item && (
                     <td className="px-3 py-3 font-medium">
-                      {(() => {
-                        const baseName = item.name || item.position || item.item
-                        const isVietnamese =
-                          i18n.language === "vi-VN" || i18n.language?.startsWith("vi")
-                        if (isVietnamese && item.packageType) {
-                          const typeKey = normalizePackageTypeKey(item.packageType)
-                          if (typeKey === "PRINT_PLACEMENT" && item.placementKey) {
-                            const placementKey = `adContact.pricing.platformItems.PRINT_PLACEMENT.${item.placementKey}`
-                            const translated = t(placementKey)
-                            if (translated !== placementKey) return translated
+                      <span className="inline-flex items-center">
+                        {(() => {
+                          const baseName = item.name || item.position || item.item
+                          const isVietnamese =
+                            i18n.language === "vi-VN" || i18n.language?.startsWith("vi")
+                          if (isVietnamese && item.packageType) {
+                            const typeKey = normalizePackageTypeKey(item.packageType)
+                            if (typeKey === "PRINT_PLACEMENT" && item.placementKey) {
+                              const placementKey = `adContact.pricing.platformItems.PRINT_PLACEMENT.${item.placementKey}`
+                              const translated = t(placementKey)
+                              if (translated !== placementKey) return translated
+                            }
+                            const key = `adContact.pricing.platformItems.${typeKey}.name`
+                            const translated = t(key)
+                            return translated !== key ? translated : baseName
                           }
-                          const key = `adContact.pricing.platformItems.${typeKey}.name`
-                          const translated = t(key)
-                          return translated !== key ? translated : baseName
-                        }
-                        return baseName
-                      })()}
+                          return baseName
+                        })()}
+                        {item.hint && <PackageHint text={item.hint} />}
+                      </span>
                     </td>
                   )}
                   {columns.description && (
