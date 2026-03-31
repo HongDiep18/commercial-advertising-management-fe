@@ -121,37 +121,7 @@ export type AdOrderAssetToUpload = {
 }
 
 export async function getAdOrderPreview(orderId: string): Promise<AdOrderPreviewResponse> {
-  // TODO: replace with real API call once backend is ready
-  // return api.request<AdOrderPreviewResponse>(`/ad-orders/${orderId}/preview`, { method: "GET" })
-  await new Promise((resolve) => setTimeout(resolve, 800))
-  const mockPopupCompany: PopupCompanyItem = {
-    id: "preview-company-id",
-    name: "Preview Company (Mock)",
-    logoUrl: null,
-    email: "preview@example.com",
-    contactName: "Preview Contact",
-    phone: "0900000000",
-    industry: "technology",
-    address: "123 Preview Street",
-    description: "This is a preview of how your ad would appear on the website.",
-    featuredHighlight: true,
-    companyInfoHighlight: false,
-    showDetailsButton: true,
-    adLinkUrl: undefined,
-    metadata: { activeAdAssets: [] },
-    sortPriority: 1,
-  }
-  const mockFeaturedCompany: FeaturedCompanyItem = {
-    ...mockPopupCompany,
-    country: null,
-  }
-  return {
-    orderId,
-    companyId: "preview-company-id",
-    popupPriority: [mockPopupCompany],
-    popupRotational: [mockPopupCompany],
-    featuredCompanies: [mockFeaturedCompany],
-  }
+  return api.request<AdOrderPreviewResponse>(`/ad-orders/${orderId}/preview`, { method: "GET" })
 }
 
 export async function attachAssetsAndSubmitOrder(
