@@ -24,7 +24,8 @@
   "error": {
     "failedToLoadOrders": "無法載入訂單",
     "failedToLoadOrdersMetrics": "無法載入訂單統計數據",
-    "failedToLoadCompanies": "無法載入企業"
+    "failedToLoadCompanies": "無法載入企業",
+    "failedToLoadData": "無法載入資料"
   },
   "hero": {
     "title": "華商採購網－連結優質商業夥伴",
@@ -899,6 +900,14 @@
       "bronze": "您目前為銅牌會員，升級可查看官網、電話、地址等完整資訊",
       "register": "註冊成為會員",
       "upgrade": "升級解鎖完整資訊"
+    },
+    "errors": {
+      "industryAccessDenied": {
+        "title": "訪問受限",
+        "message": "您當前的會員等級無法訪問此行業的企業",
+        "backToHome": "返回首頁",
+        "upgradeButton": "升級以解鎖資訊"
+      }
     },
     "breadcrumb": "返回企業名錄",
     "address": "地址",

@@ -61,6 +61,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     data: apiCompany,
     isLoading: isCompanyLoading,
     isError: isCompanyError,
+    error: apiCompanyError,
   } = useCompanyDetail(companyId, true)
   const isAdmin = !!user && user.role === UserRole.Admin
   const {
@@ -109,11 +110,65 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     )
   }
 
+  // Check if error is 403 industry access denied
+  const isIndustryAccessDenied =
+    !isDemo &&
+    isCompanyError &&
+    apiCompanyError &&
+    (apiCompanyError as any).status === 403 &&
+    (apiCompanyError as any).message?.includes("do not have access to companies in this industry")
+
+  // Show industry access denied error UI
+  if (isIndustryAccessDenied) {
+    return (
+      <div className="min-h-screen bg-body-bg-dark">
+        {/* Back to Home Link - Top Left */}
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          <Link
+            href="/"
+            className="text-muted-foreground hover:text-primary inline-flex items-center text-sm transition-colors"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("companyDetail.errors.industryAccessDenied.backToHome") || "Back to Home"}
+          </Link>
+        </div>
+
+        {/* Centered Error Message */}
+        <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+          <Card className="bg-card border-border/50 overflow-hidden">
+            <CardContent className="bg-body-bg-light p-6 lg:p-8">
+              <div className="flex min-h-[60vh] items-center justify-center">
+                <div className="text-center">
+                  <Lock className="text-muted-foreground mx-auto mb-4 h-16 w-16" />
+                  <h2 className="mb-2 text-2xl font-semibold">
+                    {t("companyDetail.errors.industryAccessDenied.title") || "Access Restricted"}
+                  </h2>
+                  <p className="text-muted-foreground mb-6">
+                    {t("companyDetail.errors.industryAccessDenied.message") ||
+                      "Your current tier cannot access companies in this industry"}
+                  </p>
+                  <Button className="bg-white font-semibold !text-amber-600 hover:bg-white/90" asChild>
+                    <Link href="/account">
+                      <Crown className="mr-2 h-4 w-4" />
+                      {t("companyDetail.errors.industryAccessDenied.upgradeButton") ||
+                        "Upgrade to unlock information"}
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+    )
+  }
+
+  // Show generic error for other cases
   if (!isDemo && (isCompanyError || !apiCompany)) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
         <p className="text-muted-foreground">
-          {t("error.failedToLoadOrders") || "Failed to load data"}
+          {t("error.failedToLoadData") || "Failed to load data"}
         </p>
       </div>
     )

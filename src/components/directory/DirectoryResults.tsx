@@ -209,7 +209,7 @@ export function DirectoryResults({
       ) : isError ? (
         <div className="py-12 text-center">
           <p className="text-muted-foreground">
-            {t("error.failedToLoadOrders") || "Failed to load data"}
+            {t("error.failedToLoadData") || "Failed to load data"}
           </p>
         </div>
       ) : displayedCompanies.length === 0 ? (
