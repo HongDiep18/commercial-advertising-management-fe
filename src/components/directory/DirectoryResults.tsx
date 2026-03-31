@@ -69,6 +69,7 @@ export function DirectoryResults({
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn, getMemberTier } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
+  const serverDirectoryQueryEnabled = !isDemo
   const isAdmin = !!user && user.role === UserRole.Admin
 
   const userTier = getMemberTier()
@@ -102,7 +103,10 @@ export function DirectoryResults({
         sortOrder: "asc" as const,
       }
 
-  const { data, isLoading, isError } = useCompanyDirectory(directoryQuery, !isDemo)
+  const { data, isLoading, isError } = useCompanyDirectory(
+    directoryQuery,
+    serverDirectoryQueryEnabled
+  )
 
   const rawCompanies = isDemo
     ? Object.values(mockCompanies).map((c) => ({
@@ -126,6 +130,7 @@ export function DirectoryResults({
   const displayedCompanies = rawCompanies.filter((c) => {
     if (selectedCategories.length > 0 && !selectedCategories.includes(c.industry)) return false
     if (!isSearching) return true
+    if (serverDirectoryQueryEnabled) return true
 
     return companyDirectoryRowMatchesSearch(
       {
@@ -143,7 +148,9 @@ export function DirectoryResults({
     )
   })
 
-  const usesClientFiltering = isSearching || selectedCategories.length > 0
+  const usesClientFiltering =
+    (isDemo && (isSearching || selectedCategories.length > 0)) ||
+    (!isDemo && !isSearching && selectedCategories.length > 0)
   const totalPages = isDemo || usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
   const displayTotalResults =
     isDemo || usesClientFiltering ? displayedCompanies.length : (data?.pagination.total ?? 0)
