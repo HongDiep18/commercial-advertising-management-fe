@@ -121,7 +121,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   // Show industry access denied error UI
   if (isIndustryAccessDenied) {
     return (
-      <div className="min-h-screen bg-body-bg-dark">
+      <div className="bg-body-bg-dark min-h-screen">
         {/* Back to Home Link - Top Left */}
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <Link
@@ -147,7 +147,10 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     {t("companyDetail.errors.industryAccessDenied.message") ||
                       "Your current tier cannot access companies in this industry"}
                   </p>
-                  <Button className="bg-white font-semibold !text-amber-600 hover:bg-white/90" asChild>
+                  <Button
+                    className="bg-white font-semibold !text-amber-600 hover:bg-white/90"
+                    asChild
+                  >
                     <Link href="/account">
                       <Crown className="mr-2 h-4 w-4" />
                       {t("companyDetail.errors.industryAccessDenied.upgradeButton") ||
@@ -226,6 +229,38 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
 
   const shouldBlurLogo = isGuest || isBronze
 
+  const copyTextSafely = async (text: string): Promise<boolean> => {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text)
+        return true
+      } catch {
+        console.error("Failed to copy text to clipboard")
+      }
+    }
+
+    if (typeof document === "undefined") return false
+
+    const textArea = document.createElement("textarea")
+    textArea.value = text
+    textArea.setAttribute("readonly", "")
+    textArea.style.position = "fixed"
+    textArea.style.top = "-9999px"
+    textArea.style.left = "-9999px"
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+
+    try {
+      const didCopy = document.execCommand("copy")
+      document.body.removeChild(textArea)
+      return didCopy
+    } catch {
+      document.body.removeChild(textArea)
+      return false
+    }
+  }
+
   if (isResolvingTier) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
@@ -235,13 +270,15 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   }
 
   const handleCopyEmail = async () => {
-    await navigator.clipboard.writeText(company.email)
+    const copied = await copyTextSafely(company.email)
+    if (!copied) return
     setCopiedEmail(true)
     setTimeout(() => setCopiedEmail(false), 2000)
   }
 
   const handleCopyPhone = async () => {
-    await navigator.clipboard.writeText(company.phone)
+    const copied = await copyTextSafely(company.phone)
+    if (!copied) return
     setCopiedPhone(true)
     setTimeout(() => setCopiedPhone(false), 2000)
   }
@@ -254,7 +291,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
         url: window.location.href,
       })
     } else {
-      await navigator.clipboard.writeText(window.location.href)
+      await copyTextSafely(window.location.href)
     }
   }
 
