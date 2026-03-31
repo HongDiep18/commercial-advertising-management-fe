@@ -12,38 +12,47 @@ const POPUP_ADDON_TYPES = ["POPUP_VIEW_DETAILS_LINK", "POPUP_RANKING_ADJUSTMENT"
 
 type PopupAddonPackageType = (typeof POPUP_ADDON_TYPES)[number]
 
+function getStartOfDayIsoString(date: Date): string {
+  const value = new Date(date)
+  value.setHours(0, 0, 0, 0)
+  return value.toISOString()
+}
+
+function createActiveAdPlaceholder(): CompanyActiveAdItem {
+  return {
+    id: "new-active-ad",
+    packageType: "POPUP_VIEW_DETAILS_LINK",
+    pricingModel: "ONE_TIME",
+    assets: [],
+    adLinkUrl: null,
+    startDate: getStartOfDayIsoString(new Date()),
+    endDate: null,
+    isActive: true,
+    status: "pending",
+  }
+}
+
 type Props = {
   companyId: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
 }
 
-const CREATE_ROW_AD_PLACEHOLDER: CompanyActiveAdItem = {
-  id: "new-active-ad",
-  packageType: "POPUP_VIEW_DETAILS_LINK",
-  pricingModel: "ONE_TIME",
-  assets: [],
-  adLinkUrl: null,
-  startDate: new Date().toISOString(),
-  endDate: null,
-  isActive: true,
-  status: "pending",
-}
-
-export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Props) {
+export function CompanyActiveAdCreateForm({ companyId }: Props) {
   const { t, i18n } = useTranslation()
   const { mutateAsync: createAddon, isPending } = useCreateCompanyPopupAddon(companyId)
   const [packageType, setPackageType] = useState<PopupAddonPackageType>("POPUP_VIEW_DETAILS_LINK")
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const adLinkRequired = packageType === "POPUP_VIEW_DETAILS_LINK"
 
   const rowAd: CompanyActiveAdItem = useMemo(
-    () => ({
-      ...CREATE_ROW_AD_PLACEHOLDER,
-      packageType,
-      startDate: new Date().toISOString(),
-    }),
-    [packageType]
+    () => {
+      void isCreateOpen
+      return {
+        ...createActiveAdPlaceholder(),
+        packageType,
+      }
+    },
+    [packageType, isCreateOpen]
   )
 
   const handleSubmit = async (values: {
@@ -57,17 +66,17 @@ export function CompanyActiveAdCreateForm({ companyId, open, onOpenChange }: Pro
       endDate: values.endDate ? values.endDate.toISOString() : null,
       ...(adLinkRequired ? { adLinkUrl: values.adLinkUrl.trim() } : {}),
     })
-    onOpenChange(false)
+    setIsCreateOpen(false)
   }
 
   const handleCancel = () => {
-    onOpenChange(false)
+    setIsCreateOpen(false)
   }
 
-  if (!open) {
+  if (!isCreateOpen) {
     return (
       <div className="mb-3 flex justify-end">
-        <Button type="button" size="sm" variant="primary" onClick={() => onOpenChange(true)}>
+        <Button type="button" size="sm" variant="primary" onClick={() => setIsCreateOpen(true)}>
           {t("admin.activeAds.createShowButton", "+ Create")}
         </Button>
       </div>

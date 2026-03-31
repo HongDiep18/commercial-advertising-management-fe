@@ -7,7 +7,7 @@ import Calendar from "@/components/ui/Calendar"
 import { Field, FieldError } from "@/components/ui/field"
 import Input from "@/components/ui/Input"
 import { Label } from "@/components/ui/Label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn-popover"
 import TextColorBadge from "@/components/ui/TextColorBadge"
 import { useForm } from "@tanstack/react-form-nextjs"
 import { format } from "date-fns"
@@ -221,7 +221,7 @@ export function CompanyActiveAdEditRow({
                   {values.startDate ? formatDateDisplay(values.startDate.toISOString(), lang) : "—"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="z-90 w-[280px] p-0" align="start">
+              <PopoverContent className="z-90 w-[280px] p-2" align="start">
                 <Calendar
                   mode="single"
                   selected={values.startDate}
@@ -253,7 +253,7 @@ export function CompanyActiveAdEditRow({
                   {values.endDate ? formatDateDisplay(values.endDate.toISOString(), lang) : "—"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="z-90 w-[280px] p-0" align="start">
+              <PopoverContent className="z-90 w-[280px] p-2" align="start">
                 <Calendar
                   mode="single"
                   selected={values.endDate}
