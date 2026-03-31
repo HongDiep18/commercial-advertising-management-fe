@@ -260,6 +260,10 @@
       "product": {
         "title": "Đăng bán sản phẩm"
       },
+      "packageHints": {
+        "POPUP_PRIORITY_DETAILS_LINK": "Mua gói này để hiển thị nút \"Xem chi tiết\" trên quảng cáo vị trí ưu tiên. Nút sẽ bị ẩn nếu bạn không mua.",
+        "POPUP_ROTATION_DETAILS_LINK": "Mua gói này để hiển thị nút \"Xem chi tiết\" trên quảng cáo vị trí luân phiên. Nút sẽ bị ẩn nếu bạn không mua."
+      },
       "adPackageCategory": {
         "HOMEPAGE_POPUP": "Popup trang chủ",
         "FEATURED_COMPANY": "Công ty nổi bật",
@@ -276,6 +280,12 @@
         },
         "POPUP_VIEW_DETAILS_LINK": {
           "name": "Thiết lập liên kết \"Xem chi tiết\""
+        },
+        "POPUP_PRIORITY_DETAILS_LINK": {
+          "name": "Liên kết \"Xem chi tiết\" (Vị trí ưu tiên)"
+        },
+        "POPUP_ROTATION_DETAILS_LINK": {
+          "name": "Liên kết \"Xem chi tiết\" (Vị trí luân phiên)"
         },
         "POPUP_RANKING_ADJUSTMENT": {
           "name": "Điều chỉnh xếp hạng (nâng thứ hạng)"
@@ -1445,6 +1455,8 @@
         "POPUP_PRIORITY_SLOT": "Hiển thị ưu tiên (vị trí đầu tiên)",
         "POPUP_ROTATION_SLOT": "Luân phiên chung (vị trí 2–5)",
         "POPUP_VIEW_DETAILS_LINK": "Cài đặt nút \"Xem chi tiết\"",
+        "POPUP_PRIORITY_DETAILS_LINK": "Liên kết \"Xem chi tiết\" (Vị trí ưu tiên)",
+        "POPUP_ROTATION_DETAILS_LINK": "Liên kết \"Xem chi tiết\" (Vị trí luân phiên)",
         "POPUP_RANKING_ADJUSTMENT": "Điều chỉnh thứ hạng (đẩy lên trên)",
         "FEATURED_HOMEPAGE_DISPLAY": "Hiển thị công ty nổi bật trên trang chủ",
         "FEATURED_HIGHLIGHT_BOOST": "Tăng nổi bật cho công ty nổi bật",

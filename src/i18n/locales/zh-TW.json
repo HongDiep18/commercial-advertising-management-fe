@@ -260,6 +260,10 @@
       "product": {
         "title": "商品銷售刊登"
       },
+      "packageHints": {
+        "POPUP_PRIORITY_DETAILS_LINK": "購買此附加方案，可在優先位廣告顯示「查看詳細」連結。未購買時連結將不顯示。",
+        "POPUP_ROTATION_DETAILS_LINK": "購買此附加方案，可在輪播位廣告顯示「查看詳細」連結。未購買時連結將不顯示。"
+      },
       "adPackageCategory": {
         "HOMEPAGE_POPUP": "首頁彈窗廣告"
       },
@@ -1384,6 +1388,8 @@
         "POPUP_PRIORITY_SLOT": "優先曝光（第一順位）",
         "POPUP_ROTATION_SLOT": "一般輪播（第二至第五順位）",
         "POPUP_VIEW_DETAILS_LINK": "「查看詳細」連結設定",
+        "POPUP_PRIORITY_DETAILS_LINK": "「查看詳細」連結（優先位）",
+        "POPUP_ROTATION_DETAILS_LINK": "「查看詳細」連結（輪播位）",
         "POPUP_RANKING_ADJUSTMENT": "排名調整（提升排序）",
         "FEATURED_HOMEPAGE_DISPLAY": "首頁推薦公司曝光",
         "FEATURED_HIGHLIGHT_BOOST": "推薦公司強調加亮",

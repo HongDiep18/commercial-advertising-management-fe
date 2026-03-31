@@ -48,6 +48,12 @@ export default function PricingSection({
     return t(`adContact.pricing.adPackageCategory.${categoryTypeKey}`) || categoryName
   }
 
+  // Add an entry here to show a hint tooltip for any package type in the future
+  const PACKAGE_HINTS: Record<string, string> = {
+    POPUP_PRIORITY_DETAILS_LINK: t("adContact.pricing.packageHints.POPUP_PRIORITY_DETAILS_LINK"),
+    POPUP_ROTATION_DETAILS_LINK: t("adContact.pricing.packageHints.POPUP_ROTATION_DETAILS_LINK"),
+  }
+
   if (activeTab === "platform") {
     const platformOnlyItems = platformCatalogItems.filter((item) =>
       PLATFORM_CATEGORY_TYPES.has(item.categoryType ?? "")
@@ -56,7 +62,13 @@ export default function PricingSection({
     const useApiCatalog = platformOnlyItems.length > 0
 
     const categories = useApiCatalog
-      ? groupPlatformByCategory(platformOnlyItems)
+      ? groupPlatformByCategory(platformOnlyItems).map((cat) => ({
+          ...cat,
+          items: cat.items.map((item) => ({
+            ...item,
+            hint: item.packageType ? PACKAGE_HINTS[item.packageType] : undefined,
+          })),
+        }))
       : allowMockFallback
         ? Object.entries(platformPricing).map(([categoryKey, category]) => ({
             categoryKey,
