@@ -236,6 +236,11 @@ export function AdOrdersManagement() {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearchQuery, statusFilter])
   const [selectedOrder, setSelectedOrder] = useState<AdminOrderDto | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null)
@@ -266,13 +271,14 @@ export function AdOrdersManagement() {
   const { data, isLoading, isError } = useAdminOrders({
     search: debouncedSearchQuery || undefined,
     status: statusFilter === "all" ? undefined : statusFilter,
-    page: 1,
-    limit: 50,
+    page,
+    limit: 20,
     sortBy: "createdAt",
     sortOrder: "desc",
   })
 
   const visibleOrders = data?.orders ?? []
+  const pagination = data?.pagination
 
   // Keep selectedOrder in sync when the list refetches (e.g. after an edit)
   useEffect(() => {
@@ -446,6 +452,46 @@ export function AdOrdersManagement() {
           )}
         </CardContent>
       </Card>
+
+      {pagination && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-muted-foreground text-xs">
+            {t("admin.advertising.paginationInfo", {
+              from: (pagination.page - 1) * pagination.limit + 1,
+              to: Math.min(pagination.page * pagination.limit, pagination.total),
+              total: pagination.total,
+              defaultValue: `{{from}}–{{to}} of {{total}}`,
+            })}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              disabled={pagination.page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              {t("common.previous", { defaultValue: "Previous" })}
+            </Button>
+            <span className="text-muted-foreground text-xs">
+              {t("admin.advertising.pageOf", {
+                page: pagination.page,
+                totalPages: pagination.totalPages,
+                defaultValue: `{{page}} / {{totalPages}}`,
+              })}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              disabled={pagination.page >= pagination.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              {t("common.next", { defaultValue: "Next" })}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <AdOrderDetailDialog
         order={selectedOrder}
