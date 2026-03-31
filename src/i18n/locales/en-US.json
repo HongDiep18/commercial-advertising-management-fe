@@ -25,7 +25,8 @@
   "error": {
     "failedToLoadOrders": "Failed to load orders",
     "failedToLoadOrdersMetrics": "Failed to load orders metrics",
-    "failedToLoadCompanies": "Failed to load companies"
+    "failedToLoadCompanies": "Failed to load companies",
+    "failedToLoadData": "Failed to load data"
   },
   "hero": {
     "title": "Vietnam Buyer Guide - Connect Quality Business Partners",
@@ -914,6 +915,14 @@
       "bronze": "You are currently a Bronze member. Upgrade to view complete information including website, phone, and address",
       "register": "Register as Member",
       "upgrade": "Upgrade to Unlock Complete Information"
+    },
+    "errors": {
+      "industryAccessDenied": {
+        "title": "Access Restricted",
+        "message": "Your current tier cannot access companies in this industry",
+        "backToHome": "Back to Home",
+        "upgradeButton": "Upgrade to unlock information"
+      }
     },
     "breadcrumb": "Back to Company Directory",
     "address": "Address",
