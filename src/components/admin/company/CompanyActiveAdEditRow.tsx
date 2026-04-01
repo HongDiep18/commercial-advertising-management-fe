@@ -62,8 +62,6 @@ type Props = {
   showActiveToggle?: boolean
   showAssets?: boolean
   disableDateEditing?: boolean
-  showDateRangeValidation?: boolean
-  showAdLinkValidation?: boolean
   showAdLinkField?: boolean
   saveLabel?: string
   saving: boolean
@@ -78,8 +76,6 @@ export function CompanyActiveAdEditRow({
   showActiveToggle = true,
   showAssets = true,
   disableDateEditing = true,
-  showDateRangeValidation = false,
-  showAdLinkValidation = false,
   showAdLinkField = true,
   saveLabel,
   saving,
@@ -126,7 +122,7 @@ export function CompanyActiveAdEditRow({
       })
       .superRefine((val, ctx) => {
         if (
-          showDateRangeValidation &&
+          !disableDateEditing &&
           val.startDate &&
           val.endDate &&
           val.endDate.getTime() <= val.startDate.getTime()
@@ -138,7 +134,7 @@ export function CompanyActiveAdEditRow({
           })
         }
 
-        if (showAdLinkValidation && val.adLinkUrl.trim() !== "" && !isValidHttpUrl(val.adLinkUrl)) {
+        if (showAdLinkField && val.adLinkUrl.trim() !== "" && !isValidHttpUrl(val.adLinkUrl)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: invalidUrlMessage,
@@ -146,7 +142,7 @@ export function CompanyActiveAdEditRow({
           })
         }
       })
-  }, [showAdLinkValidation, showDateRangeValidation, t])
+  }, [disableDateEditing, showAdLinkField, t])
 
   const form = useForm({
     defaultValues: {
@@ -168,20 +164,8 @@ export function CompanyActiveAdEditRow({
       : validation.error.issues.find((issue) => issue.path[0] === "adLinkUrl")
 
     const hasInvalidDateRange = Boolean(endDateIssue)
-    const isAdLinkValid = isValidHttpUrl(values.adLinkUrl)
-    const hasInvalidAdLink =
-      showAdLinkValidation && values.adLinkUrl.trim() !== "" && !isAdLinkValid
-
-    const invalidRangeMessage = endDateIssue?.message
-    const invalidUrlMessage = adLinkIssue?.message
-
-    const canSubmitDate =
-      !showDateRangeValidation ||
-      (values.startDate
-        ? !values.endDate || values.endDate.getTime() > values.startDate.getTime()
-        : false)
-    const canSubmitAdLink = !showAdLinkValidation || isAdLinkValid
-    const canSubmit = canSubmitDate && canSubmitAdLink
+    const hasInvalidAdLink = Boolean(adLinkIssue)
+    const canSubmit = validation.success
 
     return (
       <div className="mb-2 space-y-3 rounded-lg bg-white p-3 shadow-md">
@@ -246,7 +230,7 @@ export function CompanyActiveAdEditRow({
                   variant="outline"
                   disabled={disableDateEditing}
                   className={`h-8 w-full justify-start bg-transparent px-2 text-left text-xs font-normal ${
-                    showDateRangeValidation && hasInvalidDateRange ? "border-red-500" : ""
+                    !disableDateEditing &&hasInvalidDateRange ? "border-red-500" : ""
                   }`}
                 >
                   <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
@@ -280,10 +264,10 @@ export function CompanyActiveAdEditRow({
                 </div>
               </PopoverContent>
             </Popover>
-            {showDateRangeValidation && hasInvalidDateRange && (
+            {!disableDateEditing &&hasInvalidDateRange && (
               <FieldError
                 errors={[
-                  { message: invalidRangeMessage ?? t("admin.activeAds.createInvalidRange") },
+                  { message: endDateIssue?.message ?? t("admin.activeAds.createInvalidRange") },
                 ]}
               />
             )}
@@ -302,7 +286,7 @@ export function CompanyActiveAdEditRow({
             />
             {hasInvalidAdLink && (
               <FieldError
-                errors={[{ message: invalidUrlMessage ?? t("admin.activeAds.createUrlError") }]}
+                errors={[{ message: adLinkIssue?.message ?? t("admin.activeAds.createUrlError") }]}
               />
             )}
           </Field>

@@ -112,9 +112,7 @@ export function CompanyActiveAdCreateForm({ companyId }: Props) {
         showActiveToggle={false}
         showAssets={false}
         disableDateEditing={false}
-        showDateRangeValidation
         showAdLinkField={adLinkRequired}
-        showAdLinkValidation={adLinkRequired}
         saveLabel={t("admin.activeAds.createSubmit")}
         saving={isPending}
         deleting={false}
