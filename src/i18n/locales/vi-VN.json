@@ -493,7 +493,7 @@
       "note3": "Kích thước: Trang đầy đủ là cao 26cm x rộng 19cm.",
       "note4": "Hạn chót: 31 tháng 10 năm 2024."
     },
-    "orderSuccess": "Cảm ơn bạn đã đặt hàng!\n\nĐã chọn {{count}} mục quảng cáo\nChúng tôi sẽ liên hệ với bạn sớm để xác nhận chi tiết.",
+    "orderSuccess": "Cảm ơn bạn đã đặt hàng!\n\nĐã chọn {{count}} mục quảng cáo\nChúng tôi sẽ liên hệ với bạn sớm để xác nhận chi tiết. Xem trạng thái chi tiết và chi phí cho đơn quảng cáo của bạn trong \"Tài khoản của tôi\".",
     "orderSubmittedTitle": "Đơn hàng của bạn đã được gửi.",
     "orderSuccessDescription": "Đơn đặt quảng cáo của bạn đã được gửi và đang chờ xét duyệt.",
     "previewAd": "Xem trước quảng cáo",
