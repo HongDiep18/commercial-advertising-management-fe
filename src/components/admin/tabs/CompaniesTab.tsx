@@ -1,6 +1,5 @@
 "use client"
 
-import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
 import { getCompanyDetail } from "@/api/companies/service"
 import { AccountProfileModal } from "@/components/account"
 import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
@@ -83,24 +82,17 @@ export function CompaniesTab() {
     },
   })
 
-  const resolveUserIdForRow = async (row: ProfileRequestRow): Promise<string | null> => {
-    if (row.userId) return row.userId
-
-    const detail = await getProfileRequestById(row.id)
-    const userId = extractUserIdFromProfileRequest(detail)
-
-    if (!userId) {
-      showToast(t("admin.companies.userIdRequired", "User ID not available for this row"), "error")
-      return null
-    }
-
-    return userId
+  const resolveUserIdForRow = (row: ProfileRequestRow): string | null => {
+    const userId = row.userId?.trim()
+    if (userId) return userId
+    showToast(t("admin.companies.userIdRequired", "User ID not available for this row"), "error")
+    return null
   }
 
   const handleToggleActive = async (row: ProfileRequestRow, nextActive: boolean) => {
     if (!updateUserActive) return
 
-    const userId = await resolveUserIdForRow(row)
+    const userId = resolveUserIdForRow(row)
     if (!userId) return
 
     setUpdatingId(row.id)
@@ -128,7 +120,7 @@ export function CompaniesTab() {
     )
     if (!confirmed) return
 
-    const userId = await resolveUserIdForRow(row)
+    const userId = resolveUserIdForRow(row)
     if (!userId) return
 
     setUpdatingId(row.id)

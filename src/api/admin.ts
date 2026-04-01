@@ -17,52 +17,6 @@ export async function getAllProfileRequests(): Promise<ProfileRequest[]> {
   return []
 }
 
-type ProfileRequestDetailResponse = {
-  id: string
-  user?: { id: string; deletedAt?: string | null }
-  userId?: string
-  deletedAt?: string | null
-  [key: string]: unknown
-}
-
-export function getDeletedAtFromDetail(
-  item: ProfileRequestDetailResponse | null | undefined
-): string | null | undefined {
-  if (!item || typeof item !== "object") return undefined
-  const u = item.user as { deletedAt?: string | null } | undefined
-  if (u?.deletedAt != null) return u.deletedAt
-  const d = item as { deletedAt?: string | null }
-  return d.deletedAt ?? undefined
-}
-
-export async function getProfileRequestById(
-  requestId: string
-): Promise<ProfileRequestDetailResponse | null> {
-  try {
-    const res = await api.request<
-      ProfileRequestDetailResponse | { data: ProfileRequestDetailResponse }
-    >(`/auth/profile-requests/${requestId}`, { method: "GET" })
-    const item =
-      res && typeof res === "object" && "data" in res
-        ? (res as { data: ProfileRequestDetailResponse }).data
-        : (res as ProfileRequestDetailResponse)
-    return item?.id ? item : null
-  } catch {
-    return null
-  }
-}
-
-export function extractUserIdFromProfileRequest(
-  item: { user?: { id?: string }; userId?: string } | null | undefined
-): string | undefined {
-  if (!item || typeof item !== "object") return undefined
-  const u = item as Record<string, unknown>
-  const nested = u.user as { id?: string } | undefined
-  if (nested?.id && typeof nested.id === "string") return nested.id
-  if (typeof u.userId === "string") return u.userId
-  return undefined
-}
-
 export async function updateProfileRequestStatus(
   id: string,
   status: ProfileRequestStatusUpdate

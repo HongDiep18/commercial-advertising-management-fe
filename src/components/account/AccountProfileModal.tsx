@@ -52,7 +52,6 @@ export function AccountProfileModal({
   companyLogo,
   onLogoUpload,
   fileInputRef,
-  logoUploaded,
   onSave,
   isSaving,
   countries,
@@ -123,13 +122,6 @@ export function AccountProfileModal({
                         ? t("account.reupload") || "重新上傳"
                         : t("account.uploadLogo") || "上傳 Logo"}
                     </Button>
-                    {!logoUploaded && (
-                      <p className="text-primary text-xs">
-                        {t("account.uploadLogoPoints", {
-                          count: CONTRIBUTION_VALUES.logo,
-                        }) || `上傳 Logo 可獲得 ${CONTRIBUTION_VALUES.logo.toLocaleString()} 點`}
-                      </p>
-                    )}
                   </>
                 )}
               </div>

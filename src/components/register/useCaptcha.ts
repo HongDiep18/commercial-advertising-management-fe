@@ -1,21 +1,19 @@
 import { useState, useRef, useCallback, useEffect } from "react"
+import { api } from "@/lib/api"
 
-const CAPTCHA_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-const CAPTCHA_LENGTH = 5
-
-function generateCode(): string {
-  let code = ""
-  for (let i = 0; i < CAPTCHA_LENGTH; i++) {
-    code += CAPTCHA_CHARS.charAt(Math.floor(Math.random() * CAPTCHA_CHARS.length))
-  }
-  return code
+type CaptchaChallengeResponse = {
+  captchaId?: string
+  captchaText?: string
+  expiresInMs?: number
 }
+type CaptchaRefreshResult = "ok" | "failed" | "rate_limited"
 
 function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): void {
   if (!canvas) return
   const ctx = canvas.getContext("2d")
   if (!ctx) return
 
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.fillStyle = "#f3f4f6"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -27,8 +25,8 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
     ctx.stroke()
   }
 
-  for (let i = 0; i < 50; i++) {
-    ctx.fillStyle = `rgba(${Math.random() * 150}, ${Math.random() * 150}, ${Math.random() * 150}, 0.5)`
+  for (let i = 0; i < 40; i++) {
+    ctx.fillStyle = `rgba(${Math.random() * 150}, ${Math.random() * 150}, ${Math.random() * 150}, 0.45)`
     ctx.beginPath()
     ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, Math.PI * 2)
     ctx.fill()
@@ -39,9 +37,9 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
   ctx.textBaseline = "middle"
 
   for (let i = 0; i < text.length; i++) {
-    const x = 15 + i * 22
-    const y = canvas.height / 2 + (Math.random() - 0.5) * 10
-    const rotation = (Math.random() - 0.5) * 0.4
+    const x = 14 + i * 22
+    const y = canvas.height / 2 + (Math.random() - 0.5) * 8
+    const rotation = (Math.random() - 0.5) * 0.35
     ctx.save()
     ctx.translate(x, y)
     ctx.rotate(rotation)
@@ -50,26 +48,74 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
   }
 }
 
+function getCaptchaChallengePath(): string {
+  const value = process.env.NEXT_PUBLIC_REGISTER_CAPTCHA_PATH?.trim()
+  return value && value.startsWith("/") ? value : "/auth/captcha"
+}
+
+function isRateLimitedError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false
+  const e = err as { status?: number; data?: { statusCode?: number } }
+  return e.status === 429 || e.data?.statusCode === 429
+}
+
 export function useCaptcha() {
-  const [code, setCode] = useState("")
   const [input, setInput] = useState("")
+  const [captchaId, setCaptchaId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
+  const [isRateLimited, setIsRateLimited] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const refresh = useCallback(() => {
-    const newCode = generateCode()
-    setCode(newCode)
+  const refresh = useCallback(async (): Promise<CaptchaRefreshResult> => {
+    setIsLoading(true)
+    setLoadFailed(false)
+    setIsRateLimited(false)
     setInput("")
-    setTimeout(() => drawCaptchaOnCanvas(canvasRef.current, newCode), 0)
+    try {
+      const payload = await api.request<CaptchaChallengeResponse>(getCaptchaChallengePath(), {
+        method: "GET",
+      })
+      const nextCaptchaId = payload.captchaId?.trim()
+      const nextCaptchaText = payload.captchaText?.trim()
+      if (!nextCaptchaId || !nextCaptchaText) {
+        setLoadFailed(true)
+        setCaptchaId(null)
+        drawCaptchaOnCanvas(canvasRef.current, "")
+        return "failed"
+      }
+      setCaptchaId(nextCaptchaId)
+      drawCaptchaOnCanvas(canvasRef.current, nextCaptchaText)
+      return "ok"
+    } catch (err) {
+      setLoadFailed(true)
+      setCaptchaId(null)
+      drawCaptchaOnCanvas(canvasRef.current, "")
+      if (isRateLimitedError(err)) {
+        setIsRateLimited(true)
+        return "rate_limited"
+      }
+      return "failed"
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      refresh()
-    }, 0)
-    return () => clearTimeout(timer)
+    void refresh()
   }, [refresh])
 
-  const isValid = input.toUpperCase() === code
+  const isValid = input.trim().length > 0
 
-  return { code, input, setInput, canvasRef, refresh, isValid }
+  return {
+    input,
+    setInput,
+    captchaId,
+    canvasRef,
+    refresh,
+    isValid,
+    isLoading,
+    loadFailed,
+    isRateLimited,
+  }
 }
