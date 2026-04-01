@@ -442,7 +442,7 @@
       "note3": "Size: Full page is 26cm high x 19cm wide.",
       "note4": "Deadline: October 31, 2024."
     },
-    "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details.",
+    "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details. View detailed status and spending for your ad orders in \"My Account\".",
     "orderSubmittedTitle": "Your order has been submitted.",
     "orderSuccessDescription": "Your ad order has been submitted and is pending review.",
     "previewAd": "Preview ad",
