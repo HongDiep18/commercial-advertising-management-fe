@@ -443,6 +443,9 @@
       "note4": "Deadline: October 31, 2024."
     },
     "orderSuccess": "Thank you for your order!\n\n{{count}} advertising items selected\nWe will contact you soon to confirm the details.",
+    "orderSubmittedTitle": "Your order has been submitted.",
+    "orderSuccessDescription": "Your ad order has been submitted and is pending review.",
+    "previewAd": "Preview ad",
     "viewOrders": "View orders",
     "orderError": "Your order could not be completed. Please try again.",
     "inquirySuccess": "Thank you for your inquiry, we will reply to you as soon as possible!",
