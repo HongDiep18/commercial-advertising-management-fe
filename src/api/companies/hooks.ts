@@ -66,6 +66,7 @@ export function useCompanyDetail(
     queryKey: companiesKeys.detail(id),
     queryFn: () => getCompanyDetail(id),
     enabled: enabled && Boolean(id),
+    retry: false,
   })
 
   return { data, isLoading, isError, error }
