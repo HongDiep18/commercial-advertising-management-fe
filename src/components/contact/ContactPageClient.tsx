@@ -1,27 +1,30 @@
 "use client"
 
+import { attachAssetsAndSubmitOrder, createAdOrder } from "@/api/ad-orders/service"
+import { flattenPlatformCatalog } from "@/api/ads-pricing/contactPlatform"
+import { useAvailableAdPackages } from "@/api/ads-pricing/hooks"
+import {
+  ContactContentSection,
+  HeroSection,
+  InquiryModal,
+  OrderModal,
+  PricingSection,
+  TabNavigation,
+} from "@/components/contact"
+import Footer from "@/components/layout/Footer"
+import Header from "@/components/layout/Header"
+import { isDemoUser } from "@/components/login/demo"
+import { AdOrderPreviewButton } from "@/components/shared/AdOrderPreviewButton"
+import { AlertDialog } from "@/components/ui/AlertDialog"
+import Button from "@/components/ui/Button"
+import { Toast, type ToastVariant } from "@/components/ui/Toast"
+import { useUser } from "@/contexts/user-context"
+import { directoryPricing, platformPricing, productPricing } from "@/data/contactMockData"
+import type { CreateAdOrderInput } from "@/types/types"
+import { TabType, getTabConfig } from "@/utils/contactHelpers"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import Header from "@/components/layout/Header"
-import Footer from "@/components/layout/Footer"
-import {
-  HeroSection,
-  TabNavigation,
-  ContactContentSection,
-  PricingSection,
-  OrderModal,
-  InquiryModal,
-} from "@/components/contact"
-import { TabType, getTabConfig } from "@/utils/contactHelpers"
-import { platformPricing, directoryPricing, productPricing } from "@/data/contactMockData"
-import { createAdOrder, attachAssetsAndSubmitOrder } from "@/api/ad-orders/service"
-import { useAvailableAdPackages } from "@/api/ads-pricing/hooks"
-import { flattenPlatformCatalog } from "@/api/ads-pricing/contactPlatform"
-import type { CreateAdOrderInput } from "@/types/types"
-import { useUser } from "@/contexts/user-context"
-import { Toast, type ToastVariant } from "@/components/ui/Toast"
-import { isDemoUser } from "@/components/login/demo"
 
 export type SelectedEntry = { id: string; quantity: number }
 
@@ -48,6 +51,7 @@ export default function ContactPageClient() {
   const [selectedItems, setSelectedItems] = useState<SelectedEntry[]>([])
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [successOrder, setSuccessOrder] = useState<{ orderId: string; count: number } | null>(null)
   const [toast, setToast] = useState<{
     message: string
     variant: ToastVariant
@@ -250,12 +254,9 @@ export default function ContactPageClient() {
         )
         throw assetError
       }
-      showToast(t("adContact.orderSuccess", { count: totalQuantity }), "success", {
-        label: t("adContact.viewOrders", { defaultValue: "View orders" }),
-        href: "/account",
-      })
       setShowOrderModal(false)
       setSelectedItems([])
+      setSuccessOrder({ orderId, count: totalQuantity })
     } catch (err) {
       const apiErr = err as { data?: { code?: string } }
       if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
@@ -330,6 +331,35 @@ export default function ContactPageClient() {
         onClose={() => setShowInquiryModal(false)}
         onSubmit={handleInquirySubmit}
       />
+
+      <AlertDialog
+        open={successOrder !== null}
+        onClose={() => setSuccessOrder(null)}
+        variant="success"
+        title={t("adContact.orderSubmittedTitle")}
+        description={t("adContact.orderSuccess", { count: successOrder?.count ?? 0 })}
+      >
+        <div className="flex flex-col gap-2">
+          {successOrder && (
+            <AdOrderPreviewButton
+              orderId={successOrder.orderId}
+              labelKey="adContact.previewAd"
+              labelDefault="Preview ad"
+              variant="outline"
+              size="sm"
+              className="w-full"
+            />
+          )}
+          <Button
+            variant="primary"
+            size="sm"
+            className="w-full"
+            onClick={() => setSuccessOrder(null)}
+          >
+            {t("common.close", "Close")}
+          </Button>
+        </div>
+      </AlertDialog>
 
       <Footer />
 
