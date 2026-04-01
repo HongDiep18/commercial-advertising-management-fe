@@ -27,6 +27,15 @@ function getErrorMessage(err: unknown): string {
   return ""
 }
 
+function isCaptchaInvalidOrExpired(status: number | undefined, message: string): boolean {
+  if (status !== 400) return false
+  const normalized = message.trim().toLowerCase()
+  return (
+    normalized.includes("captcha") &&
+    (normalized.includes("invalid") || normalized.includes("expired"))
+  )
+}
+
 function FieldWithError({ error, children }: { error?: string; children: React.ReactNode }) {
   return (
     <div data-field-error={error ? true : undefined}>
@@ -60,10 +69,22 @@ export default function RegisterForm() {
   const {
     input: captchaInput,
     setInput: setCaptchaInput,
+    captchaId,
     canvasRef,
     refresh: refreshCaptcha,
     isValid: isCaptchaValid,
+    isLoading: isCaptchaLoading,
+    loadFailed: captchaLoadFailed,
+    isRateLimited: isCaptchaRateLimited,
   } = useCaptcha()
+  const tooManyRequestsMsg =
+    t("register.errors.tooManyRequests") || "Too many requests. Please wait and try again."
+  const refreshCaptchaWith429Notice = async () => {
+    const result = await refreshCaptcha()
+    if (result === "rate_limited") {
+      showToast(tooManyRequestsMsg, "warning")
+    }
+  }
 
   const countries = getCountryOptions(i18n.language)
   const categories = REGISTER_CATEGORIES.map((cat) => ({
@@ -102,19 +123,35 @@ export default function RegisterForm() {
     setFieldErrors({})
     if (!isCaptchaValid) {
       showToast(t("register.errors.captcha") || "驗證碼錯誤，請重新輸入", "warning")
-      refreshCaptcha()
+      await refreshCaptchaWith429Notice()
+      return
+    }
+    if (captchaLoadFailed || !captchaId) {
+      if (isCaptchaRateLimited) {
+        showToast(tooManyRequestsMsg, "warning")
+        return
+      }
+      showToast(
+        t("register.errors.submit") ||
+          "Captcha challenge unavailable. Please refresh and try again.",
+        "error"
+      )
       return
     }
 
     setIsLoading(true)
     try {
-      const payload = formDataToRegisterPayload({ ...formData, captcha: captchaInput })
+      const payload = formDataToRegisterPayload({
+        ...formData,
+        captchaId,
+        captcha: captchaInput,
+      })
       if (process.env.NODE_ENV !== "production") {
         console.debug("[Register] Request payload:", payload)
       }
       await register(payload)
       setFormData({ ...INITIAL_REGISTER_FORM })
-      refreshCaptcha()
+      await refreshCaptchaWith429Notice()
       setRegistrationSuccess(true)
     } catch (err) {
       const status =
@@ -134,6 +171,12 @@ export default function RegisterForm() {
             "This account has already submitted a registration request.",
           "error"
         )
+      } else if (isCaptchaInvalidOrExpired(status, msg)) {
+        showToast(
+          msg || t("register.errors.captcha") || "Invalid captcha, please try again.",
+          "warning"
+        )
+        await refreshCaptchaWith429Notice()
       } else {
         showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
       }
@@ -357,17 +400,18 @@ export default function RegisterForm() {
                 ref={canvasRef}
                 width={150}
                 height={45}
-                className="border-border cursor-pointer rounded border"
-                onClick={refreshCaptcha}
+                className="border-border bg-muted cursor-pointer rounded border"
+                onClick={() => void refreshCaptchaWith429Notice()}
                 title={captchaRefreshTitle}
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={refreshCaptcha}
+                onClick={() => void refreshCaptchaWith429Notice()}
                 className="h-9 w-9"
                 title={captchaRefreshTitle}
+                disabled={isCaptchaLoading}
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
