@@ -2,11 +2,10 @@
 
 import { useAdOrderPreview } from "@/api/ad-orders/hooks"
 import HomePageClient from "@/components/landing/HomePageClient"
+import { AD_ORDER_PREVIEW_STORAGE_KEY } from "@/components/shared/ad-order-preview.constants"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-
-const PREVIEW_KEY = "pendingPreview"
 
 export default function AdPreviewPage() {
   const { orderId } = useParams<{ orderId: string }>()
@@ -21,9 +20,9 @@ export default function AdPreviewPage() {
     if (checkedRef.current) return
     checkedRef.current = true
 
-    const pending = localStorage.getItem(PREVIEW_KEY)
+    const pending = localStorage.getItem(AD_ORDER_PREVIEW_STORAGE_KEY)
     const allowed = pending === orderId
-    if (allowed) localStorage.removeItem(PREVIEW_KEY)
+    if (allowed) localStorage.removeItem(AD_ORDER_PREVIEW_STORAGE_KEY)
     queueMicrotask(() => setIsAllowed(allowed))
   }, [orderId])
 
