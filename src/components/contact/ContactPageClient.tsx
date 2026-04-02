@@ -40,6 +40,7 @@ export interface SelectedItem {
   packageType?: string
   durationValue?: number | null
   durationUnit?: string | null
+  formConfig?: import("@/api/ads-pricing/types").AdPackageFormConfig
 }
 
 export default function ContactPageClient() {
@@ -161,6 +162,7 @@ export default function ContactPageClient() {
           packageType: item.packageType,
           durationValue: item.durationValue,
           durationUnit: item.durationUnit,
+          formConfig: item.formConfig,
         })
       })
     } else {
@@ -222,9 +224,14 @@ export default function ContactPageClient() {
       )
       return
     }
-    const hasMissingStartDate = input.items.some(
-      (item) => !item.startDate || item.startDate.trim() === ""
+    const selectedItemsById = Object.fromEntries(
+      getSelectedItemsDetails().map((item) => [item.pricingId ?? item.id, item])
     )
+    const hasMissingStartDate = input.items.some((item) => {
+      const selectedItem = selectedItemsById[item.pricingId]
+      if (selectedItem?.formConfig && !selectedItem.formConfig.requiresStartDate) return false
+      return !item.startDate || item.startDate.trim() === ""
+    })
     if (hasMissingStartDate) {
       showToast(
         t("adContact.startDateRequired") || "Please select a start date for each advertising item.",
