@@ -1274,16 +1274,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "Đã tạo đơn quảng cáo",
+          "adOrderApproved": "Đã duyệt đơn quảng cáo",
           "companyUpdatedByAdmin": "Quản trị viên đã cập nhật công ty",
           "profileRequestSubmitted": "Đã gửi yêu cầu đăng ký",
           "userPasswordChanged": "Người dùng đã đổi mật khẩu",
           "setPasswordCompleted": "Đã hoàn tất thiết lập mật khẩu",
           "loyaltyPointsAwarded": "Đã cộng điểm khách hàng thân thiết",
           "loyaltyTierRecalculated": "Đã tính lại hạng thành viên",
+          "activeAdCreated": "Đã tạo quảng cáo hoạt động",
           "profileRequestApproved": "Đã duyệt yêu cầu đăng ký",
           "profileRequestStatusChanged": "Đã thay đổi trạng thái yêu cầu đăng ký",
           "userStatusChanged": "Đã thay đổi trạng thái người dùng",
-          "userSoftDeleted": "Đã xóa mềm người dùng"
+          "userSoftDeleted": "Đã xóa mềm người dùng",
+          "profileRequestRejected": "Yêu cầu đăng ký bị từ chối"
         },
         "contents": {
           "adOrderCreated": "Đã tạo đơn quảng cáo {{orderId}}.",

@@ -1207,16 +1207,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "已建立廣告訂單",
+          "adOrderApproved": "已核准廣告訂單",
           "companyUpdatedByAdmin": "管理員已更新公司資料",
           "profileRequestSubmitted": "已送出註冊申請",
           "userPasswordChanged": "使用者已變更密碼",
           "setPasswordCompleted": "密碼設定已完成",
           "loyaltyPointsAwarded": "已發放忠誠點數",
           "loyaltyTierRecalculated": "忠誠等級已重新計算",
+          "activeAdCreated": "已建立活動廣告",
           "profileRequestApproved": "註冊申請已核准",
           "profileRequestStatusChanged": "註冊申請狀態已變更",
           "userStatusChanged": "使用者狀態已變更",
-          "userSoftDeleted": "使用者已軟刪除"
+          "userSoftDeleted": "使用者已軟刪除",
+          "profileRequestRejected": "已拒絕註冊申請"
         },
         "contents": {
           "adOrderCreated": "已建立廣告訂單 {{orderId}}。",
