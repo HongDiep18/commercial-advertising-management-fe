@@ -70,6 +70,7 @@ export default function RegisterForm() {
     input: captchaInput,
     setInput: setCaptchaInput,
     captchaId,
+    visual: captchaVisual,
     canvasRef,
     refresh: refreshCaptcha,
     isValid: isCaptchaValid,
@@ -396,14 +397,30 @@ export default function RegisterForm() {
                 required
                 className="w-[20%]"
               />
-              <canvas
-                ref={canvasRef}
-                width={150}
-                height={45}
-                className="border-border bg-muted cursor-pointer rounded border"
-                onClick={() => void refreshCaptchaWith429Notice()}
-                title={captchaRefreshTitle}
-              />
+              {captchaVisual?.kind === "image" ? (
+                <button
+                  type="button"
+                  className="border-border bg-muted flex h-[45px] w-[150px] cursor-pointer items-center justify-center overflow-hidden rounded border"
+                  onClick={() => void refreshCaptchaWith429Notice()}
+                  title={captchaRefreshTitle}
+                  disabled={isCaptchaLoading}
+                >
+                  <img
+                    src={captchaVisual.src}
+                    alt=""
+                    className="max-h-[45px] max-w-[150px] object-contain"
+                  />
+                </button>
+              ) : (
+                <canvas
+                  ref={canvasRef}
+                  width={150}
+                  height={45}
+                  className="border-border bg-muted cursor-pointer rounded border"
+                  onClick={() => void refreshCaptchaWith429Notice()}
+                  title={captchaRefreshTitle}
+                />
+              )}
               <Button
                 type="button"
                 variant="ghost"
