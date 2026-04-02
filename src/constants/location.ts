@@ -35,7 +35,7 @@ export const REGION_KEYS_BY_COUNTRY: Record<string, readonly string[]> = {
     "tuyenquang",
     "vinhlong",
     "binhduong",
-    "other-vn",
+    "other-region",
   ],
 }
 

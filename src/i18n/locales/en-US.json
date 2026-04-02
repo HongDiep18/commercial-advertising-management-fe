@@ -625,6 +625,7 @@
       "invalidRegion": "Please select a country first, then choose a region from the list.",
       "invalidWebsite": "Please enter a valid website URL.",
       "captcha": "Invalid captcha, please try again",
+      "tooManyRequests": "Too many requests. Please wait a moment and try again.",
       "submit": "Registration failed, please try again later",
       "duplicate409": "This account has already submitted a registration request.",
       "invalidTaxId": "Tax ID must contain numbers only",
@@ -743,7 +744,6 @@
     "logoUpdated": "Logo updated!",
     "uploadLogo": "Upload logo",
     "reupload": "Re-upload",
-    "uploadLogoPoints": "Upload logo to earn {{count}} points",
     "companyInfo": "Company info",
     "cancel": "Cancel",
     "saveChanges": "Save changes",
@@ -1222,16 +1222,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "Ad order created",
+          "adOrderApproved": "Ad order approved",
           "companyUpdatedByAdmin": "Company updated by admin",
           "profileRequestSubmitted": "Profile request submitted",
           "userPasswordChanged": "User password changed",
           "setPasswordCompleted": "Set password completed",
           "loyaltyPointsAwarded": "Loyalty points awarded",
           "loyaltyTierRecalculated": "Loyalty tier recalculated",
+          "activeAdCreated": "Active ad created",
           "profileRequestApproved": "Profile request approved",
           "profileRequestStatusChanged": "Profile request status changed",
           "userStatusChanged": "User status changed",
-          "userSoftDeleted": "User soft deleted"
+          "userSoftDeleted": "User soft deleted",
+          "profileRequestRejected": "Profile request rejected"
         },
         "contents": {
           "adOrderCreated": "Created ad order {{orderId}}.",
@@ -1715,7 +1718,7 @@
       "emailInvalid": "Invalid email format",
       "nameRequired": "Name is required",
       "submit": "Submit Inquiry",
-      "submitSuccess": "Inquiry submitted (Demo)! The seller will contact you as soon as possible.",
+      "submitSuccess": "Inquiry submitted! The seller will contact you as soon as possible.",
       "area": "Area",
       "description": "Description",
       "features": "Features",

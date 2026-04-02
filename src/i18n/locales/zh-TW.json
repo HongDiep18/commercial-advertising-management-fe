@@ -623,6 +623,7 @@
       "invalidPhone": "請輸入有效的電話號碼（至少 8 位數字）。",
       "invalidRegion": "請先選擇國家，再從列表中選擇地區。",
       "captcha": "驗證碼錯誤，請重新輸入",
+      "tooManyRequests": "請求過於頻繁，請稍候再試。",
       "submit": "註冊失敗，請稍後再試",
       "invalidWebsite": "請輸入有效的網站網址。",
       "duplicate409": "此帳號已提交過註冊申請。",
@@ -742,7 +743,6 @@
     "logoUpdated": "Logo 更新成功！",
     "uploadLogo": "上傳 Logo",
     "reupload": "重新上傳",
-    "uploadLogoPoints": "上傳 Logo 可獲得 {{count}} 點",
     "companyInfo": "公司資料",
     "cancel": "取消",
     "saveChanges": "儲存變更",
@@ -1207,16 +1207,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "已建立廣告訂單",
+          "adOrderApproved": "已核准廣告訂單",
           "companyUpdatedByAdmin": "管理員已更新公司資料",
           "profileRequestSubmitted": "已送出註冊申請",
           "userPasswordChanged": "使用者已變更密碼",
           "setPasswordCompleted": "密碼設定已完成",
           "loyaltyPointsAwarded": "已發放忠誠點數",
           "loyaltyTierRecalculated": "忠誠等級已重新計算",
+          "activeAdCreated": "已建立活動廣告",
           "profileRequestApproved": "註冊申請已核准",
           "profileRequestStatusChanged": "註冊申請狀態已變更",
           "userStatusChanged": "使用者狀態已變更",
-          "userSoftDeleted": "使用者已軟刪除"
+          "userSoftDeleted": "使用者已軟刪除",
+          "profileRequestRejected": "已拒絕註冊申請"
         },
         "contents": {
           "adOrderCreated": "已建立廣告訂單 {{orderId}}。",
@@ -1700,11 +1703,11 @@
       "emailInvalid": "請填寫有效的 Email 格式",
       "nameRequired": "請填寫您的姓名",
       "submit": "送出詢問",
-      "submitSuccess": "詢問已送出（示範）",
+      "submitSuccess": "詢問已送出",
       "area": "面積",
       "description": "物業描述",
       "features": "物業特點",
-      "addressNotice": "為保護物業資訊安全，詳細地址僅在聯繫賣家後提供。",
+      "addressNotice": "為保護物業資訊安，詳細地址僅在聯繫賣家後提供。",
       "contactForDetail": "聯繫賣家取得完整資訊"
     }
   },
