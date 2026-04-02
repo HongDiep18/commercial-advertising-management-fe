@@ -12,6 +12,7 @@ type ContentRule = {
 
 const TITLE_KEY_BY_ACTION: Record<string, string> = {
   "ad_order.created": "adOrderCreated",
+  "ad_order.approved": "adOrderApproved",
   "company.updated_by_admin": "companyUpdatedByAdmin",
   "profile_request.submitted": "profileRequestSubmitted",
   "user.password_changed": "userPasswordChanged",
@@ -22,6 +23,7 @@ const TITLE_KEY_BY_ACTION: Record<string, string> = {
   "profile_request.status_changed": "profileRequestStatusChanged",
   "user.status_changed": "userStatusChanged",
   "user.soft_deleted": "userSoftDeleted",
+  "active_ad.created": "activeAdCreated",
 }
 
 const TITLE_KEY_BY_TEXT: Record<string, string> = {
@@ -33,6 +35,8 @@ const TITLE_KEY_BY_TEXT: Record<string, string> = {
   "profile request status changed": "profileRequestStatusChanged",
   "user status changed": "userStatusChanged",
   "user soft deleted": "userSoftDeleted",
+  "ad order approved": "adOrderApproved",
+  "active ad created": "activeAdCreated",
 }
 
 function extractWithRegex(input: string, pattern: RegExp): string | null {
@@ -131,6 +135,8 @@ function matchesIncludes(rule: ContentRule, normalizedContent: string): boolean 
 }
 
 function translateContent(t: TranslateFn, activity: RecentActivityItem): string {
+  if (activity.action === "ad_order.created") return activity.content
+
   const normalizedContent = activity.content.trim().toLowerCase()
   const matched =
     CONTENT_RULES.find((rule) => rule.action === activity.action) ??
@@ -148,9 +154,20 @@ export function translateRecentActivity(
   activity: RecentActivityItem
 ): { title: string; content: string } {
   const normalizedTitle = activity.title.trim().toLowerCase()
-  const titleKey = TITLE_KEY_BY_ACTION[activity.action] ?? TITLE_KEY_BY_TEXT[normalizedTitle]
+  let titleKey = TITLE_KEY_BY_ACTION[activity.action] ?? TITLE_KEY_BY_TEXT[normalizedTitle]
+
+  if (activity.action === "profile_request.status_changed") {
+    const parsed = parseStatusChange(activity.content)
+    const toStatus = parsed.toStatus?.trim().toUpperCase()
+    if (toStatus === "REJECTED") {
+      titleKey = "profileRequestRejected"
+    }
+  }
+
   const title = titleKey
-    ? t(`admin.dashboard.recentActivityLogs.actions.${titleKey}`, { defaultValue: activity.title })
+    ? t(`admin.dashboard.recentActivityLogs.actions.${titleKey}`, {
+        defaultValue: activity.title,
+      })
     : activity.title
 
   return { title, content: translateContent(t, activity) }
