@@ -4,6 +4,7 @@ import type { UiAdItemDetails, UiSelectedAdItem } from "@/api/ad-orders/builders
 import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
 import { hasOverlapWithExistingOrders, type NewOrderItem } from "@/api/ad-orders/overlap"
 import { type AdOrderAssetToUpload, getMyPendingOrderItems } from "@/api/ad-orders/service"
+import { AdPackageFormConfig } from "@/api/ads-pricing/types"
 import { getProfile } from "@/api/profile"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
@@ -47,6 +48,7 @@ type SelectedItem = {
   packageType?: string
   durationValue?: number | null
   durationUnit?: string | null
+  formConfig?: AdPackageFormConfig
 }
 
 type OrderModalProps = {
@@ -390,6 +392,7 @@ export default function OrderModal({
                     onCalendarOpenChange={(open) => setOpenCalendar(open ? item.id : null)}
                     slotError={slotError}
                     calendarDefaultMonth={calendarDefaultMonth}
+                    formConfig={item.formConfig}
                   />
                 )
               })}
