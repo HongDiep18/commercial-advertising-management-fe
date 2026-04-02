@@ -1,12 +1,70 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 import { api } from "@/lib/api"
 
+/** GET /auth/captcha — supports image/SVG from backend or legacy plain text for canvas. */
 type CaptchaChallengeResponse = {
   captchaId?: string
   captchaText?: string
+  /** Image: data URL, raw base64, or backend-specific field names */
+  captchaImage?: string
+  captchaSvg?: string
+  imageDataUrl?: string
+  imageBase64?: string
+  imageSvg?: string
   expiresInMs?: number
 }
+
+export type CaptchaVisual =
+  | { kind: "image"; src: string }
+  | { kind: "canvas"; text: string }
+
 type CaptchaRefreshResult = "ok" | "failed" | "rate_limited"
+
+function getCaptchaChallengePath(): string {
+  const value = process.env.NEXT_PUBLIC_REGISTER_CAPTCHA_PATH?.trim()
+  return value && value.startsWith("/") ? value : "/auth/captcha"
+}
+
+function isRateLimitedError(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false
+  const e = err as { status?: number; data?: { statusCode?: number } }
+  return e.status === 429 || e.data?.statusCode === 429
+}
+
+/** Normalize API payload to a single displayable image URL (prefer SVG / data URLs). */
+function captchaPayloadToImageSrc(payload: CaptchaChallengeResponse): string | null {
+  const rawCandidates = [
+    payload.captchaImage,
+    payload.imageDataUrl,
+    payload.captchaSvg,
+    payload.imageSvg,
+    payload.imageBase64,
+  ]
+    .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+    .map((s) => s.trim())
+
+  for (const raw of rawCandidates) {
+    if (raw.startsWith("data:")) return raw
+    if (raw.startsWith("<svg") || raw.includes("<svg")) {
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(raw)}`
+    }
+    if (/^[A-Za-z0-9+/=\s]+$/.test(raw) && raw.replace(/\s/g, "").length >= 16) {
+      return `data:image/png;base64,${raw.replace(/\s/g, "")}`
+    }
+  }
+
+  return null
+}
+
+function buildCaptchaVisual(payload: CaptchaChallengeResponse): CaptchaVisual | null {
+  const imageSrc = captchaPayloadToImageSrc(payload)
+  if (imageSrc) return { kind: "image", src: imageSrc }
+
+  const text = payload.captchaText?.trim()
+  if (text) return { kind: "canvas", text }
+
+  return null
+}
 
 function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): void {
   if (!canvas) return
@@ -14,6 +72,8 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
   if (!ctx) return
 
   ctx.clearRect(0, 0, canvas.width, canvas.height)
+  if (!text) return
+
   ctx.fillStyle = "#f3f4f6"
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -48,20 +108,10 @@ function drawCaptchaOnCanvas(canvas: HTMLCanvasElement | null, text: string): vo
   }
 }
 
-function getCaptchaChallengePath(): string {
-  const value = process.env.NEXT_PUBLIC_REGISTER_CAPTCHA_PATH?.trim()
-  return value && value.startsWith("/") ? value : "/auth/captcha"
-}
-
-function isRateLimitedError(err: unknown): boolean {
-  if (!err || typeof err !== "object") return false
-  const e = err as { status?: number; data?: { statusCode?: number } }
-  return e.status === 429 || e.data?.statusCode === 429
-}
-
 export function useCaptcha() {
   const [input, setInput] = useState("")
   const [captchaId, setCaptchaId] = useState<string | null>(null)
+  const [visual, setVisual] = useState<CaptchaVisual | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
   const [isRateLimited, setIsRateLimited] = useState(false)
@@ -73,23 +123,38 @@ export function useCaptcha() {
     setIsRateLimited(false)
     setInput("")
     try {
-      const payload = await api.request<CaptchaChallengeResponse>(getCaptchaChallengePath(), {
-        method: "GET",
-      })
-      const nextCaptchaId = payload.captchaId?.trim()
-      const nextCaptchaText = payload.captchaText?.trim()
-      if (!nextCaptchaId || !nextCaptchaText) {
+      const res = await api.request<CaptchaChallengeResponse | { data: CaptchaChallengeResponse }>(
+        getCaptchaChallengePath(),
+        { method: "GET" }
+      )
+      const payload =
+        res && typeof res === "object" && "data" in res && res.data && typeof res.data === "object"
+          ? (res as { data: CaptchaChallengeResponse }).data
+          : (res as CaptchaChallengeResponse)
+      const nextId = payload.captchaId?.trim()
+      const nextVisual = buildCaptchaVisual(payload)
+
+      if (!nextId || !nextVisual) {
         setLoadFailed(true)
         setCaptchaId(null)
+        setVisual(null)
         drawCaptchaOnCanvas(canvasRef.current, "")
         return "failed"
       }
-      setCaptchaId(nextCaptchaId)
-      drawCaptchaOnCanvas(canvasRef.current, nextCaptchaText)
+
+      setCaptchaId(nextId)
+      setVisual(nextVisual)
+
+      if (nextVisual.kind === "canvas") {
+        drawCaptchaOnCanvas(canvasRef.current, nextVisual.text)
+      } else {
+        drawCaptchaOnCanvas(canvasRef.current, "")
+      }
       return "ok"
     } catch (err) {
       setLoadFailed(true)
       setCaptchaId(null)
+      setVisual(null)
       drawCaptchaOnCanvas(canvasRef.current, "")
       if (isRateLimitedError(err)) {
         setIsRateLimited(true)
@@ -111,6 +176,7 @@ export function useCaptcha() {
     input,
     setInput,
     captchaId,
+    visual,
     canvasRef,
     refresh,
     isValid,

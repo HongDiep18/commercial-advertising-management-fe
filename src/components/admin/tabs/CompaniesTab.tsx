@@ -350,7 +350,7 @@ export function CompaniesTab() {
                                 setUpdatingId(row.id)
                                 updateCompanyRequestStatus(row.id, ProfileRequestStatus.REJECTED)
                                   .then(() =>
-                                    showToast(t("admin.companies.rejectedSuccess"), "success")
+                                    showToast(t("admin.companies.rejectedSuccess"), "error")
                                   )
                                   .catch(() => showToast(t("admin.companies.updateError"), "error"))
                                   .finally(() => setUpdatingId(null))

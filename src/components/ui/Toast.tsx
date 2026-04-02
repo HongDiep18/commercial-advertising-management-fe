@@ -31,8 +31,8 @@ const variantStyles: Record<
     iconColor: "text-emerald-600 dark:text-emerald-400",
   },
   error: {
-    accent: "border-l-red-500 bg-red-50 dark:border-l-red-400 dark:bg-red-950/90",
-    border: "border border-slate-200/80 border-l-4 dark:border-slate-700",
+    accent: "border-l-red-600 bg-red-100 dark:border-l-red-500 dark:bg-red-950/95",
+    border: "border border-red-200/90 border-l-4 dark:border-red-800/80",
     icon: XCircle,
     iconColor: "text-red-600 dark:text-red-400",
   },
@@ -60,6 +60,14 @@ export function Toast({
 }: ToastProps) {
   const style = variantStyles[variant]
   const Icon = style.icon
+  const messageClass =
+    variant === "error"
+      ? "text-red-950 dark:text-red-50"
+      : variant === "success"
+        ? "text-emerald-950 dark:text-emerald-50"
+        : variant === "warning"
+          ? "text-amber-950 dark:text-amber-50"
+          : "text-slate-800 dark:text-slate-100"
 
   useEffect(() => {
     if (!visible || duration <= 0) return
@@ -80,7 +88,7 @@ export function Toast({
       >
         <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${style.iconColor}`} aria-hidden />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{message}</p>
+          <p className={`text-sm font-semibold ${messageClass}`}>{message}</p>
           {action && (
             <Link
               href={action.href}
