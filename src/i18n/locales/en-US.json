@@ -1222,16 +1222,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "Ad order created",
+          "adOrderApproved": "Ad order approved",
           "companyUpdatedByAdmin": "Company updated by admin",
           "profileRequestSubmitted": "Profile request submitted",
           "userPasswordChanged": "User password changed",
           "setPasswordCompleted": "Set password completed",
           "loyaltyPointsAwarded": "Loyalty points awarded",
           "loyaltyTierRecalculated": "Loyalty tier recalculated",
+          "activeAdCreated": "Active ad created",
           "profileRequestApproved": "Profile request approved",
           "profileRequestStatusChanged": "Profile request status changed",
           "userStatusChanged": "User status changed",
-          "userSoftDeleted": "User soft deleted"
+          "userSoftDeleted": "User soft deleted",
+          "profileRequestRejected": "Profile request rejected"
         },
         "contents": {
           "adOrderCreated": "Created ad order {{orderId}}.",
