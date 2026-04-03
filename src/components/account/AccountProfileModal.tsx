@@ -2,11 +2,12 @@
 
 import { categories } from "@/components/directory/DirectorySidebar"
 import Button from "@/components/ui/Button"
+import { Field, FieldLabel } from "@/components/ui/field"
+import { RequiredMark, stripTrailingAsterisk } from "@/components/ui/required-mark"
 import Input from "@/components/ui/Input"
 import Select from "@/components/ui/Select"
 import { SearchableSelect } from "@/components/ui/SearchableSelect"
 import Textarea from "@/components/ui/Textarea"
-import { CONTRIBUTION_VALUES } from "@/contexts/user-context"
 import type { ProfileFormData } from "@/types/account"
 import type { TFunction } from "i18next"
 import { Edit3, ImageIcon, Save, Upload, X } from "lucide-react"
@@ -131,160 +132,250 @@ export function AccountProfileModal({
           <div className="space-y-4 border-t pt-4">
             <h3 className="text-muted-foreground text-sm font-medium">
               {t("account.companyInfo") || "公司資料"}
+              <RequiredMark />
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.companyNameVi}>
-                <Input
-                  placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
-                  value={profileData.companyNameVi}
-                  onChange={(e) => onProfileChange("companyNameVi", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(
+                      t("register.placeholders.companyNameVi") || "公司名稱（越文）"
+                    )}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
+                    value={profileData.companyNameVi}
+                    onChange={(e) => onProfileChange("companyNameVi", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
               <FieldWithError error={fieldErrors.companyNameCn}>
-                <Input
-                  placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
-                  value={profileData.companyNameCn}
-                  onChange={(e) => onProfileChange("companyNameCn", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(
+                      t("register.placeholders.companyNameCn") || "公司名稱（中文）"
+                    )}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
+                    value={profileData.companyNameCn}
+                    onChange={(e) => onProfileChange("companyNameCn", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.phone}>
-                <Input
-                  placeholder={t("register.placeholders.phone") || "電話"}
-                  value={profileData.phone}
-                  onChange={(e) => onProfileChange("phone", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.phone") || "電話")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.phone") || "電話"}
+                    value={profileData.phone}
+                    onChange={(e) => onProfileChange("phone", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
               <FieldWithError error={fieldErrors.taxId}>
-                <Input
-                  placeholder={t("register.placeholders.taxId") || "稅號"}
-                  value={profileData.taxId}
-                  onChange={(e) => onProfileChange("taxId", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.taxId") || "稅號")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.taxId") || "稅號"}
+                    value={profileData.taxId}
+                    onChange={(e) => onProfileChange("taxId", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.contactName}>
-                <Input
-                  placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
-                  value={profileData.contactName}
-                  onChange={(e) => onProfileChange("contactName", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.contactPerson") || "聯絡人")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
+                    value={profileData.contactName}
+                    onChange={(e) => onProfileChange("contactName", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
               <FieldWithError error={fieldErrors.contactPhone}>
-                <Input
-                  placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
-                  value={profileData.contactPhone}
-                  onChange={(e) => onProfileChange("contactPhone", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(
+                      t("register.placeholders.contactPhone") || "聯絡人電話號碼"
+                    )}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
+                    value={profileData.contactPhone}
+                    onChange={(e) => onProfileChange("contactPhone", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.address}>
-                <Input
-                  placeholder={t("register.placeholders.companyAddress") || "公司地址"}
-                  value={profileData.address}
-                  onChange={(e) => onProfileChange("address", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.companyAddress") || "公司地址")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    placeholder={t("register.placeholders.companyAddress") || "公司地址"}
+                    value={profileData.address}
+                    onChange={(e) => onProfileChange("address", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
               <FieldWithError error={fieldErrors.email}>
-                <Input
-                  placeholder={t("register.placeholders.email") || "E-Mail"}
-                  value={profileData.email}
-                  onChange={(e) => onProfileChange("email", e.target.value)}
-                  disabled={readOnly}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.email") || "E-Mail")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Input
+                    type="email"
+                    placeholder={t("register.placeholders.emailExample", {
+                      defaultValue: "name@company.com",
+                    })}
+                    value={profileData.email}
+                    onChange={(e) => onProfileChange("email", e.target.value)}
+                    disabled={readOnly}
+                  />
+                </Field>
               </FieldWithError>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.country}>
-                <SearchableSelect
-                  value={profileData.country || COUNTRY_NONE}
-                  onValueChange={(value) => onProfileChange("country", value)}
-                  disabled={readOnly}
-                  options={[
-                    {
-                      value: COUNTRY_NONE,
-                      label: t("register.placeholders.country") || "Select Country *",
-                    },
-                    ...countries,
-                  ]}
-                  placeholder={t("register.placeholders.country") || "Select Country *"}
-                  searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                  emptyText={t("common.noResults", { defaultValue: "No results." })}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(
+                      t("register.placeholders.country") || "Select Country *"
+                    )}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <SearchableSelect
+                    value={profileData.country || COUNTRY_NONE}
+                    onValueChange={(value) => onProfileChange("country", value)}
+                    disabled={readOnly}
+                    options={[
+                      {
+                        value: COUNTRY_NONE,
+                        label: t("register.placeholders.country") || "Select Country *",
+                      },
+                      ...countries,
+                    ]}
+                    placeholder={t("register.placeholders.country") || "Select Country *"}
+                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                    emptyText={t("common.noResults", { defaultValue: "No results." })}
+                  />
+                </Field>
               </FieldWithError>
 
               <FieldWithError error={fieldErrors.region}>
-                <SearchableSelect
-                  value={profileData.region}
-                  onValueChange={(value) => onProfileChange("region", value)}
-                  disabled={readOnly}
-                  options={allRegions}
-                  placeholder={t("register.placeholders.region") || "Select Region *"}
-                  searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                  emptyText={t("common.noResults", { defaultValue: "No results." })}
-                />
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.region") || "Select Region *")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <SearchableSelect
+                    value={profileData.region}
+                    onValueChange={(value) => onProfileChange("region", value)}
+                    disabled={readOnly}
+                    options={allRegions}
+                    placeholder={t("register.placeholders.region") || "Select Region *"}
+                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                    emptyText={t("common.noResults", { defaultValue: "No results." })}
+                  />
+                </Field>
               </FieldWithError>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
               <FieldWithError error={fieldErrors.industry}>
-                <Select
-                  value={profileData.industry}
-                  onValueChange={(value) => onProfileChange("industry", value)}
-                  disabled={readOnly}
-                  options={categories.map((cat) => ({
-                    value: cat,
-                    label: t(`directory.categories.${cat}`) || cat,
-                  }))}
-                >
-                  <Select.Trigger className="w-full min-w-0">
-                    <Select.Value
-                      placeholder={t("register.placeholders.industry") || "選擇產業類別"}
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {categories.map((cat) => (
-                      <Select.Item key={cat} value={cat}>
-                        {t(`directory.categories.${cat}`) || cat}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
+                <Field className="gap-1.5">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {stripTrailingAsterisk(t("register.placeholders.industry") || "選擇產業類別")}
+                    <RequiredMark />
+                  </FieldLabel>
+                  <Select
+                    value={profileData.industry}
+                    onValueChange={(value) => onProfileChange("industry", value)}
+                    disabled={readOnly}
+                    options={categories.map((cat) => ({
+                      value: cat,
+                      label: t(`directory.categories.${cat}`) || cat,
+                    }))}
+                  >
+                    <Select.Trigger className="w-full min-w-0">
+                      <Select.Value
+                        placeholder={t("register.placeholders.industry") || "選擇產業類別"}
+                      />
+                    </Select.Trigger>
+                    <Select.Content>
+                      {categories.map((cat) => (
+                        <Select.Item key={cat} value={cat}>
+                          {t(`directory.categories.${cat}`) || cat}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select>
+                </Field>
               </FieldWithError>
             </div>
 
             <FieldWithError error={fieldErrors.website}>
-              <div className="space-y-1">
-                <Input
-                  placeholder="Website"
-                  value={profileData.website}
-                  onChange={(e) => onProfileChange("website", e.target.value)}
-                  disabled={readOnly}
-                />
-                <p className="text-muted-foreground text-xs">
-                  {t("register.hints.websiteFormat") ||
-                    "Example: https://your-company.com or your-company.com"}
-                </p>
-              </div>
+              <Field className="gap-1.5">
+                <FieldLabel className="text-foreground text-sm font-medium">
+                  {stripTrailingAsterisk(t("register.placeholders.website") || "Website *")}
+                  <RequiredMark />
+                </FieldLabel>
+                <div className="space-y-1">
+                  <Input
+                    placeholder={t("register.placeholders.website") || "Website *"}
+                    value={profileData.website}
+                    onChange={(e) => onProfileChange("website", e.target.value)}
+                    disabled={readOnly}
+                  />
+                  <p className="text-muted-foreground text-xs">
+                    {t("register.hints.websiteFormat") ||
+                      "Example: https://your-company.com or your-company.com"}
+                  </p>
+                </div>
+              </Field>
             </FieldWithError>
             <FieldWithError error={fieldErrors.description}>
-              <Textarea
-                placeholder={t("register.placeholders.introduction") || "簡單介紹"}
-                value={profileData.description}
-                onChange={(e) => onProfileChange("description", e.target.value)}
-                rows={3}
-                disabled={readOnly}
-              />
+              <Field className="gap-1.5">
+                <FieldLabel className="text-foreground text-sm font-medium">
+                  {stripTrailingAsterisk(t("register.placeholders.introduction") || "簡單介紹")}
+                  <RequiredMark />
+                </FieldLabel>
+                <Textarea
+                  placeholder={t("register.placeholders.introduction") || "簡單介紹"}
+                  value={profileData.description}
+                  onChange={(e) => onProfileChange("description", e.target.value)}
+                  rows={3}
+                  disabled={readOnly}
+                />
+              </Field>
             </FieldWithError>
           </div>
           <div className="flex gap-3 border-t border-gray-400 pt-4">

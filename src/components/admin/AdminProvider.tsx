@@ -1,42 +1,20 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
-import {
-  deleteCompany,
-  getAllProfileRequests,
-  mapProfileRequestToCompanyRequest,
-  patchUserActive,
-  updateProfileRequestStatus,
-} from "@/api/admin"
+import { adminCompanyRequestsKeys } from "@/api/admin/hooks"
+import { deleteCompany, patchUserActive, updateProfileRequestStatus } from "@/api/admin"
 import { mockAdSubmissions } from "@/contexts/user-context"
 import * as fallbackData from "@/data/adminMockData"
+import { useQueryClient } from "@tanstack/react-query"
+import { useCallback, useMemo, type ReactNode } from "react"
 import { AdminDataContext, type AdminData } from "./AdminDataContext"
 import type { ProfileRequestStatusUpdate } from "@/types/admin"
 
 export function AdminProvider({ children }: { children: ReactNode }) {
-  const [companyRequests, setCompanyRequests] = useState<AdminData["companyRequests"]>([])
-  const [companyRequestsLoading, setCompanyRequestsLoading] = useState(true)
-  const [companyRequestsError, setCompanyRequestsError] = useState<string | undefined>(undefined)
+  const queryClient = useQueryClient()
 
   const refetchCompanyRequests = useCallback(() => {
-    setCompanyRequestsLoading(true)
-    setCompanyRequestsError(undefined)
-    getAllProfileRequests()
-      .then((list) => {
-        setCompanyRequests(list.map((p) => mapProfileRequestToCompanyRequest(p)))
-      })
-      .catch((err) => {
-        setCompanyRequestsError(err?.message ?? "Failed to load company requests")
-        setCompanyRequests([])
-      })
-      .finally(() => setCompanyRequestsLoading(false))
-  }, [])
-
-  useEffect(() => {
-    setTimeout(() => {
-      refetchCompanyRequests()
-    }, 1000)
-  }, [refetchCompanyRequests])
+    void queryClient.invalidateQueries({ queryKey: adminCompanyRequestsKeys.all })
+  }, [queryClient])
 
   const updateCompanyRequestStatus = useCallback(
     async (id: string, status: ProfileRequestStatusUpdate) => {
@@ -64,28 +42,20 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AdminData>(
     () => ({
-      companyRequests,
+      companyRequests: [],
       products: fallbackData.mockProducts,
       newsSources: fallbackData.mockNewsSources,
       propertyListings: fallbackData.mockPropertyListings,
       users: fallbackData.mockUsers,
       adSubmissions: mockAdSubmissions,
-      companyRequestsLoading,
-      companyRequestsError,
+      companyRequestsLoading: false,
+      companyRequestsError: undefined,
       updateCompanyRequestStatus,
       updateUserActive,
       deleteCompany: deleteCompanyApi,
       refetchCompanyRequests,
     }),
-    [
-      companyRequests,
-      companyRequestsLoading,
-      companyRequestsError,
-      updateCompanyRequestStatus,
-      updateUserActive,
-      deleteCompanyApi,
-      refetchCompanyRequests,
-    ]
+    [updateCompanyRequestStatus, updateUserActive, deleteCompanyApi, refetchCompanyRequests]
   )
   return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>
 }

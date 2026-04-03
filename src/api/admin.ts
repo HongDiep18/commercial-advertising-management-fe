@@ -6,15 +6,108 @@ import {
   type ProfileRequestStatusUpdate,
 } from "@/types/admin"
 
-type GetProfileRequestsResponse = { data: ProfileRequest[] } | ProfileRequest[]
+export type ApiPagination = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  sortBy?: string
+  sortOrder?: "asc" | "desc" | string
+}
 
-export async function getAllProfileRequests(): Promise<ProfileRequest[]> {
-  const res = await api.request<GetProfileRequestsResponse>("/auth/all-profile-requests", {
+export type AdminListProfileRequestsQuery = {
+  page?: number
+  limit?: number
+  status?: ProfileRequestStatus | string
+  sortBy?: string
+  sortOrder?: "asc" | "desc"
+}
+
+export type AdminListProfileRequestsResponse = {
+  data: ProfileRequest[]
+  pagination?: ApiPagination
+}
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v)
+}
+
+export function parseAllProfileRequestsResponse(raw: unknown): AdminListProfileRequestsResponse {
+  if (Array.isArray(raw)) {
+    return { data: raw as ProfileRequest[], pagination: undefined }
+  }
+  if (!isRecord(raw)) {
+    return { data: [] }
+  }
+
+  const pagination = raw.pagination as ApiPagination | undefined
+
+  if (Array.isArray(raw.requests)) {
+    return {
+      data: raw.requests as ProfileRequest[],
+      pagination,
+    }
+  }
+
+  if (Array.isArray(raw.data)) {
+    return {
+      data: raw.data as ProfileRequest[],
+      pagination,
+    }
+  }
+
+  if (isRecord(raw.data) && Array.isArray(raw.data.data)) {
+    const inner = raw.data as Record<string, unknown> & {
+      data: ProfileRequest[]
+      pagination?: ApiPagination
+    }
+    return {
+      data: inner.data,
+      pagination: inner.pagination ?? pagination,
+    }
+  }
+
+  if (isRecord(raw.data) && Array.isArray(raw.data.requests)) {
+    const inner = raw.data as Record<string, unknown> & {
+      requests: ProfileRequest[]
+      pagination?: ApiPagination
+    }
+    return {
+      data: inner.requests,
+      pagination: inner.pagination ?? pagination,
+    }
+  }
+
+  if (Array.isArray(raw.items)) {
+    return {
+      data: raw.items as ProfileRequest[],
+      pagination,
+    }
+  }
+
+  return { data: [] }
+}
+
+function buildQuery(query?: AdminListProfileRequestsQuery): string {
+  if (!query) return ""
+  const params = new URLSearchParams()
+  if (query.page) params.set("page", String(query.page))
+  if (query.limit) params.set("limit", String(query.limit))
+  if (query.status) params.set("status", String(query.status))
+  if (query.sortBy) params.set("sortBy", query.sortBy)
+  if (query.sortOrder) params.set("sortOrder", query.sortOrder)
+  const qs = params.toString()
+  return qs ? `?${qs}` : ""
+}
+
+export async function getAllProfileRequests(
+  query?: AdminListProfileRequestsQuery
+): Promise<AdminListProfileRequestsResponse> {
+  const qs = buildQuery(query)
+  const res = await api.request<unknown>(`/auth/all-profile-requests${qs}`, {
     method: "GET",
   })
-  if (Array.isArray(res)) return res
-  if (res?.data && Array.isArray(res.data)) return res.data
-  return []
+  return parseAllProfileRequestsResponse(res)
 }
 
 export async function updateProfileRequestStatus(
@@ -49,6 +142,7 @@ type ProfileRequestInput = ProfileRequest & {
   isActive?: boolean
   deletedAt?: string | null
   contactName?: string
+  registrationStatus?: string
 }
 
 function getUserIdFromItem(p: ProfileRequestInput): string | undefined {
@@ -66,6 +160,7 @@ function getDeletedAtFromItem(p: ProfileRequestInput): string | null | undefined
 }
 
 export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): ProfileRequestRow {
+  const statusRaw = p.status ?? p.registrationStatus ?? ""
   return {
     id: p.id,
     companyName: p.companyNameVi || p.companyNameCn || "",
@@ -73,7 +168,7 @@ export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): Profi
     contactName: p.contactName ?? "",
     industry: p.industry,
     country: p.country,
-    status: p.status as ProfileRequestStatus,
+    status: statusRaw as ProfileRequestStatus,
     submittedAt: p.submittedAt ?? p.createdAt ?? "",
     companyId: p.companyId ?? undefined,
     userId: getUserIdFromItem(p),
