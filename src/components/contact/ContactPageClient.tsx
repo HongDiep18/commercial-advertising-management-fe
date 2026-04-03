@@ -13,19 +13,17 @@ import {
 } from "@/components/contact"
 import Footer from "@/components/layout/Footer"
 import Header from "@/components/layout/Header"
-import { isDemoUser } from "@/components/login/demo"
 import { AdOrderPreviewButton } from "@/components/shared/AdOrderPreviewButton"
 import { AlertDialog } from "@/components/ui/AlertDialog"
 import Button from "@/components/ui/Button"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { useUser } from "@/contexts/user-context"
-import { directoryPricing, platformPricing, productPricing } from "@/data/contactMockData"
 import type { CreateAdOrderInput } from "@/types/types"
 import { TabType, getTabConfig } from "@/utils/contactHelpers"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-
+import { getAdPackageLabelText } from "../admin/advertising/AdPackageLabel"
 export type SelectedEntry = { id: string; quantity: number }
 
 export interface SelectedItem {
@@ -81,24 +79,21 @@ export default function ContactPageClient() {
   const tabConfig = getTabConfig(t)
   const currentConfig = tabConfig[activeTab]
 
-  const isDemoAccount = isDemoUser(user ?? null)
-
   const { data: adPackagesData, isError: isAdPackagesError } = useAvailableAdPackages()
   const platformCatalogItems = useMemo(
-    () =>
-      !isDemoAccount && adPackagesData ? flattenPlatformCatalog(adPackagesData, i18n.language) : [],
-    [adPackagesData, i18n.language, isDemoAccount]
+    () => (adPackagesData ? flattenPlatformCatalog(adPackagesData, i18n.language) : []),
+    [adPackagesData, i18n.language]
   )
 
   useEffect(() => {
-    if (!isDemoAccount && isAdPackagesError) {
+    if (isAdPackagesError) {
       showToast(
         t("adContact.pricingLoadError") ||
           "Unable to load pricing from server. Please try again later.",
         "error"
       )
     }
-  }, [isAdPackagesError, isDemoAccount, t])
+  }, [isAdPackagesError, t])
 
   const selectedIds = selectedItems.map((e) => e.id)
   const totalQuantity = selectedItems.reduce((sum, e) => sum + e.quantity, 0)
@@ -152,8 +147,13 @@ export default function ContactPageClient() {
 
         details.push({
           id: item.id,
-          name: item.name,
-          category: item.categoryName,
+          name: getAdPackageLabelText({
+            packageType: item.packageType,
+            packageMetadata: item.metadata,
+            fallbackLabel: item.name,
+            t,
+          }),
+          category: item.categoryType,
           duration: item.duration,
           price: item.price,
           quantity: byId[item.id],
@@ -165,48 +165,6 @@ export default function ContactPageClient() {
           formConfig: item.formConfig,
         })
       })
-    } else {
-      if (activeTab === "platform") {
-        Object.entries(platformPricing).forEach(([categoryKey, category]) => {
-          category.items.forEach((item) => {
-            if (!byId[item.id]) return
-            details.push({
-              id: item.id,
-              name: t(`adContact.pricing.platformItems.${item.id}.name`) || item.name,
-              category: t(`adContact.pricing.${categoryKey}.title`),
-              duration: t(`adContact.pricing.platformItems.${item.id}.duration`) || item.duration,
-              price: item.price,
-              quantity: byId[item.id],
-            })
-          })
-        })
-      } else if (activeTab === "directory") {
-        directoryPricing.forEach((item) => {
-          if (!byId[item.id]) return
-          details.push({
-            id: item.id,
-            name: t(`adContact.pricing.directoryPositions.${item.id}`) || item.position,
-            category: t("adContact.categoryNames.directory"),
-            duration: t("adContact.durationAnnual"),
-            price: item.price,
-            quantity: byId[item.id],
-          })
-        })
-      } else {
-        productPricing.forEach((item) => {
-          if (!byId[item.id]) return
-          details.push({
-            id: item.id,
-            name: `${t(`adContact.pricing.productItems.${item.id}.item`) || item.item} - ${
-              t(`adContact.pricing.productItems.${item.id}.description`) || item.description
-            }`,
-            category: t("adContact.categoryNames.product"),
-            duration: t(`adContact.pricing.productItems.${item.id}.duration`) || item.duration,
-            price: item.price,
-            quantity: byId[item.id],
-          })
-        })
-      }
     }
 
     return details
@@ -216,14 +174,6 @@ export default function ContactPageClient() {
     input: CreateAdOrderInput,
     meta: { subtotal: string; assets: { pricingId: string; assetType: string; file: File }[] }
   ) => {
-    if (isDemoAccount) {
-      showToast(
-        t("adContact.demoOrderInfo") ||
-          "This is a demo account. Orders here are for demonstration only and are not actually submitted.",
-        "info"
-      )
-      return
-    }
     const selectedItemsById = Object.fromEntries(
       getSelectedItemsDetails().map((item) => [item.pricingId ?? item.id, item])
     )
@@ -317,7 +267,6 @@ export default function ContactPageClient() {
                 selectedItems={selectedIds}
                 onItemToggle={handleItemToggle}
                 platformCatalogItems={platformCatalogItems}
-                allowMockFallback={isDemoAccount}
               />
             </div>
           </div>
