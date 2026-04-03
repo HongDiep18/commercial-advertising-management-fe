@@ -2,49 +2,34 @@
 
 import { useDeleteActiveAd, useSaveActiveAd } from "@/api/active-ads/hooks"
 import { uploadFiles } from "@/api/files/service"
+import AdItemForm, { type OrderItemValues } from "@/components/shared/AdItemForm"
+import { t } from "i18next"
 import { useState } from "react"
 import { CompanyActiveAdDisplayRow } from "./CompanyActiveAdDisplayRow"
-import { CompanyActiveAdEditRow } from "./CompanyActiveAdEditRow"
-import type { AssetEntry, CompanyActiveAdRowProps } from "./company-active-ads.types"
+import type { CompanyActiveAdRowProps } from "./company-active-ads.types"
 
-export function CompanyActiveAdRow({ ad, companyId, locale, lang }: CompanyActiveAdRowProps) {
+export function CompanyActiveAdRow({ ad, companyId, locale }: CompanyActiveAdRowProps) {
   const [editing, setEditing] = useState(false)
   const { mutateAsync: saveAd, isPending: saving } = useSaveActiveAd(companyId)
   const { mutateAsync: deleteAd, isPending: deleting } = useDeleteActiveAd(companyId)
 
   const handleCancel = () => setEditing(false)
 
-  const handleSave = async (values: {
-    isActive: boolean
-    startDate: Date | undefined
-    endDate: Date | undefined
-    adLinkUrl: string
-    assets: AssetEntry[]
-  }): Promise<void> => {
-    const newFiles = values.assets.filter(
-      (a): a is Extract<AssetEntry, { kind: "new" }> => a.kind === "new"
-    )
+  const handleSave = async (values: OrderItemValues): Promise<void> => {
     let uploadedUrls: string[] = []
-    if (newFiles.length > 0) {
-      const result = await uploadFiles(
-        newFiles.map((a) => a.file),
-        "active-ads"
-      )
+    if (values.files.length > 0) {
+      const result = await uploadFiles(values.files, "active-ads")
       uploadedUrls = result.files.map((f) => f.url)
     }
-    let uploadIndex = 0
-    const finalAssets = values.assets.map((a) =>
-      a.kind === "existing"
-        ? { fileUrl: a.fileUrl, assetType: a.assetType }
-        : { fileUrl: uploadedUrls[uploadIndex++] ?? "", assetType: a.assetType }
-    )
+    const newAssets = uploadedUrls.map((url) => ({ fileUrl: url, assetType: "banner" }))
+    const finalAssets = [...(values.existingAssets ?? []), ...newAssets]
     await saveAd({
       activeAdId: ad.id,
       payload: {
-        isActive: values.isActive,
-        startDate: values.startDate?.toISOString(),
-        endDate: values.endDate ? values.endDate.toISOString() : null,
-        adLinkUrl: values.adLinkUrl.trim() || null,
+        isActive: values.isActive ?? ad.isActive,
+        startDate: values.startDate || undefined,
+        endDate: values.endDate ? values.endDate : null,
+        adLinkUrl: values.adLink.trim() || null,
         assets: finalAssets,
       },
     })
@@ -68,14 +53,35 @@ export function CompanyActiveAdRow({ ad, companyId, locale, lang }: CompanyActiv
     )
   }
 
+  const orderItemData = {
+    id: ad.id,
+    name: ad.packageType,
+    category: "",
+    price: "",
+    packageType: ad.packageType,
+  }
+
+  const formConfig = {
+    ...ad.formConfig,
+    requiresActiveToggle: true,
+  }
+
+  const defaultValues: Partial<OrderItemValues> = {
+    isActive: ad.isActive,
+    startDate: ad.startDate,
+    endDate: ad.endDate ?? "",
+    adLink: ad.adLinkUrl ?? "",
+    existingAssets: ad.assets,
+  }
+
   return (
-    <CompanyActiveAdEditRow
-      ad={ad}
-      lang={lang}
-      saving={saving}
-      deleting={deleting}
+    <AdItemForm
+      orderItemData={orderItemData}
+      formConfig={formConfig}
+      defaultValues={defaultValues}
+      onSubmit={handleSave}
       onCancel={handleCancel}
-      onSave={handleSave}
+      submitLabel={saving ? t("common.saving", "Saving...") : t("common.save")}
     />
   )
 }

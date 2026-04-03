@@ -1,3 +1,5 @@
+import type { AdPackageFormConfig } from "@/api/ads-pricing/types"
+
 export type AdminOrderStatus = "DRAFT" | "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED"
 
 export type AdminListOrdersQuery = {
@@ -31,6 +33,7 @@ export type AdminOrderItemDto = {
     assetType: string
   }>
   packageMetadata?: Record<string, unknown> | null
+  formConfig: AdPackageFormConfig
 }
 
 export type AdminOrderDto = {

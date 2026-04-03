@@ -9,7 +9,11 @@ import type {
 import { useAvailableAdPackages } from "@/api/ads-pricing/hooks"
 import type { PublicAdPackagePricingItem } from "@/api/ads-pricing/types"
 import { uploadFiles } from "@/api/files/service"
-import { AdPackageLabel } from "@/components/admin/advertising/AdPackageLabel"
+import AdItemForm, {
+  type AdItemFormHandle,
+  type OrderItemData,
+  type OrderItemValues,
+} from "@/components/shared/AdItemForm"
 import Button from "@/components/ui/Button"
 import Calendar from "@/components/ui/Calendar"
 import {
@@ -22,12 +26,10 @@ import {
 import Input from "@/components/ui/Input"
 import { Label } from "@/components/ui/Label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
-import TextColorBadge from "@/components/ui/TextColorBadge"
 import { VndPrice } from "@/components/VndPrice"
-import { addDuration } from "@/data/contactMockData"
 import { format } from "date-fns"
-import { CalendarIcon, Loader2, Paperclip, Plus, Trash2, Upload, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { CalendarIcon, Loader2, Plus, Trash2, X } from "lucide-react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const POPUP_ADDON_TYPES = [
@@ -39,24 +41,6 @@ const POPUP_ADDON_NEEDS_LINK_TYPES = ["popup_rotation_details_link", "popup_prio
 
 function matchesType(value: string, targets: string[]): boolean {
   return targets.includes(value.toLowerCase())
-}
-
-type AssetEntry =
-  | { kind: "existing"; fileUrl: string; assetType: string }
-  | { kind: "new"; file: File; assetType: string; previewUrl: string }
-
-const IMAGE_EXTS = /\.(jpe?g|png|gif|webp|avif|svg)$/i
-function isImageUrl(url: string): boolean {
-  return IMAGE_EXTS.test(url.split("?")[0])
-}
-
-type ItemEditState = {
-  adLinkUrl: string
-  startDate: Date | undefined
-  startCalOpen: boolean
-  designServiceRequired: boolean
-  assetsTouched: boolean
-  assets: AssetEntry[]
 }
 
 type AddOnDraft = {
@@ -133,7 +117,9 @@ export function AdOrderEditDialog({
   const { edit, isPending: isSubmitting } = useEditAdminOrder()
 
   const [notes, setNotes] = useState("")
-  const [itemStates, setItemStates] = useState<Record<string, ItemEditState>>({})
+  const [itemFormRefs, setItemFormRefs] = useState<
+    Record<string, React.RefObject<AdItemFormHandle | null>>
+  >({})
   const [addOnDrafts, setAddOnDrafts] = useState<AddOnDraft[]>([])
   const [deleteItemIds, setDeleteItemIds] = useState<string[]>([])
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -165,54 +151,16 @@ export function AdOrderEditDialog({
   useEffect(() => {
     if (!order) return
     setNotes(order.notes ?? "")
-    const states: Record<string, ItemEditState> = {}
+    const refs: Record<string, React.RefObject<AdItemFormHandle | null>> = {}
     for (const item of order.items) {
-      states[item.id] = {
-        adLinkUrl: item.adLinkUrl ?? "",
-        startDate: item.startDate ? new Date(item.startDate) : undefined,
-        startCalOpen: false,
-        designServiceRequired: item.designServiceRequired,
-        assetsTouched: false,
-        assets: item.assets.map((a) => ({
-          kind: "existing" as const,
-          assetType: a.assetType,
-          fileUrl: a.fileUrl,
-        })),
-      }
+      refs[item.id] = React.createRef<AdItemFormHandle>()
     }
-    setItemStates(states)
+    setItemFormRefs(refs)
     setAddOnDrafts([])
     setDeleteItemIds([])
     setSubmitError(null)
     setAddOnErrors({})
   }, [order])
-
-  function updateItem(itemId: string, patch: Partial<ItemEditState>) {
-    setItemStates((prev) => ({ ...prev, [itemId]: { ...prev[itemId], ...patch } }))
-  }
-
-  function addFiles(itemId: string, files: FileList | null) {
-    if (!files || files.length === 0) return
-    const newEntries: AssetEntry[] = Array.from(files).map((file) => ({
-      kind: "new" as const,
-      file,
-      assetType: "main_image",
-      previewUrl: file.type.startsWith("image/") ? URL.createObjectURL(file) : "",
-    }))
-    const state = itemStates[itemId]
-    updateItem(itemId, {
-      assetsTouched: true,
-      assets: [...state.assets, ...newEntries],
-    })
-  }
-
-  function removeAsset(itemId: string, idx: number) {
-    const state = itemStates[itemId]
-    updateItem(itemId, {
-      assetsTouched: true,
-      assets: state.assets.filter((_, i) => i !== idx),
-    })
-  }
 
   function getAvailableOptionsForDraft(draftIdx: number): AddOnPricingOption[] {
     const otherIds = new Set(addOnDrafts.filter((_, i) => i !== draftIdx).map((d) => d.pricingId))
@@ -276,60 +224,70 @@ export function AdOrderEditDialog({
     setAddOnErrors(errors)
     if (Object.keys(errors).length > 0) return
 
+    // Validate all items via refs
+    type ItemResult = { itemId: string; values: OrderItemValues }
+    const itemResults: ItemResult[] = []
+    for (const item of order.items) {
+      if (deleteItemIds.includes(item.id)) continue
+      const ref = itemFormRefs[item.id]
+      const values = await ref?.current?.validate()
+      if (!values) return // validation failed — errors shown in that item's form
+      itemResults.push({ itemId: item.id, values })
+    }
+
     try {
       // Step 1: upload new files per item and collect resulting URLs
       const itemsWithUploadedUrls: Record<string, string[]> = {}
-      for (const item of order.items) {
-        const s = itemStates[item.id]
-        if (!s.assetsTouched) continue
-        const newFiles = s.assets
-          .filter((a): a is Extract<AssetEntry, { kind: "new" }> => a.kind === "new")
-          .map((a) => a.file)
+      for (const { itemId, values } of itemResults) {
+        const newFiles = values.files
         if (newFiles.length === 0) {
-          itemsWithUploadedUrls[item.id] = []
+          itemsWithUploadedUrls[itemId] = []
           continue
         }
         const result = await uploadFiles(newFiles, "ad-orders")
         const urls = result.files.map((f) => f.url)
-        // Validate that the server returned valid HTTP URLs for every uploaded file
         const invalid = urls.find((u) => !isValidHttpUrl(u))
         if (invalid !== undefined || urls.length !== newFiles.length) {
           throw new Error(t("admin.advertising.editErrorGeneric"))
         }
-        itemsWithUploadedUrls[item.id] = urls
+        itemsWithUploadedUrls[itemId] = urls
       }
 
-      // Step 2: build items payload using the uploaded URLs
-      const items: AdminEditOrderItemPayload[] = order.items
-        .filter((item) => !deleteItemIds.includes(item.id))
-        .map((item) => {
-          const s = itemStates[item.id]
-          const payload: AdminEditOrderItemPayload = {
-            itemId: item.id,
-            adLinkUrl: s.adLinkUrl || undefined,
-            startDate: s.startDate ? format(s.startDate, "yyyy-MM-dd") : undefined,
-            designServiceRequired: s.designServiceRequired,
-          }
-          if (s.assetsTouched) {
-            let uploadIdx = 0
-            const uploadedUrls = itemsWithUploadedUrls[item.id] ?? []
-            payload.assets = s.assets
-              .map((a): AdminEditOrderAssetPayload | null => {
-                if (a.kind === "existing") {
-                  // Only re-send existing assets that have a valid HTTP URL.
-                  // Non-HTTP values (relative paths, storage keys) are skipped
-                  // because the BE validator requires full URLs.
-                  return isValidHttpUrl(a.fileUrl)
-                    ? { assetType: a.assetType, fileUrl: a.fileUrl }
-                    : null
-                }
-                // New assets: URL was validated after upload
-                return { assetType: a.assetType, fileUrl: uploadedUrls[uploadIdx++] }
+      // Step 2: build items payload
+      const items: AdminEditOrderItemPayload[] = itemResults.map(({ itemId, values }) => {
+        const originalItem = order.items.find((i) => i.id === itemId)!
+        const currentExistingUrls = new Set(values.existingAssets.map((a) => a.fileUrl))
+        const assetsTouched =
+          values.files.length > 0 ||
+          originalItem.assets.some((a) => !currentExistingUrls.has(a.fileUrl))
+
+        const payload: AdminEditOrderItemPayload = {
+          itemId,
+          adLinkUrl: values.adLink || undefined,
+          startDate: values.startDate || undefined,
+          designServiceRequired: values.needDesign,
+        }
+
+        if (assetsTouched) {
+          const uploadedUrls = itemsWithUploadedUrls[itemId] ?? []
+          let uploadIdx = 0
+          payload.assets = [
+            ...values.existingAssets
+              .filter((a) => isValidHttpUrl(a.fileUrl))
+              .map(
+                (a): AdminEditOrderAssetPayload => ({ assetType: a.assetType, fileUrl: a.fileUrl })
+              ),
+            ...values.files.map(
+              (): AdminEditOrderAssetPayload => ({
+                assetType: "main_image",
+                fileUrl: uploadedUrls[uploadIdx++],
               })
-              .filter((a): a is AdminEditOrderAssetPayload => a !== null)
-          }
-          return payload
-        })
+            ),
+          ]
+        }
+
+        return payload
+      })
 
       const newItems: AdminNewOrderItemPayload[] = addOnDrafts
         .filter((d) => d.pricingId)
@@ -428,237 +386,50 @@ export function AdOrderEditDialog({
               </p>
               <div className="space-y-3">
                 {order.items.map((item) => {
-                  const s = itemStates[item.id]
-                  if (!s) return null
-                  const isAdLinkInvalid = s.adLinkUrl.trim() !== "" && !isValidHttpUrl(s.adLinkUrl)
-                  const isAddOn = matchesType(item.packageType ?? "", POPUP_ADDON_TYPES)
                   const isMarkedForDelete = deleteItemIds.includes(item.id)
+
+                  const orderItemData: OrderItemData = {
+                    id: item.id,
+                    category: item.categoryType ?? "",
+                    packageType: item.packageType ?? undefined,
+                    durationValue: item.durationValue ?? null,
+                    durationUnit: item.durationUnit ?? null,
+                    price: item.price?.toLocaleString() ?? "",
+                  }
+
+                  const defaultValues: Partial<OrderItemValues> = {
+                    startDate: item.startDate ?? "",
+                    adLink: item.adLinkUrl ?? "",
+                    needDesign: item.designServiceRequired,
+                    existingAssets: item.assets.map((a) => ({
+                      fileUrl: a.fileUrl,
+                      assetType: a.assetType,
+                    })),
+                    files: [],
+                  }
+
+                  const isAddOn = matchesType(item.packageType ?? "", POPUP_ADDON_TYPES)
+
                   return (
-                    <div
+                    <AdItemForm
                       key={item.id}
-                      className={`space-y-3 rounded-lg bg-white p-3 shadow-md transition-opacity ${isMarkedForDelete ? "opacity-40" : ""}`}
-                    >
-                      {/* Package header */}
-                      <div className="flex items-center gap-2">
-                        <TextColorBadge colorKey={item.packageType} className="text-xs">
-                          <AdPackageLabel
-                            packageType={item.packageType}
-                            packageMetadata={item.packageMetadata}
-                            fallbackLabel={item.packageType}
-                          />
-                        </TextColorBadge>
-                        <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
-                          <AdPackageLabel
-                            packageType={item.packageType}
-                            packageMetadata={item.packageMetadata}
-                            fallbackLabel={item.packageName}
-                          />
-                        </span>
-                        {isAddOn && (
-                          <button
-                            type="button"
-                            title={t("admin.advertising.deleteItem", {
-                              defaultValue: "Remove package",
-                            })}
-                            onClick={() =>
+                      ref={itemFormRefs[item.id]}
+                      mode="controlled"
+                      orderItemData={orderItemData}
+                      defaultValues={defaultValues}
+                      formConfig={item.formConfig}
+                      isDeleted={isMarkedForDelete}
+                      onDelete={
+                        isAddOn
+                          ? () =>
                               setDeleteItemIds((prev) =>
                                 isMarkedForDelete
                                   ? prev.filter((id) => id !== item.id)
                                   : [...prev, item.id]
                               )
-                            }
-                            className={`shrink-0 transition-colors ${isMarkedForDelete ? "text-muted-foreground" : "text-destructive/70 hover:text-destructive"}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Start date */}
-                      <div className="space-y-1">
-                        <Label className="text-xs">{t("admin.advertising.startTime")}</Label>
-                        <Popover
-                          open={s.startCalOpen}
-                          onOpenChange={(v) => updateItem(item.id, { startCalOpen: v })}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="h-8 w-full justify-start bg-transparent px-2 text-left text-xs font-normal"
-                            >
-                              <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
-                              {s.startDate ? formatDateDisplay(s.startDate, lang) : "—"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="z-90 w-[280px] p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={s.startDate}
-                              onSelect={(d) =>
-                                updateItem(item.id, { startDate: d, startCalOpen: false })
-                              }
-                              className="w-full"
-                              initialFocus
-                              localeCode={lang}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        {s.startDate && item.durationValue && item.durationUnit && (
-                          <p className="text-muted-foreground text-xs">
-                            {t("admin.advertising.endTime")}:{" "}
-                            {formatDateDisplay(
-                              addDuration(s.startDate, item.durationValue, item.durationUnit),
-                              lang
-                            )}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Ad link URL */}
-                      <div className="space-y-1">
-                        <Label className="text-xs">
-                          {t("admin.advertising.editAdLink", { defaultValue: "Ad Link URL" })}
-                        </Label>
-                        <Input
-                          type="url"
-                          placeholder="https://"
-                          className={`h-8 text-xs ${isAdLinkInvalid ? "border-red-500" : ""}`}
-                          value={s.adLinkUrl}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            updateItem(item.id, { adLinkUrl: e.target.value })
-                          }
-                        />
-                        {isAdLinkInvalid && (
-                          <p className="text-destructive text-xs">
-                            {t("admin.activeAds.createUrlError")}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Design service toggle */}
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs">{t("admin.advertising.designService")}</Label>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateItem(item.id, {
-                              designServiceRequired: !s.designServiceRequired,
-                            })
-                          }
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            s.designServiceRequired ? "bg-green-600" : "bg-muted"
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-                              s.designServiceRequired ? "translate-x-4" : "translate-x-0.5"
-                            }`}
-                          />
-                        </button>
-                      </div>
-
-                      {/* Assets */}
-                      <div className="space-y-1">
-                        <Label className="text-xs">
-                          {t("admin.advertising.assets")}
-                          {s.assetsTouched && (
-                            <span className="ml-1 font-normal text-amber-500">
-                              {t("admin.advertising.editAssetsModified", {
-                                defaultValue: "(modified)",
-                              })}
-                            </span>
-                          )}
-                        </Label>
-
-                        {s.assets.length > 0 && (
-                          <ul className="space-y-2">
-                            {s.assets.map((asset, idx) => {
-                              const previewUrl =
-                                asset.kind === "existing" && isImageUrl(asset.fileUrl)
-                                  ? asset.fileUrl
-                                  : asset.kind === "new"
-                                    ? asset.previewUrl
-                                    : ""
-                              const label =
-                                asset.kind === "existing"
-                                  ? asset.fileUrl.split("/").pop() || asset.fileUrl
-                                  : asset.file.name
-                              return (
-                                <li key={idx} className="bg-body-bg-dark space-y-1.5 rounded p-2">
-                                  {previewUrl && (
-                                    <a href={previewUrl} target="_blank" rel="noreferrer">
-                                      <img
-                                        src={previewUrl}
-                                        alt={label}
-                                        className="h-20 w-full rounded object-cover"
-                                      />
-                                    </a>
-                                  )}
-                                  <div className="flex items-center gap-2">
-                                    <Paperclip className="text-muted-foreground h-3 w-3 shrink-0" />
-                                    <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
-                                      {label}
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeAsset(item.id, idx)}
-                                      className="text-muted-foreground hover:text-foreground shrink-0"
-                                    >
-                                      <X className="h-3.5 w-3.5" />
-                                    </button>
-                                  </div>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        )}
-
-                        {s.assetsTouched && s.assets.length === 0 && (
-                          <p className="text-muted-foreground text-xs">
-                            {t("admin.advertising.editNoAssets", {
-                              defaultValue: "No assets — existing will be cleared",
-                            })}
-                          </p>
-                        )}
-
-                        <button
-                          type="button"
-                          className="border-border hover:border-primary/50 flex w-full items-center justify-center gap-2 rounded border border-dashed py-2 text-xs transition-colors"
-                          onClick={() =>
-                            (
-                              document.getElementById(`asset-upload-${item.id}`) as HTMLInputElement
-                            )?.click()
-                          }
-                        >
-                          <Upload className="text-muted-foreground h-3.5 w-3.5" />
-                          <span className="text-muted-foreground">
-                            {t("adContact.clickToUpload", { defaultValue: "Click to upload file" })}
-                          </span>
-                        </button>
-                        <input
-                          id={`asset-upload-${item.id}`}
-                          type="file"
-                          multiple
-                          accept=".jpg,.jpeg,.png,.pdf,.ai"
-                          className="hidden"
-                          onChange={(e) => addFiles(item.id, e.target.files)}
-                        />
-
-                        {!s.assetsTouched && item.assets.length > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => updateItem(item.id, { assetsTouched: true, assets: [] })}
-                            className="text-destructive flex items-center gap-1 text-xs hover:opacity-70"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                            {t("admin.advertising.editClearAssets", {
-                              defaultValue: "Clear all assets",
-                            })}
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                          : undefined
+                      }
+                    />
                   )
                 })}
               </div>

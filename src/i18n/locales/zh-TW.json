@@ -8,7 +8,9 @@
     "close": "關閉",
     "cancel": "取消",
     "save": "儲存",
-    "saving": "儲存中..."
+    "saving": "儲存中...",
+    "required": "必填",
+    "active": "啟用"
   },
   "header": {
     "aboutUs": "關於我們",
@@ -186,12 +188,6 @@
     "select": "選擇",
     "adItem": "廣告項目",
     "duration": "時長",
-    "durationUnit": {
-      "MONTH": "個月",
-      "DAY": "天",
-      "WEEK": "週",
-      "YEAR": "年"
-    },
     "price": "金額",
     "discount": "折扣",
     "pricingLoadError": "無法從伺服器載入價格資訊，請稍後再試。",
@@ -216,6 +212,7 @@
     "startDate": "起始日期",
     "endDate": "結束日期",
     "selectStartDate": "請選擇起始日期",
+    "selectEndDate": "選擇結束日期",
     "autoCalculated": "系統自動計算",
     "bookedDatesNote": "灰色日期為已預約，無法選擇",
     "adLink": "廣告連結網址",
@@ -1518,7 +1515,8 @@
       "createSuccess": "已建立啟用廣告。",
       "createError": "無法建立啟用廣告，請稍後再試。",
       "createInvalidRange": "結束時間必須晚於開始時間。",
-      "createShowButton": "+ 新增"
+      "createShowButton": "+ 新增",
+      "empty": "此公司目前沒有活躍廣告。"
     },
     "property": {
       "listingsCount": "{{count}} 筆物業",
@@ -1801,5 +1799,22 @@
     "loading": "正在載入預覽…",
     "errorTitle": "預覽載入失敗",
     "errorDesc": "無法載入廣告預覽。您可能沒有查看此訂單的權限。"
+  },
+  "formValidation": {
+    "filesRequired": "請至少上傳一個檔案",
+    "endDateBeforeStart": "結束日期不能早於開始日期"
+  },
+  "adCategory": {
+    "HOMEPAGE_POPUP": "首頁彈出視窗",
+    "FEATURED_COMPANY": "精選公司",
+    "COMPANY_DIRECTORY": "公司目錄",
+    "PLATFORM_PRINT": "平台印刷",
+    "PRODUCT_LISTING": "產品列表"
+  },
+  "durationUnit": {
+    "MONTH": "個月",
+    "DAY": "天",
+    "WEEK": "週",
+    "YEAR": "年"
   }
 }
