@@ -8,7 +8,9 @@
     "close": "Đóng",
     "cancel": "Hủy",
     "save": "Lưu",
-    "saving": "Đang lưu..."
+    "saving": "Đang lưu...",
+    "required": "Bắt buộc",
+    "active": "Hoạt động"
   },
   "header": {
     "aboutUs": "Về chúng tôi",
@@ -26,6 +28,23 @@
     "failedToLoadOrdersMetrics": "Không thể tải số liệu đơn hàng",
     "failedToLoadCompanies": "Không thể tải công ty",
     "failedToLoadData": "Không thể tải dữ liệu"
+  },
+  "formValidation": {
+    "filesRequired": "Vui lòng tải lên ít nhất một tệp",
+    "endDateBeforeStart": "Ngày kết thúc không thể trước ngày bắt đầu"
+  },
+  "adCategory": {
+    "HOMEPAGE_POPUP": "Popup trang chủ",
+    "FEATURED_COMPANY": "Công ty nổi bật",
+    "COMPANY_DIRECTORY": "Danh mục công ty",
+    "PLATFORM_PRINT": "Quảng cáo ấn phẩm",
+    "PRODUCT_LISTING": "Danh sách sản phẩm"
+  },
+  "durationUnit": {
+    "MONTH": "tháng",
+    "DAY": "ngày",
+    "WEEK": "tuần",
+    "YEAR": "năm"
   },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
@@ -186,12 +205,6 @@
     "select": "Chọn",
     "adItem": "Mục quảng cáo",
     "duration": "Thời lượng",
-    "durationUnit": {
-      "MONTH": "tháng",
-      "DAY": "ngày",
-      "WEEK": "tuần",
-      "YEAR": "năm"
-    },
     "price": "Giá",
     "discount": "Giảm giá",
     "pricingLoadError": "Không thể tải bảng giá từ máy chủ. Vui lòng thử lại sau.",
@@ -216,6 +229,7 @@
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
     "selectStartDate": "Vui lòng chọn ngày bắt đầu",
+    "selectEndDate": "Chọn ngày kết thúc",
     "autoCalculated": "Tự động tính toán bởi hệ thống",
     "bookedDatesNote": "Ngày màu xám đã được đặt trước và không thể chọn",
     "adLink": "URL liên kết quảng cáo",
@@ -1585,7 +1599,8 @@
       "createSuccess": "Đã tạo quảng cáo đang hoạt động.",
       "createError": "Không thể tạo quảng cáo. Vui lòng thử lại.",
       "createInvalidRange": "Thời điểm kết thúc phải sau thời điểm bắt đầu.",
-      "createShowButton": "+ Tạo mới"
+      "createShowButton": "+ Tạo mới",
+      "empty": "Công ty này chưa có quảng cáo nào đang hoạt động."
     },
     "property": {
       "listingsCount": "{{count}} bất động sản",

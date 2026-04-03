@@ -1,3 +1,4 @@
+import { AdPackageFormConfig } from "@/api/ads-pricing/types"
 import { api } from "@/lib/api"
 
 export enum AdPackageType {
@@ -22,6 +23,7 @@ export type CompanyActiveAdItem = {
   endDate: string | null
   isActive: boolean
   status: "expired" | "activating" | "pending" | "disabled"
+  formConfig: AdPackageFormConfig
 }
 
 export type CompanyActiveAdsResponse = {

@@ -1,12 +1,12 @@
 "use client"
 
-import { AdPackageType, CompanyActiveAdItem } from "@/api/active-ads/adminService"
+import { AdPackageType } from "@/api/active-ads/adminService"
 import { useCreateCompanyPopupAddon } from "@/api/active-ads/hooks"
 import { translateAdPackageType } from "@/components/admin/advertising/AdPackageLabel"
+import AdItemForm, { type OrderItemValues } from "@/components/shared/AdItemForm"
 import Button from "@/components/ui/Button"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { CompanyActiveAdEditRow } from "./CompanyActiveAdEditRow"
 
 const AllowedAdPackage = [
   AdPackageType.POPUP_PRIORITY_DETAILS_LINK,
@@ -14,25 +14,10 @@ const AllowedAdPackage = [
   AdPackageType.POPUP_RANKING_ADJUSTMENT,
 ] as const
 
-function getStartOfDayIsoString(date: Date): string {
-  const value = new Date(date)
-  value.setHours(0, 0, 0, 0)
-  return value.toISOString()
-}
-
-function createActiveAdPlaceholder(): CompanyActiveAdItem {
-  return {
-    id: "new-active-ad",
-    packageType: AdPackageType.POPUP_VIEW_DETAILS_LINK,
-    pricingModel: "ONE_TIME",
-    assets: [],
-    adLinkUrl: null,
-    startDate: getStartOfDayIsoString(new Date()),
-    endDate: null,
-    isActive: true,
-    status: "pending",
-  }
-}
+const AD_LINK_REQUIRED_TYPES: string[] = [
+  AdPackageType.POPUP_PRIORITY_DETAILS_LINK,
+  AdPackageType.POPUP_ROTATION_DETAILS_LINK,
+]
 
 type Props = {
   companyId: string
@@ -46,33 +31,32 @@ export function CompanyActiveAdCreateForm({ companyId }: Props) {
   )
   const [isCreateOpen, setIsCreateOpen] = useState(false)
 
-  const adLinkRequired =
-    packageType === AdPackageType.POPUP_PRIORITY_DETAILS_LINK ||
-    packageType === AdPackageType.POPUP_ROTATION_DETAILS_LINK
+  const adLinkRequired = AD_LINK_REQUIRED_TYPES.includes(packageType)
 
-  const rowAd: CompanyActiveAdItem = useMemo(() => {
-    void isCreateOpen
-    return {
-      ...createActiveAdPlaceholder(),
-      packageType,
-    }
-  }, [packageType, isCreateOpen])
-
-  const handleSubmit = async (values: {
-    startDate: Date | undefined
-    endDate: Date | undefined
-    adLinkUrl: string
-  }): Promise<void> => {
-    await createAddon({
-      packageType,
-      startDate: values.startDate!.toISOString(),
-      endDate: values.endDate ? values.endDate.toISOString() : null,
-      ...(adLinkRequired ? { adLinkUrl: values.adLinkUrl.trim() } : {}),
-    })
-    setIsCreateOpen(false)
+  const orderItemData = {
+    id: packageType,
+    name: translateAdPackageType(t, packageType),
+    category: "",
+    price: "",
+    packageType,
   }
 
-  const handleCancel = () => {
+  const formConfig = {
+    requiresStartDate: false,
+    requiresAdLink: adLinkRequired,
+    requiresDesignService: false,
+    requiresAssets: false,
+  }
+
+  const handleSubmit = async (values: OrderItemValues): Promise<void> => {
+    await createAddon({
+      packageType,
+      startDate: values.startDate
+        ? new Date(values.startDate).toISOString()
+        : new Date().toISOString(),
+      endDate: values.endDate ? new Date(values.endDate).toISOString() : null,
+      adLinkUrl: values.adLink,
+    })
     setIsCreateOpen(false)
   }
 
@@ -106,18 +90,13 @@ export function CompanyActiveAdCreateForm({ companyId }: Props) {
           </select>
         </div>
       </div>
-      <CompanyActiveAdEditRow
-        ad={rowAd}
-        lang={i18n.language}
-        showActiveToggle={false}
-        showAssets={false}
-        disableDateEditing={false}
-        showAdLinkField={adLinkRequired}
-        saveLabel={t("admin.activeAds.createSubmit")}
-        saving={isPending}
-        deleting={false}
-        onCancel={handleCancel}
-        onSave={handleSubmit}
+      <AdItemForm
+        key={`${packageType}-${i18n.language}`}
+        orderItemData={orderItemData}
+        formConfig={formConfig}
+        onSubmit={handleSubmit}
+        onCancel={() => setIsCreateOpen(false)}
+        submitLabel={isPending ? t("common.saving", "Saving...") : t("common.save")}
       />
     </div>
   )

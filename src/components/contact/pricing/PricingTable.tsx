@@ -1,9 +1,9 @@
 "use client"
 
-import { useTranslation } from "react-i18next"
-import Checkbox from "@/components/ui/Checkbox"
 import Card, { CardContent } from "@/components/ui/Card"
+import Checkbox from "@/components/ui/Checkbox"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useTranslation } from "react-i18next"
 
 function normalizePackageTypeKey(type: string): string {
   const withUnderscores = type.replace(/-/g, "_").replace(/\s+/g, "_")
@@ -32,11 +32,14 @@ interface PricingItem {
 
 function PackageHint({ text }: { text: string }) {
   return (
-    <span className="ml-2 inline-flex items-center align-middle" onClick={(e) => e.stopPropagation()}>
+    <span
+      className="ml-2 inline-flex items-center align-middle"
+      onClick={(e) => e.stopPropagation()}
+    >
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="flex h-5 w-5 cursor-default items-center justify-center rounded-full bg-primary text-[11px] font-black text-white shadow-sm ring-2 ring-primary/30">
+            <span className="bg-primary ring-primary/30 flex h-5 w-5 cursor-default items-center justify-center rounded-full text-[11px] font-black text-white shadow-sm ring-2">
               !
             </span>
           </TooltipTrigger>
@@ -160,7 +163,7 @@ export default function PricingTable({
                     <td className="px-3 py-3">
                       {(() => {
                         if (item.durationValue != null && item.durationUnit) {
-                          const unitKey = `adContact.durationUnit.${item.durationUnit}`
+                          const unitKey = `durationUnit.${item.durationUnit}`
                           const unitLabel = t(unitKey)
                           if (unitLabel !== unitKey) {
                             return `${item.durationValue} ${unitLabel}`
