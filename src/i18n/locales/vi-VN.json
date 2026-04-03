@@ -678,7 +678,7 @@
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
       "tooManyRequests": "Quá nhiều yêu cầu. Vui lòng đợi một lúc rồi thử lại.",
       "submit": "Đăng ký thất bại, vui lòng thử lại sau",
-      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ (ví dụ: https://your-company.com hoặc http://your-company.com)",
+      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ (ví dụ: https://your-company hoặc http://your-company)",
       "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó.",
       "invalidTaxId": "Mã số thuế chỉ được chứa chữ số",
       "duplicatePhone": "Vui lòng nhập số điện thoại của người liên hệ khác với số điện thoại công ty"

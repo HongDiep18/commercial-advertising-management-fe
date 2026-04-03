@@ -624,7 +624,7 @@
       "invalidEmail": "Please enter a valid email address.",
       "invalidPhone": "Please enter a valid phone number (at least 8 digits).",
       "invalidRegion": "Please select a country first, then choose a region from the list.",
-      "invalidWebsite": "Please enter a valid website URL (e.g. https://your-company.com or http://your-company.com)", 
+      "invalidWebsite": "Please enter a valid website URL (e.g. https://your-company or http://your-company)", 
       "captcha": "Invalid captcha, please try again",
       "tooManyRequests": "Too many requests. Please wait a moment and try again.",
       "submit": "Registration failed, please try again later",

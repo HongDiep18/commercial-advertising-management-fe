@@ -350,15 +350,14 @@ export function AccountProfileModal({
                 </FieldLabel>
                 <div className="space-y-1">
                   <Input
-                    placeholder={t("register.placeholders.website") || "Website *"}
+                    placeholder={
+                      t("register.hints.websiteFormat") ||
+                      "Example: https://your-company or http://your-company"
+                    }
                     value={profileData.website}
                     onChange={(e) => onProfileChange("website", e.target.value)}
                     disabled={readOnly}
                   />
-                  <p className="text-muted-foreground text-xs">
-                    {t("register.hints.websiteFormat") ||
-                      "Example: https://your-company.com or your-company.com"}
-                  </p>
                 </div>
               </Field>
             </FieldWithError>
