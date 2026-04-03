@@ -626,7 +626,7 @@
       "captcha": "驗證碼錯誤，請重新輸入",
       "tooManyRequests": "請求過於頻繁，請稍候再試。",
       "submit": "註冊失敗，請稍後再試",
-      "invalidWebsite": "請輸入有效的網站網址 (例如：https://your-company.com 或 http://your-company.com)",
+      "invalidWebsite": "請輸入有效的網站網址 (例如：https://your-company 或 http://your-company)",
       "duplicate409": "此帳號已提交過註冊申請。",
       "invalidTaxId": "稅號只能包含數字",
       "duplicatePhone": "請輸入與公司電話不同的聯絡人電話號碼"
