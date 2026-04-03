@@ -512,7 +512,7 @@ export default function RegisterForm() {
                         <Input
                           placeholder={
                             t("register.hints.websiteFormat") ||
-                            "Example: https://your-company.com or your-company.com"
+                            "Example: https://your-company or http://your-company"
                           }
                           value={values.website}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

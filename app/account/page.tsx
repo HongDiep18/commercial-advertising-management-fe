@@ -235,7 +235,7 @@ export default function AccountPage() {
     setProfileData((prev) => {
       if (field === "country") {
         const nextCountry = value === COUNTRY_NONE ? "" : value
-        return { ...prev, country: nextCountry, region: "" }
+        return { ...prev, country: nextCountry }
       }
       return { ...prev, [field]: value }
     })
