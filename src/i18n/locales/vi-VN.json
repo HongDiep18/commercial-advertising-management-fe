@@ -655,6 +655,7 @@
       "contactPhone": "Số điện thoại người liên hệ",
       "companyAddress": "Địa chỉ Công ty",
       "email": "E-Mail",
+      "emailExample": "ten@congty.com",
       "country": "Chọn xuất xứ *",
       "region": "Chọn Khu vực *",
       "industry": "Chọn ngành nghề *",
@@ -677,7 +678,7 @@
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
       "tooManyRequests": "Quá nhiều yêu cầu. Vui lòng đợi một lúc rồi thử lại.",
       "submit": "Đăng ký thất bại, vui lòng thử lại sau",
-      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ.",
+      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ (ví dụ: https://your-company.com hoặc http://your-company.com)",
       "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó.",
       "invalidTaxId": "Mã số thuế chỉ được chứa chữ số",
       "duplicatePhone": "Vui lòng nhập số điện thoại của người liên hệ khác với số điện thoại công ty"
@@ -1251,7 +1252,7 @@
     },
     "dashboard": {
       "totalCompanies": "Tổng doanh nghiệp",
-      "pendingApplications": "Đơn chờ duyệt",
+      "pendingApplications": "Đơn đăng ký chờ duyệt",
       "newsCount": "Số tin tức",
       "propertyViews": "Lượt xem bất động sản",
       "pendingAdOrders": "Đơn quảng cáo chờ duyệt",
@@ -1403,7 +1404,7 @@
     "advertising": {
       "assets": "Hình ảnh đính kèm",
       "monthlyRevenue": "Doanh thu tháng",
-      "adOrders": "Đơn quảng cáo",
+      "adOrders": "Đơn đặt hàng quảng cáo hàng tháng (Tất cả trạng thái)",
       "monthlyGrowth": "Tăng trưởng tháng",
       "orderHistory": "Lịch sử đơn quảng cáo",
       "packageManagementTab": "Quản lý gói quảng cáo",

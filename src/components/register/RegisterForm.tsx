@@ -1,6 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useRegisterMutation } from "@/api/auth/hooks"
+import { formDataToRegisterPayload } from "@/types/auth"
+import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
+import { getCountryOptions } from "./registerOptions"
+import { REGISTER_CATEGORIES } from "./registerCategories"
+import { useCaptcha } from "./useCaptcha"
+import { createRegisterFormSchema } from "./registerSchema"
+import type { ZodIssue } from "zod"
+import { useForm } from "@tanstack/react-form-nextjs"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, RefreshCw, CheckCircle2 } from "lucide-react"
@@ -10,14 +19,9 @@ import Select from "../ui/Select"
 import Textarea from "../ui/Textarea"
 import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { RequiredMark, stripTrailingAsterisk } from "@/components/ui/required-mark"
 import { SearchableSelect } from "@/components/ui/SearchableSelect"
-import { register } from "@/api/auth"
-import { formDataToRegisterPayload } from "@/types/auth"
-import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
-import { getCountryOptions } from "./registerOptions"
-import { REGISTER_CATEGORIES } from "./registerCategories"
-import { useCaptcha } from "./useCaptcha"
-import { REGISTER_ERROR_KEYS, validateRegisterForm } from "./registerValidation"
 
 function getErrorMessage(err: unknown): string {
   if (err && typeof err === "object" && "data" in err) {
@@ -36,23 +40,25 @@ function isCaptchaInvalidOrExpired(status: number | undefined, message: string):
   )
 }
 
-function FieldWithError({ error, children }: { error?: string; children: React.ReactNode }) {
-  return (
-    <div data-field-error={error ? true : undefined}>
-      {children}
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
-    </div>
-  )
+function zodIssuesToFieldErrors(
+  issues: ZodIssue[]
+): Partial<Record<keyof RegisterFormData, string>> {
+  const next: Partial<Record<keyof RegisterFormData, string>> = {}
+  for (const issue of issues) {
+    const k = issue.path[0]
+    if (typeof k === "string" && !(k in next) && k in INITIAL_REGISTER_FORM) {
+      next[k as keyof RegisterFormData] = issue.message
+    }
+  }
+  return next
 }
 
 export default function RegisterForm() {
   const { t, i18n } = useTranslation()
   const router = useRouter()
-  const [formData, setFormData] = useState<RegisterFormData>(INITIAL_REGISTER_FORM)
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof RegisterFormData, string>>>(
     {}
   )
-  const [isLoading, setIsLoading] = useState(false)
   const [registrationSuccess, setRegistrationSuccess] = useState(false)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: "",
@@ -66,6 +72,11 @@ export default function RegisterForm() {
       ...prev,
       visible: false,
     }))
+
+  const registerSchema = useMemo(() => createRegisterFormSchema(t), [t])
+
+  const registerMutation = useRegisterMutation()
+
   const {
     input: captchaInput,
     setInput: setCaptchaInput,
@@ -78,6 +89,7 @@ export default function RegisterForm() {
     loadFailed: captchaLoadFailed,
     isRateLimited: isCaptchaRateLimited,
   } = useCaptcha()
+
   const tooManyRequestsMsg =
     t("register.errors.tooManyRequests") || "Too many requests. Please wait and try again."
   const refreshCaptchaWith429Notice = async () => {
@@ -93,97 +105,94 @@ export default function RegisterForm() {
     name: t(cat.i18nKey) || `${cat.code}. ${cat.fallback}`,
   }))
 
-  const handleInputChange = (field: keyof RegisterFormData, value: string) => {
-    setFormData((prev: RegisterFormData) => ({ ...prev, [field]: value }))
-    if (fieldErrors[field])
-      setFieldErrors((prev: Partial<Record<keyof RegisterFormData, string>>) => ({
-        ...prev,
-        [field]: undefined,
-      }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const validation = validateRegisterForm(formData)
-    if (!validation.valid) {
-      const next: Partial<Record<keyof RegisterFormData, string>> = {}
-      validation.errors.forEach(({ field, kind }) => {
-        next[field] = t(REGISTER_ERROR_KEYS[kind])
-      })
-      setFieldErrors(next)
-      setTimeout(
-        () =>
-          document.querySelector("[data-field-error]")?.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          }),
-        100
-      )
-      return
-    }
-    setFieldErrors({})
-    if (!isCaptchaValid) {
-      showToast(t("register.errors.captcha") || "驗證碼錯誤，請重新輸入", "warning")
-      await refreshCaptchaWith429Notice()
-      return
-    }
-    if (captchaLoadFailed || !captchaId) {
-      if (isCaptchaRateLimited) {
-        showToast(tooManyRequestsMsg, "warning")
+  const form = useForm({
+    defaultValues: INITIAL_REGISTER_FORM,
+    onSubmit: async ({ value }) => {
+      setFieldErrors({})
+      const parsed = registerSchema.safeParse(value)
+      if (!parsed.success) {
+        setFieldErrors(zodIssuesToFieldErrors(parsed.error.issues))
+        setTimeout(
+          () =>
+            document.querySelector("[data-slot='field-error']")?.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            }),
+          100
+        )
         return
       }
-      showToast(
-        t("register.errors.submit") ||
-          "Captcha challenge unavailable. Please refresh and try again.",
-        "error"
-      )
-      return
-    }
 
-    setIsLoading(true)
-    try {
+      if (!isCaptchaValid) {
+        showToast(t("register.errors.captcha") || "驗證碼錯誤，請重新輸入", "warning")
+        await refreshCaptchaWith429Notice()
+        return
+      }
+      if (captchaLoadFailed || !captchaId) {
+        if (isCaptchaRateLimited) {
+          showToast(tooManyRequestsMsg, "warning")
+          return
+        }
+        showToast(
+          t("register.errors.submit") ||
+            "Captcha challenge unavailable. Please refresh and try again.",
+          "error"
+        )
+        return
+      }
+
       const payload = formDataToRegisterPayload({
-        ...formData,
+        ...parsed.data,
         captchaId,
         captcha: captchaInput,
       })
       if (process.env.NODE_ENV !== "production") {
         console.debug("[Register] Request payload:", payload)
       }
-      await register(payload)
-      setFormData({ ...INITIAL_REGISTER_FORM })
-      await refreshCaptchaWith429Notice()
-      setRegistrationSuccess(true)
-    } catch (err) {
-      const status =
-        err && typeof err === "object" && "status" in err
-          ? (err as { status: number }).status
-          : undefined
-      const data =
-        err && typeof err === "object" && "data" in err
-          ? (err as { data: unknown }).data
-          : undefined
-      console.error("[Register] Error:", { status, data, fullError: err })
-      const msg = getErrorMessage(err)
-      if (status === 409) {
-        showToast(
-          msg ||
-            t("register.errors.duplicate409") ||
-            "This account has already submitted a registration request.",
-          "error"
-        )
-      } else if (isCaptchaInvalidOrExpired(status, msg)) {
-        showToast(
-          msg || t("register.errors.captcha") || "Invalid captcha, please try again.",
-          "warning"
-        )
+
+      try {
+        await registerMutation.mutateAsync(payload)
+        form.reset()
         await refreshCaptchaWith429Notice()
-      } else {
-        showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
+        setRegistrationSuccess(true)
+      } catch (err) {
+        const status =
+          err && typeof err === "object" && "status" in err
+            ? (err as { status: number }).status
+            : undefined
+        const data =
+          err && typeof err === "object" && "data" in err
+            ? (err as { data: unknown }).data
+            : undefined
+        console.error("[Register] Error:", { status, data, fullError: err })
+        const msg = getErrorMessage(err)
+        if (status === 409) {
+          showToast(
+            msg ||
+              t("register.errors.duplicate409") ||
+              "This account has already submitted a registration request.",
+            "error"
+          )
+        } else if (isCaptchaInvalidOrExpired(status, msg)) {
+          showToast(
+            msg || t("register.errors.captcha") || "Invalid captcha, please try again.",
+            "warning"
+          )
+          await refreshCaptchaWith429Notice()
+        } else {
+          showToast(msg || t("register.errors.submit") || "註冊失敗，請稍後再試", "error")
+        }
       }
-    } finally {
-      setIsLoading(false)
-    }
+    },
+  })
+
+  const clearFieldError = (name: keyof RegisterFormData) => {
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
   }
 
   const captchaPlaceholder = t("register.placeholders.captcha") || "請輸入驗證碼"
@@ -228,231 +237,403 @@ export default function RegisterForm() {
             {t("register.title") || "會員註冊"}
           </h1>
 
-          <form onSubmit={handleSubmit} className="registration-form space-y-4">
-            <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <FieldWithError error={fieldErrors.companyNameVi}>
-                  <Input
-                    placeholder={t("register.placeholders.companyNameVi") || "公司名稱（越文）"}
-                    value={formData.companyNameVi}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("companyNameVi", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-                <FieldWithError error={fieldErrors.companyNameCn}>
-                  <Input
-                    placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
-                    value={formData.companyNameCn}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("companyNameCn", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-              </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              void form.handleSubmit()
+            }}
+            className="registration-form space-y-4"
+          >
+            <form.Subscribe
+              selector={(state) => state.values}
+              children={(values) => (
+                <>
+                  <div className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(
+                            t("register.placeholders.companyNameVi") || "公司名稱（越文）"
+                          )}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={
+                            t("register.placeholders.companyNameVi") || "公司名稱（越文）"
+                          }
+                          value={values.companyNameVi}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("companyNameVi", e.target.value)
+                            clearFieldError("companyNameVi")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={
+                            fieldErrors.companyNameVi
+                              ? [{ message: fieldErrors.companyNameVi }]
+                              : undefined
+                          }
+                        />
+                      </Field>
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(
+                            t("register.placeholders.companyNameCn") || "公司名稱（中文）"
+                          )}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={
+                            t("register.placeholders.companyNameCn") || "公司名稱（中文）"
+                          }
+                          value={values.companyNameCn}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("companyNameCn", e.target.value)
+                            clearFieldError("companyNameCn")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={
+                            fieldErrors.companyNameCn
+                              ? [{ message: fieldErrors.companyNameCn }]
+                              : undefined
+                          }
+                        />
+                      </Field>
+                    </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <FieldWithError error={fieldErrors.phone}>
-                  <Input
-                    placeholder={t("register.placeholders.phone") || "電話"}
-                    value={formData.phone}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("phone", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-                <FieldWithError error={fieldErrors.taxId}>
-                  <Input
-                    placeholder={t("register.placeholders.taxId") || "稅號"}
-                    value={formData.taxId}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("taxId", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-              </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(t("register.placeholders.phone") || "電話")}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={t("register.placeholders.phone") || "電話"}
+                          value={values.phone}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("phone", e.target.value)
+                            clearFieldError("phone")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={fieldErrors.phone ? [{ message: fieldErrors.phone }] : undefined}
+                        />
+                      </Field>
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(t("register.placeholders.taxId") || "稅號")}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={t("register.placeholders.taxId") || "稅號"}
+                          value={values.taxId}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("taxId", e.target.value)
+                            clearFieldError("taxId")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={fieldErrors.taxId ? [{ message: fieldErrors.taxId }] : undefined}
+                        />
+                      </Field>
+                    </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <FieldWithError error={fieldErrors.contactPerson}>
-                  <Input
-                    placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
-                    value={formData.contactPerson}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("contactPerson", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-                <FieldWithError error={fieldErrors.contactPhone}>
-                  <Input
-                    placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
-                    value={formData.contactPhone}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("contactPhone", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-              </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(
+                            t("register.placeholders.contactPerson") || "聯絡人"
+                          )}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={t("register.placeholders.contactPerson") || "聯絡人"}
+                          value={values.contactPerson}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("contactPerson", e.target.value)
+                            clearFieldError("contactPerson")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={
+                            fieldErrors.contactPerson
+                              ? [{ message: fieldErrors.contactPerson }]
+                              : undefined
+                          }
+                        />
+                      </Field>
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(
+                            t("register.placeholders.contactPhone") || "聯絡人電話號碼"
+                          )}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={t("register.placeholders.contactPhone") || "聯絡人電話號碼"}
+                          value={values.contactPhone}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("contactPhone", e.target.value)
+                            clearFieldError("contactPhone")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={
+                            fieldErrors.contactPhone
+                              ? [{ message: fieldErrors.contactPhone }]
+                              : undefined
+                          }
+                        />
+                      </Field>
+                    </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <FieldWithError error={fieldErrors.companyAddress}>
-                  <Input
-                    placeholder={t("register.placeholders.companyAddress") || "公司地址"}
-                    value={formData.companyAddress}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("companyAddress", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-                <FieldWithError error={fieldErrors.email}>
-                  <Input
-                    type="email"
-                    placeholder={t("register.placeholders.email") || "電子郵件"}
-                    value={formData.email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("email", e.target.value)
-                    }
-                    required
-                  />
-                </FieldWithError>
-              </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(
+                            t("register.placeholders.companyAddress") || "公司地址"
+                          )}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          placeholder={t("register.placeholders.companyAddress") || "公司地址"}
+                          value={values.companyAddress}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("companyAddress", e.target.value)
+                            clearFieldError("companyAddress")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={
+                            fieldErrors.companyAddress
+                              ? [{ message: fieldErrors.companyAddress }]
+                              : undefined
+                          }
+                        />
+                      </Field>
+                      <Field className="gap-1.5">
+                        <FieldLabel className="text-foreground text-sm font-medium">
+                          {stripTrailingAsterisk(t("register.placeholders.email") || "電子郵件")}
+                          <RequiredMark />
+                        </FieldLabel>
+                        <Input
+                          type="email"
+                          placeholder={t("register.placeholders.emailExample", {
+                            defaultValue: "name@company.com",
+                          })}
+                          value={values.email}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("email", e.target.value)
+                            clearFieldError("email")
+                          }}
+                          required
+                        />
+                        <FieldError
+                          errors={fieldErrors.email ? [{ message: fieldErrors.email }] : undefined}
+                        />
+                      </Field>
+                    </div>
 
-              <div className="registration-form gap-4 md:grid-cols-2">
-                <FieldWithError error={fieldErrors.country}>
-                  <SearchableSelect
-                    value={formData.country}
-                    onValueChange={(v) => handleInputChange("country", v)}
-                    options={countries}
-                    placeholder={t("register.placeholders.country") || "Select Country *"}
-                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                    emptyText={t("common.noResults", { defaultValue: "No results." })}
-                  />
-                </FieldWithError>
-              </div>
+                    <Field className="gap-1.5">
+                      <FieldLabel className="text-foreground text-sm font-medium">
+                        {stripTrailingAsterisk(
+                          t("register.placeholders.country") || "Select Country *"
+                        )}
+                        <RequiredMark />
+                      </FieldLabel>
+                      <SearchableSelect
+                        value={values.country}
+                        onValueChange={(v) => {
+                          form.setFieldValue("country", v)
+                          clearFieldError("country")
+                        }}
+                        options={countries}
+                        placeholder={t("register.placeholders.country") || "Select Country *"}
+                        searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                        emptyText={t("common.noResults", { defaultValue: "No results." })}
+                      />
+                      <FieldError
+                        errors={
+                          fieldErrors.country ? [{ message: fieldErrors.country }] : undefined
+                        }
+                      />
+                    </Field>
 
-              <FieldWithError error={fieldErrors.industry}>
-                <Select
-                  value={formData.industry}
-                  onValueChange={(v) => handleInputChange("industry", v)}
-                  required
-                >
-                  <Select.Trigger className="w-full">
-                    <Select.Value
-                      placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
-                    />
-                  </Select.Trigger>
-                  <Select.Content>
-                    {categories.map((cat) => (
-                      <Select.Item key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select>
-              </FieldWithError>
+                    <Field className="gap-1.5">
+                      <FieldLabel className="text-foreground text-sm font-medium">
+                        {stripTrailingAsterisk(
+                          t("register.placeholders.industry") || "選擇產業類別 *"
+                        )}
+                        <RequiredMark />
+                      </FieldLabel>
+                      <Select
+                        value={values.industry}
+                        onValueChange={(v) => {
+                          form.setFieldValue("industry", v)
+                          clearFieldError("industry")
+                        }}
+                        required
+                      >
+                        <Select.Trigger className="w-full">
+                          <Select.Value
+                            placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
+                          />
+                        </Select.Trigger>
+                        <Select.Content>
+                          {categories.map((cat) => (
+                            <Select.Item key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select>
+                      <FieldError
+                        errors={
+                          fieldErrors.industry ? [{ message: fieldErrors.industry }] : undefined
+                        }
+                      />
+                    </Field>
 
-              <FieldWithError error={fieldErrors.website}>
-                <div className="space-y-1">
-                  <Input
-                    placeholder={t("register.placeholders.website") || "網站 *"}
-                    value={formData.website}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange("website", e.target.value)
-                    }
-                    required
-                  />
-                  <p className="text-muted-foreground text-xs">
-                    {t("register.hints.websiteFormat") ||
-                      "Example: https://your-company.com or your-company.com"}
-                  </p>
-                </div>
-              </FieldWithError>
+                    <Field className="gap-1.5">
+                      <FieldLabel className="text-foreground text-sm font-medium">
+                        {stripTrailingAsterisk(t("register.placeholders.website") || "網站 *")}
+                        <RequiredMark />
+                      </FieldLabel>
+                      <div className="space-y-1">
+                        <Input
+                          placeholder={
+                            t("register.hints.websiteFormat") ||
+                            "Example: https://your-company.com or your-company.com"
+                          }
+                          value={values.website}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            form.setFieldValue("website", e.target.value)
+                            clearFieldError("website")
+                          }}
+                          required
+                        />
+                      </div>
+                      <FieldError
+                        errors={
+                          fieldErrors.website ? [{ message: fieldErrors.website }] : undefined
+                        }
+                      />
+                    </Field>
 
-              <FieldWithError error={fieldErrors.introduction}>
-                <Textarea
-                  placeholder={t("register.placeholders.introduction") || "簡單介紹 *"}
-                  value={formData.introduction}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    handleInputChange("introduction", e.target.value)
-                  }
-                  rows={4}
-                  required
-                />
-              </FieldWithError>
-            </div>
+                    <Field className="gap-1.5">
+                      <FieldLabel className="text-foreground text-sm font-medium">
+                        {stripTrailingAsterisk(
+                          t("register.placeholders.introduction") || "簡單介紹 *"
+                        )}
+                        <RequiredMark />
+                      </FieldLabel>
+                      <Textarea
+                        placeholder={t("register.placeholders.introduction") || "簡單介紹 *"}
+                        value={values.introduction}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                          form.setFieldValue("introduction", e.target.value)
+                          clearFieldError("introduction")
+                        }}
+                        rows={4}
+                        required
+                      />
+                      <FieldError
+                        errors={
+                          fieldErrors.introduction
+                            ? [{ message: fieldErrors.introduction }]
+                            : undefined
+                        }
+                      />
+                    </Field>
+                  </div>
 
-            <div className="flex items-center justify-center gap-4 pt-4">
-              <Input
-                placeholder={captchaPlaceholder}
-                value={captchaInput}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCaptchaInput(e.target.value)
-                }
-                required
-                className="w-[20%]"
-              />
-              {captchaVisual?.kind === "image" ? (
-                <button
-                  type="button"
-                  className="border-border bg-muted flex h-[45px] w-[150px] cursor-pointer items-center justify-center overflow-hidden rounded border"
-                  onClick={() => void refreshCaptchaWith429Notice()}
-                  title={captchaRefreshTitle}
-                  disabled={isCaptchaLoading}
-                >
-                  <img
-                    src={captchaVisual.src}
-                    alt=""
-                    className="max-h-[45px] max-w-[150px] object-contain"
-                  />
-                </button>
-              ) : (
-                <canvas
-                  ref={canvasRef}
-                  width={150}
-                  height={45}
-                  className="border-border bg-muted cursor-pointer rounded border"
-                  onClick={() => void refreshCaptchaWith429Notice()}
-                  title={captchaRefreshTitle}
-                />
+                  <div className="flex w-full justify-center overflow-x-auto pt-4">
+                    <div
+                      role="group"
+                      className="flex w-full max-w-4xl min-w-0 flex-nowrap items-center justify-center gap-3 sm:gap-4"
+                    >
+                      <FieldLabel className="text-foreground mb-0 shrink-0 text-sm font-medium whitespace-nowrap">
+                        {stripTrailingAsterisk(captchaPlaceholder)}
+                        <RequiredMark />
+                      </FieldLabel>
+                      <Input
+                        placeholder={captchaPlaceholder}
+                        value={captchaInput}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setCaptchaInput(e.target.value)
+                        }
+                        required
+                        className="h-10 w-[min(160px,28vw)] shrink-0 sm:w-40"
+                      />
+                      {captchaVisual?.kind === "image" ? (
+                        <button
+                          type="button"
+                          className="border-border bg-muted flex h-[45px] w-[150px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded border"
+                          onClick={() => void refreshCaptchaWith429Notice()}
+                          title={captchaRefreshTitle}
+                          disabled={isCaptchaLoading}
+                        >
+                          <img
+                            src={captchaVisual.src}
+                            alt=""
+                            className="max-h-[45px] max-w-[150px] object-contain"
+                          />
+                        </button>
+                      ) : (
+                        <canvas
+                          ref={canvasRef}
+                          width={150}
+                          height={45}
+                          className="border-border bg-muted shrink-0 cursor-pointer rounded border"
+                          onClick={() => void refreshCaptchaWith429Notice()}
+                          title={captchaRefreshTitle}
+                        />
+                      )}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => void refreshCaptchaWith429Notice()}
+                        className="h-9 w-9 shrink-0"
+                        title={captchaRefreshTitle}
+                        disabled={isCaptchaLoading}
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center pt-6">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground w-full max-w-md py-6 font-semibold"
+                      disabled={registerMutation.isPending}
+                    >
+                      {registerMutation.isPending
+                        ? t("register.processing") || "處理中..."
+                        : t("register.submit") || "會員註冊"}
+                    </Button>
+                  </div>
+
+                  <div className="text-muted-foreground pt-2 text-center text-sm">
+                    {t("register.hasAccount") || "已經有帳號？"}{" "}
+                    <Link href="/login" className="text-primary font-medium hover:underline">
+                      {t("register.loginLink") || "立即登入"}
+                    </Link>
+                  </div>
+                </>
               )}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => void refreshCaptchaWith429Notice()}
-                className="h-9 w-9"
-                title={captchaRefreshTitle}
-                disabled={isCaptchaLoading}
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex justify-center pt-6">
-              <Button
-                type="submit"
-                variant="primary"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground w-full max-w-md py-6 font-semibold"
-                disabled={isLoading}
-              >
-                {isLoading
-                  ? t("register.processing") || "處理中..."
-                  : t("register.submit") || "會員註冊"}
-              </Button>
-            </div>
-
-            <div className="text-muted-foreground pt-2 text-center text-sm">
-              {t("register.hasAccount") || "已經有帳號？"}{" "}
-              <Link href="/login" className="text-primary font-medium hover:underline">
-                {t("register.loginLink") || "立即登入"}
-              </Link>
-            </div>
+            />
           </form>
         </div>
       </div>

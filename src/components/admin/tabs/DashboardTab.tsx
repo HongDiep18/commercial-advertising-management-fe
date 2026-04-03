@@ -5,19 +5,28 @@ import { useTranslation } from "react-i18next"
 import { Building2, Clock, Megaphone } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
 
-import { useAdminData } from "../AdminDataContext"
-import { ProfileRequestStatus } from "@/types/admin"
+import { getAllProfileRequests } from "@/api/admin"
+import { adminCompanyRequestsKeys } from "@/api/admin/hooks"
 import { useAdminCompaniesStats } from "@/api/admin-companies/hooks"
 import { useAdminOrders } from "@/api/ad-orders-admin/hooks"
+import { ProfileRequestStatus } from "@/types/admin"
+import { useQuery } from "@tanstack/react-query"
 import { DashboardNotificationsCard } from "./DashboardNotificationsCard"
 
 export function DashboardTab() {
   const { t } = useTranslation()
-  const { companyRequests } = useAdminData()
 
-  const pendingCount = companyRequests.filter(
-    (c) => c.status === ProfileRequestStatus.PENDING
-  ).length
+  const { data: pendingCount = 0 } = useQuery({
+    queryKey: adminCompanyRequestsKeys.count(ProfileRequestStatus.PENDING),
+    queryFn: async () => {
+      const r = await getAllProfileRequests({
+        page: 1,
+        limit: 1,
+        status: ProfileRequestStatus.PENDING,
+      })
+      return r.pagination?.total ?? 0
+    },
+  })
 
   const { data: companiesStatsData, isLoading: isCompaniesLoading } = useAdminCompaniesStats(true)
   const { data: pendingOrdersData, isLoading: isAdOrdersLoading } = useAdminOrders({
@@ -39,7 +48,7 @@ export function DashboardTab() {
     },
     {
       labelKey: "pendingApplications",
-      value: String(pendingCount),
+      value: String(pendingCount ?? 0),
       icon: Clock,
       trend: "",
       color: "text-amber-600",

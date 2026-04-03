@@ -603,6 +603,7 @@
       "contactPhone": "聯絡人電話號碼",
       "companyAddress": "公司地址",
       "email": "電子郵件",
+      "emailExample": "例如：name@company.com",
       "country": "選擇產地 *",
       "region": "選擇地區 *",
       "industry": "選擇產業類別 *",
@@ -625,7 +626,7 @@
       "captcha": "驗證碼錯誤，請重新輸入",
       "tooManyRequests": "請求過於頻繁，請稍候再試。",
       "submit": "註冊失敗，請稍後再試",
-      "invalidWebsite": "請輸入有效的網站網址。",
+      "invalidWebsite": "請輸入有效的網站網址 (例如：https://your-company.com 或 http://your-company.com)",
       "duplicate409": "此帳號已提交過註冊申請。",
       "invalidTaxId": "稅號只能包含數字",
       "duplicatePhone": "請輸入與公司電話不同的聯絡人電話號碼"
@@ -1336,7 +1337,7 @@
     "advertising": {
       "assets": "附件",
       "monthlyRevenue": "本月營收",
-      "adOrders": "廣告訂單",
+      "adOrders": "本月廣告訂單（所有狀態）",
       "monthlyGrowth": "月增長率",
       "orderHistory": "廣告訂單紀錄",
       "packageManagementTab": "廣告方案管理",
