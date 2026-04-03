@@ -35,6 +35,8 @@ export type OrderItemValues = {
 
 export type OrderItemData = {
   id: string
+  categoryName?: string
+  packageTypeName?: string
   category: string
   price: string
   packageType?: string
@@ -205,6 +207,13 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
 
   const initialValues: FormValues = { ...DEFAULT_VALUES, ...defaultValues }
 
+  if (!formConfig.requiresStartDate) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const startDate = format(today, "yyyy-MM-dd")
+    initialValues.startDate = startDate
+  }
+
   if (formConfig.requiresStartDate && hasDuration) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -297,10 +306,14 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
       <div className="border-border mb-4 flex items-center justify-between border-b pb-3">
         <div>
           <p className="text-primary mb-1 text-xs font-medium">
-            {t(`adCategory.${orderItemData.category}`)}
+            {orderItemData.categoryName
+              ? orderItemData.categoryName
+              : t(`adCategory.${orderItemData.category}`)}
           </p>
           <p className="text-foreground font-semibold">
-            {orderItemData.packageType && translateAdPackageType(t, orderItemData.packageType)}
+            {orderItemData.packageTypeName
+              ? orderItemData.packageTypeName
+              : orderItemData.packageType && translateAdPackageType(t, orderItemData.packageType)}
           </p>
           {(durationString || orderItemData.price) && (
             <p className="text-muted-foreground mt-1 text-sm">
