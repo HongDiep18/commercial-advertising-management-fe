@@ -56,6 +56,7 @@ export type AdPackageFormConfig = {
   requiresAdLink: boolean
   requiresDesignService: boolean
   requiresAssets: boolean
+  requiresActiveToggle?: boolean
 }
 
 export type PublicAdPackageItem = {
