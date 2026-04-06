@@ -8,7 +8,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import Input from "@/components/ui/Input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/shadcn-popover"
 import { Switch } from "@/components/ui/switch"
-import { addDurationToDateStr, isDateDisabled } from "@/data/contactMockData"
+import { addDurationToDateStr } from "@/data/contactMockData"
 import { useForm } from "@tanstack/react-form-nextjs"
 import { format } from "date-fns"
 import type { TFunction } from "i18next"
@@ -80,6 +80,8 @@ type AdItemFormProps = {
   onDelete?: () => void
   /** Dims the card when true (item is marked for deletion) */
   isDeleted?: boolean
+  /** Return true for dates that should be disabled in the start date calendar */
+  disabledDates?: (date: Date) => boolean
 }
 
 const IMAGE_EXTS = /\.(jpe?g|png|gif|webp|avif|svg)$/i
@@ -182,6 +184,7 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
     mode = "standalone",
     onDelete,
     isDeleted = false,
+    disabledDates,
   },
   ref
 ) {
@@ -240,10 +243,10 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
     for (let i = 0; i < 365; i++) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
-      if (!isDateDisabled(orderItemData.id, date)) return date
+      if (!disabledDates?.(date)) return date
     }
     return today
-  }, [orderItemData.id])
+  }, [disabledDates])
 
   const handleStartDateSelect = (date: Date | undefined) => {
     if (!date) return
@@ -409,7 +412,7 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
                         onSelect={handleStartDateSelect}
                         disabled={(date) => {
                           if (date < new Date(new Date().setHours(0, 0, 0, 0))) return true
-                          return isDateDisabled(orderItemData.id, date)
+                          return disabledDates?.(date) ?? false
                         }}
                         className="w-full"
                         initialFocus
