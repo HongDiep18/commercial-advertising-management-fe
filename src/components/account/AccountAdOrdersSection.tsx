@@ -405,6 +405,7 @@ export function AccountAdOrdersSection() {
               <div className="border-t pt-4">
                 <AdOrderPreviewButton
                   orderId={selectedOrder.id}
+                  itemPackageTypes={selectedOrder.items.map((item) => item.packageType)}
                   labelKey="account.previewOrder"
                   labelDefault="Preview on website"
                   variant="outline"

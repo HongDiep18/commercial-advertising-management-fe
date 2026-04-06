@@ -50,7 +50,11 @@ export default function ContactPageClient() {
   const [selectedItems, setSelectedItems] = useState<SelectedEntry[]>([])
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [showOrderModal, setShowOrderModal] = useState(false)
-  const [successOrder, setSuccessOrder] = useState<{ orderId: string; count: number } | null>(null)
+  const [successOrder, setSuccessOrder] = useState<{
+    orderId: string
+    count: number
+    itemPackageTypes: (string | undefined)[]
+  } | null>(null)
   const [toast, setToast] = useState<{
     message: string
     variant: ToastVariant
@@ -213,7 +217,11 @@ export default function ContactPageClient() {
       }
       setShowOrderModal(false)
       setSelectedItems([])
-      setSuccessOrder({ orderId, count: totalQuantity })
+      const itemPackageTypes = input.items.map((item) => {
+        const selectedItem = selectedItemsById[item.pricingId]
+        return selectedItem?.packageType
+      })
+      setSuccessOrder({ orderId, count: totalQuantity, itemPackageTypes })
     } catch (err) {
       const apiErr = err as { data?: { code?: string } }
       if (apiErr?.data?.code === "AD_ORDER_SLOT_NOT_AVAILABLE") {
@@ -299,6 +307,7 @@ export default function ContactPageClient() {
           {successOrder && (
             <AdOrderPreviewButton
               orderId={successOrder.orderId}
+              itemPackageTypes={successOrder.itemPackageTypes}
               labelKey="adContact.previewAd"
               labelDefault="Preview ad"
               variant="outline"
