@@ -60,9 +60,7 @@ export function CompanyActiveAdsDialog({ companyId, companyName, open, onOpenCha
           )}
 
           {!isLoading && !isError && data?.items.length === 0 && (
-            <p className="text-muted-foreground text-sm">
-              {t("admin.activeAds.empty", "No active ads found for this company.")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("admin.activeAds.empty")}</p>
           )}
 
           {!isLoading &&

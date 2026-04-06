@@ -64,6 +64,7 @@ export function CompanyActiveAdRow({ ad, companyId, locale }: CompanyActiveAdRow
   const formConfig = {
     ...ad.formConfig,
     requiresActiveToggle: true,
+    requiresDesignService: false,
   }
 
   const defaultValues: Partial<OrderItemValues> = {

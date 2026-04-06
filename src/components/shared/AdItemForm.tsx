@@ -158,13 +158,6 @@ function runValidation(
     }
     return { errors }
   }
-  if (
-    formConfig.requiresAssets &&
-    values.files.length === 0 &&
-    (values.existingAssets ?? []).length === 0
-  ) {
-    return { errors: { files: t("formValidation.filesRequired") } }
-  }
   if (values.startDate && values.endDate && values.endDate < values.startDate) {
     return { errors: { endDate: t("formValidation.endDateBeforeStart") } }
   }
@@ -212,20 +205,6 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
     today.setHours(0, 0, 0, 0)
     const startDate = format(today, "yyyy-MM-dd")
     initialValues.startDate = startDate
-  }
-
-  if (formConfig.requiresStartDate && hasDuration) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const startDate = format(today, "yyyy-MM-dd")
-    initialValues.startDate = startDate
-    if (hasDuration) {
-      initialValues.endDate = addDurationToDateStr(
-        startDate,
-        orderItemData.durationValue!,
-        orderItemData.durationUnit!
-      )
-    }
   }
 
   const form = useForm({ defaultValues: initialValues })
@@ -305,11 +284,14 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
     >
       <div className="border-border mb-4 flex items-center justify-between border-b pb-3">
         <div>
-          <p className="text-primary mb-1 text-xs font-medium">
-            {orderItemData.categoryName
-              ? orderItemData.categoryName
-              : t(`adCategory.${orderItemData.category}`)}
-          </p>
+          {orderItemData.category ||
+            (orderItemData.categoryName && (
+              <p className="text-primary mb-1 text-xs font-medium">
+                {orderItemData.categoryName
+                  ? orderItemData.categoryName
+                  : t(`adCategory.${orderItemData.category}`)}
+              </p>
+            ))}
           <p className="text-foreground font-semibold">
             {orderItemData.packageTypeName
               ? orderItemData.packageTypeName
@@ -452,9 +434,11 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
                           disabled={hasDuration}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {endDate
-                            ? formatDate(new Date(endDate))
-                            : t("adContact.selectEndDate", "Select end date")}
+                          {!endDate && hasDuration
+                            ? t("adContact.autoCalculated")
+                            : endDate
+                              ? formatDate(new Date(endDate))
+                              : t("adContact.selectEndDate", "Select end date")}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent
