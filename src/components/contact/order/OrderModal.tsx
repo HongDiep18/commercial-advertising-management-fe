@@ -5,6 +5,7 @@ import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
 import { hasOverlapWithExistingOrders, type NewOrderItem } from "@/api/ad-orders/overlap"
 import { type AdOrderAssetToUpload, getMyPendingOrderItems } from "@/api/ad-orders/service"
 import type { AdPackageFormConfig } from "@/api/ads-pricing/types"
+import { useBookedDates } from "@/api/active-ads/hooks"
 import { getProfile } from "@/api/profile"
 import AdItemForm, {
   type AdItemFormHandle,
@@ -15,12 +16,56 @@ import Input from "@/components/ui/Input"
 import { Label } from "@/components/ui/Label"
 import Textarea from "@/components/ui/Textarea"
 import { useUser } from "@/contexts/user-context"
+import { addDuration } from "@/data/contactMockData"
 import type { CreateAdOrderInput } from "@/types/types"
 import { isValidPhone } from "@/utils/validation/phone"
 import { useQueryClient } from "@tanstack/react-query"
 import { Send, X } from "lucide-react"
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+
+type AdItemWithBookedDatesProps = {
+  item: SelectedItem
+  orderItemData: OrderItemData
+  formConfig?: AdPackageFormConfig
+  defaultValues: Partial<{ quantity: number }>
+  formRef: React.RefObject<AdItemFormHandle | null>
+}
+
+function AdItemFormWithBookedDates({
+  item,
+  orderItemData,
+  formConfig,
+  defaultValues,
+  formRef,
+}: AdItemWithBookedDatesProps) {
+  const { data: bookedDatesData } = useBookedDates(item.packageType)
+
+  const disabledDates = useCallback(
+    (date: Date): boolean => {
+      if (!bookedDatesData?.fullyBookedRanges?.length) return false
+      if (!item.durationValue || !item.durationUnit) return false
+      const endDate = addDuration(date, item.durationValue, item.durationUnit)
+      return bookedDatesData.fullyBookedRanges.some((range) => {
+        const rangeStart = new Date(range.startDate)
+        const rangeEnd = range.endDate ? new Date(range.endDate) : null
+        return (rangeEnd === null || date < rangeEnd) && endDate > rangeStart
+      })
+    },
+    [bookedDatesData, item.durationValue, item.durationUnit]
+  )
+
+  return (
+    <AdItemForm
+      ref={formRef}
+      mode="controlled"
+      orderItemData={orderItemData}
+      defaultValues={defaultValues}
+      formConfig={formConfig}
+      disabledDates={disabledDates}
+    />
+  )
+}
 
 type OrderForm = {
   company: string
@@ -298,13 +343,13 @@ export default function OrderModal({
                 }
 
                 return (
-                  <AdItemForm
+                  <AdItemFormWithBookedDates
                     key={item.id}
-                    ref={itemFormRefs[item.id]}
-                    mode="controlled"
+                    item={item}
                     orderItemData={orderItemData}
                     defaultValues={{ quantity: item.quantity ?? 1 }}
                     formConfig={item.formConfig}
+                    formRef={itemFormRefs[item.id]}
                   />
                 )
               })}
