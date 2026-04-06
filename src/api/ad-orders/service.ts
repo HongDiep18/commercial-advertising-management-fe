@@ -15,6 +15,7 @@ export type AdOrderPreviewResponse = {
 export type MyAdOrderItem = {
   id: string
   packageName: string
+  packageType: string
   pricingName: string
   price: number
   designServiceRequired: boolean

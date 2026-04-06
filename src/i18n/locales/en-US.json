@@ -9,7 +9,8 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
-    "required": "Required"
+    "required": "Required",
+    "active": "Active"
   },
   "header": {
     "aboutUs": "About Us",
@@ -187,12 +188,6 @@
     "select": "Select",
     "adItem": "Advertising Item",
     "duration": "Duration",
-    "durationUnit": {
-      "MONTH": "month",
-      "DAY": "day",
-      "WEEK": "week",
-      "YEAR": "year"
-    },
     "price": "Price",
     "discount": "Discount",
     "pricingLoadError": "Unable to load pricing from server. Please try again later.",
@@ -217,6 +212,7 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "selectStartDate": "Please select start date",
+    "selectEndDate": "Select end date",
     "autoCalculated": "Auto-calculated by system",
     "bookedDatesNote": "Gray dates are already booked and cannot be selected",
     "adLink": "Advertising Link URL",
@@ -1533,7 +1529,8 @@
       "createSuccess": "Active ad created.",
       "createError": "Could not create active ad. Please try again.",
       "createInvalidRange": "End must be after start.",
-      "createShowButton": "+ Create"
+      "createShowButton": "+ Create",
+      "empty": "No active ads for this company."
     },
     "property": {
       "listingsCount": "{{count}} listings",
@@ -1808,6 +1805,23 @@
     "previewMode": "PREVIEW MODE",
     "order": "Order",
     "close": "Close preview"
+  },
+  "formValidation": {
+    "filesRequired": "Please upload at least one file",
+    "endDateBeforeStart": "End date cannot be before start date"
+  },
+  "adCategory": {
+    "HOMEPAGE_POPUP": "Homepage Popup",
+    "FEATURED_COMPANY": "Featured Company",
+    "COMPANY_DIRECTORY": "Company Directory",
+    "PLATFORM_PRINT": "Platform Print",
+    "PRODUCT_LISTING": "Product Listing"
+  },
+  "durationUnit": {
+    "MONTH": "month",
+    "DAY": "day",
+    "WEEK": "week",
+    "YEAR": "year"
   },
   "adPreview": {
     "notAccessibleTitle": "Preview not accessible",

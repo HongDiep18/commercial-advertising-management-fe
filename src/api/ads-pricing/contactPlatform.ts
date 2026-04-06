@@ -1,4 +1,8 @@
-import type { PublicAdPackageCategoryItem, PublicAdPackagePricingItem } from "./types"
+import type {
+  AdPackageFormConfig,
+  PublicAdPackageCategoryItem,
+  PublicAdPackagePricingItem,
+} from "./types"
 
 export type PlatformCatalogItem = {
   id: string
@@ -9,11 +13,13 @@ export type PlatformCatalogItem = {
   pricingId: string
   categoryId: string
   categoryName: string
-  packageType?: string
-  categoryType?: string
+  packageType: string
+  categoryType: string
   placementKey?: string
   durationValue?: number | null
   durationUnit?: string | null
+  metadata: Record<string, unknown> | null
+  formConfig?: AdPackageFormConfig
 }
 
 const DURATION_PLURALS: Record<string, string> = {
@@ -101,6 +107,8 @@ export function flattenPlatformCatalog(
           placementKey,
           durationValue: pricing.durationValue,
           durationUnit: pricing.durationUnit,
+          formConfig: pkg.formConfig,
+          metadata: pkg.metadata,
         })
       }
     }

@@ -4,21 +4,68 @@ import type { UiAdItemDetails, UiSelectedAdItem } from "@/api/ad-orders/builders
 import { buildCreateAdOrderInput } from "@/api/ad-orders/builders"
 import { hasOverlapWithExistingOrders, type NewOrderItem } from "@/api/ad-orders/overlap"
 import { type AdOrderAssetToUpload, getMyPendingOrderItems } from "@/api/ad-orders/service"
+import type { AdPackageFormConfig } from "@/api/ads-pricing/types"
+import { useBookedDates } from "@/api/active-ads/hooks"
 import { getProfile } from "@/api/profile"
+import AdItemForm, {
+  type AdItemFormHandle,
+  type OrderItemData,
+} from "@/components/shared/AdItemForm"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
 import { Label } from "@/components/ui/Label"
 import Textarea from "@/components/ui/Textarea"
 import { useUser } from "@/contexts/user-context"
-import { addDurationToDateStr, addMonths, getDurationMonths } from "@/data/contactMockData"
+import { addDuration } from "@/data/contactMockData"
 import type { CreateAdOrderInput } from "@/types/types"
 import { isValidPhone } from "@/utils/validation/phone"
 import { useQueryClient } from "@tanstack/react-query"
-import { format } from "date-fns"
 import { Send, X } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import AdItemForm from "./AdItemForm"
+
+type AdItemWithBookedDatesProps = {
+  item: SelectedItem
+  orderItemData: OrderItemData
+  formConfig?: AdPackageFormConfig
+  defaultValues: Partial<{ quantity: number }>
+  formRef: React.RefObject<AdItemFormHandle | null>
+}
+
+function AdItemFormWithBookedDates({
+  item,
+  orderItemData,
+  formConfig,
+  defaultValues,
+  formRef,
+}: AdItemWithBookedDatesProps) {
+  const { data: bookedDatesData } = useBookedDates(item.packageType)
+
+  const disabledDates = useCallback(
+    (date: Date): boolean => {
+      if (!bookedDatesData?.fullyBookedRanges?.length) return false
+      if (!item.durationValue || !item.durationUnit) return false
+      const endDate = addDuration(date, item.durationValue, item.durationUnit)
+      return bookedDatesData.fullyBookedRanges.some((range) => {
+        const rangeStart = new Date(range.startDate)
+        const rangeEnd = range.endDate ? new Date(range.endDate) : null
+        return (rangeEnd === null || date < rangeEnd) && endDate > rangeStart
+      })
+    },
+    [bookedDatesData, item.durationValue, item.durationUnit]
+  )
+
+  return (
+    <AdItemForm
+      ref={formRef}
+      mode="controlled"
+      orderItemData={orderItemData}
+      defaultValues={defaultValues}
+      formConfig={formConfig}
+      disabledDates={disabledDates}
+    />
+  )
+}
 
 type OrderForm = {
   company: string
@@ -26,15 +73,6 @@ type OrderForm = {
   phone: string
   email: string
   notes: string
-}
-
-type ItemDetail = {
-  startDate: string
-  endDate: string
-  needDesign: boolean
-  adLink: string
-  files: File[]
-  quantity?: number
 }
 
 type SelectedItem = {
@@ -47,6 +85,7 @@ type SelectedItem = {
   packageType?: string
   durationValue?: number | null
   durationUnit?: string | null
+  formConfig?: AdPackageFormConfig
 }
 
 type OrderModalProps = {
@@ -67,7 +106,6 @@ export default function OrderModal({
   selectedItems,
   companyId,
   onSubmit,
-  onQuantityChange,
 }: OrderModalProps) {
   const { t, i18n } = useTranslation()
   const [orderForm, setOrderForm] = useState<OrderForm>({
@@ -77,13 +115,16 @@ export default function OrderModal({
     email: "",
     notes: "",
   })
-
-  const [itemDetails, setItemDetails] = useState<Record<string, ItemDetail>>({})
-  const [openCalendar, setOpenCalendar] = useState<string | null>(null)
-  const [calendarDefaultMonth, setCalendarDefaultMonth] = useState<Date | undefined>(undefined)
-
   const [phoneError, setPhoneError] = useState<string | null>(null)
   const [slotError, setSlotError] = useState<string | null>(null)
+
+  const itemFormRefs = useMemo<Record<string, React.RefObject<AdItemFormHandle | null>>>(() => {
+    const result: Record<string, React.RefObject<AdItemFormHandle | null>> = {}
+    for (const item of selectedItems) {
+      result[item.id] = React.createRef<AdItemFormHandle>()
+    }
+    return result
+  }, [selectedItems])
 
   const queryClient = useQueryClient()
   const { isLoggedIn, isAuthReady } = useUser()
@@ -120,100 +161,40 @@ export default function OrderModal({
     })()
   }, [i18n.language, isAuthReady, isLoggedIn, isOpen])
 
-  useEffect(() => {
-    if (!isOpen) {
-      setSlotError(null)
-      setCalendarDefaultMonth(undefined)
-    }
-  }, [isOpen])
-
-  const handleStartDateChange = (
-    itemId: string,
-    date: Date | undefined,
-    duration: string,
-    durationValue?: number | null,
-    durationUnit?: string | null
-  ) => {
-    if (!date) return
-
-    const startDate = format(date, "yyyy-MM-dd")
-    let endDate: string
-    if (durationValue && durationUnit) {
-      endDate = addDurationToDateStr(startDate, durationValue, durationUnit)
-    } else {
-      const months = getDurationMonths(duration)
-      endDate = months > 0 ? addMonths(startDate, months) : startDate
-    }
-
-    setSlotError(null)
-    setItemDetails((prev) => ({
-      ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        startDate,
-        endDate,
-      },
-    }))
-
-    setOpenCalendar(null)
-  }
-
-  const handleItemDetailChange = (
-    itemId: string,
-    field: string,
-    value: string | boolean | number
-  ) => {
-    if (field === "quantity" && typeof value === "number") {
-      onQuantityChange?.(itemId, value)
-    }
-    setItemDetails((prev) => ({
-      ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        [field]: value,
-      },
-    }))
-  }
-
-  const handleFileChange = (itemId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setItemDetails((prev) => ({
-        ...prev,
-        [itemId]: {
-          ...prev[itemId],
-          files: [...(prev[itemId]?.files || []), ...Array.from(e.target.files!)],
-        },
-      }))
-    }
-  }
-
-  const removeFile = (itemId: string, index: number) => {
-    setItemDetails((prev) => ({
-      ...prev,
-      [itemId]: {
-        ...prev[itemId],
-        files: prev[itemId].files.filter((_, i) => i !== index),
-      },
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setSlotError(null)
     if (!isValidPhone(orderForm.phone)) {
       setPhoneError(t("register.errors.invalidPhone"))
       return
     }
     setPhoneError(null)
 
+    // Validate all item forms and collect values
+    const itemDetailsById: Record<string, UiAdItemDetails> = {}
+    for (const item of selectedItems) {
+      const ref = itemFormRefs[item.id]
+      const values = await ref?.current?.validate()
+      if (!values) return // validation failed — errors shown inside that item's form
+      itemDetailsById[item.id] = {
+        startDate: values.startDate,
+        endDate: values.endDate,
+        needDesign: values.needDesign,
+        adLink: values.adLink,
+        files: values.files,
+        quantity: values.quantity,
+      }
+    }
+
     const { input, subtotal } = buildCreateAdOrderInput({
       notes: orderForm.notes,
       companyId: companyId ?? null,
       selectedItems: selectedItems as UiSelectedAdItem[],
-      itemDetailsById: itemDetails as Record<string, UiAdItemDetails>,
+      itemDetailsById,
     })
 
     const newItems: NewOrderItem[] = selectedItems.map((item) => {
-      const details = itemDetails[item.id]
+      const details = itemDetailsById[item.id]
       const sel = item as UiSelectedAdItem
       return {
         packageName: item.name,
@@ -226,15 +207,12 @@ export default function OrderModal({
 
     try {
       const existingItems = await getMyPendingOrderItems()
-      const { overlap, suggestedDate } = hasOverlapWithExistingOrders(existingItems, newItems)
+      const { overlap } = hasOverlapWithExistingOrders(existingItems, newItems)
       if (overlap) {
         setSlotError(
           t("adContact.overlapWarning") ||
             "You already have an order for this advertising package with overlapping dates. Please choose different dates."
         )
-        if (suggestedDate) {
-          setCalendarDefaultMonth(suggestedDate)
-        }
         return
       }
     } catch (err) {
@@ -243,8 +221,7 @@ export default function OrderModal({
 
     const assets: AdOrderAssetToUpload[] = []
     selectedItems.forEach((item) => {
-      const details = itemDetails[item.id]
-      const files = details?.files ?? []
+      const files = itemDetailsById[item.id]?.files ?? []
       const pricingId = (item as UiSelectedAdItem).pricingId || item.id
       files.forEach((file) => {
         assets.push({ pricingId, assetType: "ad_material", file })
@@ -254,7 +231,6 @@ export default function OrderModal({
     try {
       await onSubmit(input, { subtotal, assets })
       setOrderForm({ company: "", contact: "", phone: "", email: "", notes: "" })
-      setItemDetails({})
       setSlotError(null)
     } catch (err) {
       const apiErr = err as { data?: { code?: string; message?: string } }
@@ -356,40 +332,24 @@ export default function OrderModal({
             </h3>
             <div className="space-y-4">
               {selectedItems.map((item) => {
-                const details = itemDetails[item.id] || {
-                  startDate: "",
-                  endDate: "",
-                  needDesign: false,
-                  adLink: "",
-                  files: [],
-                  quantity: item.quantity ?? 1,
-                }
-                const mergedDetails = {
-                  ...details,
-                  quantity: details.quantity ?? item.quantity ?? 1,
+                const orderItemData: OrderItemData = {
+                  id: item.id,
+                  category: item.category,
+                  price: item.price,
+                  packageType: item.packageType,
+                  packageTypeName: item.name,
+                  durationValue: item.durationValue,
+                  durationUnit: item.durationUnit,
                 }
 
                 return (
-                  <AdItemForm
+                  <AdItemFormWithBookedDates
                     key={item.id}
                     item={item}
-                    itemDetails={mergedDetails}
-                    openCalendar={openCalendar}
-                    onStartDateChange={(date) =>
-                      handleStartDateChange(
-                        item.id,
-                        date,
-                        item.duration || "",
-                        item.durationValue,
-                        item.durationUnit
-                      )
-                    }
-                    onDetailChange={(field, value) => handleItemDetailChange(item.id, field, value)}
-                    onFileChange={(e) => handleFileChange(item.id, e)}
-                    onRemoveFile={(index) => removeFile(item.id, index)}
-                    onCalendarOpenChange={(open) => setOpenCalendar(open ? item.id : null)}
-                    slotError={slotError}
-                    calendarDefaultMonth={calendarDefaultMonth}
+                    orderItemData={orderItemData}
+                    defaultValues={{ quantity: item.quantity ?? 1 }}
+                    formConfig={item.formConfig}
+                    formRef={itemFormRefs[item.id]}
                   />
                 )
               })}
@@ -409,6 +369,8 @@ export default function OrderModal({
               className="mt-3"
             />
           </div>
+
+          {slotError && <p className="text-sm text-red-500">{slotError}</p>}
 
           <div className="flex gap-3 pt-4">
             <Button
