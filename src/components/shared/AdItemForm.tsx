@@ -278,20 +278,27 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
     await onSubmit?.(validation.result)
   }
 
+  console.log(
+    orderItemData.categoryName
+      ? orderItemData.categoryName
+      : t(`adCategory.${orderItemData.category}`)
+  )
+
+  const shouldShowCategory = orderItemData.category || orderItemData.categoryName
+
   const content = (
     <div
       className={`bg-card rounded-lg p-5 shadow-sm transition-opacity ${isDeleted ? "opacity-40" : ""}`}
     >
       <div className="border-border mb-4 flex items-center justify-between border-b pb-3">
         <div>
-          {orderItemData.category ||
-            (orderItemData.categoryName && (
-              <p className="text-primary mb-1 text-xs font-medium">
-                {orderItemData.categoryName
-                  ? orderItemData.categoryName
-                  : t(`adCategory.${orderItemData.category}`)}
-              </p>
-            ))}
+          {shouldShowCategory && (
+            <p className="text-primary mb-1 text-xs font-medium">
+              {orderItemData.categoryName
+                ? orderItemData.categoryName
+                : t(`adCategory.${orderItemData.category}`)}
+            </p>
+          )}
           <p className="text-foreground font-semibold">
             {orderItemData.packageTypeName
               ? orderItemData.packageTypeName
