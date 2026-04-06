@@ -240,6 +240,7 @@ export function AdOrderDetailDialog({ order, open, onOpenChange }: AdOrderDetail
           <div className="flex gap-3 border-t py-5">
             <AdOrderPreviewButton
               orderId={order.id}
+              itemPackageTypes={order.items.map((item) => item.packageType)}
               labelKey="admin.advertising.previewOrder"
               labelDefault="Preview"
               variant="outline"
