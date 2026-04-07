@@ -1,15 +1,15 @@
 "use client"
 
-import { extractUserIdFromProfileRequest, getProfileRequestById } from "@/api/admin"
+import { useCompanyRequestsPage, useCompanyRequestsTabCounts } from "@/api/admin/hooks"
 import { getCompanyDetail } from "@/api/companies/service"
 import { AccountProfileModal } from "@/components/account"
+import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { useUser } from "@/contexts/user-context"
 import {
-  getProfileRequestFilterState,
   isCompanyActive,
   type ProfileRequestFilterId,
   type ProfileRequestRow,
@@ -37,16 +37,10 @@ export function CompaniesTab() {
   const { t, i18n } = useTranslation()
   const { user } = useUser()
   const canEditCompanyProfile = isAdminRole(user?.role)
-  const {
-    companyRequests,
-    companyRequestsLoading,
-    companyRequestsError,
-    updateCompanyRequestStatus,
-    updateUserActive,
-    deleteCompany,
-    refetchCompanyRequests,
-  } = useAdminData()
+  const { updateCompanyRequestStatus, updateUserActive, deleteCompany, refetchCompanyRequests } =
+    useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
+  const [page, setPage] = useState(1)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [activeAdsRow, setActiveAdsRow] = useState<ProfileRequestRow | null>(null)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
@@ -83,24 +77,17 @@ export function CompaniesTab() {
     },
   })
 
-  const resolveUserIdForRow = async (row: ProfileRequestRow): Promise<string | null> => {
-    if (row.userId) return row.userId
-
-    const detail = await getProfileRequestById(row.id)
-    const userId = extractUserIdFromProfileRequest(detail)
-
-    if (!userId) {
-      showToast(t("admin.companies.userIdRequired", "User ID not available for this row"), "error")
-      return null
-    }
-
-    return userId
+  const resolveUserIdForRow = (row: ProfileRequestRow): string | null => {
+    const userId = row.userId?.trim()
+    if (userId) return userId
+    showToast(t("admin.companies.userIdRequired", "User ID not available for this row"), "error")
+    return null
   }
 
   const handleToggleActive = async (row: ProfileRequestRow, nextActive: boolean) => {
     if (!updateUserActive) return
 
-    const userId = await resolveUserIdForRow(row)
+    const userId = resolveUserIdForRow(row)
     if (!userId) return
 
     setUpdatingId(row.id)
@@ -128,7 +115,7 @@ export function CompaniesTab() {
     )
     if (!confirmed) return
 
-    const userId = await resolveUserIdForRow(row)
+    const userId = resolveUserIdForRow(row)
     if (!userId) return
 
     setUpdatingId(row.id)
@@ -142,10 +129,24 @@ export function CompaniesTab() {
       .finally(() => setUpdatingId(null))
   }
 
-  const { statusCounts, filtered } = useMemo(
-    () => getProfileRequestFilterState(companyRequests, filter),
-    [companyRequests, filter]
+  const listQueryParams = useMemo(
+    () => ({
+      page,
+      limit: 20,
+      ...(filter === "all" ? {} : { status: filter }),
+    }),
+    [page, filter]
   )
+
+  const {
+    rows,
+    pagination,
+    isLoading: isListLoading,
+    isError: isListError,
+    error: listError,
+  } = useCompanyRequestsPage(listQueryParams)
+
+  const { statusCounts } = useCompanyRequestsTabCounts()
 
   useEffect(() => {
     let cancelled = false
@@ -153,7 +154,7 @@ export function CompaniesTab() {
     const loadApprovedCompanyInfo = async () => {
       const companyRowById: Record<string, ProfileRequestRow> = {}
 
-      for (const r of filtered) {
+      for (const r of rows) {
         if (r.status !== ProfileRequestStatus.APPROVED) continue
         const id = r.companyId?.trim()
         if (!id) continue
@@ -215,19 +216,19 @@ export function CompaniesTab() {
     return () => {
       cancelled = true
     }
-  }, [filtered, companyInfoById])
+  }, [rows, companyInfoById])
 
-  if (companyRequestsLoading) {
+  if (isListLoading) {
     return (
       <div className="text-muted-foreground flex min-h-[200px] items-center justify-center">
         {t("common.loading", "Loading...")}
       </div>
     )
   }
-  if (companyRequestsError) {
+  if (isListError) {
     return (
       <div className="text-destructive flex min-h-[200px] flex-col items-center justify-center gap-2">
-        <p>{companyRequestsError}</p>
+        <p>{listError?.message ?? t("error.failedToLoadData", "Failed to load data")}</p>
       </div>
     )
   }
@@ -244,7 +245,10 @@ export function CompaniesTab() {
         {PROFILE_REQUEST_FILTERS.map((f) => (
           <button
             key={f.id}
-            onClick={() => setFilter(f.id)}
+            onClick={() => {
+              setFilter(f.id)
+              setPage(1)
+            }}
             className={`!body-bg-dark-foreground rounded-lg px-3 py-1.5 text-sm transition-colors ${
               filter === f.id
                 ? "bg-primary text-primary-foreground"
@@ -283,170 +287,167 @@ export function CompaniesTab() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="border-border hover:bg-muted/20 hover:bg-body-table-dark-hover border-b"
-                  >
-                    <td className="px-4 py-3">
-                      <p className="text-foreground text-sm font-medium">
-                        {row.status === ProfileRequestStatus.APPROVED &&
-                        row.companyId &&
-                        companyInfoById[row.companyId]
-                          ? companyInfoById[row.companyId].companyName
-                          : row.companyName}
-                      </p>
-                      <p className="text-muted-foreground text-xs">
-                        {row.status === ProfileRequestStatus.APPROVED &&
-                        row.companyId &&
-                        companyInfoById[row.companyId]
-                          ? companyInfoById[row.companyId].email
-                          : row.email}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {row.status === ProfileRequestStatus.APPROVED &&
-                      row.companyId &&
-                      companyInfoById[row.companyId]
-                        ? companyInfoById[row.companyId].contactName
-                        : row.contactName}
-                    </td>
-                    <td className="text-muted-foreground px-4 py-3 text-sm">
-                      {row.status === ProfileRequestStatus.APPROVED &&
-                      row.companyId &&
-                      companyInfoById[row.companyId]
-                        ? companyInfoById[row.companyId].industry
-                        : row.industry}
-                    </td>
-                    <td className="text-muted-foreground px-4 py-3 text-sm">
-                      {formatDateTimeForLocale(row.submittedAt, i18n.language)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={row.status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        {row.status === ProfileRequestStatus.PENDING && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 !text-green-600 hover:!bg-green-700 hover:!text-green-700 hover:!text-white"
-                              aria-label={t("admin.status.approved")}
-                              disabled={!!updatingId}
-                              onClick={() => {
-                                if (!updateCompanyRequestStatus) return
-                                setUpdatingId(row.id)
-                                updateCompanyRequestStatus(row.id, ProfileRequestStatus.APPROVED)
-                                  .then(() =>
-                                    showToast(t("admin.companies.approvedSuccess"), "success")
-                                  )
-                                  .catch(() => showToast(t("admin.companies.updateError"), "error"))
-                                  .finally(() => setUpdatingId(null))
-                              }}
-                            >
-                              <CheckCircle2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-red-700 hover:!text-white"
-                              aria-label={t("admin.status.rejected")}
-                              disabled={!!updatingId}
-                              onClick={() => {
-                                if (!updateCompanyRequestStatus) return
-                                setUpdatingId(row.id)
-                                updateCompanyRequestStatus(row.id, ProfileRequestStatus.REJECTED)
-                                  .then(() =>
-                                    showToast(t("admin.companies.rejectedSuccess"), "success")
-                                  )
-                                  .catch(() => showToast(t("admin.companies.updateError"), "error"))
-                                  .finally(() => setUpdatingId(null))
-                              }}
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                        {row.status === ProfileRequestStatus.APPROVED &&
-                          (() => {
-                            const active = isCompanyActive(row)
-                            const nextActive = !active
-                            return (
+                {rows.map((row, rowIndex) => {
+                  const cached =
+                    row.status === ProfileRequestStatus.APPROVED && row.companyId
+                      ? companyInfoById[row.companyId]
+                      : undefined
+                  const displayCompanyName = cached?.companyName?.trim()
+                    ? cached.companyName
+                    : row.companyName
+                  const displayEmail = cached?.email?.trim() ? cached.email : row.email
+                  const displayContact = cached?.contactName?.trim()
+                    ? cached.contactName
+                    : row.contactName
+                  const displayIndustry = cached?.industry?.trim() ? cached.industry : row.industry
+
+                  return (
+                    <tr
+                      key={row.id ? `${row.id}-${rowIndex}` : `row-${rowIndex}`}
+                      className="border-border hover:bg-muted/20 hover:bg-body-table-dark-hover border-b"
+                    >
+                      <td className="px-4 py-3">
+                        <p className="text-foreground text-sm font-medium">{displayCompanyName}</p>
+                        <p className="text-muted-foreground text-xs">{displayEmail}</p>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{displayContact}</td>
+                      <td className="text-muted-foreground px-4 py-3 text-sm">{displayIndustry}</td>
+                      <td className="text-muted-foreground px-4 py-3 text-sm">
+                        {formatDateTimeForLocale(row.submittedAt, i18n.language)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={row.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          {row.status === ProfileRequestStatus.PENDING && (
+                            <>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-8 ${
-                                  active
-                                    ? "!text-green-600 hover:!bg-green-700 hover:!text-white"
-                                    : "!text-red-600 hover:!bg-red-700 hover:!text-white"
-                                }`}
-                                aria-label={
-                                  active
-                                    ? t("admin.companies.disableAccount", "Disable account")
-                                    : t("admin.companies.enableAccount", "Enable account")
-                                }
-                                title={
-                                  active
-                                    ? t("admin.companies.enableAccount", "Enable account")
-                                    : t("admin.companies.disableAccount", "Disable account")
-                                }
+                                className="h-8 !text-green-600 hover:!bg-green-700 hover:!text-green-700 hover:!text-white"
+                                aria-label={t("admin.status.approved")}
                                 disabled={!!updatingId}
-                                onClick={() => handleToggleActive(row, nextActive)}
+                                onClick={() => {
+                                  if (!updateCompanyRequestStatus) return
+                                  setUpdatingId(row.id)
+                                  updateCompanyRequestStatus(row.id, ProfileRequestStatus.APPROVED)
+                                    .then(() =>
+                                      showToast(t("admin.companies.approvedSuccess"), "success")
+                                    )
+                                    .catch(() =>
+                                      showToast(t("admin.companies.updateError"), "error")
+                                    )
+                                    .finally(() => setUpdatingId(null))
+                                }}
                               >
-                                {active ? (
-                                  <ToggleLeft className="h-4 w-4" />
-                                ) : (
-                                  <ToggleRight className="h-4 w-4" />
-                                )}
+                                <CheckCircle2 className="h-4 w-4" />
                               </Button>
-                            )
-                          })()}
-                        {row.status === ProfileRequestStatus.APPROVED && deleteCompany && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-white"
-                            aria-label={t("admin.companies.deleteCompany", "Delete company")}
-                            disabled={!!updatingId}
-                            onClick={() => handleDeleteCompanyClick(row)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {row.status === ProfileRequestStatus.APPROVED && row.companyId && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hover:bg-primary! h-8 hover:text-white!"
-                            aria-label={t("admin.activeAds.dialogDescription", "Active ads")}
-                            disabled={!!updatingId}
-                            onClick={() => setActiveAdsRow(row)}
-                          >
-                            <Megaphone className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {row.status === ProfileRequestStatus.APPROVED && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hover:!bg-primary h-8 hover:!text-white"
-                            aria-label={t("admin.companies.edit", "Edit")}
-                            disabled={!!updatingId || companyEdit.state.editOpening}
-                            onClick={() => companyEdit.actions.openCompanyEdit(row)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-red-700 hover:!text-white"
+                                aria-label={t("admin.status.rejected")}
+                                disabled={!!updatingId}
+                                onClick={() => {
+                                  if (!updateCompanyRequestStatus) return
+                                  setUpdatingId(row.id)
+                                  updateCompanyRequestStatus(row.id, ProfileRequestStatus.REJECTED)
+                                    .then(() =>
+                                      showToast(t("admin.companies.rejectedSuccess"), "error")
+                                    )
+                                    .catch(() =>
+                                      showToast(t("admin.companies.updateError"), "error")
+                                    )
+                                    .finally(() => setUpdatingId(null))
+                                }}
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                          {row.status === ProfileRequestStatus.APPROVED &&
+                            (() => {
+                              const active = isCompanyActive(row)
+                              const nextActive = !active
+                              return (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={`h-8 ${
+                                    active
+                                      ? "!text-green-600 hover:!bg-green-700 hover:!text-white"
+                                      : "!text-red-600 hover:!bg-red-700 hover:!text-white"
+                                  }`}
+                                  aria-label={
+                                    active
+                                      ? t("admin.companies.disableAccount", "Disable account")
+                                      : t("admin.companies.enableAccount", "Enable account")
+                                  }
+                                  title={
+                                    active
+                                      ? t("admin.companies.enableAccount", "Enable account")
+                                      : t("admin.companies.disableAccount", "Disable account")
+                                  }
+                                  disabled={!!updatingId}
+                                  onClick={() => handleToggleActive(row, nextActive)}
+                                >
+                                  {active ? (
+                                    <ToggleLeft className="h-4 w-4" />
+                                  ) : (
+                                    <ToggleRight className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              )
+                            })()}
+                          {row.status === ProfileRequestStatus.APPROVED && deleteCompany && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-white"
+                              aria-label={t("admin.companies.deleteCompany", "Delete company")}
+                              disabled={!!updatingId}
+                              onClick={() => handleDeleteCompanyClick(row)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {row.status === ProfileRequestStatus.APPROVED && row.companyId && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="hover:bg-primary! h-8 hover:text-white!"
+                              aria-label={t("admin.activeAds.dialogDescription", "Active ads")}
+                              disabled={!!updatingId}
+                              onClick={() => setActiveAdsRow(row)}
+                            >
+                              <Megaphone className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {row.status === ProfileRequestStatus.APPROVED && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="hover:!bg-primary h-8 hover:!text-white"
+                              aria-label={t("admin.companies.edit", "Edit")}
+                              disabled={!!updatingId || companyEdit.state.editOpening}
+                              onClick={() => companyEdit.actions.openCompanyEdit(row)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         </CardContent>
       </Card>
+
+      {pagination && <AdminPaginationBar pagination={pagination} setPage={setPage} />}
 
       {activeAdsRow?.companyId && (
         <CompanyActiveAdsDialog

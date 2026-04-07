@@ -8,7 +8,9 @@
     "close": "關閉",
     "cancel": "取消",
     "save": "儲存",
-    "saving": "儲存中..."
+    "saving": "儲存中...",
+    "required": "必填",
+    "active": "啟用"
   },
   "header": {
     "aboutUs": "關於我們",
@@ -186,12 +188,6 @@
     "select": "選擇",
     "adItem": "廣告項目",
     "duration": "時長",
-    "durationUnit": {
-      "MONTH": "個月",
-      "DAY": "天",
-      "WEEK": "週",
-      "YEAR": "年"
-    },
     "price": "金額",
     "discount": "折扣",
     "pricingLoadError": "無法從伺服器載入價格資訊，請稍後再試。",
@@ -216,6 +212,7 @@
     "startDate": "起始日期",
     "endDate": "結束日期",
     "selectStartDate": "請選擇起始日期",
+    "selectEndDate": "選擇結束日期",
     "autoCalculated": "系統自動計算",
     "bookedDatesNote": "灰色日期為已預約，無法選擇",
     "adLink": "廣告連結網址",
@@ -603,6 +600,7 @@
       "contactPhone": "聯絡人電話號碼",
       "companyAddress": "公司地址",
       "email": "電子郵件",
+      "emailExample": "例如：name@company.com",
       "country": "選擇產地 *",
       "region": "選擇地區 *",
       "industry": "選擇產業類別 *",
@@ -623,8 +621,9 @@
       "invalidPhone": "請輸入有效的電話號碼（至少 8 位數字）。",
       "invalidRegion": "請先選擇國家，再從列表中選擇地區。",
       "captcha": "驗證碼錯誤，請重新輸入",
+      "tooManyRequests": "請求過於頻繁，請稍候再試。",
       "submit": "註冊失敗，請稍後再試",
-      "invalidWebsite": "請輸入有效的網站網址。",
+      "invalidWebsite": "請輸入有效的網站網址 (例如：https://your-company 或 http://your-company)",
       "duplicate409": "此帳號已提交過註冊申請。",
       "invalidTaxId": "稅號只能包含數字",
       "duplicatePhone": "請輸入與公司電話不同的聯絡人電話號碼"
@@ -742,7 +741,6 @@
     "logoUpdated": "Logo 更新成功！",
     "uploadLogo": "上傳 Logo",
     "reupload": "重新上傳",
-    "uploadLogoPoints": "上傳 Logo 可獲得 {{count}} 點",
     "companyInfo": "公司資料",
     "cancel": "取消",
     "saveChanges": "儲存變更",
@@ -1207,16 +1205,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "已建立廣告訂單",
+          "adOrderApproved": "已核准廣告訂單",
           "companyUpdatedByAdmin": "管理員已更新公司資料",
           "profileRequestSubmitted": "已送出註冊申請",
           "userPasswordChanged": "使用者已變更密碼",
           "setPasswordCompleted": "密碼設定已完成",
           "loyaltyPointsAwarded": "已發放忠誠點數",
           "loyaltyTierRecalculated": "忠誠等級已重新計算",
+          "activeAdCreated": "已建立活動廣告",
           "profileRequestApproved": "註冊申請已核准",
           "profileRequestStatusChanged": "註冊申請狀態已變更",
           "userStatusChanged": "使用者狀態已變更",
-          "userSoftDeleted": "使用者已軟刪除"
+          "userSoftDeleted": "使用者已軟刪除",
+          "profileRequestRejected": "已拒絕註冊申請"
         },
         "contents": {
           "adOrderCreated": "已建立廣告訂單 {{orderId}}。",
@@ -1333,7 +1334,7 @@
     "advertising": {
       "assets": "附件",
       "monthlyRevenue": "本月營收",
-      "adOrders": "廣告訂單",
+      "adOrders": "本月廣告訂單（所有狀態）",
       "monthlyGrowth": "月增長率",
       "orderHistory": "廣告訂單紀錄",
       "packageManagementTab": "廣告方案管理",
@@ -1514,7 +1515,8 @@
       "createSuccess": "已建立啟用廣告。",
       "createError": "無法建立啟用廣告，請稍後再試。",
       "createInvalidRange": "結束時間必須晚於開始時間。",
-      "createShowButton": "+ 新增"
+      "createShowButton": "+ 新增",
+      "empty": "此公司目前沒有活躍廣告。"
     },
     "property": {
       "listingsCount": "{{count}} 筆物業",
@@ -1700,11 +1702,11 @@
       "emailInvalid": "請填寫有效的 Email 格式",
       "nameRequired": "請填寫您的姓名",
       "submit": "送出詢問",
-      "submitSuccess": "詢問已送出（示範）",
+      "submitSuccess": "詢問已送出",
       "area": "面積",
       "description": "物業描述",
       "features": "物業特點",
-      "addressNotice": "為保護物業資訊安全，詳細地址僅在聯繫賣家後提供。",
+      "addressNotice": "為保護物業資訊安，詳細地址僅在聯繫賣家後提供。",
       "contactForDetail": "聯繫賣家取得完整資訊"
     }
   },
@@ -1797,5 +1799,22 @@
     "loading": "正在載入預覽…",
     "errorTitle": "預覽載入失敗",
     "errorDesc": "無法載入廣告預覽。您可能沒有查看此訂單的權限。"
+  },
+  "formValidation": {
+    "filesRequired": "請至少上傳一個檔案",
+    "endDateBeforeStart": "結束日期不能早於開始日期"
+  },
+  "adCategory": {
+    "HOMEPAGE_POPUP": "首頁彈出視窗",
+    "FEATURED_COMPANY": "精選公司",
+    "COMPANY_DIRECTORY": "公司目錄",
+    "PLATFORM_PRINT": "平台印刷",
+    "PRODUCT_LISTING": "產品列表"
+  },
+  "durationUnit": {
+    "MONTH": "個月",
+    "DAY": "天",
+    "WEEK": "週",
+    "YEAR": "年"
   }
 }

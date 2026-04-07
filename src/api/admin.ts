@@ -6,61 +6,108 @@ import {
   type ProfileRequestStatusUpdate,
 } from "@/types/admin"
 
-type GetProfileRequestsResponse = { data: ProfileRequest[] } | ProfileRequest[]
+export type ApiPagination = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  sortBy?: string
+  sortOrder?: "asc" | "desc" | string
+}
 
-export async function getAllProfileRequests(): Promise<ProfileRequest[]> {
-  const res = await api.request<GetProfileRequestsResponse>("/auth/all-profile-requests", {
+export type AdminListProfileRequestsQuery = {
+  page?: number
+  limit?: number
+  status?: ProfileRequestStatus | string
+  sortBy?: string
+  sortOrder?: "asc" | "desc"
+}
+
+export type AdminListProfileRequestsResponse = {
+  data: ProfileRequest[]
+  pagination?: ApiPagination
+}
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v)
+}
+
+export function parseAllProfileRequestsResponse(raw: unknown): AdminListProfileRequestsResponse {
+  if (Array.isArray(raw)) {
+    return { data: raw as ProfileRequest[], pagination: undefined }
+  }
+  if (!isRecord(raw)) {
+    return { data: [] }
+  }
+
+  const pagination = raw.pagination as ApiPagination | undefined
+
+  if (Array.isArray(raw.requests)) {
+    return {
+      data: raw.requests as ProfileRequest[],
+      pagination,
+    }
+  }
+
+  if (Array.isArray(raw.data)) {
+    return {
+      data: raw.data as ProfileRequest[],
+      pagination,
+    }
+  }
+
+  if (isRecord(raw.data) && Array.isArray(raw.data.data)) {
+    const inner = raw.data as Record<string, unknown> & {
+      data: ProfileRequest[]
+      pagination?: ApiPagination
+    }
+    return {
+      data: inner.data,
+      pagination: inner.pagination ?? pagination,
+    }
+  }
+
+  if (isRecord(raw.data) && Array.isArray(raw.data.requests)) {
+    const inner = raw.data as Record<string, unknown> & {
+      requests: ProfileRequest[]
+      pagination?: ApiPagination
+    }
+    return {
+      data: inner.requests,
+      pagination: inner.pagination ?? pagination,
+    }
+  }
+
+  if (Array.isArray(raw.items)) {
+    return {
+      data: raw.items as ProfileRequest[],
+      pagination,
+    }
+  }
+
+  return { data: [] }
+}
+
+function buildQuery(query?: AdminListProfileRequestsQuery): string {
+  if (!query) return ""
+  const params = new URLSearchParams()
+  if (query.page) params.set("page", String(query.page))
+  if (query.limit) params.set("limit", String(query.limit))
+  if (query.status) params.set("status", String(query.status))
+  if (query.sortBy) params.set("sortBy", query.sortBy)
+  if (query.sortOrder) params.set("sortOrder", query.sortOrder)
+  const qs = params.toString()
+  return qs ? `?${qs}` : ""
+}
+
+export async function getAllProfileRequests(
+  query?: AdminListProfileRequestsQuery
+): Promise<AdminListProfileRequestsResponse> {
+  const qs = buildQuery(query)
+  const res = await api.request<unknown>(`/auth/all-profile-requests${qs}`, {
     method: "GET",
   })
-  if (Array.isArray(res)) return res
-  if (res?.data && Array.isArray(res.data)) return res.data
-  return []
-}
-
-type ProfileRequestDetailResponse = {
-  id: string
-  user?: { id: string; deletedAt?: string | null }
-  userId?: string
-  deletedAt?: string | null
-  [key: string]: unknown
-}
-
-export function getDeletedAtFromDetail(
-  item: ProfileRequestDetailResponse | null | undefined
-): string | null | undefined {
-  if (!item || typeof item !== "object") return undefined
-  const u = item.user as { deletedAt?: string | null } | undefined
-  if (u?.deletedAt != null) return u.deletedAt
-  const d = item as { deletedAt?: string | null }
-  return d.deletedAt ?? undefined
-}
-
-export async function getProfileRequestById(
-  requestId: string
-): Promise<ProfileRequestDetailResponse | null> {
-  try {
-    const res = await api.request<
-      ProfileRequestDetailResponse | { data: ProfileRequestDetailResponse }
-    >(`/auth/profile-requests/${requestId}`, { method: "GET" })
-    const item =
-      res && typeof res === "object" && "data" in res
-        ? (res as { data: ProfileRequestDetailResponse }).data
-        : (res as ProfileRequestDetailResponse)
-    return item?.id ? item : null
-  } catch {
-    return null
-  }
-}
-
-export function extractUserIdFromProfileRequest(
-  item: { user?: { id?: string }; userId?: string } | null | undefined
-): string | undefined {
-  if (!item || typeof item !== "object") return undefined
-  const u = item as Record<string, unknown>
-  const nested = u.user as { id?: string } | undefined
-  if (nested?.id && typeof nested.id === "string") return nested.id
-  if (typeof u.userId === "string") return u.userId
-  return undefined
+  return parseAllProfileRequestsResponse(res)
 }
 
 export async function updateProfileRequestStatus(
@@ -95,6 +142,7 @@ type ProfileRequestInput = ProfileRequest & {
   isActive?: boolean
   deletedAt?: string | null
   contactName?: string
+  registrationStatus?: string
 }
 
 function getUserIdFromItem(p: ProfileRequestInput): string | undefined {
@@ -112,6 +160,7 @@ function getDeletedAtFromItem(p: ProfileRequestInput): string | null | undefined
 }
 
 export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): ProfileRequestRow {
+  const statusRaw = p.status ?? p.registrationStatus ?? ""
   return {
     id: p.id,
     companyName: p.companyNameVi || p.companyNameCn || "",
@@ -119,7 +168,7 @@ export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): Profi
     contactName: p.contactName ?? "",
     industry: p.industry,
     country: p.country,
-    status: p.status as ProfileRequestStatus,
+    status: statusRaw as ProfileRequestStatus,
     submittedAt: p.submittedAt ?? p.createdAt ?? "",
     companyId: p.companyId ?? undefined,
     userId: getUserIdFromItem(p),

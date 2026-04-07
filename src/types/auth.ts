@@ -40,6 +40,7 @@ export type RegisterPayload = {
   industry: string
   website: string
   introduction: string
+  captchaId: string
   captcha: string
 }
 
@@ -76,6 +77,7 @@ export function formDataToRegisterPayload(form: {
   industry: string
   website: string
   introduction: string
+  captchaId: string
   captcha: string
 }): RegisterPayload {
   return {
@@ -92,6 +94,7 @@ export function formDataToRegisterPayload(form: {
     industry: form.industry,
     website: normalizeWebsiteForPayload(form.website),
     introduction: form.introduction,
+    captchaId: form.captchaId,
     captcha: form.captcha,
   }
 }

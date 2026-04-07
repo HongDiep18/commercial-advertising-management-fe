@@ -8,7 +8,9 @@
     "close": "Đóng",
     "cancel": "Hủy",
     "save": "Lưu",
-    "saving": "Đang lưu..."
+    "saving": "Đang lưu...",
+    "required": "Bắt buộc",
+    "active": "Hoạt động"
   },
   "header": {
     "aboutUs": "Về chúng tôi",
@@ -26,6 +28,23 @@
     "failedToLoadOrdersMetrics": "Không thể tải số liệu đơn hàng",
     "failedToLoadCompanies": "Không thể tải công ty",
     "failedToLoadData": "Không thể tải dữ liệu"
+  },
+  "formValidation": {
+    "filesRequired": "Vui lòng tải lên ít nhất một tệp",
+    "endDateBeforeStart": "Ngày kết thúc không thể trước ngày bắt đầu"
+  },
+  "adCategory": {
+    "HOMEPAGE_POPUP": "Popup trang chủ",
+    "FEATURED_COMPANY": "Công ty nổi bật",
+    "COMPANY_DIRECTORY": "Danh mục công ty",
+    "PLATFORM_PRINT": "Quảng cáo ấn phẩm",
+    "PRODUCT_LISTING": "Danh sách sản phẩm"
+  },
+  "durationUnit": {
+    "MONTH": "tháng",
+    "DAY": "ngày",
+    "WEEK": "tuần",
+    "YEAR": "năm"
   },
   "hero": {
     "title": "Hướng dẫn mua hàng Việt Nam - Kết nối đối tác kinh doanh chất lượng",
@@ -186,12 +205,6 @@
     "select": "Chọn",
     "adItem": "Mục quảng cáo",
     "duration": "Thời lượng",
-    "durationUnit": {
-      "MONTH": "tháng",
-      "DAY": "ngày",
-      "WEEK": "tuần",
-      "YEAR": "năm"
-    },
     "price": "Giá",
     "discount": "Giảm giá",
     "pricingLoadError": "Không thể tải bảng giá từ máy chủ. Vui lòng thử lại sau.",
@@ -216,6 +229,7 @@
     "startDate": "Ngày bắt đầu",
     "endDate": "Ngày kết thúc",
     "selectStartDate": "Vui lòng chọn ngày bắt đầu",
+    "selectEndDate": "Chọn ngày kết thúc",
     "autoCalculated": "Tự động tính toán bởi hệ thống",
     "bookedDatesNote": "Ngày màu xám đã được đặt trước và không thể chọn",
     "adLink": "URL liên kết quảng cáo",
@@ -655,6 +669,7 @@
       "contactPhone": "Số điện thoại người liên hệ",
       "companyAddress": "Địa chỉ Công ty",
       "email": "E-Mail",
+      "emailExample": "ten@congty.com",
       "country": "Chọn xuất xứ *",
       "region": "Chọn Khu vực *",
       "industry": "Chọn ngành nghề *",
@@ -675,8 +690,9 @@
       "invalidPhone": "Vui lòng nhập số điện thoại hợp lệ (ít nhất 8 chữ số).",
       "invalidRegion": "Vui lòng chọn quốc gia trước, sau đó chọn khu vực trong danh sách.",
       "captcha": "Mã xác minh không đúng, vui lòng thử lại",
+      "tooManyRequests": "Quá nhiều yêu cầu. Vui lòng đợi một lúc rồi thử lại.",
       "submit": "Đăng ký thất bại, vui lòng thử lại sau",
-      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ.",
+      "invalidWebsite": "Vui lòng nhập URL trang web hợp lệ (ví dụ: https://your-company hoặc http://your-company)",
       "duplicate409": "Tài khoản này đã gửi yêu cầu đăng ký trước đó.",
       "invalidTaxId": "Mã số thuế chỉ được chứa chữ số",
       "duplicatePhone": "Vui lòng nhập số điện thoại của người liên hệ khác với số điện thoại công ty"
@@ -794,7 +810,6 @@
     "logoUpdated": "Đã cập nhật logo!",
     "uploadLogo": "Tải logo",
     "reupload": "Tải lại",
-    "uploadLogoPoints": "Tải logo để nhận {{count}} điểm",
     "companyInfo": "Thông tin công ty",
     "cancel": "Hủy",
     "saveChanges": "Lưu thay đổi",
@@ -1251,7 +1266,7 @@
     },
     "dashboard": {
       "totalCompanies": "Tổng doanh nghiệp",
-      "pendingApplications": "Đơn chờ duyệt",
+      "pendingApplications": "Đơn đăng ký chờ duyệt",
       "newsCount": "Số tin tức",
       "propertyViews": "Lượt xem bất động sản",
       "pendingAdOrders": "Đơn quảng cáo chờ duyệt",
@@ -1274,16 +1289,19 @@
       "recentActivityLogs": {
         "actions": {
           "adOrderCreated": "Đã tạo đơn quảng cáo",
+          "adOrderApproved": "Đã duyệt đơn quảng cáo",
           "companyUpdatedByAdmin": "Quản trị viên đã cập nhật công ty",
           "profileRequestSubmitted": "Đã gửi yêu cầu đăng ký",
           "userPasswordChanged": "Người dùng đã đổi mật khẩu",
           "setPasswordCompleted": "Đã hoàn tất thiết lập mật khẩu",
           "loyaltyPointsAwarded": "Đã cộng điểm khách hàng thân thiết",
           "loyaltyTierRecalculated": "Đã tính lại hạng thành viên",
+          "activeAdCreated": "Đã tạo quảng cáo hoạt động",
           "profileRequestApproved": "Đã duyệt yêu cầu đăng ký",
           "profileRequestStatusChanged": "Đã thay đổi trạng thái yêu cầu đăng ký",
           "userStatusChanged": "Đã thay đổi trạng thái người dùng",
-          "userSoftDeleted": "Đã xóa mềm người dùng"
+          "userSoftDeleted": "Đã xóa mềm người dùng",
+          "profileRequestRejected": "Yêu cầu đăng ký bị từ chối"
         },
         "contents": {
           "adOrderCreated": "Đã tạo đơn quảng cáo {{orderId}}.",
@@ -1400,7 +1418,7 @@
     "advertising": {
       "assets": "Hình ảnh đính kèm",
       "monthlyRevenue": "Doanh thu tháng",
-      "adOrders": "Đơn quảng cáo",
+      "adOrders": "Đơn đặt hàng quảng cáo hàng tháng (Tất cả trạng thái)",
       "monthlyGrowth": "Tăng trưởng tháng",
       "orderHistory": "Lịch sử đơn quảng cáo",
       "packageManagementTab": "Quản lý gói quảng cáo",
@@ -1581,7 +1599,8 @@
       "createSuccess": "Đã tạo quảng cáo đang hoạt động.",
       "createError": "Không thể tạo quảng cáo. Vui lòng thử lại.",
       "createInvalidRange": "Thời điểm kết thúc phải sau thời điểm bắt đầu.",
-      "createShowButton": "+ Tạo mới"
+      "createShowButton": "+ Tạo mới",
+      "empty": "Công ty này chưa có quảng cáo nào đang hoạt động."
     },
     "property": {
       "listingsCount": "{{count}} bất động sản",
@@ -1767,7 +1786,7 @@
       "emailRequired": "Vui lòng điền email của bạn",
       "emailInvalid": "Định dạng email không hợp lệ",
       "submit": "Gửi yêu cầu",
-      "submitSuccess": "Yêu cầu đã được gửi (minh họa)! Người bán sẽ liên hệ với bạn sớm nhất có thể.",
+      "submitSuccess": "Yêu cầu đã được gửi! Người bán sẽ liên hệ với bạn sớm nhất có thể.",
       "area": "Diện tích",
       "description": "Mô tả bất động sản",
       "features": "Đặc điểm bất động sản",

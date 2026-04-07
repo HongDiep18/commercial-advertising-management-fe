@@ -51,6 +51,14 @@ export type PublicAdPackagePricingItem = {
   isActive: boolean
 }
 
+export type AdPackageFormConfig = {
+  requiresStartDate: boolean
+  requiresAdLink: boolean
+  requiresDesignService: boolean
+  requiresAssets: boolean
+  requiresActiveToggle?: boolean
+}
+
 export type PublicAdPackageItem = {
   id: string
   categoryId: string
@@ -63,6 +71,7 @@ export type PublicAdPackageItem = {
   sortOrder: number
   isActive: boolean
   pricing: PublicAdPackagePricingItem[]
+  formConfig: AdPackageFormConfig
 }
 
 export type PublicAdPackageCategoryItem = {
