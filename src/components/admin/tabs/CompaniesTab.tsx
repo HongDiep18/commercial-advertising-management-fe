@@ -5,6 +5,7 @@ import { getCompanyDetail } from "@/api/companies/service"
 import { AccountProfileModal } from "@/components/account"
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
+import { CompanyDeleteDialog } from "@/components/admin/company/CompanyDeleteDialog"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
@@ -104,21 +105,23 @@ export function CompaniesTab() {
       .finally(() => setUpdatingId(null))
   }
 
-  const handleDeleteCompanyClick = async (row: ProfileRequestRow) => {
-    if (!deleteCompany) return
+  const [deleteCandidate, setDeleteCandidate] = useState<ProfileRequestRow | null>(null)
 
-    const confirmed = window.confirm(
-      t(
-        "admin.companies.deleteCompanyConfirm",
-        "Delete this company? The user will be deactivated."
-      )
-    )
-    if (!confirmed) return
+  const handleDeleteCompanyClick = (row: ProfileRequestRow) => {
+    setDeleteCandidate(row)
+  }
 
-    const userId = resolveUserIdForRow(row)
-    if (!userId) return
+  const handleDeleteConfirm = async () => {
+    if (!deleteCandidate || !deleteCompany) return
 
-    setUpdatingId(row.id)
+    const userId = resolveUserIdForRow(deleteCandidate)
+    if (!userId) {
+      setDeleteCandidate(null)
+      return
+    }
+
+    setUpdatingId(deleteCandidate.id)
+    setDeleteCandidate(null)
     deleteCompany(userId)
       .then(() =>
         showToast(t("admin.companies.deleteCompanySuccess", "Company deleted"), "success")
@@ -479,6 +482,12 @@ export function CompaniesTab() {
           t={t}
         />
       )}
+      <CompanyDeleteDialog
+        candidate={deleteCandidate}
+        onClose={() => setDeleteCandidate(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={!!updatingId}
+      />
     </div>
   )
 }
