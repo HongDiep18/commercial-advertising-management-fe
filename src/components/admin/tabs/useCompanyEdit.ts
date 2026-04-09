@@ -16,9 +16,14 @@ import {
   patchAdminCompany,
   patchAdminCompanyWithLogo,
 } from "@/api/companies/service"
+import { useAddAdminCompanyContacts } from "@/api/companies/hooks"
 import type { ProfileFormData } from "@/types/account"
 import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
-import { getCountryOptions } from "@/components/register/registerOptions"
+import {
+  getRegisterCountryOptions,
+  getRegionOptions,
+  REGISTER_COUNTRY_OTHER_VALUE,
+} from "@/components/register/registerOptions"
 import type { ProfileRequestRow } from "@/types/admin"
 
 type ToastVariant = "info" | "success" | "error"
@@ -74,6 +79,7 @@ export function useCompanyEdit({
 }: UseCompanyEditParams) {
   const [state, setState] = useReducer(editReducer, initialEditState)
   const editFileInputRef = useRef<HTMLInputElement>(null)
+  const addContacts = useAddAdminCompanyContacts()
   const {
     editModalOpen,
     editCompanyId,
@@ -84,7 +90,11 @@ export function useCompanyEdit({
     editLogo,
   } = state
 
-  const countries = useMemo(() => getCountryOptions(language), [language])
+  const countries = useMemo(
+    () =>
+      getRegisterCountryOptions(language, t("register.countries.other", { defaultValue: "Other" })),
+    [language, t]
+  )
   const regionsByCountry = useMemo(() => {
     const result: Record<string, { value: string; label: string }[]> = {}
     for (const [country, keys] of Object.entries(REGION_KEYS_BY_COUNTRY)) {
@@ -93,6 +103,7 @@ export function useCompanyEdit({
         label: t(`register.regions.${key}`) || key,
       }))
     }
+    result[REGISTER_COUNTRY_OTHER_VALUE] = getRegionOptions(REGISTER_COUNTRY_OTHER_VALUE, t)
     return result
   }, [t])
 
@@ -160,12 +171,15 @@ export function useCompanyEdit({
     }
   }
 
-  const handleEditProfileChange = (field: string, value: string) => {
+  const handleEditProfileChange = (field: string, value: string | string[]) => {
     if (!canEditCompanyProfile) return
     const nextProfile = (() => {
       if (field === "country") {
-        const nextCountry = value === COUNTRY_NONE ? "" : value
-        return { ...editProfile, country: nextCountry }
+        const nextCountry = typeof value === "string" && value === COUNTRY_NONE ? "" : value
+        return {
+          ...editProfile,
+          country: typeof nextCountry === "string" ? nextCountry : editProfile.country,
+        }
       }
       return { ...editProfile, [field]: value }
     })()
@@ -193,7 +207,7 @@ export function useCompanyEdit({
     e.target.value = ""
   }
 
-  const handleSaveCompanyEdit = async () => {
+  const handleSaveCompanyEdit = async (extras?: { emails: string[]; contactPhones: string[] }) => {
     if (!canEditCompanyProfile || !editCompanyId) {
       if (!editCompanyId) {
         onShowToast(
@@ -251,6 +265,46 @@ export function useCompanyEdit({
         })
       } else {
         setState({ editLogo: { ...editLogo, changed: false } })
+      }
+
+      const emails = extras?.emails ?? []
+      const contactPhones = extras?.contactPhones ?? []
+      if (emails.length > 0 || contactPhones.length > 0) {
+        try {
+          const contactsRes = await addContacts.mutateAsync({
+            companyId,
+            payload: {
+              emails: emails.length > 0 ? emails : undefined,
+              contactPhones: contactPhones.length > 0 ? contactPhones : undefined,
+              contactName: editProfile.contactName?.trim()
+                ? editProfile.contactName.trim()
+                : undefined,
+            },
+          })
+          onShowToast(
+            t("admin.companies.contactsProcessed", {
+              defaultValue: "Contacts processed (added: {{added}}, skipped: {{skipped}})",
+              added: contactsRes.added,
+              skipped: contactsRes.skippedDuplicates,
+            }),
+            "success"
+          )
+        } catch (err) {
+          const messageRaw = (err as { message?: string | string[] }).message
+          const msgFromApi = Array.isArray(messageRaw)
+            ? messageRaw.join(", ")
+            : typeof messageRaw === "string"
+              ? messageRaw
+              : ""
+          onShowToast(
+            msgFromApi ||
+              t("admin.companies.contactsAddError", {
+                defaultValue: "Failed to add extra contacts.",
+              }),
+            "error"
+          )
+          return
+        }
       }
       onShowToast(t("admin.companies.profileUpdatedSuccess", "Company profile updated"), "success")
       onRefetchCompanyRequests?.()

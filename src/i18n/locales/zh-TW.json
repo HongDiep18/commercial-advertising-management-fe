@@ -593,25 +593,32 @@
     },
     "placeholders": {
       "companyNameVi": "公司名稱（越文）",
-      "companyNameCn": "公司名稱（中文）",
+      "companyNameZh": "公司名稱（台灣）",
       "phone": "電話",
       "taxId": "稅號",
       "contactPerson": "聯絡人",
       "contactPhone": "聯絡人電話號碼",
       "companyAddress": "公司地址",
-      "email": "電子郵件",
+      "email": "電子郵件 註冊",
+      "companyEmail": "公司 Email",
       "emailExample": "例如：name@company.com",
       "country": "選擇產地 *",
       "region": "選擇地區 *",
       "industry": "選擇產業類別 *",
       "website": "網站 *",
       "introduction": "簡單介紹 *",
+      "note": "備註: ",
       "captcha": "請輸入驗證碼",
       "selectCountryFirst": "請先選擇國家",
       "membershipTier": "選擇會員等級"
     },
     "hints": {
       "websiteFormat": "範例：https://your-company 或 http://your-company"
+    },
+    "notes": {
+      "multipleAddress": "備註：若您的公司有多個地址，請先在備註中說明，我們將再與您聯繫確認。",
+      "registerEmailUsage": "備註：此 Email 不必是公司對外公開聯絡信箱。我們將透過此 Email 與您聯繫後續註冊流程。",
+      "companyEmailExtra": "備註：若您希望新增更多公司聯絡 Email，請先於備註中說明，我們將再與您聯繫確認。"
     },
     "noRegions": "無可用地區",
     "errors": {
@@ -744,6 +751,11 @@
     "companyInfo": "公司資料",
     "cancel": "取消",
     "saveChanges": "儲存變更",
+    "addContactPerson": "新增聯絡人",
+    "addCompanyEmail": "新增公司 Email",
+    "contactPersonN": "聯絡人 {{count}}",
+    "emailN": "Email {{count}}",
+    "industriesSelectedCount": "已選 {{count}} 個產業類別",
     "membershipBenefits": "會員等級與權益",
     "currentTierLabel": "目前等級",
     "tiers": {
@@ -929,6 +941,11 @@
     "relatedCompanies": "相關企業",
     "viewMore": "查看更多",
     "noRelatedCompanies": "沒有相關企業",
+    "industriesShowMore": "再顯示 {{count}} 項",
+    "industriesShowLess": "收合",
+    "industriesSeeMore": "查看更多",
+    "industriesSeeMoreAria": "再顯示 {{count}} 個產業類別",
+    "keywordTags": "關鍵字",
     "regions": {
       "寶島台灣": "寶島台灣",
       "台灣": "台灣",

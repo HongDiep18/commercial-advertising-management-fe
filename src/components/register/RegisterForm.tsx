@@ -3,7 +3,7 @@
 import { useRegisterMutation } from "@/api/auth/hooks"
 import { formDataToRegisterPayload } from "@/types/auth"
 import { INITIAL_REGISTER_FORM, type RegisterFormData } from "./registerConstants"
-import { getCountryOptions } from "./registerOptions"
+import { getRegisterCountryOptions } from "./registerOptions"
 import { REGISTER_CATEGORIES } from "./registerCategories"
 import { useCaptcha } from "./useCaptcha"
 import { createRegisterFormSchema } from "./registerSchema"
@@ -15,12 +15,12 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, RefreshCw, CheckCircle2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Input from "../ui/Input"
-import Select from "../ui/Select"
 import Textarea from "../ui/Textarea"
 import Button from "../ui/Button"
 import { Toast, type ToastVariant } from "../ui/Toast"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { RequiredMark, stripTrailingAsterisk } from "@/components/ui/required-mark"
+import { SearchableMultiSelect } from "@/components/ui/SearchableMultiSelect"
 import { SearchableSelect } from "@/components/ui/SearchableSelect"
 
 function getErrorMessage(err: unknown): string {
@@ -99,7 +99,14 @@ export default function RegisterForm() {
     }
   }
 
-  const countries = getCountryOptions(i18n.language)
+  const countries = useMemo(
+    () =>
+      getRegisterCountryOptions(
+        i18n.language,
+        t("register.countries.other", { defaultValue: "Other" })
+      ),
+    [i18n.language, t]
+  )
   const categories = REGISTER_CATEGORIES.map((cat) => ({
     id: cat.id,
     name: t(cat.i18nKey) || `${cat.code}. ${cat.fallback}`,
@@ -280,13 +287,13 @@ export default function RegisterForm() {
                       <Field className="gap-1.5">
                         <FieldLabel className="text-foreground text-sm font-medium">
                           {stripTrailingAsterisk(
-                            t("register.placeholders.companyNameCn") || "公司名稱（中文）"
+                            t("register.placeholders.companyNameZh") || "公司名稱（中文）"
                           )}
                           <RequiredMark />
                         </FieldLabel>
                         <Input
                           placeholder={
-                            t("register.placeholders.companyNameCn") || "公司名稱（中文）"
+                            t("register.placeholders.companyNameZh") || "公司名稱（中文）"
                           }
                           value={values.companyNameCn}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -419,7 +426,14 @@ export default function RegisterForm() {
                               : undefined
                           }
                         />
+                        <p className="text-muted-foreground text-xs">
+                          {t("register.notes.multipleAddress", {
+                            defaultValue:
+                              "Note: If your company has more than one address, please leave in Note and we will contact you for confirmation.",
+                          })}
+                        </p>
                       </Field>
+
                       <Field className="gap-1.5">
                         <FieldLabel className="text-foreground text-sm font-medium">
                           {stripTrailingAsterisk(t("register.placeholders.email") || "電子郵件")}
@@ -440,8 +454,48 @@ export default function RegisterForm() {
                         <FieldError
                           errors={fieldErrors.email ? [{ message: fieldErrors.email }] : undefined}
                         />
+                        <p className="text-muted-foreground text-xs">
+                          {t("register.notes.registerEmailUsage", {
+                            defaultValue:
+                              "Note: this email does not need to be your company official public contact email. We will contact you through this email for next step of registration process",
+                          })}
+                        </p>
                       </Field>
                     </div>
+
+                    <Field className="gap-1.5">
+                      <FieldLabel className="text-foreground text-sm font-medium">
+                        {stripTrailingAsterisk(
+                          t("register.placeholders.companyEmail") || "Company Email"
+                        )}
+                        <RequiredMark />
+                      </FieldLabel>
+                      <Input
+                        type="email"
+                        placeholder={t("register.placeholders.emailExample", {
+                          defaultValue: "name@company.com",
+                        })}
+                        value={values.companyEmail}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          form.setFieldValue("companyEmail", e.target.value)
+                          clearFieldError("companyEmail")
+                        }}
+                        required
+                      />
+                      <FieldError
+                        errors={
+                          fieldErrors.companyEmail
+                            ? [{ message: fieldErrors.companyEmail }]
+                            : undefined
+                        }
+                      />
+                      <p className="text-muted-foreground text-xs">
+                        {t("register.notes.companyEmailExtra", {
+                          defaultValue:
+                            "Note: If you wish to add more email for company contact, please leave in Note and we will contact you for confirmation.",
+                        })}
+                      </p>
+                    </Field>
 
                     <Field className="gap-1.5">
                       <FieldLabel className="text-foreground text-sm font-medium">
@@ -475,27 +529,26 @@ export default function RegisterForm() {
                         )}
                         <RequiredMark />
                       </FieldLabel>
-                      <Select
+                      <SearchableMultiSelect
                         value={values.industry}
-                        onValueChange={(v) => {
-                          form.setFieldValue("industry", v)
+                        onValueChange={(next) => {
+                          form.setFieldValue("industry", next)
                           clearFieldError("industry")
                         }}
-                        required
-                      >
-                        <Select.Trigger className="w-full">
-                          <Select.Value
-                            placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
-                          />
-                        </Select.Trigger>
-                        <Select.Content>
-                          {categories.map((cat) => (
-                            <Select.Item key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select>
+                        options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+                        placeholder={t("register.placeholders.industry") || "選擇產業類別 *"}
+                        searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                        emptyText={t("common.noResults", { defaultValue: "No results." })}
+                        listMaxHeightClassName="max-h-[11.25rem]"
+                        formatSummary={(selected, opts) => {
+                          const labels = selected
+                            .map((v) => opts.find((o) => o.value === v)?.label)
+                            .filter(Boolean) as string[]
+                          if (labels.length === 0) return ""
+                          if (labels.length <= 2) return labels.join(", ")
+                          return t("account.industriesSelectedCount", { count: labels.length })
+                        }}
+                      />
                       <FieldError
                         errors={
                           fieldErrors.industry ? [{ message: fieldErrors.industry }] : undefined
@@ -552,6 +605,19 @@ export default function RegisterForm() {
                             ? [{ message: fieldErrors.introduction }]
                             : undefined
                         }
+                      />
+                    </Field>
+                    <Field className="gap-1.5">
+                      <FieldLabel className="text-foreground text-sm font-medium">
+                        {t("register.placeholders.note", { defaultValue: "Note:" })}
+                      </FieldLabel>
+                      <Textarea
+                        placeholder={t("register.placeholders.note", { defaultValue: "Note" })}
+                        value={values.note}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                          form.setFieldValue("note", e.target.value)
+                        }}
+                        rows={3}
                       />
                     </Field>
                   </div>

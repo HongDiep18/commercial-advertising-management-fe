@@ -20,12 +20,17 @@ import {
   COUNTRY_NONE,
 } from "@/components/account"
 import type { ProfileFormData } from "@/types/account"
+import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
 import { getProfile, getProfileAndLogoFromUpdateData, type ProfileResponse } from "@/api/profile"
 import { updateProfile, updateProfileWithLogo } from "@/api/auth"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
 import { getDemoProfileForUser } from "@/components/login/demo"
-import { getCountryOptions } from "@/components/register/registerOptions"
+import {
+  getRegisterCountryOptions,
+  getRegionOptions,
+  REGISTER_COUNTRY_OTHER_VALUE,
+} from "@/components/register/registerOptions"
 import { api } from "@/lib/api"
 
 function normalizeMembershipTier(value: unknown): MembershipTier | null {
@@ -52,7 +57,7 @@ const INITIAL_PROFILE_FORM: ProfileFormData = {
   email: "",
   country: "",
   region: "",
-  industry: "",
+  industry: [],
   website: "",
   description: "",
 }
@@ -69,7 +74,7 @@ function apiProfileToFormData(api: ProfileResponse, fallbackEmail?: string): Pro
     email: api.email ?? fallbackEmail ?? "",
     country: api.country ?? "",
     region: api.region ?? "",
-    industry: api.industry ?? "",
+    industry: industryFromUnknown(api.industry),
     website: api.website ?? "",
     description: api.description ?? "",
   }
@@ -120,7 +125,14 @@ export default function AccountPage() {
   const setProfileData = (fn: (prev: ProfileFormData) => ProfileFormData) =>
     setProfile((p) => ({ ...p, data: fn(p.data) }))
 
-  const countries = useMemo(() => getCountryOptions(i18n.language), [i18n.language])
+  const countries = useMemo(
+    () =>
+      getRegisterCountryOptions(
+        i18n.language,
+        t("register.countries.other", { defaultValue: "Other" })
+      ),
+    [i18n.language, t]
+  )
 
   const regionsByCountry = useMemo(() => {
     const result: Record<string, { value: string; label: string }[]> = {}
@@ -130,6 +142,7 @@ export default function AccountPage() {
         label: t(`register.regions.${key}`) || key,
       }))
     }
+    result[REGISTER_COUNTRY_OTHER_VALUE] = getRegionOptions(REGISTER_COUNTRY_OTHER_VALUE, t)
     return result
   }, [t])
 
@@ -231,11 +244,11 @@ export default function AccountPage() {
     }
   }, [modals.profile, isLoggedIn, user])
 
-  const handleProfileChange = (field: string, value: string) => {
+  const handleProfileChange = (field: string, value: string | string[]) => {
     setProfileData((prev) => {
       if (field === "country") {
-        const nextCountry = value === COUNTRY_NONE ? "" : value
-        return { ...prev, country: nextCountry }
+        const nextCountry = typeof value === "string" && value === COUNTRY_NONE ? "" : value
+        return { ...prev, country: typeof nextCountry === "string" ? nextCountry : prev.country }
       }
       return { ...prev, [field]: value }
     })
@@ -277,7 +290,7 @@ export default function AccountPage() {
       }
       const profilePayload = {
         company_name_vi: profileData.companyNameVi,
-        company_name_cn: profileData.companyNameCn,
+        company_name_zh: profileData.companyNameCn,
         phone: profileData.phone,
         tax_id: profileData.taxId,
         contact_person: profileData.contactName,

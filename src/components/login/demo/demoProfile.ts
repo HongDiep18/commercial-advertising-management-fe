@@ -13,7 +13,7 @@ export const DEMO_PROFILE_DATA: ProfileFormData = {
   email: "demo@company.com",
   country: "vietnam",
   region: "hcm",
-  industry: "electronics",
+  industry: ["electronics"],
   website: "https://demo-company.com",
   description: "這是一家示範公司，專注於提供優質的產品和服務。",
 }
