@@ -9,7 +9,7 @@ export type ProfileFormData = {
   email: string
   country: string
   region: string
-  industry: string
+  industry: string[]
   website: string
   description: string
 }

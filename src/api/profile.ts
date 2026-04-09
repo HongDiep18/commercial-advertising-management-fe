@@ -53,8 +53,34 @@ function normalizeIndustryId(value: unknown): string {
   return ""
 }
 
+function normalizeIndustryArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((x) => normalizeIndustryId(x)).filter(Boolean)
+  }
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value) as unknown
+      if (Array.isArray(parsed)) {
+        return parsed.map((x) => normalizeIndustryId(x)).filter(Boolean)
+      }
+    } catch {
+      /* not JSON */
+    }
+    const one = normalizeIndustryId(value)
+    return one ? [one] : []
+  }
+  return []
+}
+
+function getIndustryRaw(d: Record<string, unknown>): unknown {
+  if (Array.isArray(d.industry)) return d.industry
+  if (Array.isArray(d.industries)) return d.industries
+  if (Array.isArray(d.selectedIndustries)) return d.selectedIndustries
+  return firstDefined<unknown>(d, INDUSTRY_KEYS)
+}
+
 function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
-  const rawIndustry = firstDefined<string>(d, INDUSTRY_KEYS) ?? ""
+  const rawIndustry = getIndustryRaw(d)
   return {
     ...(d as ProfileResponse),
     contactName: (firstDefined<string>(d, ["contactName", "contactPerson", "contact_person"]) ??
@@ -64,7 +90,7 @@ function toProfileResponse(d: Record<string, unknown>): ProfileResponse {
     uploadLogo: firstDefined<string | null>(d, ["logoUrl", "uploadLogo"]) ?? undefined,
     membershipTier: (firstDefined<string>(d, ["membershipTier", "membership_tier", "membership"]) ??
       undefined) as string | undefined,
-    industry: normalizeIndustryId(rawIndustry),
+    industry: normalizeIndustryArray(rawIndustry),
   }
 }
 

@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type {
+  AddAdminCompanyContactsPayload,
+  AddAdminCompanyContactsResponse,
   CompanyCategoriesResponse,
   CompanyDetail,
   CompanyDirectoryQuery,
@@ -7,6 +9,7 @@ import type {
   FeaturedCompaniesResponse,
 } from "./types"
 import {
+  addAdminCompanyContacts,
   getCompanyCategories,
   getCompanyDetail,
   getCompanyDirectory,
@@ -83,4 +86,24 @@ export function useFeaturedCompanies(): {
   })
 
   return { data, isLoading, isError }
+}
+
+export function useAddAdminCompanyContacts(): {
+  mutateAsync: (args: {
+    companyId: string
+    payload: AddAdminCompanyContactsPayload
+  }) => Promise<AddAdminCompanyContactsResponse>
+  isPending: boolean
+} {
+  const queryClient = useQueryClient()
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: ({ companyId, payload }: { companyId: string; payload: AddAdminCompanyContactsPayload }) =>
+      addAdminCompanyContacts(companyId, payload),
+    onSuccess: (_res, vars) => {
+      queryClient.invalidateQueries({ queryKey: companiesKeys.detail(vars.companyId) })
+    },
+  })
+
+  return { mutateAsync, isPending }
 }

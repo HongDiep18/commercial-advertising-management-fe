@@ -2,6 +2,8 @@ import { api } from "@/lib/api"
 import { profileFormDataToAdminCompanyPatchBody } from "./adminCompany.mapper"
 import type {
   AdminCompanyResponse,
+  AddAdminCompanyContactsPayload,
+  AddAdminCompanyContactsResponse,
   CompanyCategoriesResponse,
   CompanyDirectoryQuery,
   CompanyDirectoryResponse,
@@ -62,7 +64,7 @@ export async function getCompanyDetail(id: string): Promise<CompanyDetail> {
 
 export async function patchAdminCompany(
   companyId: string,
-  body: Record<string, string>
+  body: Record<string, string | string[]>
 ): Promise<AdminCompanyResponse> {
   return api.request<AdminCompanyResponse>(`/admin/companies/${encodeURIComponent(companyId)}`, {
     method: "PATCH",
@@ -78,11 +80,30 @@ export async function patchAdminCompanyWithLogo(
   const form = new FormData()
   const fields = profileFormDataToAdminCompanyPatchBody(data)
   for (const [key, value] of Object.entries(fields)) {
-    form.append(key, value)
+    if (key === "industry" && Array.isArray(value)) {
+      for (const id of value) {
+        form.append(key, id)
+      }
+      continue
+    }
+    form.append(key, String(value))
   }
   form.append("logo_url", logoFile, logoFile.name)
   return api.request<AdminCompanyResponse>(`/admin/companies/${encodeURIComponent(companyId)}`, {
     method: "PATCH",
     body: form,
   })
+}
+
+export async function addAdminCompanyContacts(
+  companyId: string,
+  payload: AddAdminCompanyContactsPayload
+): Promise<AddAdminCompanyContactsResponse> {
+  return api.request<AddAdminCompanyContactsResponse>(
+    `/admin/companies/${encodeURIComponent(companyId)}/contacts`,
+    {
+      method: "POST",
+      body: payload,
+    }
+  )
 }

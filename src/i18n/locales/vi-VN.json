@@ -662,25 +662,32 @@
     },
     "placeholders": {
       "companyNameVi": "Tên Công ty (Tiếng Việt)",
-      "companyNameCn": "Tên Công ty (Tiếng Trung)",
+      "companyNameZh": "Tên Công ty (Tiếng Trung)",
       "phone": "Số điện thoại",
       "taxId": "Mã số thuế",
       "contactPerson": "Người liên hệ",
       "contactPhone": "Số điện thoại người liên hệ",
       "companyAddress": "Địa chỉ Công ty",
-      "email": "E-Mail",
+      "email": "E-Mai đăng ký",
+      "companyEmail": "Email Công ty",
       "emailExample": "ten@congty.com",
       "country": "Chọn xuất xứ *",
       "region": "Chọn Khu vực *",
       "industry": "Chọn ngành nghề *",
       "website": "Trang web *",
       "introduction": "Giới thiệu ngắn *",
+      "note": "Ghi chú:",
       "captcha": "Nhập mã xác minh",
       "selectCountryFirst": "Vui lòng chọn quốc gia trước",
       "membershipTier": "Chọn hạng thành viên"
     },
     "hints": {
       "websiteFormat": "Ví dụ: https://your-company hoặc http://your-company"
+    },
+    "notes": {
+      "multipleAddress": "Lưu ý: Nếu công ty của bạn có nhiều hơn một địa chỉ, vui lòng ghi trong phần Ghi chú và chúng tôi sẽ liên hệ để xác nhận.",
+      "registerEmailUsage": "Lưu ý: Email này không nhất thiết phải là email liên hệ công khai chính thức của công ty. Chúng tôi sẽ liên hệ với bạn qua email này cho các bước tiếp theo của quy trình đăng ký.",
+      "companyEmailExtra": "Lưu ý: Nếu bạn muốn thêm nhiều email liên hệ công ty, vui lòng ghi trong phần Ghi chú và chúng tôi sẽ liên hệ để xác nhận."
     },
     "noRegions": "Không có khu vực nào",
     "errors": {
@@ -813,6 +820,11 @@
     "companyInfo": "Thông tin công ty",
     "cancel": "Hủy",
     "saveChanges": "Lưu thay đổi",
+    "addContactPerson": "Thêm người liên hệ",
+    "addCompanyEmail": "Thêm email công ty",
+    "contactPersonN": "Người liên hệ {{count}}",
+    "emailN": "Email {{count}}",
+    "industriesSelectedCount": "Đã chọn {{count}} ngành",
     "membershipBenefits": "Hạng & quyền lợi hội viên",
     "currentTierLabel": "Hạng hiện tại",
     "tiers": {
@@ -969,7 +981,7 @@
     "close": "Đóng",
     "submittedAt": "Gửi lúc {{date}}",
     "contactPerson": "Người liên hệ",
-    "email": "Email",
+    "email": "Email đăng ký",
     "phone": "Số điện thoại",
     "adType": "Loại quảng cáo",
     "selectedItems": "Mục đã chọn",
@@ -1012,6 +1024,11 @@
     "relatedCompanies": "Doanh nghiệp liên quan",
     "viewMore": "Xem thêm",
     "noRelatedCompanies": "Không có công ty liên quan",
+    "industriesShowMore": "Xem thêm {{count}} ngành",
+    "industriesShowLess": "Thu gọn",
+    "industriesSeeMore": "Xem thêm",
+    "industriesSeeMoreAria": "Hiển thị thêm {{count}} ngành",
+    "keywordTags": "Từ khóa",
     "regions": {
       "寶島台灣": "Đài Loan",
       "台灣": "Đài Loan",

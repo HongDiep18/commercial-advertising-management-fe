@@ -7,10 +7,12 @@ export interface RegisterFormData {
   contactPhone: string
   companyAddress: string
   email: string
+  companyEmail: string
   country: string
-  industry: string
+  industry: string[]
   website: string
   introduction: string
+  note: string
 }
 
 export const INITIAL_REGISTER_FORM: RegisterFormData = {
@@ -22,8 +24,10 @@ export const INITIAL_REGISTER_FORM: RegisterFormData = {
   contactPhone: "",
   companyAddress: "",
   email: "",
+  companyEmail: "",
   country: "",
-  industry: "",
+  industry: [],
   website: "",
   introduction: "",
+  note: "",
 }

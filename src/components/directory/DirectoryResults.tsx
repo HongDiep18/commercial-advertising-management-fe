@@ -5,6 +5,7 @@ import type { CompanyDirectoryQuery } from "@/api/companies/types"
 import { useDebounce } from "@/hooks/useDebounce"
 import { isDemoUser } from "@/components/login/demo"
 import { mockCompanies } from "@/data/mockCompanies"
+import { directoryCompanyMatchesSelectedCategories } from "@/utils/directoryIndustry"
 import {
   companyDirectoryRowMatchesSearch,
   getDirectorySearchAndRegionParams,
@@ -108,6 +109,13 @@ export function DirectoryResults({
     serverDirectoryQueryEnabled
   )
 
+  /** Real API already filters by `industry` query param — avoid redundant client filter + wrong pagination. */
+  const industryFilteredByServer =
+    !isDemo &&
+    serverDirectoryQueryEnabled &&
+    industryParam != null &&
+    industryParam.length > 0
+
   const rawCompanies = isDemo
     ? Object.values(mockCompanies).map((c) => ({
         id: c.id,
@@ -128,7 +136,13 @@ export function DirectoryResults({
   const isSearching = searchValue.length > 0
 
   const displayedCompanies = rawCompanies.filter((c) => {
-    if (selectedCategories.length > 0 && !selectedCategories.includes(c.industry)) return false
+    if (
+      selectedCategories.length > 0 &&
+      !industryFilteredByServer &&
+      !directoryCompanyMatchesSelectedCategories(selectedCategories, c.industry)
+    ) {
+      return false
+    }
     if (!isSearching) return true
     if (serverDirectoryQueryEnabled) return true
 
@@ -150,7 +164,10 @@ export function DirectoryResults({
 
   const usesClientFiltering =
     (isDemo && (isSearching || selectedCategories.length > 0)) ||
-    (!isDemo && !isSearching && selectedCategories.length > 0)
+    (!isDemo &&
+      !isSearching &&
+      selectedCategories.length > 0 &&
+      !industryFilteredByServer)
   const totalPages = isDemo || usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
   const displayTotalResults =
     isDemo || usesClientFiltering ? displayedCompanies.length : (data?.pagination.total ?? 0)
