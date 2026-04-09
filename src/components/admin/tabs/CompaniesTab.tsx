@@ -1,6 +1,7 @@
 "use client"
 
 import { useCompanyRequestsPage, useCompanyRequestsTabCounts } from "@/api/admin/hooks"
+import { formatIndustryForDisplay } from "@/api/companies/adminCompany.mapper"
 import { getCompanyDetail } from "@/api/companies/service"
 import { AccountProfileModal } from "@/components/account"
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
@@ -302,7 +303,10 @@ export function CompaniesTab() {
                   const displayContact = cached?.contactName?.trim()
                     ? cached.contactName
                     : row.contactName
-                  const displayIndustry = cached?.industry?.trim() ? cached.industry : row.industry
+                  const industryFromCache = formatIndustryForDisplay(cached?.industry)
+                  const industryFromRow = formatIndustryForDisplay(row.industry)
+                  const displayIndustry =
+                    (industryFromCache.trim() ? industryFromCache : industryFromRow) || ""
 
                   return (
                     <tr
@@ -474,7 +478,7 @@ export function CompaniesTab() {
           onLogoUpload={companyEdit.actions.handleEditLogoUpload}
           fileInputRef={companyEdit.ui.editFileInputRef}
           logoUploaded={companyEdit.state.editLogo.uploaded}
-          onSave={() => void companyEdit.actions.handleSaveCompanyEdit()}
+          onSave={(extras) => void companyEdit.actions.handleSaveCompanyEdit(extras)}
           isSaving={companyEdit.state.editSaving}
           countries={companyEdit.ui.countries}
           allRegions={companyEdit.ui.allRegions}

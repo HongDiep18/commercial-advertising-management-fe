@@ -21,11 +21,15 @@ import {
   Lock,
   Crown,
   FileText,
+  ChevronsDown,
+  ChevronsUp,
 } from "lucide-react"
 import { useUser, UserRole, MembershipTier } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
 import { isDemoUser } from "@/components/login/demo"
+import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
 import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import { truncateIntroduction, categoryNameToIdMap } from "../../utils/companyHelpers"
@@ -52,6 +56,21 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
+  const queryClient = useQueryClient()
+  const industriesExpandedQueryKey = [
+    "ui",
+    "companyDetail",
+    companyId,
+    "industriesExpanded",
+  ] as const
+  const { data: industriesExpanded = false } = useQuery({
+    queryKey: industriesExpandedQueryKey,
+    queryFn: () => Promise.resolve(false),
+    enabled: false,
+    initialData: false,
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 30,
+  })
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -71,6 +90,10 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   } = useTierInfo(isLoggedIn && !isAdmin)
 
   const relatedIndustry = apiCompany?.industry
+  const hasRelatedIndustryQuery =
+    relatedIndustry != null &&
+    relatedIndustry !== "" &&
+    (!Array.isArray(relatedIndustry) || relatedIndustry.length > 0)
 
   const { data: relatedDirectoryData } = useCompanyDirectory(
     {
@@ -80,7 +103,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
       sortBy: "name",
       sortOrder: "asc",
     },
-    Boolean(relatedIndustry)
+    hasRelatedIndustryQuery
   )
 
   const relatedCompanies = useMemo<
@@ -212,8 +235,22 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     backParam && backParam.startsWith("/directory") ? backParam : fallbackBackToDirectory
   const encodedBackToDirectory = encodeURIComponent(backToDirectoryHref)
 
-  const categoryId = categoryNameToIdMap[company.category] || ""
-  const translatedCategory = categoryId ? t(`directory.categories.${categoryId}`) : company.category
+  const industryTags = [...new Set(industryFromUnknown(company.category as unknown))].map(
+    (entry) => {
+      const slug = categoryNameToIdMap[entry] ?? entry
+      return {
+        key: `${slug}-${entry}`,
+        label: t(`directory.categories.${slug}`, { defaultValue: entry }),
+      }
+    }
+  )
+
+  const INDUSTRY_TAG_VISIBLE_DEFAULT = 3
+  const industryTagsOverflow = industryTags.length > INDUSTRY_TAG_VISIBLE_DEFAULT
+  const visibleIndustryTags = industriesExpanded
+    ? industryTags
+    : industryTags.slice(0, INDUSTRY_TAG_VISIBLE_DEFAULT)
+  const hiddenIndustryCount = Math.max(0, industryTags.length - INDUSTRY_TAG_VISIBLE_DEFAULT)
 
   const effectiveTier = isAdmin
     ? MembershipTier.DIAMOND
@@ -363,22 +400,100 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                   </p>
                 </div>
 
-                <div className="mb-6 flex flex-wrap gap-2">
-                  <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-                    {translatedCategory}
-                  </span>
-                  {company.categoryTags.map((tag) => {
-                    const translatedTag = t(`directory.categoryTags.${tag}`, { defaultValue: tag })
-                    return (
-                      <span
-                        key={tag}
-                        className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-sm"
-                      >
-                        {translatedTag}
-                      </span>
-                    )
-                  })}
-                </div>
+                {(industryTags.length > 0 || company.categoryTags.length > 0) && (
+                  <div className="mb-6 space-y-4">
+                    {industryTags.length > 0 && (
+                      <div className="border-border/60 from-muted/35 via-muted/15 rounded-xl border bg-gradient-to-br to-transparent p-4 shadow-sm">
+                        <div className="mb-3 flex items-center gap-2">
+                          <div className="bg-primary/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                            <Building2 className="text-primary h-4 w-4" aria-hidden />
+                          </div>
+                          <span className="text-foreground text-sm font-semibold tracking-tight">
+                            {t("directory.industryCategory")}
+                          </span>
+                        </div>
+                        <ul className="m-0 flex w-full list-none flex-col gap-1.5 p-0">
+                          {visibleIndustryTags.map(({ key, label }) => (
+                            <li key={key} className="w-full min-w-0">
+                              <span className="border-primary/15 bg-primary/[0.06] text-primary flex w-full min-w-0 items-center justify-start rounded-md border px-3 py-2 text-left text-xs leading-snug font-medium break-words shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] sm:text-[13px]">
+                                {label}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        {industryTagsOverflow && (
+                          <div className="border-border/50 mt-3 border-t pt-3">
+                            <button
+                              type="button"
+                              className="text-primary hover:bg-primary/10 flex w-full flex-col items-center gap-1 rounded-lg py-2 text-center transition-colors"
+                              onClick={() =>
+                                queryClient.setQueryData<boolean>(
+                                  industriesExpandedQueryKey,
+                                  (prev) => !(prev ?? false)
+                                )
+                              }
+                              aria-expanded={industriesExpanded}
+                              aria-label={
+                                industriesExpanded
+                                  ? t("companyDetail.industriesShowLess")
+                                  : t("companyDetail.industriesSeeMoreAria", {
+                                      count: hiddenIndustryCount,
+                                    })
+                              }
+                            >
+                              {industriesExpanded ? (
+                                <>
+                                  <ChevronsUp className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+                                  <span className="text-xs font-semibold">
+                                    {t("companyDetail.industriesShowLess")}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronsDown
+                                    className="h-4 w-4 shrink-0 opacity-90"
+                                    aria-hidden
+                                  />
+                                  <span className="text-xs font-semibold">
+                                    {t("companyDetail.industriesSeeMore")}
+                                  </span>
+                                  <span className="text-muted-foreground text-[11px] font-normal">
+                                    {t("companyDetail.industriesShowMore", {
+                                      count: hiddenIndustryCount,
+                                    })}
+                                  </span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {company.categoryTags.length > 0 && (
+                      <div>
+                        <p className="text-muted-foreground mb-2 text-xs font-medium">
+                          {t("companyDetail.keywordTags")}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {company.categoryTags.map((tag) => {
+                            const translatedTag = t(`directory.categoryTags.${tag}`, {
+                              defaultValue: tag,
+                            })
+                            return (
+                              <span
+                                key={tag}
+                                className="bg-muted/80 text-muted-foreground inline-flex max-w-full items-center rounded-md border border-transparent px-2 py-1 text-xs break-words"
+                              >
+                                {translatedTag}
+                              </span>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="flex items-start gap-3">

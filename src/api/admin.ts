@@ -1,4 +1,5 @@
 import { api } from "@/lib/api"
+import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
 import {
   type ProfileRequest,
   type ProfileRequestRow,
@@ -143,6 +144,8 @@ type ProfileRequestInput = ProfileRequest & {
   deletedAt?: string | null
   contactName?: string
   registrationStatus?: string
+  industries?: unknown
+  companyEmail?: string
 }
 
 function getUserIdFromItem(p: ProfileRequestInput): string | undefined {
@@ -159,14 +162,21 @@ function getDeletedAtFromItem(p: ProfileRequestInput): string | null | undefined
   return p.deletedAt ?? undefined
 }
 
+function getEmailFromItem(p: ProfileRequestInput): string {
+  const direct = typeof p.email === "string" ? p.email.trim() : ""
+  if (direct) return direct
+  const fallback = p.companyEmail as unknown
+  return typeof fallback === "string" ? fallback.trim() : ""
+}
+
 export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): ProfileRequestRow {
   const statusRaw = p.status ?? p.registrationStatus ?? ""
   return {
     id: p.id,
     companyName: p.companyNameVi || p.companyNameCn || "",
-    email: p.email,
+    email: getEmailFromItem(p),
     contactName: p.contactName ?? "",
-    industry: p.industry,
+    industry: industryFromUnknown(p.industries ?? p.industry).join(", "),
     country: p.country,
     status: statusRaw as ProfileRequestStatus,
     submittedAt: p.submittedAt ?? p.createdAt ?? "",

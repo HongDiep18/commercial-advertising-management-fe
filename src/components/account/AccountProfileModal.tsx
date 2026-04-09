@@ -1,17 +1,18 @@
 "use client"
 
-import { categories } from "@/components/directory/DirectorySidebar"
+import { REGISTER_CATEGORIES } from "@/components/register/registerCategories"
 import Button from "@/components/ui/Button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { RequiredMark, stripTrailingAsterisk } from "@/components/ui/required-mark"
 import Input from "@/components/ui/Input"
-import Select from "@/components/ui/Select"
+import { SearchableMultiSelect } from "@/components/ui/SearchableMultiSelect"
 import { SearchableSelect } from "@/components/ui/SearchableSelect"
 import Textarea from "@/components/ui/Textarea"
+import { cn } from "@/lib/utils"
 import type { ProfileFormData } from "@/types/account"
 import type { TFunction } from "i18next"
-import { Edit3, ImageIcon, Save, Upload, X } from "lucide-react"
-import type { RefObject } from "react"
+import { Edit3, ImageIcon, Plus, Save, Upload, X } from "lucide-react"
+import { useState, type RefObject } from "react"
 import { COUNTRY_NONE } from "./accountConstants"
 
 type CountryOption = { value: string; label: string }
@@ -30,13 +31,13 @@ type AccountProfileModalProps = {
   open: boolean
   onClose: () => void
   profileData: ProfileFormData
-  onProfileChange: (field: string, value: string) => void
+  onProfileChange: (field: string, value: string | string[]) => void
   fieldErrors?: Partial<Record<keyof ProfileFormData, string>>
   companyLogo: string | null
   onLogoUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
   fileInputRef: RefObject<HTMLInputElement | null>
   logoUploaded: boolean
-  onSave: () => void
+  onSave: (extras: { emails: string[]; contactPhones: string[] }) => void
   isSaving: boolean
   countries: CountryOption[]
   allRegions: RegionOption[]
@@ -60,7 +61,38 @@ export function AccountProfileModal({
   readOnly = false,
   t,
 }: AccountProfileModalProps) {
+  const [extraEmails, setExtraEmails] = useState<string[]>([])
+  const [extraEmailErrors, setExtraEmailErrors] = useState<string[]>([])
+  const [extraContacts, setExtraContacts] = useState<Array<{ name: string; phone: string }>>([])
+  const [addContactRows, setAddContactRows] = useState<Array<{ type: string; value: string }>>([])
+
+  const getInvalidEmailMessage = () =>
+    t("register.errors.invalidEmail", {
+      defaultValue: "Please enter a valid email address.",
+    })
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  const validateExtraEmails = (values: string[]) =>
+    values.map((email) => {
+      const trimmed = email.trim()
+      if (!trimmed) return ""
+      return isValidEmail(trimmed) ? "" : getInvalidEmailMessage()
+    })
+
+  const industryCategories = REGISTER_CATEGORIES.map((cat) => ({
+    id: cat.id,
+    name: t(cat.i18nKey) || `${cat.code}. ${cat.fallback}`,
+  }))
+
   if (!open) return null
+
+  const extraEmailsToSubmit = extraEmails.map((s) => s.trim()).filter(Boolean)
+  const extraContactPhonesToSubmit = extraContacts.map((row) => row.phone.trim()).filter(Boolean)
+  const handleSaveClick = () => {
+    const nextExtraEmailErrors = validateExtraEmails(extraEmails)
+    setExtraEmailErrors(nextExtraEmailErrors)
+    if (nextExtraEmailErrors.some(Boolean)) return
+    onSave({ emails: extraEmailsToSubmit, contactPhones: extraContactPhonesToSubmit })
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -155,12 +187,12 @@ export function AccountProfileModal({
                 <Field className="gap-1.5">
                   <FieldLabel className="text-foreground text-sm font-medium">
                     {stripTrailingAsterisk(
-                      t("register.placeholders.companyNameCn") || "公司名稱（中文）"
+                      t("register.placeholders.companyNameZh") || "公司名稱（中文）"
                     )}
                     <RequiredMark />
                   </FieldLabel>
                   <Input
-                    placeholder={t("register.placeholders.companyNameCn") || "公司名稱（中文）"}
+                    placeholder={t("register.placeholders.companyNameZh") || "公司名稱（中文）"}
                     value={profileData.companyNameCn}
                     onChange={(e) => onProfileChange("companyNameCn", e.target.value)}
                     disabled={readOnly}
@@ -229,6 +261,77 @@ export function AccountProfileModal({
                   />
                 </Field>
               </FieldWithError>
+              {(!readOnly || extraContacts.length > 0) && (
+                <div className="col-span-full space-y-2 sm:col-span-2">
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      className="text-primary hover:bg-primary/10 inline-flex w-fit items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors"
+                      onClick={() => setExtraContacts((prev) => [...prev, { name: "", phone: "" }])}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {t("account.addContactPerson", { defaultValue: "Add contact person" })}
+                    </button>
+                  )}
+                  {extraContacts.length > 0 && (
+                    <div className="space-y-2">
+                      {extraContacts.map((row, idx) => (
+                        <div
+                          key={`extra-contact-${idx}`}
+                          className={cn(
+                            "grid w-full min-w-0 items-center gap-2",
+                            readOnly
+                              ? "grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+                              : "grid-cols-[minmax(0,1fr)_minmax(0,1fr)_40px]"
+                          )}
+                        >
+                          <Input
+                            className="min-w-0"
+                            placeholder={t("account.contactPersonN", {
+                              count: idx + 1,
+                              defaultValue: `Contact person ${idx + 1}`,
+                            })}
+                            value={row.name}
+                            onChange={(e) =>
+                              setExtraContacts((prev) =>
+                                prev.map((v, i) => (i === idx ? { ...v, name: e.target.value } : v))
+                              )
+                            }
+                            disabled={readOnly}
+                          />
+                          <Input
+                            className="min-w-0"
+                            placeholder={`${t("register.placeholders.contactPhone", {
+                              defaultValue: "Contact Phone",
+                            })} ${idx + 1}`}
+                            value={row.phone}
+                            onChange={(e) =>
+                              setExtraContacts((prev) =>
+                                prev.map((v, i) =>
+                                  i === idx ? { ...v, phone: e.target.value } : v
+                                )
+                              )
+                            }
+                            disabled={readOnly}
+                          />
+                          {!readOnly && (
+                            <button
+                              type="button"
+                              className="text-muted-foreground hover:text-destructive inline-flex h-10 w-[40px] max-w-[40px] min-w-[40px] shrink-0 items-center justify-center rounded-md border border-gray-400 p-0 transition-colors"
+                              onClick={() =>
+                                setExtraContacts((prev) => prev.filter((_, i) => i !== idx))
+                              }
+                              aria-label={t("common.remove", { defaultValue: "Remove" })}
+                            >
+                              <X className="h-4 w-4 shrink-0" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.address}>
@@ -260,9 +363,151 @@ export function AccountProfileModal({
                     onChange={(e) => onProfileChange("email", e.target.value)}
                     disabled={readOnly}
                   />
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      className="text-primary hover:bg-primary/10 mt-2 inline-flex w-fit items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors"
+                      onClick={() => {
+                        setExtraEmails((prev) => [...prev, ""])
+                        setExtraEmailErrors((prev) => [...prev, ""])
+                      }}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {t("account.addCompanyEmail", { defaultValue: "Add company email" })}
+                    </button>
+                  )}
+                  {extraEmails.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {extraEmails.map((value, idx) => (
+                        <div key={`extra-email-${idx}`} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="email"
+                              className={cn(
+                                extraEmailErrors[idx] &&
+                                  "border-red-500 focus-visible:ring-red-500/30"
+                              )}
+                              placeholder={t("account.emailN", {
+                                count: idx + 1,
+                                defaultValue: `Email ${idx + 1}`,
+                              })}
+                              value={value}
+                              onChange={(e) => {
+                                const nextValue = e.target.value
+                                setExtraEmails((prev) =>
+                                  prev.map((v, i) => (i === idx ? nextValue : v))
+                                )
+                                setExtraEmailErrors((prev) =>
+                                  prev.map((err, i) => {
+                                    if (i !== idx) return err
+                                    const trimmed = nextValue.trim()
+                                    if (!trimmed) return ""
+                                    return isValidEmail(trimmed) ? "" : getInvalidEmailMessage()
+                                  })
+                                )
+                              }}
+                              disabled={readOnly}
+                            />
+                            {!readOnly && (
+                              <button
+                                type="button"
+                                className="text-muted-foreground hover:text-destructive inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-400 transition-colors"
+                                onClick={() => {
+                                  setExtraEmails((prev) => prev.filter((_, i) => i !== idx))
+                                  setExtraEmailErrors((prev) => prev.filter((_, i) => i !== idx))
+                                }}
+                                aria-label={t("common.remove", { defaultValue: "Remove" })}
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                          {extraEmailErrors[idx] && (
+                            <p className="text-sm text-red-500">{extraEmailErrors[idx]}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Field>
               </FieldWithError>
             </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <Field>
+                <div className="flex items-center justify-between gap-3">
+                  <FieldLabel className="text-foreground text-sm font-medium">
+                    {t("account.addContact", { defaultValue: "Add contact" })}
+                  </FieldLabel>
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      className="text-primary hover:bg-primary/10 inline-flex w-fit items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors"
+                      onClick={() =>
+                        setAddContactRows((prev) => [...prev, { type: "email", value: "" }])
+                      }
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {t("account.addContact", { defaultValue: "Add contact" })}
+                    </button>
+                  )}
+                </div>
+                {addContactRows.length > 0 && (
+                  <div className="space-y-2">
+                    {addContactRows.map((row, idx) => (
+                      <div
+                        key={`add-contact-row-${idx}`}
+                        className="grid grid-cols-1 gap-2 sm:grid-cols-10"
+                      >
+                        <div className="sm:col-span-3">
+                          <SearchableSelect
+                            value={row.type}
+                            onValueChange={(nextType) =>
+                              setAddContactRows((prev) =>
+                                prev.map((item, i) =>
+                                  i === idx ? { ...item, type: nextType } : item
+                                )
+                              )
+                            }
+                            disabled={readOnly}
+                            options={[
+                              {
+                                value: "email",
+                                label: t("register.placeholders.email", { defaultValue: "E-Mail" }),
+                              },
+                              {
+                                value: "phone",
+                                label: t("register.placeholders.contactPhone", {
+                                  defaultValue: "Contact Phone",
+                                }),
+                              },
+                            ]}
+                            placeholder={t("account.addContact", { defaultValue: "Add contact" })}
+                            searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                            emptyText={t("common.noResults", { defaultValue: "No results." })}
+                          />
+                        </div>
+                        <div className="sm:col-span-7">
+                          <Input
+                            value={row.value}
+                            onChange={(e) =>
+                              setAddContactRows((prev) =>
+                                prev.map((item, i) =>
+                                  i === idx ? { ...item, value: e.target.value } : item
+                                )
+                              )
+                            }
+                            disabled={readOnly}
+                            placeholder={t("account.addContact", { defaultValue: "Add contact" })}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Field>
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FieldWithError error={fieldErrors.country}>
                 <Field className="gap-1.5">
@@ -316,28 +561,29 @@ export function AccountProfileModal({
                     {stripTrailingAsterisk(t("register.placeholders.industry") || "選擇產業類別")}
                     <RequiredMark />
                   </FieldLabel>
-                  <Select
+                  <SearchableMultiSelect
                     value={profileData.industry}
-                    onValueChange={(value) => onProfileChange("industry", value)}
+                    onValueChange={(next) => onProfileChange("industry", next)}
                     disabled={readOnly}
-                    options={categories.map((cat) => ({
-                      value: cat,
-                      label: t(`directory.categories.${cat}`) || cat,
+                    options={industryCategories.map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
                     }))}
-                  >
-                    <Select.Trigger className="w-full min-w-0">
-                      <Select.Value
-                        placeholder={t("register.placeholders.industry") || "選擇產業類別"}
-                      />
-                    </Select.Trigger>
-                    <Select.Content>
-                      {categories.map((cat) => (
-                        <Select.Item key={cat} value={cat}>
-                          {t(`directory.categories.${cat}`) || cat}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
+                    placeholder={t("register.placeholders.industry") || "選擇產業類別"}
+                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                    emptyText={t("common.noResults", { defaultValue: "No results." })}
+                    listMaxHeightClassName="max-h-[11.25rem]"
+                    formatSummary={(selected, opts) => {
+                      const labels = selected
+                        .map((v) => opts.find((o) => o.value === v)?.label)
+                        .filter(Boolean) as string[]
+                      if (labels.length === 0) return ""
+                      if (labels.length <= 2) return labels.join(", ")
+                      return t("account.industriesSelectedCount", {
+                        count: labels.length,
+                      })
+                    }}
+                  />
                 </Field>
               </FieldWithError>
             </div>
@@ -388,7 +634,7 @@ export function AccountProfileModal({
             {!readOnly && (
               <Button
                 className="!bg-header-red-dark hover:!bg-header-red-dark/80 flex-1 text-white hover:!text-white"
-                onClick={onSave}
+                onClick={handleSaveClick}
                 disabled={isSaving}
               >
                 <Save className="mr-2 h-4 w-4" />

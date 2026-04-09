@@ -1,4 +1,3 @@
-import type { RegisterFormData } from "@/components/register/registerConstants"
 import {
   REGISTER_ERROR_KEYS,
   type RegisterErrorKind,
@@ -25,13 +24,29 @@ export function createRegisterFormSchema(t: TFunction) {
       contactPhone: z.string(),
       companyAddress: z.string(),
       email: z.string(),
+      companyEmail: z.string(),
       country: z.string(),
-      industry: z.string(),
+      industry: z.array(z.string()),
       website: z.string(),
       introduction: z.string(),
+      note: z.string().optional(),
     })
     .superRefine((data, ctx) => {
-      const req = (field: keyof RegisterFormData) => {
+      const req = (
+        field:
+          | "companyNameVi"
+          | "companyNameCn"
+          | "phone"
+          | "taxId"
+          | "contactPerson"
+          | "contactPhone"
+          | "companyAddress"
+          | "email"
+          | "companyEmail"
+          | "country"
+          | "website"
+          | "introduction"
+      ) => {
         if (typeof data[field] !== "string" || data[field].trim().length === 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -51,18 +66,34 @@ export function createRegisterFormSchema(t: TFunction) {
           "contactPhone",
           "companyAddress",
           "email",
+          "companyEmail",
           "country",
-          "industry",
           "website",
           "introduction",
         ] as const
       ).forEach(req)
+
+      if (!Array.isArray(data.industry) || data.industry.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["industry"],
+          message: err(t, "required"),
+        })
+      }
 
       const emailVal = data.email?.trim() ?? ""
       if (emailVal && !EMAIL_REGEX.test(emailVal)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["email"],
+          message: err(t, "invalidEmail"),
+        })
+      }
+      const companyEmailVal = data.companyEmail?.trim() ?? ""
+      if (companyEmailVal && !EMAIL_REGEX.test(companyEmailVal)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["companyEmail"],
           message: err(t, "invalidEmail"),
         })
       }

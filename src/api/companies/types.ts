@@ -18,7 +18,7 @@ export type CompanyDirectoryItem = {
   email: string
   contactName: string
   phone: string
-  industry: string
+  industry: string | string[]
   region?: string
   address: string
   description: string
@@ -109,4 +109,15 @@ export type AdminCompanyResponse = {
   website?: string
   contactName?: string
   contactPhone?: string
+}
+
+export type AddAdminCompanyContactsPayload = {
+  emails?: string[]
+  contactPhones?: string[]
+  contactName?: string
+}
+
+export type AddAdminCompanyContactsResponse = {
+  added: number
+  skippedDuplicates: number
 }

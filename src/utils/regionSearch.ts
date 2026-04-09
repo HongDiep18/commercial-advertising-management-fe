@@ -8,19 +8,26 @@ export const ALL_REGION_KEYS = Array.from(new Set(Object.values(REGION_KEYS_BY_C
 
 const MIN_PREFIX_LEN = 2
 
+function stripEnglishCitySuffix(v: string): string {
+  return v.replace(/\bcity\b/g, " ")
+}
+
 export function normalizeRegionKey(region: string): string {
-  return region
+  return stripEnglishCitySuffix(
+    region
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[\s_-]+/g, "")
+  ).replace(/[\s_-]+/g, "")
 }
 
 export function normalizeSearchText(value: string): string {
-  return value
+  return stripEnglishCitySuffix(
+    value
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
+  )
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
@@ -165,7 +172,7 @@ export function companyRegionMatchesSearch(
 export function companyDirectoryRowMatchesSearch(
   row: {
     name: string
-    industry: string
+    industry: string | string[]
     region?: string
     address?: string
     description?: string
@@ -180,9 +187,11 @@ export function companyDirectoryRowMatchesSearch(
   const qc = compactSearchText(searchValue)
   if (!qn) return true
 
+  const industryText = Array.isArray(row.industry) ? row.industry.join(" ") : row.industry
+
   const baseParts = [
     row.name,
-    row.industry,
+    industryText,
     row.address,
     row.description,
     row.contactName,
