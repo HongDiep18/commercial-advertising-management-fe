@@ -2,7 +2,7 @@
 
 import { useCompanyRequestsPage, useCompanyRequestsTabCounts } from "@/api/admin/hooks"
 import { formatIndustryForDisplay } from "@/api/companies/adminCompany.mapper"
-import { getCompanyDetail } from "@/api/companies/service"
+import { companiesKeys, useCompanyDetailEnrichmentMap } from "@/api/companies/hooks"
 import { AccountProfileModal } from "@/components/account"
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
@@ -28,7 +28,8 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAdminData } from "../AdminDataContext"
 import { PROFILE_REQUEST_FILTERS } from "../constants"
@@ -37,6 +38,7 @@ import { useCompanyEdit } from "./useCompanyEdit"
 
 export function CompaniesTab() {
   const { t, i18n } = useTranslation()
+  const queryClient = useQueryClient()
   const { user } = useUser()
   const canEditCompanyProfile = isAdminRole(user?.role)
   const { updateCompanyRequestStatus, updateUserActive, deleteCompany, refetchCompanyRequests } =
@@ -51,15 +53,6 @@ export function CompaniesTab() {
     visible: false,
   })
 
-  type CompanyInfoCache = {
-    companyName: string
-    email: string
-    contactName: string
-    industry: string
-  }
-
-  const [companyInfoById, setCompanyInfoById] = useState<Record<string, CompanyInfoCache>>({})
-
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
@@ -71,11 +64,7 @@ export function CompaniesTab() {
     onShowToast: showToast,
     onRefetchCompanyRequests: refetchCompanyRequests,
     onCompanyEmailResolved: (companyId) => {
-      setCompanyInfoById((prev) => {
-        const next = { ...prev }
-        delete next[companyId]
-        return next
-      })
+      void queryClient.invalidateQueries({ queryKey: companiesKeys.detail(companyId) })
     },
   })
 
@@ -152,75 +141,23 @@ export function CompaniesTab() {
 
   const { statusCounts } = useCompanyRequestsTabCounts()
 
-  useEffect(() => {
-    let cancelled = false
-
-    const loadApprovedCompanyInfo = async () => {
-      const companyRowById: Record<string, ProfileRequestRow> = {}
-
-      for (const r of rows) {
-        if (r.status !== ProfileRequestStatus.APPROVED) continue
-        const id = r.companyId?.trim()
-        if (!id) continue
-        if (!companyRowById[id]) companyRowById[id] = r
-      }
-
-      const companyIds = Object.keys(companyRowById)
-      if (companyIds.length === 0) return
-
-      const idsToFetch = companyIds.filter((id) => !companyInfoById[id])
-      if (idsToFetch.length === 0) return
-
-      const pairs = await Promise.all(
-        idsToFetch.map(async (id) => {
-          try {
-            const detail = await getCompanyDetail(id)
-            const fallback = companyRowById[id]
-
-            const companyName =
-              detail.companyNameVi || detail.companyNameCn || fallback?.companyName || ""
-            const email =
-              typeof detail.email === "string" && detail.email.trim()
-                ? detail.email.trim()
-                : fallback?.email || ""
-            const contactName = detail.contactName || fallback?.contactName || ""
-            const industry = detail.industry || fallback?.industry || ""
-
-            if (!email) return null
-
-            return [
-              id,
-              {
-                companyName,
-                email,
-                contactName,
-                industry,
-              },
-            ] as const
-          } catch {
-            return null
-          }
-        })
-      )
-
-      if (cancelled) return
-
-      setCompanyInfoById((prev) => {
-        const next = { ...prev }
-        for (const pair of pairs) {
-          if (!pair) continue
-          const [id, info] = pair
-          next[id] = info
-        }
-        return next
-      })
+  const approvedCompanyRowsById = useMemo(() => {
+    const m: Record<string, ProfileRequestRow> = {}
+    for (const r of rows) {
+      if (r.status !== ProfileRequestStatus.APPROVED) continue
+      const id = r.companyId?.trim()
+      if (!id) continue
+      if (!m[id]) m[id] = r
     }
+    return m
+  }, [rows])
 
-    void loadApprovedCompanyInfo()
-    return () => {
-      cancelled = true
-    }
-  }, [rows, companyInfoById])
+  const approvedCompanyIds = useMemo(
+    () => Object.keys(approvedCompanyRowsById),
+    [approvedCompanyRowsById]
+  )
+
+  const companyInfoById = useCompanyDetailEnrichmentMap(approvedCompanyIds, approvedCompanyRowsById)
 
   if (isListLoading) {
     return (
