@@ -16,7 +16,7 @@ export type AdminData = {
   companyRequestsError?: string
   updateCompanyRequestStatus?: (id: string, status: ProfileRequestStatusUpdate) => Promise<void>
   updateUserActive?: (userId: string, isActive: boolean) => Promise<void>
-  deleteCompany?: (userId: string) => Promise<void>
+  deleteCompany?: (target: Pick<ProfileRequestRow, "userId" | "companyId">) => Promise<void>
   refetchCompanyRequests?: () => void
 }
 

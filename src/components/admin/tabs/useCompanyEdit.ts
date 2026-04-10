@@ -2,41 +2,64 @@
 
 import { useMemo, useReducer, useRef } from "react"
 import type { TFunction } from "i18next"
-import { COUNTRY_NONE, REGION_KEYS_BY_COUNTRY } from "@/components/account"
 import {
-  adminCompanyResponseToProfileForm,
-  companyDetailToProfileForm,
-  EMPTY_PROFILE_FORM,
-  pickLogoUrlFromApiResponse,
-  profileFormDataToAdminCompanyPatchBody,
-  rowToProfileForm,
-} from "@/api/companies/adminCompany.mapper"
+  EMPTY_ADMIN_COMPANY_FORM,
+  adminCompanyDetailToForm,
+  adminCompanyFormToUpdatePayload,
+  ensureAdminCompanyFormContacts,
+  type AdminCompanyForm,
+  pickAdminCompanyLogoUrl,
+} from "@/api/admin-companies/mapper"
 import {
-  getCompanyDetail,
-  patchAdminCompany,
-  patchAdminCompanyWithLogo,
-} from "@/api/companies/service"
-import { useAddAdminCompanyContacts } from "@/api/companies/hooks"
-import type { ProfileFormData } from "@/types/account"
-import { PROFILE_ERROR_KEYS, validateProfileForm } from "@/components/register/registerValidation"
+  getAdminCompanyDetail,
+  updateAdminCompany,
+  updateAdminCompanyWithLogo,
+} from "@/api/admin-companies/service"
+import type { AdminCompanyContact, AdminCompanyMember } from "@/api/admin-companies/types"
+import { REGION_KEYS_BY_COUNTRY } from "@/components/account"
 import {
   getRegisterCountryOptions,
   getRegionOptions,
+  REGION_OPTIONS_BY_COUNTRY,
   REGISTER_COUNTRY_OTHER_VALUE,
 } from "@/components/register/registerOptions"
 import type { ProfileRequestRow } from "@/types/admin"
+import { normalizeWebsiteHttpScheme } from "@/types/auth"
+import { formatDate } from "@/utils/datetime"
+import { isValidPhone } from "@/utils/validation/phone"
 
 type ToastVariant = "info" | "success" | "error"
+
+type ContactFieldErrors = {
+  type?: string
+  value?: string
+}
+
+type FormErrors = {
+  companyNameVi?: string
+  country?: string
+  region?: string
+  industry?: string
+  contacts: ContactFieldErrors[]
+}
+
 type EditLogoState = { url: string | null; file: File | null; uploaded: boolean; changed: boolean }
-type FieldErrors = Partial<Record<keyof ProfileFormData, string>>
+type EditAccountSummary = {
+  userName: string
+  registeredEmail: string
+  memberSince: string
+  memberRange: string
+}
+
 type EditState = {
   editModalOpen: boolean
   editCompanyId: string | null
-  editProfile: ProfileFormData
-  editFieldErrors: FieldErrors
+  editForm: AdminCompanyForm
+  editFieldErrors: FormErrors
   editSaving: boolean
   editOpening: boolean
   editLogo: EditLogoState
+  editAccountSummary: EditAccountSummary
 }
 
 type UseCompanyEditParams = {
@@ -45,7 +68,7 @@ type UseCompanyEditParams = {
   t: TFunction
   onShowToast: (message: string, variant?: ToastVariant) => void
   onRefetchCompanyRequests?: (() => Promise<unknown>) | (() => void)
-  onCompanyEmailResolved: (companyId: string, email: string | null) => void
+  onCompanyDataChanged: (companyId: string) => void
 }
 
 const EMPTY_EDIT_LOGO: EditLogoState = {
@@ -55,18 +78,157 @@ const EMPTY_EDIT_LOGO: EditLogoState = {
   changed: false,
 }
 
+const EMPTY_ERRORS: FormErrors = {
+  contacts: [],
+}
+
+const EMPTY_ACCOUNT_SUMMARY: EditAccountSummary = {
+  userName: "",
+  registeredEmail: "",
+  memberSince: "",
+  memberRange: "",
+}
+
+const PROTECTED_LAST_CONTACT_TYPES = new Set<AdminCompanyContact["type"]>([
+  "email",
+  "contact_person",
+  "website",
+  "address",
+])
+
 const initialEditState: EditState = {
   editModalOpen: false,
   editCompanyId: null,
-  editProfile: EMPTY_PROFILE_FORM,
-  editFieldErrors: {},
+  editForm: EMPTY_ADMIN_COMPANY_FORM,
+  editFieldErrors: EMPTY_ERRORS,
   editSaving: false,
   editOpening: false,
   editLogo: EMPTY_EDIT_LOGO,
+  editAccountSummary: EMPTY_ACCOUNT_SUMMARY,
 }
 
 function editReducer(state: EditState, patch: Partial<EditState>): EditState {
   return { ...state, ...patch }
+}
+
+function normalizeErrorsLength(errors: FormErrors, contacts: AdminCompanyContact[]): FormErrors {
+  const next = [...errors.contacts]
+  while (next.length < contacts.length) next.push({})
+  return { ...errors, contacts: next.slice(0, contacts.length) }
+}
+
+function hasAnyRowContent(contact: AdminCompanyContact): boolean {
+  return Boolean(
+    String(contact.value ?? "").trim() ||
+    String(contact.contactName ?? "").trim()
+  )
+}
+
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
+
+function isValidWebUrl(value: string): boolean {
+  const raw = value.trim()
+  if (!raw) return false
+  try {
+    const normalized = /^https?:\/\//i.test(raw)
+      ? normalizeWebsiteHttpScheme(raw)
+      : `https://${raw}`
+    const url = new URL(normalized)
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      Boolean(url.hostname.trim()) &&
+      /[a-z0-9]/i.test(url.hostname)
+    )
+  } catch {
+    return false
+  }
+}
+
+function validateForm(form: AdminCompanyForm, t: TFunction): FormErrors {
+  const errors: FormErrors = {
+    contacts: form.contacts.map(() => ({})),
+  }
+
+  if (!form.companyNameVi.trim()) {
+    errors.companyNameVi = t("register.errors.requiredField", {
+      defaultValue: "This field is required.",
+    })
+  }
+  if (!form.country.trim()) {
+    errors.country = t("register.errors.requiredField", {
+      defaultValue: "This field is required.",
+    })
+  }
+  if (!form.region.trim()) {
+    errors.region = t("register.errors.requiredField", {
+      defaultValue: "This field is required.",
+    })
+  }
+  if (form.industry.length === 0) {
+    errors.industry = t("register.errors.requiredField", {
+      defaultValue: "This field is required.",
+    })
+  }
+
+  form.contacts.forEach((contact, index) => {
+    if (!hasAnyRowContent(contact)) return
+
+    const type = String(contact.type ?? "").trim()
+    const value = String(contact.value ?? "").trim()
+    if (!type) {
+      errors.contacts[index].type = t("register.errors.requiredField", {
+        defaultValue: "This field is required.",
+      })
+    }
+    if (!value) {
+      errors.contacts[index].value = t("register.errors.requiredField", {
+        defaultValue: "This field is required.",
+      })
+      return
+    }
+
+    if (type === "email" && !isValidEmail(value)) {
+      errors.contacts[index].value = t("register.errors.invalidEmail", {
+        defaultValue: "Please enter a valid email address.",
+      })
+    } else if (["tel", "contact_person", "fax", "hotline"].includes(type) && !isValidPhone(value)) {
+      errors.contacts[index].value = t("register.errors.invalidPhone", {
+        defaultValue: "Please enter a valid phone number.",
+      })
+    } else if (["website", "facebook"].includes(type) && !isValidWebUrl(value)) {
+      errors.contacts[index].value = t("register.errors.invalidWebsite", {
+        defaultValue: "Please enter a valid website URL.",
+      })
+    }
+  })
+
+  return errors
+}
+
+function formHasErrors(errors: FormErrors): boolean {
+  return Boolean(
+    errors.companyNameVi ||
+    errors.country ||
+    errors.region ||
+    errors.industry ||
+    errors.contacts.some((contact) => contact.type || contact.value)
+  )
+}
+
+function mapMemberToAccountSummary(
+  member: AdminCompanyMember | null | undefined,
+  language: string
+): EditAccountSummary {
+  if (!member) return EMPTY_ACCOUNT_SUMMARY
+
+  return {
+    userName: String(member.userName ?? "").trim(),
+    registeredEmail: String(member.registeredEmail ?? "").trim(),
+    memberSince: member.memberSince?.trim() ? formatDate(member.memberSince, language) : "",
+    memberRange: String(member.membershipTier ?? "").trim(),
+  }
 }
 
 export function useCompanyEdit({
@@ -75,19 +237,19 @@ export function useCompanyEdit({
   t,
   onShowToast,
   onRefetchCompanyRequests,
-  onCompanyEmailResolved,
+  onCompanyDataChanged,
 }: UseCompanyEditParams) {
   const [state, setState] = useReducer(editReducer, initialEditState)
   const editFileInputRef = useRef<HTMLInputElement>(null)
-  const addContacts = useAddAdminCompanyContacts()
   const {
     editModalOpen,
     editCompanyId,
-    editProfile,
+    editForm,
     editFieldErrors,
     editSaving,
     editOpening,
     editLogo,
+    editAccountSummary,
   } = state
 
   const countries = useMemo(
@@ -109,23 +271,42 @@ export function useCompanyEdit({
 
   const allRegions = useMemo(() => {
     const byValue = new Map<string, { value: string; label: string }>()
+
+    // Add all regions from regionsByCountry (comprehensive Vietnam list + "other" country group)
     for (const list of Object.values(regionsByCountry)) {
-      for (const r of list) {
-        if (!byValue.has(r.value)) byValue.set(r.value, r)
+      for (const region of list) {
+        if (!byValue.has(region.value)) byValue.set(region.value, region)
       }
     }
+
+    // Add regions from other country groups (TW, CN, SG, etc.)
+    // Skip the generic "other" entry — "other-region" from Vietnam already covers it.
+    for (const [groupKey, group] of Object.entries(REGION_OPTIONS_BY_COUNTRY)) {
+      if (groupKey === REGISTER_COUNTRY_OTHER_VALUE) continue
+      for (const option of group) {
+        if (!byValue.has(option.value)) {
+          byValue.set(option.value, {
+            value: option.value,
+            label: t(option.labelKey) || option.fallback,
+          })
+        }
+      }
+    }
+
     return Array.from(byValue.values())
-  }, [regionsByCountry])
+  }, [regionsByCountry, t])
+
+  // If the stored region isn't in the list (legacy / mismatched country), inject it with a translated label.
+  const regionOptions = useMemo(() => {
+    const raw = editForm.region.trim()
+    if (!raw || allRegions.some((r) => r.value === raw)) return allRegions
+    const label = t(`register.regions.${raw}`) || raw
+    return [{ value: raw, label }, ...allRegions]
+  }, [allRegions, editForm.region, t])
 
   const closeCompanyEdit = () => {
     if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
-    setState({
-      editModalOpen: false,
-      editCompanyId: null,
-      editProfile: EMPTY_PROFILE_FORM,
-      editFieldErrors: {},
-      editLogo: EMPTY_EDIT_LOGO,
-    })
+    setState(initialEditState)
   }
 
   const openCompanyEdit = async (row: ProfileRequestRow) => {
@@ -140,64 +321,151 @@ export function useCompanyEdit({
         return
       }
 
-      let nextProfile = rowToProfileForm(row)
-      let nextLogo: EditLogoState = { ...EMPTY_EDIT_LOGO }
-
-      try {
-        const detail = await getCompanyDetail(companyId)
-        if (detail && typeof detail === "object") {
-          const d = detail as Record<string, unknown>
-          nextProfile = companyDetailToProfileForm(d, row)
-          const logoUrl = pickLogoUrlFromApiResponse(detail)
-          nextLogo = {
-            ...EMPTY_EDIT_LOGO,
-            url: logoUrl,
-            uploaded: Boolean(logoUrl),
-          }
-        }
-      } catch (err) {
-        console.error("Error getting company detail", err)
-      }
+      const detail = await getAdminCompanyDetail(companyId)
+      const nextForm = adminCompanyDetailToForm(detail)
+      const nextLogoUrl = pickAdminCompanyLogoUrl(detail)
 
       setState({
         editCompanyId: companyId,
-        editProfile: nextProfile,
-        editFieldErrors: {},
-        editLogo: nextLogo,
+        editForm: nextForm,
+        editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, nextForm.contacts),
+        editLogo: {
+          ...EMPTY_EDIT_LOGO,
+          url: nextLogoUrl,
+          uploaded: Boolean(nextLogoUrl),
+        },
+        editAccountSummary: mapMemberToAccountSummary(detail.member, language),
         editModalOpen: true,
       })
+    } catch (err) {
+      const status = (err as { status?: number }).status
+      const msgFromApi = (err as { message?: string }).message
+      if (status === 404) {
+        onShowToast(
+          t("admin.companies.companyNotFound404", "Company or linked user was not found."),
+          "error"
+        )
+      } else if (status === 403) {
+        onShowToast(
+          t("admin.companies.forbidden403", "You are not allowed to update this company."),
+          "error"
+        )
+      } else {
+        onShowToast(
+          msgFromApi ||
+            t("admin.companies.loadCompanyDetailError", "Failed to load company detail."),
+          "error"
+        )
+      }
     } finally {
       setState({ editOpening: false })
     }
   }
 
-  const handleEditProfileChange = (field: string, value: string | string[]) => {
+  const handleEditFieldChange = (field: keyof AdminCompanyForm, value: string | string[]) => {
     if (!canEditCompanyProfile) return
-    const nextProfile = (() => {
-      if (field === "country") {
-        const nextCountry = typeof value === "string" && value === COUNTRY_NONE ? "" : value
-        return {
-          ...editProfile,
-          country: typeof nextCountry === "string" ? nextCountry : editProfile.country,
-        }
-      }
-      return { ...editProfile, [field]: value }
-    })()
-    setState({ editProfile: nextProfile })
-    if (editFieldErrors[field as keyof ProfileFormData]) {
-      setState({ editFieldErrors: { ...editFieldErrors, [field]: undefined } })
+    const nextForm: AdminCompanyForm =
+      field === "country"
+        ? { ...editForm, country: value as string, region: "" }
+        : { ...editForm, [field]: value }
+    setState({ editForm: nextForm })
+
+    if (field !== "contacts" && editFieldErrors[field as keyof Omit<FormErrors, "contacts">]) {
+      setState({
+        editFieldErrors: {
+          ...editFieldErrors,
+          [field]: undefined,
+        },
+      })
     }
+  }
+
+  const handleContactChange = (index: number, field: keyof AdminCompanyContact, value: string) => {
+    if (!canEditCompanyProfile) return
+
+    const nextContacts = ensureAdminCompanyFormContacts(
+      editForm.contacts.map((contact, rowIndex) =>
+        rowIndex === index ? { ...contact, [field]: value } : contact
+      )
+    )
+    const nextErrors = normalizeErrorsLength(editFieldErrors, nextContacts)
+    if (field === "type") nextErrors.contacts[index].type = undefined
+    if (field === "value") nextErrors.contacts[index].value = undefined
+
+    setState({
+      editForm: {
+        ...editForm,
+        contacts: nextContacts,
+      },
+      editFieldErrors: nextErrors,
+    })
+  }
+
+  const handleAddContact = (type: AdminCompanyContact["type"] = "email") => {
+    if (!canEditCompanyProfile) return
+    const nextContacts = ensureAdminCompanyFormContacts([
+      ...editForm.contacts,
+      { type, value: "", contactName: null },
+    ])
+    setState({
+      editForm: {
+        ...editForm,
+        contacts: nextContacts,
+      },
+      editFieldErrors: normalizeErrorsLength(editFieldErrors, nextContacts),
+    })
+  }
+
+  const handleRemoveContact = (index: number) => {
+    if (!canEditCompanyProfile) return
+    const target = editForm.contacts[index]
+    const targetType = String(target?.type ?? "").trim() as AdminCompanyContact["type"]
+
+    if (PROTECTED_LAST_CONTACT_TYPES.has(targetType)) {
+      const sameTypeCount = editForm.contacts.filter(
+        (contact) => String(contact.type ?? "").trim() === targetType
+      ).length
+
+      if (sameTypeCount <= 1) {
+        onShowToast(
+          t("admin.companies.contactDeleteRestricted", {
+            defaultValue: "At least one {{contactType}} row must remain.",
+            contactType: t(`admin.companies.contactTypes.${targetType}`, {
+              defaultValue: targetType,
+            }),
+          }),
+          "error"
+        )
+        return
+      }
+    }
+
+    const safeContacts = ensureAdminCompanyFormContacts(
+      editForm.contacts.filter((_, rowIndex) => rowIndex !== index)
+    )
+    setState({
+      editForm: {
+        ...editForm,
+        contacts: safeContacts,
+      },
+      editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, safeContacts),
+    })
   }
 
   const handleEditLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!canEditCompanyProfile) return
     const file = e.target.files?.[0]
     if (file) {
+      const nextLogoUrl = URL.createObjectURL(file)
       if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
       setState({
+        editForm: {
+          ...editForm,
+          logoUrl: nextLogoUrl,
+        },
         editLogo: {
           ...editLogo,
-          url: URL.createObjectURL(file),
+          url: nextLogoUrl,
           file,
           uploaded: true,
           changed: true,
@@ -207,7 +475,7 @@ export function useCompanyEdit({
     e.target.value = ""
   }
 
-  const handleSaveCompanyEdit = async (extras?: { emails: string[]; contactPhones: string[] }) => {
+  const handleSaveCompanyEdit = async () => {
     if (!canEditCompanyProfile || !editCompanyId) {
       if (!editCompanyId) {
         onShowToast(
@@ -218,14 +486,9 @@ export function useCompanyEdit({
       return
     }
 
-    const companyId = editCompanyId
-    const validation = validateProfileForm(editProfile)
-    if (!validation.valid) {
-      const next: Partial<Record<keyof ProfileFormData, string>> = {}
-      validation.errors.forEach(({ field, kind }) => {
-        next[field] = t(PROFILE_ERROR_KEYS[kind])
-      })
-      setState({ editFieldErrors: next })
+    const validation = validateForm(editForm, t)
+    if (formHasErrors(validation)) {
+      setState({ editFieldErrors: validation })
       setTimeout(
         () =>
           document.querySelector("[data-profile-field-error]")?.scrollIntoView({
@@ -237,84 +500,46 @@ export function useCompanyEdit({
       return
     }
 
-    setState({ editFieldErrors: {}, editSaving: true })
+    setState({
+      editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, editForm.contacts),
+      editSaving: true,
+    })
     try {
+      const payload = adminCompanyFormToUpdatePayload(editForm)
       const res =
         editLogo.changed && editLogo.file
-          ? await patchAdminCompanyWithLogo(editCompanyId, editProfile, editLogo.file)
-          : await patchAdminCompany(
-              editCompanyId,
-              profileFormDataToAdminCompanyPatchBody(editProfile)
-            )
-      setState({ editProfile: adminCompanyResponseToProfileForm(res, editProfile.email) })
+          ? await (async () => {
+              // The multipart endpoint rejects nested payload fields like contacts/industry.
+              // Persist structured data via JSON first, then upload the logo file separately.
+              await updateAdminCompany(editCompanyId, payload)
+              return updateAdminCompanyWithLogo(editCompanyId, {}, editLogo.file)
+            })()
+          : await updateAdminCompany(editCompanyId, payload)
 
-      const nextEmail = typeof res.email === "string" && res.email.trim() ? res.email.trim() : null
-      onCompanyEmailResolved(companyId, nextEmail)
+      const nextForm = adminCompanyDetailToForm(res)
+      const savedLogoUrl = pickAdminCompanyLogoUrl(res)
 
-      const savedLogoUrl = pickLogoUrlFromApiResponse(res)
-      if (savedLogoUrl) {
-        if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
-        setState({
-          editLogo: {
-            ...editLogo,
-            url: savedLogoUrl,
-            file: null,
-            uploaded: true,
-            changed: false,
-          },
-        })
-      } else {
-        setState({ editLogo: { ...editLogo, changed: false } })
-      }
+      if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
 
-      const emails = extras?.emails ?? []
-      const contactPhones = extras?.contactPhones ?? []
-      if (emails.length > 0 || contactPhones.length > 0) {
-        try {
-          const contactsRes = await addContacts.mutateAsync({
-            companyId,
-            payload: {
-              emails: emails.length > 0 ? emails : undefined,
-              contactPhones: contactPhones.length > 0 ? contactPhones : undefined,
-              contactName: editProfile.contactName?.trim()
-                ? editProfile.contactName.trim()
-                : undefined,
-            },
-          })
-          onShowToast(
-            t("admin.companies.contactsProcessed", {
-              defaultValue: "Contacts processed (added: {{added}}, skipped: {{skipped}})",
-              added: contactsRes.added,
-              skipped: contactsRes.skippedDuplicates,
-            }),
-            "success"
-          )
-        } catch (err) {
-          const messageRaw = (err as { message?: string | string[] }).message
-          const msgFromApi = Array.isArray(messageRaw)
-            ? messageRaw.join(", ")
-            : typeof messageRaw === "string"
-              ? messageRaw
-              : ""
-          onShowToast(
-            msgFromApi ||
-              t("admin.companies.contactsAddError", {
-                defaultValue: "Failed to add extra contacts.",
-              }),
-            "error"
-          )
-          return
-        }
-      }
+      setState({
+        editForm: nextForm,
+        editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, nextForm.contacts),
+        editLogo: {
+          url: savedLogoUrl,
+          file: null,
+          uploaded: Boolean(savedLogoUrl),
+          changed: false,
+        },
+      })
+
+      onCompanyDataChanged(editCompanyId)
       onShowToast(t("admin.companies.profileUpdatedSuccess", "Company profile updated"), "success")
       onRefetchCompanyRequests?.()
       closeCompanyEdit()
     } catch (err) {
       const status = (err as { status?: number }).status
       const msgFromApi = (err as { message?: string }).message
-      if (status === 409) {
-        onShowToast(t("admin.companies.emailConflict409", "This email is already in use."), "error")
-      } else if (status === 404) {
+      if (status === 404) {
         onShowToast(
           t("admin.companies.companyNotFound404", "Company or linked user was not found."),
           "error"
@@ -339,21 +564,25 @@ export function useCompanyEdit({
   return {
     state: {
       editModalOpen,
-      editProfile,
+      editForm,
       editFieldErrors,
       editSaving,
       editOpening,
       editLogo,
+      editAccountSummary,
     },
     ui: {
       countries,
-      allRegions,
+      allRegions: regionOptions,
       editFileInputRef,
     },
     actions: {
       closeCompanyEdit,
       openCompanyEdit,
-      handleEditProfileChange,
+      handleEditFieldChange,
+      handleContactChange,
+      handleAddContact,
+      handleRemoveContact,
       handleEditLogoUpload,
       handleSaveCompanyEdit,
     },
