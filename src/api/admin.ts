@@ -132,6 +132,13 @@ export async function patchUserActive(userId: string, isActive: boolean): Promis
   })
 }
 
+export async function patchCompanyActive(companyId: string, isActive: boolean): Promise<void> {
+  await api.request(`/admin/companies/${encodeURIComponent(companyId)}/active`, {
+    method: "PATCH",
+    body: { isActive },
+  })
+}
+
 type JoinedUserShape = { id: string; isActive?: boolean; deletedAt?: string | null }
 
 type ProfileRequestInput = ProfileRequest & {
@@ -146,6 +153,82 @@ type ProfileRequestInput = ProfileRequest & {
   registrationStatus?: string
   industries?: unknown
   companyEmail?: string
+  company_name_vi?: string
+  company_name_en?: string
+  company_name_zh?: string
+  companyNameEn?: string
+  companyNameZh?: string
+  company_email?: string
+  contact_person?: string
+  contactPerson?: string
+  contacts?: unknown
+  companyContacts?: unknown
+  company_contacts?: unknown
+}
+
+type ContactRowInput = {
+  type?: unknown
+  value?: unknown
+  contactName?: unknown
+  contact_name?: unknown
+}
+
+function cleanString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : ""
+}
+
+function firstString(record: Record<string, unknown>, keys: string[]): string {
+  for (const key of keys) {
+    const value = cleanString(record[key])
+    if (value) return value
+  }
+  return ""
+}
+
+function getContactsFromItem(p: ProfileRequestInput): ContactRowInput[] {
+  const sources = [p.contacts, p.companyContacts, p.company_contacts]
+
+  for (const source of sources) {
+    if (Array.isArray(source)) return source as ContactRowInput[]
+  }
+
+  return []
+}
+
+function getCompanyNameFromItem(p: ProfileRequestInput): string {
+  return firstString(p as Record<string, unknown>, [
+    "companyNameVi",
+    "company_name_vi",
+    "companyNameZh",
+    "company_name_zh",
+    "companyNameCn",
+    "company_name_cn",
+    "companyNameEn",
+    "company_name_en",
+    "companyName",
+  ])
+}
+
+function getContactNameFromContacts(contacts: ContactRowInput[]): string {
+  for (const contact of contacts) {
+    const contactName = firstString(contact as Record<string, unknown>, [
+      "contactName",
+      "contact_name",
+    ])
+    if (contactName) return contactName
+  }
+
+  return ""
+}
+
+function getEmailFromContacts(contacts: ContactRowInput[]): string {
+  for (const contact of contacts) {
+    const type = cleanString(contact.type).toLowerCase()
+    const value = cleanString(contact.value)
+    if (type === "email" && value) return value
+  }
+
+  return ""
 }
 
 function getUserIdFromItem(p: ProfileRequestInput): string | undefined {
@@ -163,19 +246,25 @@ function getDeletedAtFromItem(p: ProfileRequestInput): string | null | undefined
 }
 
 function getEmailFromItem(p: ProfileRequestInput): string {
-  const direct = typeof p.email === "string" ? p.email.trim() : ""
+  const direct = cleanString(p.email)
   if (direct) return direct
-  const fallback = p.companyEmail as unknown
-  return typeof fallback === "string" ? fallback.trim() : ""
+
+  const fallback = firstString(p as Record<string, unknown>, ["companyEmail", "company_email"])
+  if (fallback) return fallback
+
+  return getEmailFromContacts(getContactsFromItem(p))
 }
 
 export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): ProfileRequestRow {
   const statusRaw = p.status ?? p.registrationStatus ?? ""
+  const contacts = getContactsFromItem(p)
   return {
     id: p.id,
-    companyName: p.companyNameVi || p.companyNameCn || "",
+    companyName: getCompanyNameFromItem(p),
     email: getEmailFromItem(p),
-    contactName: p.contactName ?? "",
+    contactName:
+      firstString(p as Record<string, unknown>, ["contactName", "contact_person", "contactPerson"]) ||
+      getContactNameFromContacts(contacts),
     industry: industryFromUnknown(p.industries ?? p.industry).join(", "),
     country: p.country,
     status: statusRaw as ProfileRequestStatus,
