@@ -17,19 +17,36 @@ export function CompanyDeleteDialog({
   isDeleting,
 }: CompanyDeleteDialogProps) {
   const { t } = useTranslation()
+  const hasLinkedUser = Boolean(candidate?.userId?.trim())
+  const hasCompanyTarget = Boolean(candidate?.companyId?.trim())
+  const title = hasLinkedUser
+    ? t("admin.companies.deleteCompanyTitle", { defaultValue: "Delete this company?" })
+    : hasCompanyTarget
+      ? t("admin.companies.archiveCompanyTitle", { defaultValue: "Archive this company?" })
+      : t("admin.companies.deleteCompanyTitle", { defaultValue: "Delete this company?" })
+  const description = hasLinkedUser
+    ? t("admin.companies.deleteCompanyConfirm", {
+        defaultValue: "This action cannot be undone. The user will be deactivated.",
+      })
+    : hasCompanyTarget
+      ? t("admin.companies.archiveCompanyConfirm", {
+          defaultValue: "This will archive the company and mark it as rejected.",
+        })
+      : t("admin.companies.deleteCompanyConfirm", {
+          defaultValue: "This action cannot be undone. The user will be deactivated.",
+        })
+  const confirmLabel = hasLinkedUser
+    ? t("admin.companies.deleteConfirm", { defaultValue: "Delete" })
+    : hasCompanyTarget
+      ? t("admin.companies.archiveConfirm", { defaultValue: "Archive" })
+      : t("admin.companies.deleteConfirm", { defaultValue: "Delete" })
 
   return (
     <Dialog open={Boolean(candidate)} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="overscroll-contain max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {t("admin.companies.deleteCompanyTitle", { defaultValue: "Delete this company?" })}
-          </DialogTitle>
-          <DialogDescription>
-            {t("admin.companies.deleteCompanyConfirm", {
-              defaultValue: "Delete this company? The user will be deactivated.",
-            })}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <div className="flex justify-end gap-2 mt-4 pb-6 pr-6">
@@ -37,9 +54,7 @@ export function CompanyDeleteDialog({
             {t("common.cancel", { defaultValue: "Cancel" })}
           </Button>
           <Button type="button" variant="primary" onClick={onConfirm} disabled={isDeleting}>
-            {isDeleting
-              ? t("admin.companies.deleting")
-              : t("admin.companies.deleteConfirm")}
+            {isDeleting ? t("admin.companies.deleting") : confirmLabel}
           </Button>
         </div>
       </DialogContent>
