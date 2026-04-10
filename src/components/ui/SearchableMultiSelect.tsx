@@ -44,16 +44,19 @@ export function SearchableMultiSelect({
     return safeOptions.filter((o) => o.label.toLowerCase().includes(q))
   }, [safeOptions, query])
 
+  const selectedLabels = value
+    .map((v) => safeOptions.find((o) => o.value === v)?.label)
+    .filter(Boolean) as string[]
+
   const summary = (() => {
     if (value.length === 0) return ""
     if (formatSummaryProp) return formatSummaryProp(value, safeOptions)
-    const labels = value
-      .map((v) => safeOptions.find((o) => o.value === v)?.label)
-      .filter(Boolean) as string[]
-    if (labels.length === 0) return ""
-    if (labels.length <= 2) return labels.join(", ")
-    return `${labels.length} selected`
+    if (selectedLabels.length === 0) return ""
+    if (selectedLabels.length <= 2) return selectedLabels.join(", ")
+    return `${selectedLabels.length} selected`
   })()
+
+  const summaryTitle = selectedLabels.length > 2 ? selectedLabels.join(", ") : undefined
 
   const toggle = (id: string) => {
     if (value.includes(id)) {
@@ -69,6 +72,7 @@ export function SearchableMultiSelect({
         <button
           type="button"
           disabled={disabled}
+          title={summaryTitle}
           className={`border-border bg-body-bg-light ring-offset-background placeholder:text-muted-foreground focus:ring-primary flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none ${
             disabled ? "pointer-events-none cursor-not-allowed bg-gray-100 opacity-60" : ""
           }`}
