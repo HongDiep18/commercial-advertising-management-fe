@@ -85,7 +85,8 @@ export type CompanyDetail = {
   id: string
   logoUrl?: string | null
   companyNameVi?: string | null
-  companyNameCn?: string | null
+  companyNameZh?: string | null
+  companyNameEn?: string | null
   industry: string | string[]
   email?: string
   emails?: string[]
