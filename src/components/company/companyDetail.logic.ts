@@ -56,17 +56,34 @@ export function normalizeAddressList(addresses: string[]): string[] {
   return addresses.map((v) => v.trim()).filter(Boolean)
 }
 
-function extractContactValuesByType(contacts: CompanyChannelContact[] | undefined, type: string): string[] {
+function uniqueValues(values: string[]): string[] {
+  const seen = new Set<string>()
+  const result: string[] = []
+  values.forEach((value) => {
+    const key = value.toLowerCase()
+    if (seen.has(key)) return
+    seen.add(key)
+    result.push(value)
+  })
+  return result
+}
+
+function extractContactValuesByType(
+  contacts: CompanyChannelContact[] | undefined,
+  type: string
+): string[] {
   if (!Array.isArray(contacts)) return []
-  return normalizeAddressList(
-    contacts
-      .filter(
-        (contact) =>
-          String(contact?.type ?? "")
-            .trim()
-            .toLowerCase() === type
-      )
-      .map((contact) => String(contact?.value ?? ""))
+  return uniqueValues(
+    normalizeAddressList(
+      contacts
+        .filter(
+          (contact) =>
+            String(contact?.type ?? "")
+              .trim()
+              .toLowerCase() === type
+        )
+        .map((contact) => String(contact?.value ?? ""))
+    )
   )
 }
 
@@ -76,16 +93,17 @@ export function getCompanyAddressesFromApi(company: {
   contacts?: CompanyChannelContact[] | null
   channelContacts?: CompanyChannelContact[] | null
 }): string[] {
-  const contactAddresses = extractContactValuesByType(company.contacts ?? undefined, "address")
-  if (contactAddresses.length > 0) return contactAddresses
-
-  const baseAddresses = Array.isArray(company.addresses) ? normalizeAddressList(company.addresses) : []
-  if (baseAddresses.length > 0) return baseAddresses
-
-  const channelAddresses = extractContactValuesByType(company.channelContacts ?? undefined, "address")
-  if (channelAddresses.length > 0) return channelAddresses
-
-  return normalizeAddressList([String(company.address ?? "")])
+  if (!Array.isArray(company.contacts)) return []
+  return normalizeAddressList(
+    company.contacts
+      .filter(
+        (contact) =>
+          String(contact?.type ?? "")
+            .trim()
+            .toLowerCase() === "address"
+      )
+      .map((contact) => String(contact?.value ?? ""))
+  )
 }
 
 export function getCompanyWebsitesFromApi(company: {
@@ -96,7 +114,10 @@ export function getCompanyWebsitesFromApi(company: {
   const contactWebsites = extractContactValuesByType(company.contacts ?? undefined, "website")
   if (contactWebsites.length > 0) return contactWebsites
 
-  const channelWebsites = extractContactValuesByType(company.channelContacts ?? undefined, "website")
+  const channelWebsites = extractContactValuesByType(
+    company.channelContacts ?? undefined,
+    "website"
+  )
   if (channelWebsites.length > 0) return channelWebsites
 
   return normalizeAddressList([String(company.website ?? "")])
@@ -109,7 +130,9 @@ function getTypedContactsFromApi(
   },
   allowedTypes: Set<string>
 ): SocialContactItem[] {
-  const source = Array.isArray(company.contacts) ? company.contacts : (company.channelContacts ?? [])
+  const source = Array.isArray(company.contacts)
+    ? company.contacts
+    : (company.channelContacts ?? [])
   return source
     .map((item) => ({
       type: String(item?.type ?? "")
