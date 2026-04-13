@@ -28,18 +28,18 @@ export type LoginResponse = {
 
 export type RegisterPayload = {
   company_name_vi: string
-  company_name_cn: string
+  company_name_zh: string
   phone: string
   tax_id: string
   contact_person: string
-  contact_phone: string
   company_address: string
-  email: string
+  company_email: string
   country: string
   region: string
-  industry: string
+  industry: string[]
   website: string
   introduction: string
+  note: string
   captchaId: string
   captcha: string
 }
@@ -73,27 +73,29 @@ export function formDataToRegisterPayload(form: {
   contactPhone: string
   companyAddress: string
   email: string
+  companyEmail: string
   country: string
-  industry: string
+  industry: string[]
   website: string
   introduction: string
+  note?: string
   captchaId: string
   captcha: string
 }): RegisterPayload {
   return {
     company_name_vi: form.companyNameVi,
-    company_name_cn: form.companyNameCn,
-    phone: form.phone,
+    company_name_zh: form.companyNameCn,
+    phone: (form.contactPhone || form.phone).trim(),
     tax_id: form.taxId,
     contact_person: form.contactPerson,
-    contact_phone: form.contactPhone,
     company_address: form.companyAddress,
-    email: form.email,
+    company_email: form.companyEmail,
     country: form.country,
     region: "other-region",
     industry: form.industry,
     website: normalizeWebsiteForPayload(form.website),
     introduction: form.introduction,
+    note: form.note ?? "",
     captchaId: form.captchaId,
     captcha: form.captcha,
   }
@@ -102,16 +104,15 @@ export function formDataToRegisterPayload(form: {
 export type UpdateProfilePayload = {
   upload_logo?: string
   company_name_vi: string
-  company_name_cn: string
+  company_name_zh: string
   phone: string
   tax_id: string
   contact_person: string
-  contact_phone: string
   company_address: string
   email: string
   country: string
   region: string
-  industry: string
+  industry: string[]
   website: string
   introduction: string
 }

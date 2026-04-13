@@ -104,6 +104,12 @@ export const INDUSTRY_CATEGORIES: IndustryCategory[] = [
     fallback: "Giáo dục, Y tế & thiết bị y tế",
   },
   {
+    id: "legal",
+    code: "R",
+    i18nKey: "register.industry.R",
+    fallback: "Tư vấn pháp lý và tài chính",
+  },
+  {
     id: "other",
     code: "S",
     i18nKey: "register.industry.S",

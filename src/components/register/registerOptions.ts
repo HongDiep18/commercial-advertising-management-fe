@@ -48,6 +48,20 @@ export function getCountryOptions(language: string): Array<{ value: string; labe
     .sort((a, b) => a.label.localeCompare(b.label))
 }
 
+/** Stored country value when the user picks "Other" (not an ISO alpha-2 code). */
+export const REGISTER_COUNTRY_OTHER_VALUE = "other"
+
+/**
+ * ISO country list from `i18n-iso-countries` plus a final **Other** row (translated label).
+ */
+export function getRegisterCountryOptions(
+  language: string,
+  otherCountryLabel: string
+): Array<{ value: string; label: string }> {
+  const base = getCountryOptions(language)
+  return [...base, { value: REGISTER_COUNTRY_OTHER_VALUE, label: otherCountryLabel }]
+}
+
 export function getRegionGroupForCountry(country: string): keyof typeof REGION_OPTIONS_BY_COUNTRY {
   return COUNTRY_REGION_GROUPS[country.toUpperCase()] ?? "other"
 }

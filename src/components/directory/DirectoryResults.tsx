@@ -5,12 +5,13 @@ import type { CompanyDirectoryQuery } from "@/api/companies/types"
 import { useDebounce } from "@/hooks/useDebounce"
 import { isDemoUser } from "@/components/login/demo"
 import { mockCompanies } from "@/data/mockCompanies"
+import { directoryCompanyMatchesSelectedCategories } from "@/utils/directoryIndustry"
 import {
   companyDirectoryRowMatchesSearch,
   getDirectorySearchAndRegionParams,
   translateRegionLabel,
 } from "@/utils/regionSearch"
-import { Search } from "lucide-react"
+import { Search, X } from "lucide-react"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -44,14 +45,16 @@ function SearchBar({
           placeholder={t("directory.searchPlaceholder")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="bg-body-bg-dark focus:ring-primary/20 focus:border-primary/50 w-full rounded-lg border border-gray-400 py-3 pr-4 pl-12 text-sm transition-all focus:ring-2 focus:outline-none"
+          className="bg-body-bg-dark focus:ring-primary/20 focus:border-primary/50 w-full rounded-lg border border-gray-400 py-3 pr-12 pl-12 text-sm transition-all focus:ring-2 focus:outline-none"
         />
         {searchTerm && (
           <button
+            type="button"
             onClick={() => setSearchTerm("")}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 -translate-y-1/2 text-sm"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/60 focus-visible:ring-ring absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            aria-label={t("directory.clear")}
           >
-            {t("directory.clear")}
+            <X className="h-4 w-4" />
           </button>
         )}
       </div>
@@ -108,6 +111,10 @@ export function DirectoryResults({
     serverDirectoryQueryEnabled
   )
 
+  /** Real API already filters by `industry` query param — avoid redundant client filter + wrong pagination. */
+  const industryFilteredByServer =
+    !isDemo && serverDirectoryQueryEnabled && industryParam != null && industryParam.length > 0
+
   const rawCompanies = isDemo
     ? Object.values(mockCompanies).map((c) => ({
         id: c.id,
@@ -128,7 +135,13 @@ export function DirectoryResults({
   const isSearching = searchValue.length > 0
 
   const displayedCompanies = rawCompanies.filter((c) => {
-    if (selectedCategories.length > 0 && !selectedCategories.includes(c.industry)) return false
+    if (
+      selectedCategories.length > 0 &&
+      !industryFilteredByServer &&
+      !directoryCompanyMatchesSelectedCategories(selectedCategories, c.industry)
+    ) {
+      return false
+    }
     if (!isSearching) return true
     if (serverDirectoryQueryEnabled) return true
 
@@ -150,7 +163,7 @@ export function DirectoryResults({
 
   const usesClientFiltering =
     (isDemo && (isSearching || selectedCategories.length > 0)) ||
-    (!isDemo && !isSearching && selectedCategories.length > 0)
+    (!isDemo && !isSearching && selectedCategories.length > 0 && !industryFilteredByServer)
   const totalPages = isDemo || usesClientFiltering ? 1 : (data?.pagination.totalPages ?? 1)
   const displayTotalResults =
     isDemo || usesClientFiltering ? displayedCompanies.length : (data?.pagination.total ?? 0)
