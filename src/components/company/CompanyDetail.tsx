@@ -100,6 +100,10 @@ function ContactTypeValueSection({
 }: ContactTypeValueSectionProps) {
   if (items.length === 0) return null
 
+  const typeOptions = Array.from(new Set(items.map((item) => item.type)))
+  const selectedTypeItems = selectedItem
+    ? items.filter((item) => item.type === selectedItem.type)
+    : []
   return (
     <div ref={containerRef} className="mt-4 flex items-start gap-3">
       <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
@@ -107,8 +111,8 @@ function ContactTypeValueSection({
       </div>
       <div className="flex-1">
         <p className="text-muted-foreground text-sm">{label}</p>
-        <div className="mt-2 grid grid-cols-[220px_minmax(0,1fr)] gap-2">
-          <div className="relative">
+        <div className="mt-2 grid grid-cols-[220px_minmax(0,1fr)] items-start gap-2">
+          <div className="relative self-start">
             <button
               type="button"
               onClick={onToggleList}
@@ -121,43 +125,84 @@ function ContactTypeValueSection({
             </button>
             {isListOpen && (
               <div className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]">
-                {items.map((item, idx) => (
+                {typeOptions.map((type) => (
                   <button
-                    key={`${item.type}-${idx}`}
+                    key={type}
                     type="button"
                     className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center rounded px-2 py-1 text-left text-xs font-medium transition-colors"
-                    onClick={() => onSelectType(item.type)}
+                    onClick={() => onSelectType(type)}
                   >
-                    {item.type.toUpperCase()}
+                    {type.toUpperCase()}
                   </button>
                 ))}
               </div>
             )}
           </div>
-          <div className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground min-h-9 rounded-md border bg-gradient-to-br px-2.5 py-1.5 text-sm font-medium break-all shadow-sm">
-            <div className="flex items-start gap-2">
-              <span className="min-w-0 flex-1">
-                {selectedItem
-                  ? selectedItem.contactName
-                    ? `${selectedItem.contactName}: ${selectedItem.value}`
-                    : selectedItem.value
-                  : "-"}
-              </span>
-              {selectedItem?.value ? (
-                <button
-                  type="button"
-                  onClick={() => onCopy(selectedItem.value)}
-                  className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
-                  aria-label={copyAriaLabel(selectedItem.value)}
-                >
-                  {copiedValue === selectedItem.value ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </button>
-              ) : null}
-            </div>
+          <div
+            className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground min-h-9 rounded-md border bg-gradient-to-br px-2.5 py-1.5 text-sm font-medium break-all shadow-sm"
+            onClick={() => {
+              if (selectedItem?.value) onCopy(selectedItem.value)
+            }}
+          >
+            {selectedTypeItems.length > 1 ? (
+              <div className="space-y-1">
+                {selectedTypeItems.map((entry, idx) => {
+                  const displayValue = entry.contactName
+                    ? `${entry.contactName}: ${entry.value}`
+                    : entry.value
+                  return (
+                    <div
+                      key={`${entry.type}-${entry.value}-${idx}`}
+                      className="flex items-start gap-2"
+                    >
+                      <span className="min-w-0 flex-1">{displayValue}</span>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onCopy(entry.value)
+                        }}
+                        className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                        aria-label={copyAriaLabel(entry.value)}
+                      >
+                        {copiedValue === entry.value ? (
+                          <Check className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="flex items-start gap-2">
+                <span className="min-w-0 flex-1">
+                  {selectedItem
+                    ? selectedItem.contactName
+                      ? `${selectedItem.contactName}: ${selectedItem.value}`
+                      : selectedItem.value
+                    : "-"}
+                </span>
+                {selectedItem?.value ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onCopy(selectedItem.value)
+                    }}
+                    className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                    aria-label={copyAriaLabel(selectedItem.value)}
+                  >
+                    {copiedValue === selectedItem.value ? (
+                      <Check className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -382,8 +427,8 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
         }
       : {
           id: apiCompany!.id,
-          nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
-          nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
+          nameCn: apiCompany!.companyNameZh ?? apiCompany!.companyNameVi ?? "",
+          nameEn: apiCompany!.companyNameEn ?? "",
           logo: apiCompany!.logoUrl ?? "/placeholder.svg",
           category: apiCompany!.industry,
           categoryTags: [],
@@ -424,13 +469,16 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const selectedSocialContact = pickSelectedByType(socialContacts, selectedSocialType)
   const selectedOtherContact = pickSelectedByType(otherContacts, selectedOtherType)
 
-  const companyNameCn = t(`companyDetail.companies.${companyId}.nameCn`, {
-    defaultValue: company.nameCn,
-  })
-  const companyNameEn = t(`companyDetail.companies.${companyId}.nameEn`, {
-    defaultValue: company.nameEn,
-  })
-  const companyNameVi = apiCompany?.companyNameVi?.trim() || company.nameEn || companyNameCn
+  const companyNameZh = String(
+    isDemo ? company.nameCn : (apiCompany?.companyNameZh ?? company.nameCn ?? "")
+  ).trim()
+  const companyNameEn = String(
+    isDemo ? company.nameEn : (apiCompany?.companyNameEn ?? company.nameEn ?? "")
+  ).trim()
+  const companyNameVi =
+    String(isDemo ? company.nameEn : (apiCompany?.companyNameVi ?? "")).trim() ||
+    companyNameZh ||
+    companyNameEn
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
   const fallbackBackToDirectory = fromCategory
     ? `/directory?category=${encodeURIComponent(fromCategory)}`
@@ -524,8 +572,8 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: companyNameCn,
-        text: `查看 ${companyNameCn} 的企業資訊`,
+        title: companyNameZh,
+        text: `查看 ${companyNameZh} 的企業資訊`,
         url: window.location.href,
       })
     } else {
@@ -610,7 +658,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <div className="border-border/50 relative aspect-square w-full max-w-[280px] overflow-hidden rounded-lg border bg-white">
                   <Image
                     src={company.logo || "/placeholder.svg"}
-                    alt={companyNameCn}
+                    alt={companyNameZh}
                     fill
                     className={`object-contain p-4 ${shouldBlurLogo ? "blur-sm" : ""}`}
                   />
@@ -620,7 +668,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
               <div className="lg:w-2/3 lg:p-8">
                 <div className="group relative mb-6">
                   <h1 key={i18n.language} className="text-foreground mb-2 text-3xl font-bold">
-                    {companyNameCn}
+                    {companyNameZh}
                   </h1>
                   <p key={`${i18n.language}-en`} className="text-muted-foreground mb-1 text-lg">
                     {companyNameEn}
@@ -629,7 +677,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     <p className="text-destructive font-medium">
                       Vietnamese: {companyNameVi || "-"}
                     </p>
-                    <p className="text-destructive font-medium">Taiwan: {companyNameCn || "-"}</p>
+                    <p className="text-destructive font-medium">Taiwan: {companyNameZh || "-"}</p>
                     <p className="text-destructive font-medium">English: {companyNameEn || "-"}</p>
                   </div>
                 </div>
@@ -741,7 +789,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         {t("companyDetail.address") || "地址"}
                       </p>
                       <div className="space-y-1">
-                        {company.addresses.length > 1 ? (
+                        {company.addresses.length > 0 ? (
                           <ul className="list-disc space-y-1 pl-5">
                             {company.addresses.map((addr, idx) => (
                               <li key={`${addr}-${idx}`} className="text-sm font-medium">
@@ -749,8 +797,6 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                               </li>
                             ))}
                           </ul>
-                        ) : company.addresses.length === 1 ? (
-                          <p className="text-sm font-medium">{company.addresses[0]}</p>
                         ) : (
                           <p className="text-sm font-medium">-</p>
                         )}
