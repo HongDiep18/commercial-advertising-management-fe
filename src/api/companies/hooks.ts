@@ -126,7 +126,7 @@ export function useCompanyDetailEnrichmentMap(
       const fallback = fallbackById[id]
       if (!detail) return
       const companyName =
-        detail.companyNameVi || detail.companyNameCn || fallback?.companyName || ""
+        detail.companyNameVi || detail.companyNameZh || fallback?.companyName || ""
       const email =
         typeof detail.email === "string" && detail.email.trim()
           ? detail.email.trim()
