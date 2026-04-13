@@ -1,5 +1,5 @@
 export type AdminCompaniesStatsResponse = {
-  approvedCount: number
+  activeCount: number
 }
 
 export type AdminCompanyContactType =
@@ -46,6 +46,7 @@ export type AdminCompanyDetail = {
   phone?: string | null
   address?: string | null
   description?: string | null
+  note?: string | null
   taxId?: string | null
   country?: string | null
   region?: string | null
@@ -68,5 +69,6 @@ export type AdminCompanyUpdatePayload = {
   region?: string | null
   industry?: string[]
   description?: string | null
+  note?: string | null
   contacts?: AdminCompanyContact[]
 }

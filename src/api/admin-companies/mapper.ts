@@ -15,6 +15,7 @@ export type AdminCompanyForm = {
   region: string
   industry: string[]
   description: string
+  note: string
   contacts: AdminCompanyContact[]
 }
 
@@ -49,7 +50,9 @@ function createEmptyContact(type: AdminCompanyContact["type"] = "email"): AdminC
   }
 }
 
-export function ensureAdminCompanyFormContacts(contacts: AdminCompanyContact[]): AdminCompanyContact[] {
+export function ensureAdminCompanyFormContacts(
+  contacts: AdminCompanyContact[]
+): AdminCompanyContact[] {
   const next = [...contacts]
 
   for (const group of CONTACT_PLACEHOLDER_GROUPS) {
@@ -70,11 +73,28 @@ export const EMPTY_ADMIN_COMPANY_FORM: AdminCompanyForm = {
   region: "",
   industry: [],
   description: "",
+  note: "",
   contacts: ensureAdminCompanyFormContacts([]),
 }
 
 function clean(value: string | null | undefined): string {
   return typeof value === "string" ? value.trim() : ""
+}
+
+export const ADMIN_COMPANY_CONTACT_TYPES_AS_FORM_FIELDS = new Set(["note"])
+
+function contactTypeKey(type: unknown): string {
+  return clean(String(type ?? "")).toLowerCase()
+}
+
+export function excludeCompanyLevelContactRows<T extends { type?: string | null }>(rows: T[]): T[] {
+  return rows.filter(
+    (row) => !ADMIN_COMPANY_CONTACT_TYPES_AS_FORM_FIELDS.has(contactTypeKey(row.type))
+  )
+}
+
+export function isCompanyLevelContactType(type: unknown): boolean {
+  return ADMIN_COMPANY_CONTACT_TYPES_AS_FORM_FIELDS.has(contactTypeKey(type))
 }
 
 function normalizeContact(contact: AdminCompanyContact): AdminCompanyContact | null {
@@ -164,7 +184,13 @@ export function getPrimaryAdminCompanyContact(
 }
 
 export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompanyForm {
-  const contacts = normalizeAdminCompanyContacts(detail.contacts)
+  const normalized = normalizeAdminCompanyContacts(detail.contacts)
+  const noteFromContactRows =
+    normalized
+      .filter((c) => contactTypeKey(c.type) === "note")
+      .map((c) => clean(String(c.value ?? "")))
+      .find((v) => v.length > 0) ?? ""
+  const listContacts = excludeCompanyLevelContactRows(normalized)
 
   return {
     logoUrl: pickLogoUrlFromApiResponse(detail),
@@ -176,13 +202,14 @@ export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompa
     region: clean(detail.region),
     industry: industryFromUnknown(detail.industry),
     description: clean(detail.description),
-    contacts: ensureAdminCompanyFormContacts(contacts),
+    note: clean(detail.note) || noteFromContactRows,
+    contacts: ensureAdminCompanyFormContacts(listContacts),
   }
 }
 
 export function adminCompanyFormToUpdatePayload(form: AdminCompanyForm): AdminCompanyUpdatePayload {
   const contacts = dedupeContacts(
-    form.contacts.map((contact) => {
+    excludeCompanyLevelContactRows(form.contacts).map((contact) => {
       const type = clean(String(contact.type))
       const value = clean(contact.value)
       const contactName = clean(contact.contactName ?? "")
@@ -213,11 +240,51 @@ export function adminCompanyFormToUpdatePayload(form: AdminCompanyForm): AdminCo
     country: clean(form.country) || null,
     region: clean(form.region) || null,
     industry: form.industry,
-    description: clean(form.description) || null,
+    description: clean(form.description),
+    note: clean(form.note),
     ...(contacts.length > 0 && { contacts }),
   }
 }
 
 export function pickAdminCompanyLogoUrl(detail: AdminCompanyDetail): string | null {
   return pickLogoUrlFromApiResponse(detail)
+}
+
+export type AdminCompanyRequestsTableRowCache = {
+  companyNameVi: string
+  companyNameEn: string
+  companyNameZh: string
+  displayCompanyName: string
+  contactValue: string
+  contactName: string
+  industry: string | string[]
+}
+
+type ProfileRequestRowFallback = {
+  companyName?: string
+  email?: string
+  contactName?: string
+  industry?: string
+}
+
+export function adminCompanyDetailToRequestsTableCache(
+  detail: AdminCompanyDetail,
+  fallback: ProfileRequestRowFallback
+): AdminCompanyRequestsTableRowCache {
+  const names = getAdminCompanyNameVariants(detail)
+  const displayCompanyName = getPreferredAdminCompanyName(detail, fallback.companyName || "")
+  const primaryContact = getPrimaryAdminCompanyContact(
+    normalizeAdminCompanyContacts(detail.contacts)
+  )
+  const industry = detail.industry ?? fallback.industry ?? ""
+
+  return {
+    companyNameVi: names.companyNameVi,
+    companyNameEn: names.companyNameEn,
+    companyNameZh: names.companyNameZh,
+    displayCompanyName,
+    contactValue: primaryContact.value || fallback.email || "",
+    contactName: primaryContact.contactName || detail.contactName || fallback.contactName || "",
+    industry,
+  }
 }

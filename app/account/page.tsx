@@ -291,10 +291,9 @@ export default function AccountPage() {
       const profilePayload = {
         company_name_vi: profileData.companyNameVi,
         company_name_zh: profileData.companyNameCn,
-        phone: profileData.phone,
+        phone: (profileData.contactPhone || profileData.phone).trim(),
         tax_id: profileData.taxId,
         contact_person: profileData.contactName,
-        contact_phone: profileData.contactPhone,
         company_address: profileData.address,
         email: profileData.email,
         country: profileData.country,

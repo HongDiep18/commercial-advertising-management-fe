@@ -3,7 +3,10 @@
 import { useMemo, type RefObject } from "react"
 import type { TFunction } from "i18next"
 import { Edit3, ImageIcon, Plus, Save, Trash2, Upload, X } from "lucide-react"
-import type { AdminCompanyForm } from "@/api/admin-companies/mapper"
+import {
+  type AdminCompanyForm,
+  isCompanyLevelContactType,
+} from "@/api/admin-companies/mapper"
 import type { AdminCompanyContact, AdminCompanyContactType } from "@/api/admin-companies/types"
 import { REGISTER_CATEGORIES } from "@/components/register/registerCategories"
 import Button from "@/components/ui/Button"
@@ -221,7 +224,9 @@ export function AdminCompanyEditDialog({
             <Edit3 className="text-primary mt-0.5 h-5 w-5 shrink-0" />
             <div className="min-w-0">
               <h2 className="truncate text-lg font-semibold">
-                {readOnly ? t("account.editReadOnly", { defaultValue: "View company data" }) : title}
+                {readOnly
+                  ? t("account.editReadOnly", { defaultValue: "View company data" })
+                  : title}
               </h2>
               {accountSummary.registeredEmail && (
                 <p className="text-muted-foreground truncate text-sm">
@@ -267,7 +272,7 @@ export function AdminCompanyEditDialog({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="hover:!bg-header-red-dark h-10 min-w-28 self-center whitespace-nowrap border !border-gray-400 bg-transparent px-3.5 hover:!text-white"
+                    className="hover:!bg-header-red-dark h-10 min-w-28 self-center border !border-gray-400 bg-transparent px-3.5 whitespace-nowrap hover:!text-white"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="h-4 w-4 shrink-0" />
@@ -282,13 +287,13 @@ export function AdminCompanyEditDialog({
 
               <div className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:pl-2">
                 <div className="min-w-0 space-y-1">
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                     {t("admin.companies.userName", { defaultValue: "User name" })}
                   </p>
                   <p className="truncate text-sm font-medium">{accountSummary.userName || "-"}</p>
                 </div>
                 <div className="min-w-0 space-y-1">
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                     {t("admin.companies.userRegisteredEmail", {
                       defaultValue: "User registered email",
                     })}
@@ -298,7 +303,7 @@ export function AdminCompanyEditDialog({
                   </p>
                 </div>
                 <div className="min-w-0 space-y-1">
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                     {t("admin.companies.memberSince", { defaultValue: "Member since" })}
                   </p>
                   <p className="truncate text-sm font-medium">
@@ -306,7 +311,7 @@ export function AdminCompanyEditDialog({
                   </p>
                 </div>
                 <div className="min-w-0 space-y-1">
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                     {t("admin.companies.memberRange", { defaultValue: "Member range" })}
                   </p>
                   <p className="truncate text-sm font-medium">
@@ -450,27 +455,31 @@ export function AdminCompanyEditDialog({
                 />
               </Field>
             </FieldWithError>
-
           </div>
 
           <div className="space-y-4 border-t pt-4">
             {(() => {
               const indexedContacts = form.contacts.map((contact, index) => ({ contact, index }))
-              const unknownContacts = indexedContacts.filter(
-                ({ contact }) => !ALL_KNOWN_CONTACT_TYPES.has(String(contact.type || ""))
-              )
+              const unknownContacts = indexedContacts.filter(({ contact }) => {
+                const typeStr = String(contact.type || "")
+                return (
+                  !ALL_KNOWN_CONTACT_TYPES.has(typeStr) && !isCompanyLevelContactType(contact.type)
+                )
+              })
               const allGroups: ContactGroupDef[] = [
                 ...CONTACT_GROUPS,
                 ...(unknownContacts.length > 0
-                  ? [{
-                      key: "other",
-                      labelKey: "admin.companies.contactGroups.other",
-                      fallbackLabel: "Other",
-                      types: new Set<string>(),
-                      defaultType: "email" as AdminCompanyContactType,
-                      layout: "full" as ContactGroupLayout,
-                      rowGroup: "rg_other",
-                    }]
+                  ? [
+                      {
+                        key: "other",
+                        labelKey: "admin.companies.contactGroups.other",
+                        fallbackLabel: "Other",
+                        types: new Set<string>(),
+                        defaultType: "email" as AdminCompanyContactType,
+                        layout: "full" as ContactGroupLayout,
+                        rowGroup: "rg_other",
+                      },
+                    ]
                   : []),
               ]
 
@@ -523,13 +532,13 @@ export function AdminCompanyEditDialog({
                   <div key={group.key} className="min-w-0 space-y-1.5">
                     {/* Group header */}
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                      <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                         {groupLabel}
                       </span>
                       {!readOnly && (
                         <button
                           type="button"
-                          className="text-primary border-primary/35 bg-body-bg-light inline-flex h-6 shrink-0 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-medium transition-colors hover:bg-primary hover:text-white"
+                          className="text-primary border-primary/35 bg-body-bg-light hover:bg-primary inline-flex h-6 shrink-0 items-center justify-center gap-1 rounded-full border px-2 text-[11px] font-medium transition-colors hover:text-white"
                           onClick={() => onAddContact(group.defaultType)}
                           aria-label={t("common.add", { defaultValue: "Add" })}
                           title={t("common.add", { defaultValue: "Add" })}
@@ -691,6 +700,23 @@ export function AdminCompanyEditDialog({
                 onChange={(e) => onFieldChange("description", e.target.value)}
                 placeholder={t("admin.companies.fieldExamples.description", {
                   defaultValue: "Ex: Manufacturing industrial valves and fittings",
+                })}
+                rows={3}
+                disabled={readOnly}
+              />
+            </Field>
+          </div>
+
+          <div className="space-y-3 border-t pt-4">
+            <Field className="gap-1.5">
+              <FieldLabel className="text-foreground text-sm font-medium">
+                {t("admin.companies.fieldLabels.note", { defaultValue: "Internal note" })}
+              </FieldLabel>
+              <Textarea
+                value={form.note}
+                onChange={(e) => onFieldChange("note", e.target.value)}
+                placeholder={t("admin.companies.fieldExamples.note", {
+                  defaultValue: "Optional notes for this company (admin only)",
                 })}
                 rows={3}
                 disabled={readOnly}

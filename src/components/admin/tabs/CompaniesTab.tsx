@@ -3,12 +3,10 @@
 import { patchCompanyActive } from "@/api/admin"
 import { useCompanyRequestsPage, useCompanyRequestsTabCounts } from "@/api/admin/hooks"
 import {
-  getAdminCompanyNameVariants,
-  getPreferredAdminCompanyName,
-  getPrimaryAdminCompanyContact,
-  normalizeAdminCompanyContacts,
+  adminCompanyDetailToRequestsTableCache,
+  type AdminCompanyRequestsTableRowCache,
 } from "@/api/admin-companies/mapper"
-import { getAdminCompanyDetail } from "@/api/admin-companies/service"
+import { adminCompaniesKeys, useAdminCompanyDetailsByIds } from "@/api/admin-companies/hooks"
 import { formatIndustryForDisplay } from "@/api/companies/adminCompany.mapper"
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { AdminCompanyEditDialog } from "@/components/admin/company/AdminCompanyEditDialog"
@@ -36,7 +34,8 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAdminData } from "../AdminDataContext"
 import { PROFILE_REQUEST_FILTERS } from "../constants"
@@ -45,6 +44,7 @@ import { useCompanyEdit } from "./useCompanyEdit"
 
 export function CompaniesTab() {
   const { t, i18n } = useTranslation()
+  const queryClient = useQueryClient()
   const { user } = useUser()
   const canEditCompanyProfile = isAdminRole(user?.role)
   const { updateCompanyRequestStatus, updateUserActive, deleteCompany, refetchCompanyRequests } =
@@ -59,17 +59,6 @@ export function CompaniesTab() {
     visible: false,
   })
 
-  type CompanyInfoCache = {
-    companyNameVi: string
-    companyNameEn: string
-    companyNameZh: string
-    displayCompanyName: string
-    contactValue: string
-    contactName: string
-    industry: string | string[]
-  }
-
-  const [companyInfoById, setCompanyInfoById] = useState<Record<string, CompanyInfoCache>>({})
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
@@ -81,11 +70,7 @@ export function CompaniesTab() {
     onShowToast: showToast,
     onRefetchCompanyRequests: refetchCompanyRequests,
     onCompanyDataChanged: (companyId) => {
-      setCompanyInfoById((prev) => {
-        const next = { ...prev }
-        delete next[companyId]
-        return next
-      })
+      void queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.detail(companyId) })
     },
   })
 
@@ -194,77 +179,30 @@ export function CompaniesTab() {
 
   const { statusCounts } = useCompanyRequestsTabCounts()
 
-  useEffect(() => {
-    let cancelled = false
-
-    const loadApprovedCompanyInfo = async () => {
-      const companyRowById: Record<string, ProfileRequestRow> = {}
-
-      for (const r of rows) {
-        if (r.status !== ProfileRequestStatus.APPROVED) continue
-        const id = r.companyId?.trim()
-        if (!id) continue
-        if (!companyRowById[id]) companyRowById[id] = r
-      }
-
-      const companyIds = Object.keys(companyRowById)
-      if (companyIds.length === 0) return
-
-      const idsToFetch = companyIds.filter((id) => !companyInfoById[id])
-      if (idsToFetch.length === 0) return
-
-      const pairs = await Promise.all(
-        idsToFetch.map(async (id) => {
-          try {
-            const detail = await getAdminCompanyDetail(id)
-            const fallback = companyRowById[id]
-            const names = getAdminCompanyNameVariants(detail)
-            const displayCompanyName = getPreferredAdminCompanyName(
-              detail,
-              fallback?.companyName || ""
-            )
-            const primaryContact = getPrimaryAdminCompanyContact(
-              normalizeAdminCompanyContacts(detail.contacts)
-            )
-            const industry = detail.industry || fallback?.industry || ""
-
-            return [
-              id,
-              {
-                companyNameVi: names.companyNameVi,
-                companyNameEn: names.companyNameEn,
-                companyNameZh: names.companyNameZh,
-                displayCompanyName,
-                contactValue: primaryContact.value || fallback?.email || "",
-                contactName:
-                  primaryContact.contactName || detail.contactName || fallback?.contactName || "",
-                industry,
-              },
-            ] as const
-          } catch {
-            return null
-          }
-        })
-      )
-
-      if (cancelled) return
-
-      setCompanyInfoById((prev) => {
-        const next = { ...prev }
-        for (const pair of pairs) {
-          if (!pair) continue
-          const [id, info] = pair
-          next[id] = info
-        }
-        return next
-      })
+  const companyRowsById = useMemo(() => {
+    const byId: Record<string, ProfileRequestRow> = {}
+    for (const r of rows) {
+      const id = r.companyId?.trim()
+      if (!id) continue
+      if (!byId[id]) byId[id] = r
     }
+    return byId
+  }, [rows])
 
-    void loadApprovedCompanyInfo()
-    return () => {
-      cancelled = true
+  const companyIdsOnPage = useMemo(() => Object.keys(companyRowsById), [companyRowsById])
+
+  const { detailsById } = useAdminCompanyDetailsByIds(companyIdsOnPage)
+
+  const companyInfoById = useMemo(() => {
+    const map: Record<string, AdminCompanyRequestsTableRowCache> = {}
+    for (const id of Object.keys(detailsById)) {
+      const detail = detailsById[id]
+      const fallback = companyRowsById[id]
+      if (!detail || !fallback) continue
+      map[id] = adminCompanyDetailToRequestsTableCache(detail, fallback)
     }
-  }, [rows, companyInfoById])
+    return map
+  }, [detailsById, companyRowsById])
 
   if (isListLoading) {
     return (
@@ -337,10 +275,8 @@ export function CompaniesTab() {
                 </thead>
                 <tbody>
                   {rows.map((row, rowIndex) => {
-                    const cached =
-                      row.status === ProfileRequestStatus.APPROVED && row.companyId
-                        ? companyInfoById[row.companyId]
-                        : undefined
+                    const companyIdKey = row.companyId?.trim()
+                    const cached = companyIdKey ? companyInfoById[companyIdKey] : undefined
                     const displayCompanyName = cached?.displayCompanyName?.trim()
                       ? cached.displayCompanyName
                       : row.companyName
@@ -404,9 +340,7 @@ export function CompaniesTab() {
                         <td className="px-4 py-3 text-sm">
                           <p className="text-foreground text-sm">{displayContactValue || "-"}</p>
                           {displayContactName ? (
-                            <p className="text-muted-foreground text-xs">
-                              {displayContactName}
-                            </p>
+                            <p className="text-muted-foreground text-xs">{displayContactName}</p>
                           ) : null}
                         </td>
                         <td className="text-muted-foreground px-4 py-3 text-sm">
@@ -444,32 +378,44 @@ export function CompaniesTab() {
                                 </Button>
                               </>
                             )}
-                            {row.status === ProfileRequestStatus.APPROVED && (() => {
-                              const active = isCompanyActive(row)
-                              const hasToggleTarget = Boolean(row.userId?.trim() || row.companyId?.trim())
-                              const toggleLabel = !hasToggleTarget
-                                ? t("admin.companies.noLinkedUserAccount", "No linked user account")
-                                : active
-                                  ? t("admin.companies.disableAccount", "Disable account")
-                                  : t("admin.companies.enableAccount", "Enable account")
-                              return (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={`h-8 ${active ? "!text-green-600 hover:!bg-green-700 hover:!text-white" : "!text-red-600 hover:!bg-red-700 hover:!text-white"}`}
-                                  aria-label={toggleLabel}
-                                  title={toggleLabel}
-                                  disabled={!!updatingId || !hasToggleTarget}
-                                  onClick={() => handleToggleActive(row, !active)}
-                                >
-                                  {active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
-                                </Button>
-                              )
-                            })()}
+                            {row.status === ProfileRequestStatus.APPROVED &&
+                              (() => {
+                                const active = isCompanyActive(row)
+                                const hasToggleTarget = Boolean(
+                                  row.userId?.trim() || row.companyId?.trim()
+                                )
+                                const toggleLabel = !hasToggleTarget
+                                  ? t(
+                                      "admin.companies.noLinkedUserAccount",
+                                      "No linked user account"
+                                    )
+                                  : active
+                                    ? t("admin.companies.disableAccount", "Disable account")
+                                    : t("admin.companies.enableAccount", "Enable account")
+                                return (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={`h-8 ${active ? "!text-green-600 hover:!bg-green-700 hover:!text-white" : "!text-red-600 hover:!bg-red-700 hover:!text-white"}`}
+                                    aria-label={toggleLabel}
+                                    title={toggleLabel}
+                                    disabled={!!updatingId || !hasToggleTarget}
+                                    onClick={() => handleToggleActive(row, !active)}
+                                  >
+                                    {active ? (
+                                      <ToggleRight className="h-4 w-4" />
+                                    ) : (
+                                      <ToggleLeft className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                )
+                              })()}
                             {row.status === ProfileRequestStatus.APPROVED &&
                               deleteCompany &&
                               (() => {
-                                const hasDeleteTarget = Boolean(row.userId?.trim() || row.companyId?.trim())
+                                const hasDeleteTarget = Boolean(
+                                  row.userId?.trim() || row.companyId?.trim()
+                                )
                                 const deleteLabel = row.userId?.trim()
                                   ? t("admin.companies.deleteCompany", "Delete company")
                                   : row.companyId?.trim()
