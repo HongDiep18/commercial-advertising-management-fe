@@ -75,20 +75,32 @@ export type FeaturedCompanyItem = {
 
 export type FeaturedCompaniesResponse = FeaturedCompanyItem[]
 
+export type CompanyChannelContact = {
+  type: string
+  value: string
+  contactName?: string | null
+}
+
 export type CompanyDetail = {
   id: string
   logoUrl?: string | null
   companyNameVi?: string | null
   companyNameCn?: string | null
-  industry: string
-  email: string
-  phone: string
-  address: string
+  industry: string | string[]
+  email?: string
+  emails?: string[]
+  phone?: string
+  addresses: string[]
   description: string
   taxId?: string | null
   region?: string | null
   website?: string | null
-  contactName: string
+  contactName?: string
+  contactPhonesByName?: Array<{
+    contactName: string
+    contactPhones: string[]
+  }>
+  channelContacts?: CompanyChannelContact[]
 }
 
 export type AdminCompanyResponse = {

@@ -70,7 +70,6 @@ export function CompaniesTab() {
   }
 
   const [companyInfoById, setCompanyInfoById] = useState<Record<string, CompanyInfoCache>>({})
-
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
