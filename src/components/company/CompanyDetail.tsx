@@ -670,8 +670,8 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                   <h1 key={i18n.language} className="text-foreground mb-2 text-3xl font-bold">
                     {companyNameZh}
                   </h1>
-                  <p key={`${i18n.language}-en`} className="text-muted-foreground mb-1 text-lg">
-                    {companyNameEn}
+                  <p key={`${i18n.language}-vi`} className="text-muted-foreground mb-1 text-lg">
+                    {companyNameVi || companyNameEn || "-"}
                   </p>
                   <div className="border-destructive/40 bg-body-bg-dark pointer-events-none absolute top-full left-0 z-20 mt-1 hidden min-w-[240px] rounded-md border px-3 py-2 text-sm shadow-lg group-hover:block">
                     <p className="text-destructive font-medium">
