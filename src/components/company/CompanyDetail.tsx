@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentType,
   type Dispatch,
   type RefObject,
   type SetStateAction,
@@ -31,57 +32,137 @@ import {
   FileText,
   ChevronsDown,
   ChevronsUp,
+  ChevronDown,
 } from "lucide-react"
 import { useUser, UserRole, MembershipTier } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
 import { isDemoUser } from "@/components/login/demo"
 import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
-import type { CompanyChannelContact } from "@/api/companies/types"
 import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
 import { ChannelContactsBlock } from "@/components/company/ChannelContactsBlock"
-import { PERSISTENT_FALSE_QUERY, PERSISTENT_EMPTY_STRING_QUERY } from "@/lib/persistentUiQuery"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import type { CompanyChannelContact } from "@/api/companies/types"
+import { useQueryClient } from "@tanstack/react-query"
 import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import { truncateIntroduction, categoryNameToIdMap } from "../../utils/companyHelpers"
 import { translateRegionLabel } from "@/utils/regionSearch"
+import {
+  COPY_FEEDBACK_MS,
+  EMAIL_LIST_CLOSE_DELAY_MS,
+  INDUSTRY_TAG_VISIBLE_DEFAULT,
+  clearCloseTimer,
+  getCompanyAddressesFromApi,
+  getCompanyWebsitesFromApi,
+  getDeterministicHash,
+  getOtherContactsFromApi,
+  getSocialContactsFromApi,
+  normalizeContactGroups,
+  normalizeEmails,
+  normalizeAddressList,
+  pickSelectedByType,
+  toWebsiteHref,
+  usePersistentBooleanQuery,
+  usePersistentStringQuery,
+  type ContactGroup,
+  type SocialContactItem,
+} from "./companyDetail.logic"
 
 interface CompanyDetailProps {
   companyId: string
 }
 
-type ContactGroup = { contactName: string; contactPhones: string[] }
-
-const COPY_FEEDBACK_MS = 2000
-const EMAIL_LIST_CLOSE_DELAY_MS = 160
-const INDUSTRY_TAG_VISIBLE_DEFAULT = 1
-
-function getDeterministicHash(seed: string): number {
-  let h = 0
-  for (let i = 0; i < seed.length; i += 1) {
-    h = (h * 31 + seed.charCodeAt(i)) | 0
-  }
-  return Math.abs(h)
+type ContactTypeValueSectionProps = {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  items: SocialContactItem[]
+  containerRef?: RefObject<HTMLDivElement | null>
+  selectedItem?: SocialContactItem
+  isListOpen: boolean
+  onToggleList: () => void
+  onSelectType: (type: string) => void
+  copiedValue: string | null
+  onCopy: (value: string) => void
+  copyAriaLabel: (value: string) => string
 }
 
-function normalizeEmails(emails: string[]): string[] {
-  return [...new Set(emails.map((v) => v.trim()).filter(Boolean))]
-}
+function ContactTypeValueSection({
+  icon: Icon,
+  label,
+  items,
+  containerRef,
+  selectedItem,
+  isListOpen,
+  onToggleList,
+  onSelectType,
+  copiedValue,
+  onCopy,
+  copyAriaLabel,
+}: ContactTypeValueSectionProps) {
+  if (items.length === 0) return null
 
-function normalizeContactGroups(contacts: ContactGroup[]): ContactGroup[] {
-  return contacts
-    .map((item) => ({
-      contactName: item.contactName?.trim() ?? "",
-      contactPhones: normalizeEmails(item.contactPhones ?? []),
-    }))
-    .filter((item) => item.contactName || item.contactPhones.length > 0)
-}
-
-function clearCloseTimer(timerRef: RefObject<ReturnType<typeof setTimeout> | null>) {
-  if (timerRef.current) {
-    clearTimeout(timerRef.current)
-    timerRef.current = null
-  }
+  return (
+    <div ref={containerRef} className="mt-4 flex items-start gap-3">
+      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+        <Icon className="text-primary h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <p className="text-muted-foreground text-sm">{label}</p>
+        <div className="mt-2 grid grid-cols-[220px_minmax(0,1fr)] gap-2">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={onToggleList}
+              className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground flex h-9 w-full items-center justify-between rounded-md border bg-gradient-to-br px-2 text-sm font-medium shadow-sm"
+            >
+              <span>{(selectedItem?.type ?? "").toUpperCase()}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${isListOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {isListOpen && (
+              <div className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]">
+                {items.map((item, idx) => (
+                  <button
+                    key={`${item.type}-${idx}`}
+                    type="button"
+                    className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center rounded px-2 py-1 text-left text-xs font-medium transition-colors"
+                    onClick={() => onSelectType(item.type)}
+                  >
+                    {item.type.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground min-h-9 rounded-md border bg-gradient-to-br px-2.5 py-1.5 text-sm font-medium break-all shadow-sm">
+            <div className="flex items-start gap-2">
+              <span className="min-w-0 flex-1">
+                {selectedItem
+                  ? selectedItem.contactName
+                    ? `${selectedItem.contactName}: ${selectedItem.value}`
+                    : selectedItem.value
+                  : "-"}
+              </span>
+              {selectedItem?.value ? (
+                <button
+                  type="button"
+                  onClick={() => onCopy(selectedItem.value)}
+                  className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                  aria-label={copyAriaLabel(selectedItem.value)}
+                >
+                  {copiedValue === selectedItem.value ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function CompanyDetail({ companyId }: CompanyDetailProps) {
@@ -93,6 +174,11 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null)
+  const [copiedContactValue, setCopiedContactValue] = useState<string | null>(null)
+  const [isSocialTypeListOpen, setIsSocialTypeListOpen] = useState(false)
+  const [isOtherTypeListOpen, setIsOtherTypeListOpen] = useState(false)
+  const socialSectionRef = useRef<HTMLDivElement>(null)
+  const otherSectionRef = useRef<HTMLDivElement>(null)
   const emailListCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const contactListCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const queryClient = useQueryClient()
@@ -106,30 +192,19 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   ) => queryClient.setQueryData<boolean>(key, value)
 
   const industriesExpandedQueryKey = companyUiKey("industriesExpanded")
-  const { data: industriesExpanded = false } = useQuery({
-    queryKey: industriesExpandedQueryKey,
-    ...PERSISTENT_FALSE_QUERY,
-  })
+  const industriesExpanded = usePersistentBooleanQuery(industriesExpandedQueryKey)
   const selectedEmailQueryKey = companyUiKey("selectedEmail")
   const selectedContactKeyQueryKey = companyUiKey("selectedContactKey")
+  const selectedSocialTypeQueryKey = companyUiKey("selectedSocialType")
+  const selectedOtherTypeQueryKey = companyUiKey("selectedOtherType")
   const emailListOpenQueryKey = companyUiKey("isEmailListOpen")
   const contactListOpenQueryKey = companyUiKey("isContactListOpen")
-  const { data: selectedEmail = "" } = useQuery({
-    queryKey: selectedEmailQueryKey,
-    ...PERSISTENT_EMPTY_STRING_QUERY,
-  })
-  const { data: selectedContactKey = "" } = useQuery({
-    queryKey: selectedContactKeyQueryKey,
-    ...PERSISTENT_EMPTY_STRING_QUERY,
-  })
-  const { data: isEmailListOpen = false } = useQuery({
-    queryKey: emailListOpenQueryKey,
-    ...PERSISTENT_FALSE_QUERY,
-  })
-  const { data: isContactListOpen = false } = useQuery({
-    queryKey: contactListOpenQueryKey,
-    ...PERSISTENT_FALSE_QUERY,
-  })
+  const selectedEmail = usePersistentStringQuery(selectedEmailQueryKey)
+  const selectedContactKey = usePersistentStringQuery(selectedContactKeyQueryKey)
+  const selectedSocialType = usePersistentStringQuery(selectedSocialTypeQueryKey)
+  const selectedOtherType = usePersistentStringQuery(selectedOtherTypeQueryKey)
+  const isEmailListOpen = usePersistentBooleanQuery(emailListOpenQueryKey)
+  const isContactListOpen = usePersistentBooleanQuery(contactListOpenQueryKey)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -141,6 +216,25 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
       clearCloseTimer(contactListCloseTimerRef)
     }
   }, [])
+
+  useEffect(() => {
+    const handleOutsidePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node | null
+      if (!target) return
+
+      if (isSocialTypeListOpen && !socialSectionRef.current?.contains(target)) {
+        setIsSocialTypeListOpen(false)
+      }
+      if (isOtherTypeListOpen && !otherSectionRef.current?.contains(target)) {
+        setIsOtherTypeListOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsidePointerDown)
+    return () => {
+      document.removeEventListener("mousedown", handleOutsidePointerDown)
+    }
+  }, [isSocialTypeListOpen, isOtherTypeListOpen])
 
   const {
     data: apiCompany,
@@ -274,12 +368,17 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   }
 
   const demoCompany = isDemo ? getCompanyData(companyId) : null
+  const detailAddresses = isDemo || !apiCompany ? [] : getCompanyAddressesFromApi(apiCompany)
+  const detailWebsites = isDemo || !apiCompany ? [] : getCompanyWebsitesFromApi(apiCompany)
+  const socialContacts = isDemo || !apiCompany ? [] : getSocialContactsFromApi(apiCompany)
+  const otherContacts = isDemo || !apiCompany ? [] : getOtherContactsFromApi(apiCompany)
 
   const company =
     isDemo && demoCompany
       ? {
           ...demoCompany,
           addresses: demoCompany.address ? [demoCompany.address] : [],
+          websites: normalizeAddressList([demoCompany.website ?? ""]),
         }
       : {
           id: apiCompany!.id,
@@ -288,12 +387,12 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
           logo: apiCompany!.logoUrl ?? "/placeholder.svg",
           category: apiCompany!.industry,
           categoryTags: [],
-          addresses: apiCompany!.addresses ?? [],
+          addresses: detailAddresses,
           phone: apiCompany!.phone ?? "",
           email: apiCompany!.email ?? "",
           emails: apiCompany!.emails ?? [],
           contactPhonesByName: apiCompany!.contactPhonesByName ?? [],
-          website: apiCompany!.website ?? "",
+          websites: detailWebsites,
           contactPerson: apiCompany!.contactName ?? "",
           region: apiCompany!.region ?? "",
           taxId: apiCompany!.taxId ?? "",
@@ -322,6 +421,8 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     ? selectedContactKey
     : "0"
   const selectedContact = contactsByName[Number(effectiveSelectedContactKey)] ?? contactsByName[0]
+  const selectedSocialContact = pickSelectedByType(socialContacts, selectedSocialType)
+  const selectedOtherContact = pickSelectedByType(otherContacts, selectedOtherType)
 
   const companyNameCn = t(`companyDetail.companies.${companyId}.nameCn`, {
     defaultValue: company.nameCn,
@@ -329,6 +430,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const companyNameEn = t(`companyDetail.companies.${companyId}.nameEn`, {
     defaultValue: company.nameEn,
   })
+  const companyNameVi = apiCompany?.companyNameVi?.trim() || company.nameEn || companyNameCn
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
   const fallbackBackToDirectory = fromCategory
     ? `/directory?category=${encodeURIComponent(fromCategory)}`
@@ -516,13 +618,20 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
               </div>
 
               <div className="lg:w-2/3 lg:p-8">
-                <div className="mb-6">
+                <div className="group relative mb-6">
                   <h1 key={i18n.language} className="text-foreground mb-2 text-3xl font-bold">
                     {companyNameCn}
                   </h1>
                   <p key={`${i18n.language}-en`} className="text-muted-foreground mb-1 text-lg">
                     {companyNameEn}
                   </p>
+                  <div className="border-destructive/40 bg-body-bg-dark pointer-events-none absolute top-full left-0 z-20 mt-1 hidden min-w-[240px] rounded-md border px-3 py-2 text-sm shadow-lg group-hover:block">
+                    <p className="text-destructive font-medium">
+                      Vietnamese: {companyNameVi || "-"}
+                    </p>
+                    <p className="text-destructive font-medium">Taiwan: {companyNameCn || "-"}</p>
+                    <p className="text-destructive font-medium">English: {companyNameEn || "-"}</p>
+                  </div>
                 </div>
 
                 {(industryTags.length > 0 || company.categoryTags.length > 0) && (
@@ -632,18 +741,16 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         {t("companyDetail.address") || "地址"}
                       </p>
                       <div className="space-y-1">
-                        {company.addresses.length > 0 ? (
-                          company.addresses.map((addr, idx) =>
-                            idx > 0 ? (
-                              <p key={`${addr}-${idx}`} className="text-sm font-medium">
-                                - {addr}
-                              </p>
-                            ) : (
-                              <p key={`${addr}-${idx}`} className="text-sm font-medium">
+                        {company.addresses.length > 1 ? (
+                          <ul className="list-disc space-y-1 pl-5">
+                            {company.addresses.map((addr, idx) => (
+                              <li key={`${addr}-${idx}`} className="text-sm font-medium">
                                 {addr}
-                              </p>
-                            )
-                          )
+                              </li>
+                            ))}
+                          </ul>
+                        ) : company.addresses.length === 1 ? (
+                          <p className="text-sm font-medium">{company.addresses[0]}</p>
                         ) : (
                           <p className="text-sm font-medium">-</p>
                         )}
@@ -651,7 +758,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     </div>
                   </div>
 
-                  {company.website && (
+                  {company.websites.length > 0 && (
                     <div className="flex items-start gap-3">
                       <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
                         <Globe className="text-primary h-5 w-5" />
@@ -660,15 +767,35 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         <p className="text-muted-foreground text-sm">
                           {t("companyDetail.website") || "官網"}
                         </p>
-                        <a
-                          href={`https://${company.website}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
-                        >
-                          {company.website}
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <div className="space-y-1">
+                          {company.websites.length > 1 ? (
+                            <ul className="list-disc space-y-1 pl-5">
+                              {company.websites.map((website: string, idx: number) => (
+                                <li key={`${website}-${idx}`} className="text-sm font-medium">
+                                  <a
+                                    href={toWebsiteHref(website)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary inline-flex items-center gap-1 hover:underline"
+                                  >
+                                    {website}
+                                    <ExternalLink className="h-3 w-3" />
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <a
+                              href={toWebsiteHref(company.websites[0])}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
+                            >
+                              {company.websites[0]}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -764,7 +891,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                           )}
                           {companyEmails.length > 1 && isEmailListOpen && (
                             <div
-                              className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-0 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]"
+                              className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]"
                               onMouseEnter={openEmailList}
                               onMouseLeave={scheduleCloseEmailList}
                             >
@@ -824,25 +951,23 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                               onMouseEnter={openContactList}
                               onMouseLeave={scheduleCloseContactList}
                             >
-                              <select
-                                value={effectiveSelectedContactKey}
-                                onChange={(e) =>
-                                  setUiString(selectedContactKeyQueryKey, e.target.value)
-                                }
-                                className="border-border bg-body-bg-dark/40 text-foreground h-8 w-full rounded-md border px-2 text-xs"
-                              >
-                                {contactsByName.map((contact, idx) => (
-                                  <option key={`${contact.contactName}-${idx}`} value={String(idx)}>
-                                    {contact.contactName ||
+                              <div className="border-border bg-body-bg-dark/40 text-foreground h-8 w-full rounded-md border px-2 text-xs">
+                                <div className="flex h-full items-center justify-between gap-2">
+                                  <span className="min-w-0 truncate">
+                                    {contactsByName[Number(effectiveSelectedContactKey)]
+                                      ?.contactName ||
                                       t("companyDetail.contactPerson", {
                                         defaultValue: "Contact Person",
                                       })}
-                                  </option>
-                                ))}
-                              </select>
+                                  </span>
+                                  <ChevronDown
+                                    className={`h-4 w-4 shrink-0 transition-transform ${isContactListOpen ? "rotate-180" : ""}`}
+                                  />
+                                </div>
+                              </div>
                               {isContactListOpen && (
                                 <div
-                                  className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-0 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]"
+                                  className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]"
                                   onMouseEnter={openContactList}
                                   onMouseLeave={scheduleCloseContactList}
                                 >
@@ -924,6 +1049,54 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     </div>
                   </div>
                 </div>
+
+                <ContactTypeValueSection
+                  icon={Globe}
+                  label={t("admin.companies.contactGroups.social", {
+                    defaultValue: "Social & Messaging",
+                  })}
+                  items={socialContacts}
+                  containerRef={socialSectionRef}
+                  selectedItem={selectedSocialContact}
+                  isListOpen={isSocialTypeListOpen}
+                  onToggleList={() => setIsSocialTypeListOpen((prev) => !prev)}
+                  onSelectType={(type) => {
+                    setUiString(selectedSocialTypeQueryKey, type)
+                    setIsSocialTypeListOpen(false)
+                  }}
+                  copiedValue={copiedContactValue}
+                  onCopy={(value) => void handleCopyWithFeedback(value, setCopiedContactValue)}
+                  copyAriaLabel={(value) =>
+                    t("companyDetail.channelContactCopyRow", {
+                      defaultValue: "Copy {{value}}",
+                      value,
+                    })
+                  }
+                />
+
+                <ContactTypeValueSection
+                  icon={Phone}
+                  label={t("admin.companies.contactGroups.otherContact", {
+                    defaultValue: "Other Contact",
+                  })}
+                  items={otherContacts}
+                  containerRef={otherSectionRef}
+                  selectedItem={selectedOtherContact}
+                  isListOpen={isOtherTypeListOpen}
+                  onToggleList={() => setIsOtherTypeListOpen((prev) => !prev)}
+                  onSelectType={(type) => {
+                    setUiString(selectedOtherTypeQueryKey, type)
+                    setIsOtherTypeListOpen(false)
+                  }}
+                  copiedValue={copiedContactValue}
+                  onCopy={(value) => void handleCopyWithFeedback(value, setCopiedContactValue)}
+                  copyAriaLabel={(value) =>
+                    t("companyDetail.channelContactCopyRow", {
+                      defaultValue: "Copy {{value}}",
+                      value,
+                    })
+                  }
+                />
 
                 <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2"></div>
 

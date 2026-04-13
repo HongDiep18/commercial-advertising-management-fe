@@ -811,7 +811,7 @@
     "profileUpdated": "Đã cập nhật hồ sơ!",
     "profileUpdateError": "Cập nhật hồ sơ thất bại. Vui lòng thử lại.",
     "demoProfileUpdated": "Tài khoản demo: đã cập nhật hồ sơ cục bộ (chưa lưu).",
-    "profileRequiredFields": "Vui lòng điền các trường bắt buộc (ví dụ: email).",
+    "profileRequiredFields": "Vui lòng điền đầy đủ các trường bắt buộc (có dấu *).",
     "profileRequiredCompanyName": "Vui lòng nhập ít nhất một tên công ty (tiếng Việt hoặc tiếng Trung).",
     "logoPoints": "Tải logo thành công! Bạn nhận {{count}} điểm",
     "logoUpdated": "Đã cập nhật logo!",
@@ -1429,12 +1429,16 @@
       "contactNameExample": "Nguyen Van A",
       "contactType": "Loại",
       "contactDeleteRestricted": "Phải giữ lại ít nhất một dòng {{contactType}}.",
+      "fieldLabels": {
+        "note": "Ghi chú nội bộ"
+      },
       "fieldExamples": {
         "companyNameVi": "Công Ty TNHH ABC",
         "companyNameEn": "ABC Co., Ltd.",
         "companyNameZh": "ABC有限公司",
         "taxId": "0302776159",
-        "description": "Sản xuất van và phụ kiện công nghiệp"
+        "description": "Sản xuất van và phụ kiện công nghiệp",
+        "note": "Ghi chú tùy chọn (chỉ quản trị)"
       },
       "contactGroups": {
         "contactPerson": "Người liên hệ",

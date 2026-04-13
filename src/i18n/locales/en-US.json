@@ -742,7 +742,7 @@
     "profileUpdated": "Profile updated!",
     "profileUpdateError": "Profile update failed. Please try again.",
     "demoProfileUpdated": "Demo account: profile updated locally (not saved).",
-    "profileRequiredFields": "Please fill in required fields (e.g. email).",
+    "profileRequiredFields": "Please fill in all required fields (marked with *).",
     "profileRequiredCompanyName": "Please enter at least one company name (Vietnamese or Chinese).",
     "logoPoints": "Logo uploaded! You earned {{count}} contribution points",
     "logoUpdated": "Logo updated!",
@@ -1359,12 +1359,16 @@
       "contactNameExample": "Nguyen Van A",
       "contactType": "Type",
       "contactDeleteRestricted": "At least one {{contactType}} row must remain.",
+      "fieldLabels": {
+        "note": "Internal note"
+      },
       "fieldExamples": {
         "companyNameVi": "Cong Ty TNHH ABC",
         "companyNameEn": "ABC Co., Ltd.",
         "companyNameZh": "ABC有限公司",
         "taxId": "0302776159",
-        "description": "Manufacturing industrial valves and fittings"
+        "description": "Manufacturing industrial valves and fittings",
+        "note": "Optional notes for this company (admin only)"
       },
       "contactGroups": {
         "contactPerson": "Contact Person",

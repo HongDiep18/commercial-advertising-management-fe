@@ -90,7 +90,8 @@ export type CompanyDetail = {
   email?: string
   emails?: string[]
   phone?: string
-  addresses: string[]
+  addresses?: string[]
+  address?: string | null
   description: string
   taxId?: string | null
   region?: string | null
@@ -100,6 +101,7 @@ export type CompanyDetail = {
     contactName: string
     contactPhones: string[]
   }>
+  contacts?: CompanyChannelContact[]
   channelContacts?: CompanyChannelContact[]
 }
 
