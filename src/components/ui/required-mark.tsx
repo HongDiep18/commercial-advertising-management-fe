@@ -4,7 +4,7 @@ export function stripTrailingAsterisk(text: string): string {
 
 export function RequiredMark() {
   return (
-    <span className="ml-[-3.5px] text-red-600" aria-hidden="true">
+    <span className="ml-[-3.5px] !text-red-600" aria-hidden="true">
       *
     </span>
   )

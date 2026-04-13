@@ -32,7 +32,6 @@ export type RegisterPayload = {
   phone: string
   tax_id: string
   contact_person: string
-  contact_phone: string
   company_address: string
   company_email: string
   country: string
@@ -86,10 +85,9 @@ export function formDataToRegisterPayload(form: {
   return {
     company_name_vi: form.companyNameVi,
     company_name_zh: form.companyNameCn,
-    phone: form.phone,
+    phone: (form.contactPhone || form.phone).trim(),
     tax_id: form.taxId,
     contact_person: form.contactPerson,
-    contact_phone: form.contactPhone,
     company_address: form.companyAddress,
     company_email: form.companyEmail,
     country: form.country,
@@ -110,7 +108,6 @@ export type UpdateProfilePayload = {
   phone: string
   tax_id: string
   contact_person: string
-  contact_phone: string
   company_address: string
   email: string
   country: string

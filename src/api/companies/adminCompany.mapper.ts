@@ -11,7 +11,6 @@ type CompanyRowLike = {
   industry: string
 }
 
-/** Normalize API / row industry to id list (string[]). */
 export function industryFromUnknown(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String).filter(Boolean)
   if (typeof value === "string" && value.trim()) {
@@ -19,7 +18,7 @@ export function industryFromUnknown(value: unknown): string[] {
       const p = JSON.parse(value) as unknown
       if (Array.isArray(p)) return p.map(String).filter(Boolean)
     } catch {
-      /* not JSON */
+      console.error("Invalid JSON string:", value)
     }
     return [value.trim()]
   }
@@ -30,7 +29,6 @@ function industryToRowDisplay(value: unknown): string {
   return industryFromUnknown(value).join(", ")
 }
 
-/** Table/label text: arrays, JSON array strings, or plain strings (incl. comma‑separated from list APIs). */
 export function formatIndustryForDisplay(value: unknown): string {
   if (value == null || value === "") return ""
   if (Array.isArray(value)) return industryFromUnknown(value).join(", ")
@@ -88,10 +86,9 @@ export function profileFormDataToAdminCompanyPatchBody(
   return {
     company_name_vi: data.companyNameVi ?? "",
     company_name_zh: data.companyNameCn ?? "",
-    phone: data.phone ?? "",
+    phone: (data.contactPhone || data.phone || "").trim(),
     tax_id: data.taxId ?? "",
     contact_person: data.contactName ?? "",
-    contact_phone: data.contactPhone ?? "",
     company_address: data.address ?? "",
     email: data.email ?? "",
     country: data.country ?? "",
@@ -114,7 +111,7 @@ export function adminCompanyResponseToProfileForm(
     phone: read(u, "phone"),
     taxId: read(u, "taxId", "tax_id"),
     contactName: read(u, "contactName", "contact_person"),
-    contactPhone: read(u, "contactPhone", "contact_phone"),
+    contactPhone: read(u, "contactPhone", "contact_phone") || read(u, "phone"),
     address: read(u, "address", "company_address"),
     email: read(u, "email") || fallbackEmail || "",
     country: read(u, "country"),
@@ -147,7 +144,7 @@ export function companyDetailToProfileForm(
     phone: read(detail, "phone"),
     taxId: read(detail, "taxId", "tax_id"),
     contactName: read(detail, "contactName", "contact_name", "contact_person") || row.contactName,
-    contactPhone: read(detail, "contactPhone", "contact_phone"),
+    contactPhone: read(detail, "contactPhone", "contact_phone") || read(detail, "phone"),
     address: read(detail, "address", "company_address"),
     email: read(detail, "email") || row.email,
     country: read(detail, "country") || row.country,

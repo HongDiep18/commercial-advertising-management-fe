@@ -7,7 +7,11 @@ export const authKeys = {
 }
 
 export function useRegisterMutation() {
-  return useMutation<RegisterResponse, Error & { status?: number; data?: unknown }, RegisterPayload>({
+  return useMutation<
+    RegisterResponse,
+    Error & { status?: number; data?: unknown },
+    RegisterPayload
+  >({
     mutationFn: (payload) => register(payload),
   })
 }

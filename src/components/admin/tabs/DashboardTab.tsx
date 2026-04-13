@@ -35,7 +35,7 @@ export function DashboardTab() {
     limit: 1,
   })
 
-  const totalCompanies = companiesStatsData?.approvedCount ?? 0
+  const totalCompanies = companiesStatsData?.activeCount ?? 0
   const pendingAdOrders = pendingOrdersData?.pagination.total ?? 0
 
   const stats = [

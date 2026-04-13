@@ -1,7 +1,11 @@
 "use client"
 
-import { useMemo, useReducer, useRef } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react"
 import type { TFunction } from "i18next"
+import {
+  useAdminCompanyDetail,
+  useUpdateAdminCompanyMutation,
+} from "@/api/admin-companies/hooks"
 import {
   EMPTY_ADMIN_COMPANY_FORM,
   adminCompanyDetailToForm,
@@ -10,11 +14,6 @@ import {
   type AdminCompanyForm,
   pickAdminCompanyLogoUrl,
 } from "@/api/admin-companies/mapper"
-import {
-  getAdminCompanyDetail,
-  updateAdminCompany,
-  updateAdminCompanyWithLogo,
-} from "@/api/admin-companies/service"
 import type { AdminCompanyContact, AdminCompanyMember } from "@/api/admin-companies/types"
 import { REGION_KEYS_BY_COUNTRY } from "@/components/account"
 import {
@@ -56,8 +55,6 @@ type EditState = {
   editCompanyId: string | null
   editForm: AdminCompanyForm
   editFieldErrors: FormErrors
-  editSaving: boolean
-  editOpening: boolean
   editLogo: EditLogoState
   editAccountSummary: EditAccountSummary
 }
@@ -101,8 +98,6 @@ const initialEditState: EditState = {
   editCompanyId: null,
   editForm: EMPTY_ADMIN_COMPANY_FORM,
   editFieldErrors: EMPTY_ERRORS,
-  editSaving: false,
-  editOpening: false,
   editLogo: EMPTY_EDIT_LOGO,
   editAccountSummary: EMPTY_ACCOUNT_SUMMARY,
 }
@@ -118,10 +113,7 @@ function normalizeErrorsLength(errors: FormErrors, contacts: AdminCompanyContact
 }
 
 function hasAnyRowContent(contact: AdminCompanyContact): boolean {
-  return Boolean(
-    String(contact.value ?? "").trim() ||
-    String(contact.contactName ?? "").trim()
-  )
+  return Boolean(String(contact.value ?? "").trim() || String(contact.contactName ?? "").trim())
 }
 
 function isValidEmail(value: string): boolean {
@@ -241,16 +233,28 @@ export function useCompanyEdit({
 }: UseCompanyEditParams) {
   const [state, setState] = useReducer(editReducer, initialEditState)
   const editFileInputRef = useRef<HTMLInputElement>(null)
+  const hydratedCompanyIdRef = useRef<string | null>(null)
   const {
     editModalOpen,
     editCompanyId,
     editForm,
     editFieldErrors,
-    editSaving,
-    editOpening,
     editLogo,
     editAccountSummary,
   } = state
+
+  const companyDetailQuery = useAdminCompanyDetail(
+    editCompanyId,
+    Boolean(editModalOpen && editCompanyId)
+  )
+  const updateCompanyMutation = useUpdateAdminCompanyMutation()
+
+  const editOpening =
+    Boolean(editModalOpen && editCompanyId) &&
+    (companyDetailQuery.isPending || companyDetailQuery.isLoading) &&
+    !companyDetailQuery.data
+
+  const editSaving = updateCompanyMutation.isPending
 
   const countries = useMemo(
     () =>
@@ -304,71 +308,93 @@ export function useCompanyEdit({
     return [{ value: raw, label }, ...allRegions]
   }, [allRegions, editForm.region, t])
 
-  const closeCompanyEdit = () => {
+  const closeCompanyEdit = useCallback(() => {
+    hydratedCompanyIdRef.current = null
     if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
     setState(initialEditState)
-  }
+  }, [editLogo.url])
 
-  const openCompanyEdit = async (row: ProfileRequestRow) => {
-    setState({ editOpening: true })
-    try {
-      const companyId = row.companyId?.trim()
-      if (!companyId) {
-        onShowToast(
-          t("admin.companies.companyIdRequired", "Company ID not available for this row."),
-          "error"
-        )
-        return
-      }
-
-      const detail = await getAdminCompanyDetail(companyId)
-      const nextForm = adminCompanyDetailToForm(detail)
-      const nextLogoUrl = pickAdminCompanyLogoUrl(detail)
-
-      setState({
-        editCompanyId: companyId,
-        editForm: nextForm,
-        editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, nextForm.contacts),
-        editLogo: {
-          ...EMPTY_EDIT_LOGO,
-          url: nextLogoUrl,
-          uploaded: Boolean(nextLogoUrl),
-        },
-        editAccountSummary: mapMemberToAccountSummary(detail.member, language),
-        editModalOpen: true,
-      })
-    } catch (err) {
-      const status = (err as { status?: number }).status
-      const msgFromApi = (err as { message?: string }).message
-      if (status === 404) {
-        onShowToast(
-          t("admin.companies.companyNotFound404", "Company or linked user was not found."),
-          "error"
-        )
-      } else if (status === 403) {
-        onShowToast(
-          t("admin.companies.forbidden403", "You are not allowed to update this company."),
-          "error"
-        )
-      } else {
-        onShowToast(
-          msgFromApi ||
-            t("admin.companies.loadCompanyDetailError", "Failed to load company detail."),
-          "error"
-        )
-      }
-    } finally {
-      setState({ editOpening: false })
+  useEffect(() => {
+    if (!editModalOpen || !editCompanyId) {
+      hydratedCompanyIdRef.current = null
+      return
     }
+    const detail = companyDetailQuery.data
+    if (!detail || detail.id !== editCompanyId) return
+    if (hydratedCompanyIdRef.current === editCompanyId) return
+    hydratedCompanyIdRef.current = editCompanyId
+    const nextForm = adminCompanyDetailToForm(detail)
+    const nextLogoUrl = pickAdminCompanyLogoUrl(detail)
+    setState({
+      editForm: nextForm,
+      editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, nextForm.contacts),
+      editLogo: {
+        ...EMPTY_EDIT_LOGO,
+        url: nextLogoUrl,
+        uploaded: Boolean(nextLogoUrl),
+      },
+      editAccountSummary: mapMemberToAccountSummary(detail.member, language),
+    })
+  }, [editModalOpen, editCompanyId, companyDetailQuery.data, language])
+
+  useEffect(() => {
+    if (!editModalOpen || !editCompanyId || !companyDetailQuery.isError) return
+    const err = companyDetailQuery.error as { status?: number; message?: string }
+    const status = err?.status
+    const msgFromApi = err?.message
+    if (status === 404) {
+      onShowToast(
+        t("admin.companies.companyNotFound404", "Company or linked user was not found."),
+        "error"
+      )
+    } else if (status === 403) {
+      onShowToast(
+        t("admin.companies.forbidden403", "You are not allowed to update this company."),
+        "error"
+      )
+    } else {
+      onShowToast(
+        msgFromApi ||
+          t("admin.companies.loadCompanyDetailError", "Failed to load company detail."),
+        "error"
+      )
+    }
+    hydratedCompanyIdRef.current = null
+    setState(initialEditState)
+  }, [
+    editModalOpen,
+    editCompanyId,
+    companyDetailQuery.isError,
+    companyDetailQuery.error,
+    onShowToast,
+    t,
+  ])
+
+  const openCompanyEdit = (row: ProfileRequestRow) => {
+    const companyId = row.companyId?.trim()
+    if (!companyId) {
+      onShowToast(
+        t("admin.companies.companyIdRequired", "Company ID not available for this row."),
+        "error"
+      )
+      return
+    }
+    hydratedCompanyIdRef.current = null
+    setState({
+      editCompanyId: companyId,
+      editModalOpen: true,
+      editForm: EMPTY_ADMIN_COMPANY_FORM,
+      editFieldErrors: EMPTY_ERRORS,
+      editLogo: EMPTY_EDIT_LOGO,
+      editAccountSummary: EMPTY_ACCOUNT_SUMMARY,
+    })
   }
 
   const handleEditFieldChange = (field: keyof AdminCompanyForm, value: string | string[]) => {
     if (!canEditCompanyProfile) return
-    const nextForm: AdminCompanyForm =
-      field === "country"
-        ? { ...editForm, country: value as string, region: "" }
-        : { ...editForm, [field]: value }
-    setState({ editForm: nextForm })
+    setState({
+      editForm: { ...editForm, [field]: value },
+    })
 
     if (field !== "contacts" && editFieldErrors[field as keyof Omit<FormErrors, "contacts">]) {
       setState({
@@ -475,7 +501,7 @@ export function useCompanyEdit({
     e.target.value = ""
   }
 
-  const handleSaveCompanyEdit = async () => {
+  const handleSaveCompanyEdit = () => {
     if (!canEditCompanyProfile || !editCompanyId) {
       if (!editCompanyId) {
         onShowToast(
@@ -502,63 +528,48 @@ export function useCompanyEdit({
 
     setState({
       editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, editForm.contacts),
-      editSaving: true,
     })
-    try {
-      const payload = adminCompanyFormToUpdatePayload(editForm)
-      const res =
-        editLogo.changed && editLogo.file
-          ? await (async () => {
-              // The multipart endpoint rejects nested payload fields like contacts/industry.
-              // Persist structured data via JSON first, then upload the logo file separately.
-              await updateAdminCompany(editCompanyId, payload)
-              return updateAdminCompanyWithLogo(editCompanyId, {}, editLogo.file)
-            })()
-          : await updateAdminCompany(editCompanyId, payload)
 
-      const nextForm = adminCompanyDetailToForm(res)
-      const savedLogoUrl = pickAdminCompanyLogoUrl(res)
+    const payload = adminCompanyFormToUpdatePayload(editForm)
 
-      if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
-
-      setState({
-        editForm: nextForm,
-        editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, nextForm.contacts),
-        editLogo: {
-          url: savedLogoUrl,
-          file: null,
-          uploaded: Boolean(savedLogoUrl),
-          changed: false,
+    updateCompanyMutation.mutate(
+      {
+        companyId: editCompanyId,
+        payload,
+        logoChanged: editLogo.changed,
+        logoFile: editLogo.file,
+      },
+      {
+        onSuccess: () => {
+          if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
+          onCompanyDataChanged(editCompanyId)
+          onShowToast(t("admin.companies.profileUpdatedSuccess", "Company profile updated"), "success")
+          onRefetchCompanyRequests?.()
+          closeCompanyEdit()
         },
-      })
-
-      onCompanyDataChanged(editCompanyId)
-      onShowToast(t("admin.companies.profileUpdatedSuccess", "Company profile updated"), "success")
-      onRefetchCompanyRequests?.()
-      closeCompanyEdit()
-    } catch (err) {
-      const status = (err as { status?: number }).status
-      const msgFromApi = (err as { message?: string }).message
-      if (status === 404) {
-        onShowToast(
-          t("admin.companies.companyNotFound404", "Company or linked user was not found."),
-          "error"
-        )
-      } else if (status === 403) {
-        onShowToast(
-          t("admin.companies.forbidden403", "You are not allowed to update this company."),
-          "error"
-        )
-      } else {
-        onShowToast(
-          msgFromApi ||
-            t("admin.companies.profileUpdateError", "Failed to update company profile."),
-          "error"
-        )
+        onError: (err) => {
+          const status = err?.status
+          const msgFromApi = err?.message
+          if (status === 404) {
+            onShowToast(
+              t("admin.companies.companyNotFound404", "Company or linked user was not found."),
+              "error"
+            )
+          } else if (status === 403) {
+            onShowToast(
+              t("admin.companies.forbidden403", "You are not allowed to update this company."),
+              "error"
+            )
+          } else {
+            onShowToast(
+              msgFromApi ||
+                t("admin.companies.profileUpdateError", "Failed to update company profile."),
+              "error"
+            )
+          }
+        },
       }
-    } finally {
-      setState({ editSaving: false })
-    }
+    )
   }
 
   return {
