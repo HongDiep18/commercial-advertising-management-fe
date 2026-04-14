@@ -1,5 +1,6 @@
 "use client"
 
+import { adminCompaniesKeys } from "@/api/admin-companies/hooks"
 import { adminCompanyRequestsKeys } from "@/api/admin/hooks"
 import { deleteCompany, patchUserActive, updateProfileRequestStatus } from "@/api/admin"
 import { archiveAdminCompany } from "@/api/admin-companies/service"
@@ -15,6 +16,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const refetchCompanyRequests = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: adminCompanyRequestsKeys.all })
+    void queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.all })
   }, [queryClient])
 
   const updateCompanyRequestStatus = useCallback(

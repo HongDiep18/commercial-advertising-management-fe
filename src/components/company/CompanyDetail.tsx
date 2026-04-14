@@ -51,11 +51,7 @@ import {
   EMAIL_LIST_CLOSE_DELAY_MS,
   INDUSTRY_TAG_VISIBLE_DEFAULT,
   clearCloseTimer,
-  getCompanyAddressesFromApi,
-  getCompanyWebsitesFromApi,
   getDeterministicHash,
-  getOtherContactsFromApi,
-  getSocialContactsFromApi,
   normalizeContactGroups,
   normalizeEmails,
   normalizeAddressList,
@@ -421,10 +417,51 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   }
 
   const demoCompany = isDemo ? getCompanyData(companyId) : null
-  const detailAddresses = isDemo || !apiCompany ? [] : getCompanyAddressesFromApi(apiCompany)
-  const detailWebsites = isDemo || !apiCompany ? [] : getCompanyWebsitesFromApi(apiCompany)
-  const socialContacts = isDemo || !apiCompany ? [] : getSocialContactsFromApi(apiCompany)
-  const otherContacts = isDemo || !apiCompany ? [] : getOtherContactsFromApi(apiCompany)
+  const detailAddresses =
+    isDemo || !apiCompany
+      ? []
+      : normalizeAddressList(
+          (apiCompany.contacts ?? [])
+            .filter((contact) => String(contact.type).trim().toLowerCase() === "address")
+            .map((contact) => String(contact.value))
+        )
+
+  const detailWebsites =
+    isDemo || !apiCompany
+      ? []
+      : normalizeAddressList(
+          (apiCompany.contacts ?? [])
+            .filter((contact) => String(contact.type).trim().toLowerCase() === "website")
+            .map((contact) => String(contact.value))
+        )
+
+  const socialContacts =
+    isDemo || !apiCompany
+      ? []
+      : (apiCompany.contacts ?? [])
+          .map((contact) => ({
+            type: String(contact.type).trim().toLowerCase(),
+            value: String(contact.value ?? "").trim(),
+            contactName: String(contact.contactName ?? "").trim(),
+          }))
+          .filter((contact) => {
+            const allowed = new Set(["zalo", "wechat", "line", "skype", "facebook", "viber"])
+            return allowed.has(contact.type) && contact.value.length > 0
+          })
+
+  const otherContacts =
+    isDemo || !apiCompany
+      ? []
+      : (apiCompany.contacts ?? [])
+          .map((contact) => ({
+            type: String(contact.type).trim().toLowerCase(),
+            value: String(contact.value ?? "").trim(),
+            contactName: String(contact.contactName ?? "").trim(),
+          }))
+          .filter((contact) => {
+            const allowed = new Set(["tel", "hotline", "fax"])
+            return allowed.has(contact.type) && contact.value.length > 0
+          })
 
   const company =
     isDemo && demoCompany
@@ -435,7 +472,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
         }
       : {
           id: apiCompany!.id,
-          nameCn: apiCompany!.companyNameZh ?? apiCompany!.companyNameVi ?? "",
+          nameCn: apiCompany!.companyNameZh ?? "",
           nameEn: apiCompany!.companyNameEn ?? "",
           logo: apiCompany!.logoUrl ?? "/placeholder.svg",
           category: apiCompany!.industry,
@@ -444,9 +481,9 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
           phone: apiCompany!.phone ?? "",
           email: apiCompany!.email ?? "",
           emails: apiCompany!.emails ?? [],
-          contactPhonesByName: apiCompany!.contactPhonesByName ?? [],
+          contactPhonesByName: [],
           websites: detailWebsites,
-          contactPerson: apiCompany!.contactName ?? "",
+          contactPerson: "",
           region: apiCompany!.region ?? "",
           taxId: apiCompany!.taxId ?? "",
           introduction: apiCompany!.description,
@@ -456,7 +493,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
 
   const companyEmails = isDemo
     ? normalizeEmails([company.email])
-    : normalizeEmails([...(apiCompany?.emails ?? []), apiCompany?.email ?? ""])
+    : normalizeEmails(apiCompany?.emails ?? [])
 
   const contactsByName = isDemo
     ? [
@@ -465,7 +502,25 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
           contactPhones: normalizeEmails([company.phone]),
         },
       ]
-    : normalizeContactGroups((apiCompany?.contactPhonesByName ?? []) as ContactGroup[])
+    : normalizeContactGroups(
+        Object.values(
+          (apiCompany?.contacts ?? [])
+            .filter((contact) => String(contact.type).trim().toLowerCase() === "contact_person")
+            .reduce(
+              (acc, contact) => {
+                const contactName = String(contact.contactName ?? "").trim()
+                const phone = String(contact.value ?? "").trim()
+                if (!phone) return acc
+                const key = contactName || "-"
+                const current = acc[key] ?? { contactName, contactPhones: [] as string[] }
+                current.contactPhones.push(phone)
+                acc[key] = current
+                return acc
+              },
+              {} as Record<string, { contactName: string; contactPhones: string[] }>
+            )
+        ) as ContactGroup[]
+      )
 
   const effectiveSelectedEmail = companyEmails.includes(selectedEmail)
     ? selectedEmail
@@ -477,16 +532,10 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const selectedSocialContact = pickSelectedByType(socialContacts, selectedSocialType)
   const selectedOtherContact = pickSelectedByType(otherContacts, selectedOtherType)
 
-  const companyNameZh = String(
-    isDemo ? company.nameCn : (apiCompany?.companyNameZh ?? company.nameCn ?? "")
-  ).trim()
-  const companyNameEn = String(
-    isDemo ? company.nameEn : (apiCompany?.companyNameEn ?? company.nameEn ?? "")
-  ).trim()
-  const companyNameVi =
-    String(isDemo ? company.nameEn : (apiCompany?.companyNameVi ?? "")).trim() ||
-    companyNameZh ||
-    companyNameEn
+  const companyNameZh = String(isDemo ? company.nameCn : (apiCompany?.companyNameZh ?? "")).trim()
+  const companyNameEn = String(isDemo ? company.nameEn : (apiCompany?.companyNameEn ?? "")).trim()
+  const companyNameVi = String(isDemo ? company.nameEn : (apiCompany?.companyNameVi ?? "")).trim()
+  const companyTitle = companyNameZh || companyNameVi || companyNameEn
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
   const fallbackBackToDirectory = fromCategory
     ? `/directory?category=${encodeURIComponent(fromCategory)}`
@@ -676,10 +725,10 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
               <div className="lg:w-2/3 lg:p-8">
                 <div className="group relative mb-6">
                   <h1 key={i18n.language} className="text-foreground mb-2 text-3xl font-bold">
-                    {companyNameZh}
+                    {companyTitle}
                   </h1>
                   <p key={`${i18n.language}-vi`} className="text-muted-foreground mb-1 text-lg">
-                    {companyNameVi || companyNameEn || "-"}
+                    {companyNameVi}
                   </p>
                   <div className="border-destructive/40 bg-body-bg-dark pointer-events-none absolute top-full left-0 z-20 mt-1 hidden min-w-[240px] rounded-md border px-3 py-2 text-sm shadow-lg group-hover:block">
                     <p className="text-destructive font-medium">
@@ -787,7 +836,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                   </div>
                 )}
 
-                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-[7fr_3fr]">
                   <div className="flex items-start gap-3">
                     <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
                       <MapPin className="text-primary h-5 w-5" />
@@ -809,6 +858,18 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                           <p className="text-sm font-medium">-</p>
                         )}
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                      <Building2 className="text-primary h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-sm">
+                        {t("companyDetail.region") || "地區"}
+                      </p>
+                      <p className="text-sm font-medium">{translatedRegion}</p>
                     </div>
                   </div>
 
@@ -853,18 +914,6 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       </div>
                     </div>
                   )}
-
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
-                      <Building2 className="text-primary h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-sm">
-                        {t("companyDetail.region") || "地區"}
-                      </p>
-                      <p className="text-sm font-medium">{translatedRegion}</p>
-                    </div>
-                  </div>
 
                   {company.taxId && (
                     <div className="flex items-start gap-3">
