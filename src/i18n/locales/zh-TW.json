@@ -1381,6 +1381,7 @@
         "facebook": "Facebook",
         "viber": "Viber"
       },
+      "registeredEmailNote": "註冊電子郵件 — 無法在此更改",
       "emailConflict409": "此電子郵件已被使用。",
       "companyNotFound404": "找不到公司或關聯使用者。",
       "forbidden403": "您沒有權限更新此公司。",

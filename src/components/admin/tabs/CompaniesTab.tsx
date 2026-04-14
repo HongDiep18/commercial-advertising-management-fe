@@ -280,10 +280,11 @@ export function CompaniesTab() {
                     const displayCompanyName = cached?.displayCompanyName?.trim()
                       ? cached.displayCompanyName
                       : row.companyName
-                    const displayRegisteredEmail = row.email?.trim() || ""
+                    const displayRegisteredEmail =
+                      row.registeredEmail?.trim() || row.email?.trim() || ""
                     const displayContactValue = cached?.contactValue?.trim()
                       ? cached.contactValue
-                      : row.email
+                      : row.companyEmail?.trim() || row.email
                     const displayContactName = cached?.contactName?.trim()
                       ? cached.contactName
                       : row.contactName

@@ -591,20 +591,38 @@ export function AdminCompanyEditDialog({
                           CONTACT_TYPE_EXAMPLES[
                             String(contact.type || "") as AdminCompanyContactType
                           ]
+                        const registeredEmailNorm = accountSummary.registeredEmail.trim().toLowerCase()
+                        const isRegisteredEmail =
+                          String(contact.type || "") === "register_email" ||
+                          (String(contact.type || "") === "email" &&
+                            Boolean(registeredEmailNorm) &&
+                            contact.value.trim().toLowerCase() === registeredEmailNorm)
+                        const isDisabled = readOnly || isRegisteredEmail
                         return (
                           <div
                             key={`contact-${index}`}
                             className="grid grid-cols-1 items-start gap-2 md:grid-cols-[minmax(0,1fr)_36px]"
                           >
-                            <FieldWithError error={error.value}>
+                            <FieldWithError error={isRegisteredEmail ? undefined : error.value}>
                               <Input
                                 value={contact.value}
                                 onChange={(e) => onContactChange(index, "value", e.target.value)}
-                                disabled={readOnly}
+                                disabled={isDisabled}
                                 placeholder={example || ""}
                               />
+                              {isRegisteredEmail && (
+                                <p className="text-muted-foreground mt-0.5 text-[11px]">
+                                  {t("admin.companies.registeredEmailNote", {
+                                    defaultValue: "Registered email — cannot be changed here",
+                                  })}
+                                </p>
+                              )}
                             </FieldWithError>
-                            {renderRemoveButton(index)}
+                            {isRegisteredEmail ? (
+                              <div className="h-10 w-10 shrink-0" />
+                            ) : (
+                              renderRemoveButton(index)
+                            )}
                           </div>
                         )
                       })}
