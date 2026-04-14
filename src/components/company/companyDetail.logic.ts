@@ -16,6 +16,7 @@ const SOCIAL_CONTACT_TYPES = ["zalo", "wechat", "line", "skype", "facebook", "vi
 const SOCIAL_CONTACT_TYPE_SET = new Set<string>(SOCIAL_CONTACT_TYPES)
 const OTHER_CONTACT_TYPES = ["tel", "hotline", "fax"] as const
 const OTHER_CONTACT_TYPE_SET = new Set<string>(OTHER_CONTACT_TYPES)
+const INTERNAL_CONTACT_TYPE_SET = new Set<string>(["register_email"])
 
 export function usePersistentStringQuery(queryKey: readonly unknown[]): string {
   const { data = "" } = useQuery({
@@ -78,6 +79,11 @@ function extractContactValuesByType(
       contacts
         .filter(
           (contact) =>
+            !INTERNAL_CONTACT_TYPE_SET.has(
+              String(contact?.type ?? "")
+                .trim()
+                .toLowerCase()
+            ) &&
             String(contact?.type ?? "")
               .trim()
               .toLowerCase() === type
@@ -141,7 +147,12 @@ function getTypedContactsFromApi(
       value: String(item?.value ?? "").trim(),
       contactName: String(item?.contactName ?? "").trim(),
     }))
-    .filter((item) => allowedTypes.has(item.type) && item.value.length > 0)
+    .filter(
+      (item) =>
+        !INTERNAL_CONTACT_TYPE_SET.has(item.type) &&
+        allowedTypes.has(item.type) &&
+        item.value.length > 0
+    )
 }
 
 export function getSocialContactsFromApi(company: {

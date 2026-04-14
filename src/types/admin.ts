@@ -47,6 +47,8 @@ export type ProfileRequestRow = {
   id: string
   companyName: string
   email: string
+  registeredEmail: string
+  companyEmail: string
   contactName: string
   status: ProfileRequestStatus | string
   submittedAt: string

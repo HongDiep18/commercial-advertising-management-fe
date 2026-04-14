@@ -1465,6 +1465,7 @@
         "facebook": "Facebook",
         "viber": "Viber"
       },
+      "registeredEmailNote": "Email đăng ký — không thể thay đổi tại đây",
       "emailConflict409": "Email này đã được sử dụng.",
       "companyNotFound404": "Không tìm thấy công ty hoặc người dùng liên kết.",
       "forbidden403": "Bạn không được phép cập nhật công ty này.",
