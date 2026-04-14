@@ -21,6 +21,7 @@ import {
 } from "@/components/account"
 import type { ProfileFormData } from "@/types/account"
 import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
+import { useCompanyDetail } from "@/api/companies/hooks"
 import { getProfile, getProfileAndLogoFromUpdateData, type ProfileResponse } from "@/api/profile"
 import { updateProfile, updateProfileWithLogo } from "@/api/auth"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
@@ -32,6 +33,7 @@ import {
   REGISTER_COUNTRY_OTHER_VALUE,
 } from "@/components/register/registerOptions"
 import { api } from "@/lib/api"
+import { formatDate } from "@/utils/datetime"
 
 function normalizeMembershipTier(value: unknown): MembershipTier | null {
   if (typeof value !== "string") return null
@@ -119,6 +121,11 @@ export default function AccountPage() {
   })
 
   const profileData = profile.data
+  const userCompanyId = user?.companyId?.trim() || ""
+  const { data: userCompanyDetail } = useCompanyDetail(
+    userCompanyId,
+    Boolean(modals.profile && userCompanyId)
+  )
   const showToast = (message: string, variant: ToastVariant = "info") =>
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((t) => ({ ...t, visible: false }))
@@ -400,6 +407,10 @@ export default function AccountPage() {
   const memberTier =
     user.role === UserRole.Admin ? MembershipTier.DIAMOND : (profileTier ?? getMemberTier())
   const tierConfig = MEMBERSHIP_CONFIG[memberTier]
+  const memberSinceDisplay = formatDate(
+    userCompanyDetail?.member?.memberSince ?? user.createdAt ?? "",
+    i18n.language
+  )
 
   return (
     <main className="bg-body-bg-dark min-h-screen">
@@ -414,6 +425,7 @@ export default function AccountPage() {
               tierConfig={tierConfig}
               companyLogo={logo.url}
               logoUploaded={logo.uploaded}
+              memberSinceDisplay={memberSinceDisplay}
               t={t}
               onViewBenefits={() => setModals((m) => ({ ...m, benefits: true }))}
               onEditProfile={() => setModals((m) => ({ ...m, profile: true }))}
@@ -511,6 +523,14 @@ export default function AccountPage() {
         open={modals.profile}
         onClose={() => setModals((m) => ({ ...m, profile: false }))}
         profileData={profileData}
+        companyDetail={userCompanyDetail}
+        accountSummary={{
+          userName: userCompanyDetail?.member?.userName ?? user.name ?? "",
+          registeredEmail:
+            userCompanyDetail?.member?.registeredEmail ?? user.email ?? profileData.email ?? "",
+          memberSince: userCompanyDetail?.member?.memberSince ?? user.createdAt ?? "",
+          memberRange: userCompanyDetail?.member?.membershipTier ?? tierConfig.labelEn,
+        }}
         onProfileChange={handleProfileChange}
         fieldErrors={profileFieldErrors}
         companyLogo={logo.url}
@@ -522,6 +542,7 @@ export default function AccountPage() {
         countries={countries}
         allRegions={allRegions}
         readOnly={user.role !== UserRole.Admin}
+        locale={i18n.language}
         t={t}
       />
 

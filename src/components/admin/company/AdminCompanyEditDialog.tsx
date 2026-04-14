@@ -3,19 +3,16 @@
 import { useMemo, type RefObject } from "react"
 import type { TFunction } from "i18next"
 import { Edit3, ImageIcon, Plus, Save, Trash2, Upload, X } from "lucide-react"
-import {
-  type AdminCompanyForm,
-  isCompanyLevelContactType,
-} from "@/api/admin-companies/mapper"
+import { type AdminCompanyForm, isCompanyLevelContactType } from "@/api/admin-companies/mapper"
 import type { AdminCompanyContact, AdminCompanyContactType } from "@/api/admin-companies/types"
+import { CompanyBasicInfoSection } from "@/components/company/CompanyBasicInfoSection"
 import { REGISTER_CATEGORIES } from "@/components/register/registerCategories"
 import Button from "@/components/ui/Button"
 import { Field, FieldLabel } from "@/components/ui/field"
 import Input from "@/components/ui/Input"
-import { SearchableMultiSelect } from "@/components/ui/SearchableMultiSelect"
 import { SearchableSelect } from "@/components/ui/SearchableSelect"
 import Textarea from "@/components/ui/Textarea"
-import { RequiredMark, stripTrailingAsterisk } from "@/components/ui/required-mark"
+import { RequiredMark } from "@/components/ui/required-mark"
 
 type CountryOption = { value: string; label: string }
 type RegionOption = { value: string; label: string }
@@ -27,9 +24,12 @@ type ContactFieldErrors = {
 
 type AdminCompanyFormErrors = {
   companyNameVi?: string
+  companyNameZh?: string
+  taxId?: string
   country?: string
   region?: string
   industry?: string
+  description?: string
   contacts: ContactFieldErrors[]
 }
 
@@ -57,6 +57,8 @@ type Props = {
   countries: CountryOption[]
   allRegions: RegionOption[]
   readOnly?: boolean
+  showNoteSection?: boolean
+  allowReadOnlyIndustryPreview?: boolean
   t: TFunction
 }
 
@@ -200,6 +202,8 @@ export function AdminCompanyEditDialog({
   countries,
   allRegions,
   readOnly = false,
+  showNoteSection = true,
+  allowReadOnlyIndustryPreview = false,
   t,
 }: Props) {
   const industryCategories = useMemo(
@@ -326,135 +330,35 @@ export function AdminCompanyEditDialog({
             <h3 className="text-muted-foreground text-sm font-medium">
               {t("account.companyInfo", { defaultValue: "Company Information" })}
             </h3>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldWithError error={errors.companyNameVi}>
-                <Field className="gap-1.5">
-                  <FieldLabel className="text-foreground text-sm font-medium">
-                    {stripTrailingAsterisk(
-                      t("register.placeholders.companyNameVi", {
-                        defaultValue: "Company Name (Vietnamese)",
-                      })
-                    )}
-                    <RequiredMark />
-                  </FieldLabel>
-                  <Input
-                    value={form.companyNameVi}
-                    onChange={(e) => onFieldChange("companyNameVi", e.target.value)}
-                    placeholder={t("admin.companies.fieldExamples.companyNameVi", {
-                      defaultValue: "Ex: Cong Ty TNHH ABC",
-                    })}
-                    disabled={readOnly}
-                  />
-                </Field>
-              </FieldWithError>
-
-              <Field className="gap-1.5">
-                <FieldLabel className="text-foreground text-sm font-medium">
-                  {t("admin.companies.companyNameEn", { defaultValue: "Company Name (English)" })}
-                </FieldLabel>
-                <Input
-                  value={form.companyNameEn}
-                  onChange={(e) => onFieldChange("companyNameEn", e.target.value)}
-                  placeholder={t("admin.companies.fieldExamples.companyNameEn", {
-                    defaultValue: "Ex: ABC Co., Ltd.",
-                  })}
-                  disabled={readOnly}
-                />
-              </Field>
-
-              <Field className="gap-1.5">
-                <FieldLabel className="text-foreground text-sm font-medium">
-                  {t("register.placeholders.companyNameZh", {
-                    defaultValue: "Company Name (Chinese)",
-                  })}
-                </FieldLabel>
-                <Input
-                  value={form.companyNameZh}
-                  onChange={(e) => onFieldChange("companyNameZh", e.target.value)}
-                  placeholder={t("admin.companies.fieldExamples.companyNameZh", {
-                    defaultValue: "Ex: ABC有限公司",
-                  })}
-                  disabled={readOnly}
-                />
-              </Field>
-
-              <Field className="gap-1.5">
-                <FieldLabel className="text-foreground text-sm font-medium">
-                  {t("register.placeholders.taxId", { defaultValue: "Tax ID" })}
-                </FieldLabel>
-                <Input
-                  value={form.taxId}
-                  onChange={(e) => onFieldChange("taxId", e.target.value)}
-                  placeholder={t("admin.companies.fieldExamples.taxId", {
-                    defaultValue: "Ex: 0302776159",
-                  })}
-                  disabled={readOnly}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <FieldWithError error={errors.country}>
-                <Field className="gap-1.5">
-                  <FieldLabel className="text-foreground text-sm font-medium">
-                    {stripTrailingAsterisk(
-                      t("register.placeholders.country", { defaultValue: "Country" })
-                    )}
-                    <RequiredMark />
-                  </FieldLabel>
-                  <SearchableSelect
-                    value={form.country}
-                    onValueChange={(value) => onFieldChange("country", value)}
-                    disabled={readOnly}
-                    options={countries}
-                    placeholder={t("register.placeholders.country", { defaultValue: "Country" })}
-                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                    emptyText={t("common.noResults", { defaultValue: "No results." })}
-                  />
-                </Field>
-              </FieldWithError>
-
-              <FieldWithError error={errors.region}>
-                <Field className="gap-1.5">
-                  <FieldLabel className="text-foreground text-sm font-medium">
-                    {stripTrailingAsterisk(
-                      t("register.placeholders.region", { defaultValue: "Region" })
-                    )}
-                    <RequiredMark />
-                  </FieldLabel>
-                  <SearchableSelect
-                    value={form.region}
-                    onValueChange={(value) => onFieldChange("region", value)}
-                    disabled={readOnly}
-                    options={allRegions}
-                    placeholder={t("register.placeholders.region", { defaultValue: "Region" })}
-                    searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                    emptyText={t("common.noResults", { defaultValue: "No results." })}
-                  />
-                </Field>
-              </FieldWithError>
-            </div>
-
-            <FieldWithError error={errors.industry}>
-              <Field className="gap-1.5">
-                <FieldLabel className="text-foreground text-sm font-medium">
-                  {stripTrailingAsterisk(
-                    t("register.placeholders.industry", { defaultValue: "Industry" })
-                  )}
-                  <RequiredMark />
-                </FieldLabel>
-                <SearchableMultiSelect
-                  value={form.industry}
-                  onValueChange={(next) => onFieldChange("industry", next)}
-                  disabled={readOnly}
-                  options={industryCategories}
-                  placeholder={t("register.placeholders.industry", { defaultValue: "Industry" })}
-                  searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                  emptyText={t("common.noResults", { defaultValue: "No results." })}
-                />
-              </Field>
-            </FieldWithError>
+            <CompanyBasicInfoSection
+              value={{
+                companyNameVi: form.companyNameVi,
+                companyNameEn: form.companyNameEn,
+                companyNameZh: form.companyNameZh,
+                taxId: form.taxId,
+                country: form.country,
+                region: form.region,
+                industry: form.industry,
+                description: form.description,
+              }}
+              errors={{
+                companyNameVi: errors.companyNameVi,
+                companyNameZh: errors.companyNameZh,
+                taxId: errors.taxId,
+                country: errors.country,
+                region: errors.region,
+                industry: errors.industry,
+                description: errors.description,
+              }}
+              onChange={(field, value) => onFieldChange(field as keyof AdminCompanyForm, value)}
+              countries={countries}
+              allRegions={allRegions}
+              industryOptions={industryCategories}
+              disabled={readOnly}
+              allowIndustryPreviewWhenDisabled={allowReadOnlyIndustryPreview}
+              includeEnglishName
+              t={t}
+            />
           </div>
 
           <div className="space-y-4 border-t pt-4">
@@ -532,8 +436,9 @@ export function AdminCompanyEditDialog({
                   <div key={group.key} className="min-w-0 space-y-1.5">
                     {/* Group header */}
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                      <span className="text-muted-foreground inline-flex items-center gap-0.5 text-xs font-semibold tracking-wide uppercase">
                         {groupLabel}
+                        {group.key === "email" || group.key === "website" ? <RequiredMark /> : null}
                       </span>
                       {!readOnly && (
                         <button
@@ -558,18 +463,16 @@ export function AdminCompanyEditDialog({
                             key={`contact-${index}`}
                             className="grid grid-cols-1 items-start gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_36px]"
                           >
-                            <FieldWithError error={error.value}>
-                              <Input
-                                value={contact.contactName ?? ""}
-                                onChange={(e) =>
-                                  onContactChange(index, "contactName", e.target.value)
-                                }
-                                disabled={readOnly}
-                                placeholder={t("admin.companies.contactNameExample", {
-                                  defaultValue: "Nguyen Van A",
-                                })}
-                              />
-                            </FieldWithError>
+                            <Input
+                              value={contact.contactName ?? ""}
+                              onChange={(e) =>
+                                onContactChange(index, "contactName", e.target.value)
+                              }
+                              disabled={readOnly}
+                              placeholder={t("admin.companies.contactNameExample", {
+                                defaultValue: "Nguyen Van A",
+                              })}
+                            />
                             <FieldWithError error={error.value}>
                               <Input
                                 value={contact.value}
@@ -708,39 +611,24 @@ export function AdminCompanyEditDialog({
             })()}
           </div>
 
-          <div className="space-y-3 border-t pt-4">
-            <Field className="gap-1.5">
-              <FieldLabel className="text-foreground text-sm font-medium">
-                {t("register.placeholders.introduction", { defaultValue: "Description" })}
-              </FieldLabel>
-              <Textarea
-                value={form.description}
-                onChange={(e) => onFieldChange("description", e.target.value)}
-                placeholder={t("admin.companies.fieldExamples.description", {
-                  defaultValue: "Ex: Manufacturing industrial valves and fittings",
-                })}
-                rows={3}
-                disabled={readOnly}
-              />
-            </Field>
-          </div>
-
-          <div className="space-y-3 border-t pt-4">
-            <Field className="gap-1.5">
-              <FieldLabel className="text-foreground text-sm font-medium">
-                {t("admin.companies.fieldLabels.note", { defaultValue: "Internal note" })}
-              </FieldLabel>
-              <Textarea
-                value={form.note}
-                onChange={(e) => onFieldChange("note", e.target.value)}
-                placeholder={t("admin.companies.fieldExamples.note", {
-                  defaultValue: "Optional notes for this company (admin only)",
-                })}
-                rows={3}
-                disabled={readOnly}
-              />
-            </Field>
-          </div>
+          {showNoteSection && (
+            <div className="space-y-3 border-t pt-4">
+              <Field className="gap-1.5">
+                <FieldLabel className="text-foreground text-sm font-medium">
+                  {t("admin.companies.fieldLabels.note", { defaultValue: "Internal note" })}
+                </FieldLabel>
+                <Textarea
+                  value={form.note}
+                  onChange={(e) => onFieldChange("note", e.target.value)}
+                  placeholder={t("admin.companies.fieldExamples.note", {
+                    defaultValue: "Optional notes for this company (admin only)",
+                  })}
+                  rows={3}
+                  disabled={readOnly}
+                />
+              </Field>
+            </div>
+          )}
 
           <div className="flex gap-3 border-t border-gray-400 pt-4">
             <Button

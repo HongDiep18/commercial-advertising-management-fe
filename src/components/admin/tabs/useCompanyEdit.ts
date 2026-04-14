@@ -2,10 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react"
 import type { TFunction } from "i18next"
-import {
-  useAdminCompanyDetail,
-  useUpdateAdminCompanyMutation,
-} from "@/api/admin-companies/hooks"
+import { useAdminCompanyDetail, useUpdateAdminCompanyMutation } from "@/api/admin-companies/hooks"
 import {
   EMPTY_ADMIN_COMPANY_FORM,
   adminCompanyDetailToForm,
@@ -25,7 +22,9 @@ import {
 import type { ProfileRequestRow } from "@/types/admin"
 import { normalizeWebsiteHttpScheme } from "@/types/auth"
 import { formatDate } from "@/utils/datetime"
+import { isValidEmailFormat, translateInvalidEmailHint } from "@/utils/validation/emailFormatHint"
 import { isValidPhone } from "@/utils/validation/phone"
+import { translateSocialMessagingValueError } from "@/utils/validation/socialMessagingContact"
 
 type ToastVariant = "info" | "success" | "error"
 
@@ -36,9 +35,12 @@ type ContactFieldErrors = {
 
 type FormErrors = {
   companyNameVi?: string
+  companyNameZh?: string
+  taxId?: string
   country?: string
   region?: string
   industry?: string
+  description?: string
   contacts: ContactFieldErrors[]
 }
 
@@ -116,8 +118,8 @@ function hasAnyRowContent(contact: AdminCompanyContact): boolean {
   return Boolean(String(contact.value ?? "").trim() || String(contact.contactName ?? "").trim())
 }
 
-function isValidEmail(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+function isTaxIdDigitsOnly(value: string): boolean {
+  return /^\d+$/.test(value.trim())
 }
 
 function isValidWebUrl(value: string): boolean {
@@ -148,6 +150,21 @@ function validateForm(form: AdminCompanyForm, t: TFunction): FormErrors {
       defaultValue: "This field is required.",
     })
   }
+  if (!form.companyNameZh.trim()) {
+    errors.companyNameZh = t("register.errors.requiredField", {
+      defaultValue: "This field is required.",
+    })
+  }
+  const taxIdTrimmed = form.taxId.trim()
+  if (!taxIdTrimmed) {
+    errors.taxId = t("register.errors.requiredField", {
+      defaultValue: "This field is required.",
+    })
+  } else if (!isTaxIdDigitsOnly(form.taxId)) {
+    errors.taxId = t("register.errors.invalidTaxId", {
+      defaultValue: "Tax ID must contain numbers only",
+    })
+  }
   if (!form.country.trim()) {
     errors.country = t("register.errors.requiredField", {
       defaultValue: "This field is required.",
@@ -165,10 +182,40 @@ function validateForm(form: AdminCompanyForm, t: TFunction): FormErrors {
   }
 
   form.contacts.forEach((contact, index) => {
+    const type = String(contact.type ?? "").trim()
+    const typeKey = type.toLowerCase()
+    const value = String(contact.value ?? "").trim()
+
+    if (typeKey === "email") {
+      if (!value) {
+        errors.contacts[index].value = t("register.errors.requiredField", {
+          defaultValue: "This field is required.",
+        })
+        return
+      }
+      if (!isValidEmailFormat(value)) {
+        errors.contacts[index].value = translateInvalidEmailHint(t, value)
+      }
+      return
+    }
+
+    if (typeKey === "website") {
+      if (!value) {
+        errors.contacts[index].value = t("register.errors.requiredField", {
+          defaultValue: "This field is required.",
+        })
+        return
+      }
+      if (!isValidWebUrl(value)) {
+        errors.contacts[index].value = t("register.errors.invalidWebsite", {
+          defaultValue: "Please enter a valid website URL.",
+        })
+      }
+      return
+    }
+
     if (!hasAnyRowContent(contact)) return
 
-    const type = String(contact.type ?? "").trim()
-    const value = String(contact.value ?? "").trim()
     if (!type) {
       errors.contacts[index].type = t("register.errors.requiredField", {
         defaultValue: "This field is required.",
@@ -181,15 +228,16 @@ function validateForm(form: AdminCompanyForm, t: TFunction): FormErrors {
       return
     }
 
-    if (type === "email" && !isValidEmail(value)) {
-      errors.contacts[index].value = t("register.errors.invalidEmail", {
-        defaultValue: "Please enter a valid email address.",
-      })
-    } else if (["tel", "contact_person", "fax", "hotline"].includes(type) && !isValidPhone(value)) {
+    if (["tel", "contact_person", "fax", "hotline"].includes(typeKey) && !isValidPhone(value)) {
       errors.contacts[index].value = t("register.errors.invalidPhone", {
         defaultValue: "Please enter a valid phone number.",
       })
-    } else if (["website", "facebook"].includes(type) && !isValidWebUrl(value)) {
+    } else if (["facebook", "zalo", "wechat", "line", "skype", "viber"].includes(typeKey)) {
+      const socialErr = translateSocialMessagingValueError(t, typeKey, value)
+      if (socialErr) {
+        errors.contacts[index].value = socialErr
+      }
+    } else if (typeKey === "website" && !isValidWebUrl(value)) {
       errors.contacts[index].value = t("register.errors.invalidWebsite", {
         defaultValue: "Please enter a valid website URL.",
       })
@@ -202,9 +250,12 @@ function validateForm(form: AdminCompanyForm, t: TFunction): FormErrors {
 function formHasErrors(errors: FormErrors): boolean {
   return Boolean(
     errors.companyNameVi ||
+    errors.companyNameZh ||
+    errors.taxId ||
     errors.country ||
     errors.region ||
     errors.industry ||
+    errors.description ||
     errors.contacts.some((contact) => contact.type || contact.value)
   )
 }
@@ -233,15 +284,9 @@ export function useCompanyEdit({
 }: UseCompanyEditParams) {
   const [state, setState] = useReducer(editReducer, initialEditState)
   const editFileInputRef = useRef<HTMLInputElement>(null)
-  const hydratedCompanyIdRef = useRef<string | null>(null)
-  const {
-    editModalOpen,
-    editCompanyId,
-    editForm,
-    editFieldErrors,
-    editLogo,
-    editAccountSummary,
-  } = state
+  const hydratedDetailDataUpdatedAtRef = useRef<number | null>(null)
+  const { editModalOpen, editCompanyId, editForm, editFieldErrors, editLogo, editAccountSummary } =
+    state
 
   const companyDetailQuery = useAdminCompanyDetail(
     editCompanyId,
@@ -276,15 +321,12 @@ export function useCompanyEdit({
   const allRegions = useMemo(() => {
     const byValue = new Map<string, { value: string; label: string }>()
 
-    // Add all regions from regionsByCountry (comprehensive Vietnam list + "other" country group)
     for (const list of Object.values(regionsByCountry)) {
       for (const region of list) {
         if (!byValue.has(region.value)) byValue.set(region.value, region)
       }
     }
 
-    // Add regions from other country groups (TW, CN, SG, etc.)
-    // Skip the generic "other" entry — "other-region" from Vietnam already covers it.
     for (const [groupKey, group] of Object.entries(REGION_OPTIONS_BY_COUNTRY)) {
       if (groupKey === REGISTER_COUNTRY_OTHER_VALUE) continue
       for (const option of group) {
@@ -300,7 +342,6 @@ export function useCompanyEdit({
     return Array.from(byValue.values())
   }, [regionsByCountry, t])
 
-  // If the stored region isn't in the list (legacy / mismatched country), inject it with a translated label.
   const regionOptions = useMemo(() => {
     const raw = editForm.region.trim()
     if (!raw || allRegions.some((r) => r.value === raw)) return allRegions
@@ -309,20 +350,21 @@ export function useCompanyEdit({
   }, [allRegions, editForm.region, t])
 
   const closeCompanyEdit = useCallback(() => {
-    hydratedCompanyIdRef.current = null
+    hydratedDetailDataUpdatedAtRef.current = null
     if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
     setState(initialEditState)
   }, [editLogo.url])
 
   useEffect(() => {
     if (!editModalOpen || !editCompanyId) {
-      hydratedCompanyIdRef.current = null
+      hydratedDetailDataUpdatedAtRef.current = null
       return
     }
     const detail = companyDetailQuery.data
     if (!detail || detail.id !== editCompanyId) return
-    if (hydratedCompanyIdRef.current === editCompanyId) return
-    hydratedCompanyIdRef.current = editCompanyId
+    const dataUpdatedAt = companyDetailQuery.dataUpdatedAt
+    if (hydratedDetailDataUpdatedAtRef.current === dataUpdatedAt) return
+    hydratedDetailDataUpdatedAtRef.current = dataUpdatedAt
     const nextForm = adminCompanyDetailToForm(detail)
     const nextLogoUrl = pickAdminCompanyLogoUrl(detail)
     setState({
@@ -335,7 +377,13 @@ export function useCompanyEdit({
       },
       editAccountSummary: mapMemberToAccountSummary(detail.member, language),
     })
-  }, [editModalOpen, editCompanyId, companyDetailQuery.data, language])
+  }, [
+    editModalOpen,
+    editCompanyId,
+    companyDetailQuery.data,
+    companyDetailQuery.dataUpdatedAt,
+    language,
+  ])
 
   useEffect(() => {
     if (!editModalOpen || !editCompanyId || !companyDetailQuery.isError) return
@@ -354,12 +402,11 @@ export function useCompanyEdit({
       )
     } else {
       onShowToast(
-        msgFromApi ||
-          t("admin.companies.loadCompanyDetailError", "Failed to load company detail."),
+        msgFromApi || t("admin.companies.loadCompanyDetailError", "Failed to load company detail."),
         "error"
       )
     }
-    hydratedCompanyIdRef.current = null
+    hydratedDetailDataUpdatedAtRef.current = null
     setState(initialEditState)
   }, [
     editModalOpen,
@@ -379,7 +426,7 @@ export function useCompanyEdit({
       )
       return
     }
-    hydratedCompanyIdRef.current = null
+    hydratedDetailDataUpdatedAtRef.current = null
     setState({
       editCompanyId: companyId,
       editModalOpen: true,
@@ -545,7 +592,10 @@ export function useCompanyEdit({
         onSuccess: () => {
           if (editLogo.url?.startsWith("blob:")) URL.revokeObjectURL(editLogo.url)
           onCompanyDataChanged(editCompanyId)
-          onShowToast(t("admin.companies.profileUpdatedSuccess", "Company profile updated"), "success")
+          onShowToast(
+            t("admin.companies.profileUpdatedSuccess", "Company profile updated"),
+            "success"
+          )
           onRefetchCompanyRequests?.()
           closeCompanyEdit()
         },

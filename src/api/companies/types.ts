@@ -91,10 +91,12 @@ export type CompanyDetail = {
   email?: string
   emails?: string[]
   phone?: string
+  contactPhone?: string | null
   addresses?: string[]
   address?: string | null
   description: string
   taxId?: string | null
+  country?: string | null
   region?: string | null
   website?: string | null
   contactName?: string
@@ -102,6 +104,12 @@ export type CompanyDetail = {
     contactName: string
     contactPhones: string[]
   }>
+  member?: {
+    userName?: string | null
+    registeredEmail?: string | null
+    memberSince?: string | null
+    membershipTier?: string | null
+  } | null
   contacts?: CompanyChannelContact[]
   channelContacts?: CompanyChannelContact[]
 }

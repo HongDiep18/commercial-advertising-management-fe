@@ -54,6 +54,7 @@ export type ProfileRequestRow = {
   submittedAt: string
   industry: string
   country: string
+  phone?: string
   userId?: string
   companyId?: string
   isActive?: boolean
