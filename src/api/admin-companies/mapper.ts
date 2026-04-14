@@ -81,7 +81,7 @@ function clean(value: string | null | undefined): string {
   return typeof value === "string" ? value.trim() : ""
 }
 
-export const ADMIN_COMPANY_CONTACT_TYPES_AS_FORM_FIELDS = new Set(["note"])
+export const ADMIN_COMPANY_CONTACT_TYPES_AS_FORM_FIELDS = new Set(["note", "register_email"])
 
 function contactTypeKey(type: unknown): string {
   return clean(String(type ?? "")).toLowerCase()
@@ -207,29 +207,45 @@ export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompa
   }
 }
 
-export function adminCompanyFormToUpdatePayload(form: AdminCompanyForm): AdminCompanyUpdatePayload {
-  const contacts = dedupeContacts(
-    excludeCompanyLevelContactRows(form.contacts).map((contact) => {
-      const type = clean(String(contact.type))
-      const value = clean(contact.value)
-      const contactName = clean(contact.contactName ?? "")
+export function adminCompanyFormToUpdatePayload(
+  form: AdminCompanyForm,
+  options?: { registeredEmail?: string }
+): AdminCompanyUpdatePayload {
+  const registeredEmailNorm = options?.registeredEmail?.trim().toLowerCase() ?? ""
 
-      if (type === "website" && value) {
+  const contacts = dedupeContacts(
+    excludeCompanyLevelContactRows(form.contacts)
+      .filter((contact) => {
+        if (
+          registeredEmailNorm &&
+          clean(String(contact.type)) === "email" &&
+          clean(contact.value).toLowerCase() === registeredEmailNorm
+        ) {
+          return false
+        }
+        return true
+      })
+      .map((contact) => {
+        const type = clean(String(contact.type))
+        const value = clean(contact.value)
+        const contactName = clean(contact.contactName ?? "")
+
+        if (type === "website" && value) {
+          return {
+            type,
+            value: /^https?:\/\//i.test(value)
+              ? normalizeWebsiteHttpScheme(value)
+              : `https://${value}`,
+            contactName: contactName || null,
+          }
+        }
+
         return {
           type,
-          value: /^https?:\/\//i.test(value)
-            ? normalizeWebsiteHttpScheme(value)
-            : `https://${value}`,
+          value: type === "email" ? value.toLowerCase() : value,
           contactName: contactName || null,
         }
-      }
-
-      return {
-        type,
-        value: type === "email" ? value.toLowerCase() : value,
-        contactName: contactName || null,
-      }
-    })
+      })
   )
 
   return {
@@ -262,7 +278,7 @@ export type AdminCompanyRequestsTableRowCache = {
 
 type ProfileRequestRowFallback = {
   companyName?: string
-  email?: string
+  companyEmail?: string
   contactName?: string
   industry?: string
 }
@@ -283,7 +299,7 @@ export function adminCompanyDetailToRequestsTableCache(
     companyNameEn: names.companyNameEn,
     companyNameZh: names.companyNameZh,
     displayCompanyName,
-    contactValue: primaryContact.value || fallback.email || "",
+    contactValue: primaryContact.value || fallback.companyEmail || "",
     contactName: primaryContact.contactName || detail.contactName || fallback.contactName || "",
     industry,
   }
