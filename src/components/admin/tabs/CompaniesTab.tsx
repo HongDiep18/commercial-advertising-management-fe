@@ -1,12 +1,17 @@
 "use client"
 
 import { patchCompanyActive } from "@/api/admin"
-import { useCompanyRequestsPage, useCompanyRequestsTabCounts } from "@/api/admin/hooks"
+import { useCompanyRequestsTabCounts } from "@/api/admin/hooks"
 import {
   adminCompanyDetailToRequestsTableCache,
   type AdminCompanyRequestsTableRowCache,
 } from "@/api/admin-companies/mapper"
-import { adminCompaniesKeys, useAdminCompanyDetailsByIds } from "@/api/admin-companies/hooks"
+import type { AdminCompanyListQuery } from "@/api/admin-companies/types"
+import {
+  adminCompaniesKeys,
+  useAdminCompaniesList,
+  useAdminCompanyDetailsByIds,
+} from "@/api/admin-companies/hooks"
 import { formatIndustryForDisplay } from "@/api/companies/adminCompany.mapper"
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { AdminCompanyEditDialog } from "@/components/admin/company/AdminCompanyEditDialog"
@@ -14,6 +19,7 @@ import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActive
 import { CompanyDeleteDialog } from "@/components/admin/company/CompanyDeleteDialog"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
+import Input from "@/components/ui/Input"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useUser } from "@/contexts/user-context"
@@ -29,11 +35,13 @@ import {
   CheckCircle2,
   Megaphone,
   Pencil,
+  Search,
   ToggleLeft,
   ToggleRight,
   Trash2,
   XCircle,
 } from "lucide-react"
+import { useDebounce } from "@/hooks/useDebounce"
 import { useQueryClient } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -51,6 +59,8 @@ export function CompaniesTab() {
     useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
   const [page, setPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [activeAdsRow, setActiveAdsRow] = useState<ProfileRequestRow | null>(null)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
@@ -160,14 +170,15 @@ export function CompaniesTab() {
       .finally(() => setUpdatingId(null))
   }
 
-  const listQueryParams = useMemo(
-    () => ({
+  const listQueryParams = useMemo((): AdminCompanyListQuery => {
+    return {
+      search: debouncedSearchQuery.trim() || undefined,
       page,
       limit: 20,
-      ...(filter === "all" ? {} : { status: filter }),
-    }),
-    [page, filter]
-  )
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    }
+  }, [page, debouncedSearchQuery])
 
   const {
     rows,
@@ -175,19 +186,24 @@ export function CompaniesTab() {
     isLoading: isListLoading,
     isError: isListError,
     error: listError,
-  } = useCompanyRequestsPage(listQueryParams)
+  } = useAdminCompaniesList(listQueryParams)
+
+  const displayRows = useMemo(() => {
+    if (filter === "all") return rows
+    return rows.filter((r) => r.status === filter)
+  }, [rows, filter])
 
   const { statusCounts } = useCompanyRequestsTabCounts()
 
   const companyRowsById = useMemo(() => {
     const byId: Record<string, ProfileRequestRow> = {}
-    for (const r of rows) {
+    for (const r of displayRows) {
       const id = r.companyId?.trim()
       if (!id) continue
       if (!byId[id]) byId[id] = r
     }
     return byId
-  }, [rows])
+  }, [displayRows])
 
   const companyIdsOnPage = useMemo(() => Object.keys(companyRowsById), [companyRowsById])
 
@@ -228,23 +244,46 @@ export function CompaniesTab() {
           visible={toast.visible}
           onClose={hideToast}
         />
-        <div className="border-rounded-lg flex items-center gap-2">
-          {PROFILE_REQUEST_FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => {
-                setFilter(f.id)
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="border-rounded-lg flex flex-wrap items-center gap-2">
+            {PROFILE_REQUEST_FILTERS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => {
+                  setFilter(f.id)
+                  setPage(1)
+                }}
+                className={`!body-bg-dark-foreground rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                  filter === f.id
+                    ? "bg-primary text-primary-foreground"
+                    : "!bg-body-bg-dark-foreground text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {f.useCount ? t(f.labelKey, { count: statusCounts[f.id] }) : t(f.labelKey)}
+              </button>
+            ))}
+          </div>
+          <div className="relative w-full sm:max-w-sm">
+            <Search
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+              aria-hidden
+            />
+            <Input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
                 setPage(1)
               }}
-              className={`!body-bg-dark-foreground rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                filter === f.id
-                  ? "bg-primary text-primary-foreground"
-                  : "!bg-body-bg-dark-foreground text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {f.useCount ? t(f.labelKey, { count: statusCounts[f.id] }) : t(f.labelKey)}
-            </button>
-          ))}
+              placeholder={t("admin.companies.searchPlaceholder", {
+                defaultValue: "Search by name, tax id, industry, contact…",
+              })}
+              className="bg-body-bg-dark border-border h-10 w-full pl-9"
+              aria-label={t("admin.companies.searchPlaceholder", {
+                defaultValue: "Search companies",
+              })}
+            />
+          </div>
         </div>
 
         <Card>
@@ -274,7 +313,18 @@ export function CompaniesTab() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row, rowIndex) => {
+                  {displayRows.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-muted-foreground px-4 py-10 text-center text-sm">
+                        {rows.length === 0
+                          ? t("admin.companies.emptyList", { defaultValue: "No companies to display." })
+                          : t("admin.companies.filterNoMatchesOnPage", {
+                              defaultValue: "No companies match this status on this page.",
+                            })}
+                      </td>
+                    </tr>
+                  ) : (
+                    displayRows.map((row, rowIndex) => {
                     const companyIdKey = row.companyId?.trim()
                     const cached = companyIdKey ? companyInfoById[companyIdKey] : undefined
                     const displayCompanyName = cached?.displayCompanyName?.trim()
@@ -464,7 +514,8 @@ export function CompaniesTab() {
                         </td>
                       </tr>
                     )
-                  })}
+                    })
+                  )}
                 </tbody>
               </table>
             </div>

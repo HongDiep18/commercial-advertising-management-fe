@@ -1,21 +1,65 @@
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  keepPreviousData,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query"
 import { useMemo } from "react"
 import {
   getAdminCompaniesStats,
   getAdminCompanyDetail,
+  listAdminCompanies,
   updateAdminCompany,
   updateAdminCompanyWithLogo,
 } from "./service"
 import type {
   AdminCompaniesStatsResponse,
   AdminCompanyDetail,
+  AdminCompanyListItem,
+  AdminCompanyListQuery,
+  AdminCompanyListResponse,
   AdminCompanyUpdatePayload,
 } from "./types"
+import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
+import type { ProfileRequestRow } from "@/types/admin"
 
 export const adminCompaniesKeys = {
   all: ["admin", "companies"] as const,
   stats: () => [...adminCompaniesKeys.all, "stats"] as const,
   detail: (id: string) => [...adminCompaniesKeys.all, "detail", id] as const,
+  list: (q: AdminCompanyListQuery) => [...adminCompaniesKeys.all, "list", q] as const,
+}
+
+function cleanString(v: unknown): string {
+  return typeof v === "string" ? v.trim() : ""
+}
+
+function mapListItemToRow(item: AdminCompanyListItem): ProfileRequestRow {
+  const companyId = cleanString(item.id)
+  const companyName =
+    cleanString(item.companyNameVi) ||
+    cleanString(item.companyNameEn) ||
+    cleanString(item.companyNameZh)
+  const email = cleanString(item.primaryEmail)
+  const phone = cleanString(item.primaryPhone)
+
+  return {
+    id: companyId,
+    companyId,
+    userId: cleanString(item.userId) || undefined,
+    companyName,
+    email,
+    registeredEmail: email,
+    companyEmail: email,
+    contactName: "",
+    status: cleanString(item.status),
+    submittedAt: cleanString(item.createdAt) || cleanString(item.updatedAt),
+    industry: industryFromUnknown(item.industry).join(", "),
+    country: "",
+    phone: phone || undefined,
+    isActive: item.isActive === true,
+  }
 }
 
 export function useAdminCompaniesStats(enabled: boolean = true): {
@@ -30,6 +74,30 @@ export function useAdminCompaniesStats(enabled: boolean = true): {
   })
 
   return { data, isLoading, isError }
+}
+
+export function useAdminCompaniesList(query: AdminCompanyListQuery): {
+  rows: ProfileRequestRow[]
+  pagination: AdminCompanyListResponse["pagination"] | undefined
+  isLoading: boolean
+  isError: boolean
+  error: Error | null
+} {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: adminCompaniesKeys.list(query),
+    queryFn: () => listAdminCompanies(query),
+    placeholderData: keepPreviousData,
+  })
+
+  const rows = useMemo(() => (data?.companies ?? []).map(mapListItemToRow), [data?.companies])
+
+  return {
+    rows,
+    pagination: data?.pagination,
+    isLoading,
+    isError,
+    error: error as Error | null,
+  }
 }
 
 export function useAdminCompanyDetailsByIds(companyIds: string[]): {

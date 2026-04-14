@@ -111,7 +111,6 @@ export function DirectoryResults({
     serverDirectoryQueryEnabled
   )
 
-  /** Real API already filters by `industry` query param — avoid redundant client filter + wrong pagination. */
   const industryFilteredByServer =
     !isDemo && serverDirectoryQueryEnabled && industryParam != null && industryParam.length > 0
 
