@@ -5,6 +5,7 @@ import { isValidPhone } from "@/utils/validation/phone"
 
 const PHONE_FIELDS = ["phone", "contactPhone"] as const
 const EMAIL_FIELD = "email" as const
+const COMPANY_EMAIL_FIELD = "companyEmail" as const
 const WEBSITE_FIELD = "website" as const
 const TAX_ID_FIELD = "taxId" as const
 const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
@@ -16,6 +17,7 @@ const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "contactPhone",
   "companyAddress",
   "email",
+  "companyEmail",
   "country",
   "industry",
   "website",
@@ -40,7 +42,9 @@ const PROFILE_REQUIRED_KEYS: (keyof ProfileFormData)[] = [
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function filled(v: unknown): boolean {
-  return typeof v === "string" && v.trim().length > 0
+  if (typeof v === "string") return v.trim().length > 0
+  if (Array.isArray(v)) return v.length > 0
+  return false
 }
 
 function isEmail(value: string): boolean {
@@ -88,6 +92,10 @@ function runValidation(
   if (filled(emailVal) && !isEmail(String(emailVal))) {
     errors.push({ field: EMAIL_FIELD, kind: "invalidEmail" })
   }
+  const companyEmailVal = data[COMPANY_EMAIL_FIELD]
+  if (filled(companyEmailVal) && !isEmail(String(companyEmailVal))) {
+    errors.push({ field: COMPANY_EMAIL_FIELD, kind: "invalidEmail" })
+  }
   for (const key of PHONE_FIELDS) {
     const val = data[key]
     if (filled(val) && !isValidPhone(String(val))) {
@@ -132,7 +140,6 @@ function runValidation(
     errors.push({ field: "contactPhone", kind: "duplicatePhone" })
   }
   return errors
-  
 }
 
 export function validateRegisterForm(data: RegisterFormData): RegisterValidationResult {

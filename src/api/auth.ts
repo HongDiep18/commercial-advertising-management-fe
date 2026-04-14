@@ -59,7 +59,15 @@ export async function register(payload: RegisterPayload): Promise<RegisterRespon
 function profilePayloadToFormData(payload: Omit<UpdateProfilePayload, "upload_logo">): FormData {
   const form = new FormData()
   for (const [key, value] of Object.entries(payload)) {
-    form.append(key, String(value))
+    if (key === "industry" && Array.isArray(value)) {
+      for (const id of value) {
+        form.append(key, id)
+      }
+      continue
+    }
+    if (value !== undefined && value !== null) {
+      form.append(key, String(value))
+    }
   }
   return form
 }

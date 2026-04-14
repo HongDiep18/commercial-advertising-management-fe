@@ -18,7 +18,7 @@ export type CompanyDirectoryItem = {
   email: string
   contactName: string
   phone: string
-  industry: string
+  industry: string | string[]
   region?: string
   address: string
   description: string
@@ -75,20 +75,35 @@ export type FeaturedCompanyItem = {
 
 export type FeaturedCompaniesResponse = FeaturedCompanyItem[]
 
+export type CompanyChannelContact = {
+  type: string
+  value: string
+  contactName?: string | null
+}
+
 export type CompanyDetail = {
   id: string
   logoUrl?: string | null
   companyNameVi?: string | null
-  companyNameCn?: string | null
-  industry: string
-  email: string
-  phone: string
-  address: string
+  companyNameZh?: string | null
+  companyNameEn?: string | null
+  industry: string | string[]
+  email?: string
+  emails?: string[]
+  phone?: string
+  addresses?: string[]
+  address?: string | null
   description: string
   taxId?: string | null
   region?: string | null
   website?: string | null
-  contactName: string
+  contactName?: string
+  contactPhonesByName?: Array<{
+    contactName: string
+    contactPhones: string[]
+  }>
+  contacts?: CompanyChannelContact[]
+  channelContacts?: CompanyChannelContact[]
 }
 
 export type AdminCompanyResponse = {
@@ -109,4 +124,15 @@ export type AdminCompanyResponse = {
   website?: string
   contactName?: string
   contactPhone?: string
+}
+
+export type AddAdminCompanyContactsPayload = {
+  emails?: string[]
+  contactPhones?: string[]
+  contactName?: string
+}
+
+export type AddAdminCompanyContactsResponse = {
+  added: number
+  skippedDuplicates: number
 }

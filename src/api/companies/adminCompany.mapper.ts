@@ -11,6 +11,41 @@ type CompanyRowLike = {
   industry: string
 }
 
+export function industryFromUnknown(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean)
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const p = JSON.parse(value) as unknown
+      if (Array.isArray(p)) return p.map(String).filter(Boolean)
+    } catch {
+      console.error("Invalid JSON string:", value)
+    }
+    return [value.trim()]
+  }
+  return []
+}
+
+function industryToRowDisplay(value: unknown): string {
+  return industryFromUnknown(value).join(", ")
+}
+
+export function formatIndustryForDisplay(value: unknown): string {
+  if (value == null || value === "") return ""
+  if (Array.isArray(value)) return industryFromUnknown(value).join(", ")
+  if (typeof value === "string") {
+    const s = value.trim()
+    if (!s) return ""
+    try {
+      const p = JSON.parse(s) as unknown
+      if (Array.isArray(p)) return industryFromUnknown(p).join(", ")
+    } catch {
+      return s
+    }
+    return s
+  }
+  return industryToRowDisplay(value)
+}
+
 function read(obj: AnyObj, ...keys: string[]): string {
   for (const k of keys) {
     const v = obj[k]
@@ -38,26 +73,27 @@ export const EMPTY_PROFILE_FORM: ProfileFormData = {
   email: "",
   country: "",
   region: "",
-  industry: "",
+  industry: [],
   website: "",
   description: "",
 }
 
+export type AdminCompanyPatchFields = Record<string, string | string[]>
+
 export function profileFormDataToAdminCompanyPatchBody(
   data: ProfileFormData
-): Record<string, string> {
+): AdminCompanyPatchFields {
   return {
     company_name_vi: data.companyNameVi ?? "",
-    company_name_cn: data.companyNameCn ?? "",
-    phone: data.phone ?? "",
+    company_name_zh: data.companyNameCn ?? "",
+    phone: (data.contactPhone || data.phone || "").trim(),
     tax_id: data.taxId ?? "",
     contact_person: data.contactName ?? "",
-    contact_phone: data.contactPhone ?? "",
     company_address: data.address ?? "",
     email: data.email ?? "",
     country: data.country ?? "",
     region: data.region ?? "",
-    industry: data.industry ?? "",
+    industry: data.industry ?? [],
     website: normalizeWebsiteHttpScheme(data.website ?? ""),
     introduction: data.description ?? "",
   }
@@ -71,16 +107,16 @@ export function adminCompanyResponseToProfileForm(
 
   return {
     companyNameVi: read(u, "companyNameVi", "company_name_vi"),
-    companyNameCn: read(u, "companyNameCn", "company_name_cn"),
+    companyNameCn: read(u, "companyNameCn", "companyNameZh", "company_name_zh"),
     phone: read(u, "phone"),
     taxId: read(u, "taxId", "tax_id"),
     contactName: read(u, "contactName", "contact_person"),
-    contactPhone: read(u, "contactPhone", "contact_phone"),
+    contactPhone: read(u, "contactPhone", "contact_phone") || read(u, "phone"),
     address: read(u, "address", "company_address"),
     email: read(u, "email") || fallbackEmail || "",
     country: read(u, "country"),
     region: read(u, "region"),
-    industry: read(u, "industry"),
+    industry: industryFromUnknown(u.industry ?? u.industries),
     website: read(u, "website"),
     description: read(u, "description", "introduction"),
   }
@@ -93,7 +129,7 @@ export function rowToProfileForm(row: CompanyRowLike): ProfileFormData {
     contactName: row.contactName,
     email: row.email,
     country: row.country,
-    industry: row.industry,
+    industry: industryFromUnknown(row.industry),
   }
 }
 
@@ -104,16 +140,19 @@ export function companyDetailToProfileForm(
   return {
     ...EMPTY_PROFILE_FORM,
     companyNameVi: read(detail, "companyNameVi", "company_name_vi") || row.companyName,
-    companyNameCn: read(detail, "companyNameCn", "company_name_cn"),
+    companyNameCn: read(detail, "companyNameCn", "companyNameZh", "company_name_zh"),
     phone: read(detail, "phone"),
     taxId: read(detail, "taxId", "tax_id"),
     contactName: read(detail, "contactName", "contact_name", "contact_person") || row.contactName,
-    contactPhone: read(detail, "contactPhone", "contact_phone"),
+    contactPhone: read(detail, "contactPhone", "contact_phone") || read(detail, "phone"),
     address: read(detail, "address", "company_address"),
     email: read(detail, "email") || row.email,
     country: read(detail, "country") || row.country,
     region: read(detail, "region"),
-    industry: read(detail, "industry") || row.industry,
+    industry: (() => {
+      const fromDetail = industryFromUnknown(detail.industry ?? detail.industries)
+      return fromDetail.length > 0 ? fromDetail : industryFromUnknown(row.industry)
+    })(),
     website: read(detail, "website"),
     description: read(detail, "description", "introduction"),
   }
@@ -127,7 +166,9 @@ export function companyDetailToRequestRow<T extends CompanyRowLike>(
     ...row,
     email: read(detail, "email") || row.email,
     contactName: read(detail, "contactName", "contact_name", "contact_person") || row.contactName,
-    industry: read(detail, "industry") || row.industry,
+    industry:
+      industryToRowDisplay(detail.industry ?? detail.industries) ||
+      industryToRowDisplay(row.industry),
     country: read(detail, "country") || row.country,
   }
 }

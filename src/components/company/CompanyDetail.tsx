@@ -1,6 +1,15 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -21,26 +30,184 @@ import {
   Lock,
   Crown,
   FileText,
+  ChevronsDown,
+  ChevronsUp,
+  ChevronDown,
 } from "lucide-react"
 import { useUser, UserRole, MembershipTier } from "../../contexts/user-context"
 import { useTranslation } from "react-i18next"
 import { isDemoUser } from "@/components/login/demo"
+import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
 import { useCompanyDetail, useCompanyDirectory } from "@/api/companies/hooks"
+import { ChannelContactsBlock } from "@/components/company/ChannelContactsBlock"
+import type { CompanyChannelContact } from "@/api/companies/types"
+import { useQueryClient } from "@tanstack/react-query"
 import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import { truncateIntroduction, categoryNameToIdMap } from "../../utils/companyHelpers"
 import { translateRegionLabel } from "@/utils/regionSearch"
+import {
+  COPY_FEEDBACK_MS,
+  EMAIL_LIST_CLOSE_DELAY_MS,
+  INDUSTRY_TAG_VISIBLE_DEFAULT,
+  clearCloseTimer,
+  getCompanyAddressesFromApi,
+  getCompanyWebsitesFromApi,
+  getDeterministicHash,
+  getOtherContactsFromApi,
+  getSocialContactsFromApi,
+  normalizeContactGroups,
+  normalizeEmails,
+  normalizeAddressList,
+  pickSelectedByType,
+  toWebsiteHref,
+  usePersistentBooleanQuery,
+  usePersistentStringQuery,
+  type ContactGroup,
+  type SocialContactItem,
+} from "./companyDetail.logic"
 
 interface CompanyDetailProps {
   companyId: string
 }
 
-function getDeterministicHash(seed: string): number {
-  let h = 0
-  for (let i = 0; i < seed.length; i += 1) {
-    h = (h * 31 + seed.charCodeAt(i)) | 0
-  }
-  return Math.abs(h)
+type ContactTypeValueSectionProps = {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  items: SocialContactItem[]
+  containerRef?: RefObject<HTMLDivElement | null>
+  selectedItem?: SocialContactItem
+  isListOpen: boolean
+  onToggleList: () => void
+  onSelectType: (type: string) => void
+  copiedValue: string | null
+  onCopy: (value: string) => void
+  copyAriaLabel: (value: string) => string
+}
+
+function ContactTypeValueSection({
+  icon: Icon,
+  label,
+  items,
+  containerRef,
+  selectedItem,
+  isListOpen,
+  onToggleList,
+  onSelectType,
+  copiedValue,
+  onCopy,
+  copyAriaLabel,
+}: ContactTypeValueSectionProps) {
+  if (items.length === 0) return null
+
+  const typeOptions = Array.from(new Set(items.map((item) => item.type)))
+  const selectedTypeItems = selectedItem
+    ? items.filter((item) => item.type === selectedItem.type)
+    : []
+  return (
+    <div ref={containerRef} className="mt-4 flex items-start gap-3">
+      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+        <Icon className="text-primary h-5 w-5" />
+      </div>
+      <div className="flex-1">
+        <p className="text-muted-foreground text-sm">{label}</p>
+        <div className="mt-2 grid grid-cols-[220px_minmax(0,1fr)] items-start gap-2">
+          <div className="relative self-start">
+            <button
+              type="button"
+              onClick={onToggleList}
+              className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground flex h-9 w-full items-center justify-between rounded-md border bg-gradient-to-br px-2 text-sm font-medium shadow-sm"
+            >
+              <span>{(selectedItem?.type ?? "").toUpperCase()}</span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${isListOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {isListOpen && (
+              <div className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]">
+                {typeOptions.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center rounded px-2 py-1 text-left text-xs font-medium transition-colors"
+                    onClick={() => onSelectType(type)}
+                  >
+                    {type.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div
+            className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground min-h-9 rounded-md border bg-gradient-to-br px-2.5 py-1.5 text-sm font-medium break-all shadow-sm"
+            onClick={() => {
+              if (selectedItem?.value) onCopy(selectedItem.value)
+            }}
+          >
+            {selectedTypeItems.length > 1 ? (
+              <div className="space-y-1">
+                {selectedTypeItems.map((entry, idx) => {
+                  const displayValue = entry.contactName
+                    ? `${entry.contactName}: ${entry.value}`
+                    : entry.value
+                  return (
+                    <div
+                      key={`${entry.type}-${entry.value}-${idx}`}
+                      className="flex items-start gap-2"
+                    >
+                      <span className="min-w-0 flex-1">{displayValue}</span>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onCopy(entry.value)
+                        }}
+                        className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                        aria-label={copyAriaLabel(entry.value)}
+                      >
+                        {copiedValue === entry.value ? (
+                          <Check className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="flex items-start gap-2">
+                <span className="min-w-0 flex-1">
+                  {selectedItem
+                    ? selectedItem.contactName
+                      ? `${selectedItem.contactName}: ${selectedItem.value}`
+                      : selectedItem.value
+                    : "-"}
+                </span>
+                {selectedItem?.value ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onCopy(selectedItem.value)
+                    }}
+                    className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                    aria-label={copyAriaLabel(selectedItem.value)}
+                  >
+                    {copiedValue === selectedItem.value ? (
+                      <Check className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function CompanyDetail({ companyId }: CompanyDetailProps) {
@@ -50,12 +217,69 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const { t, i18n } = useTranslation()
   const { user, isLoggedIn } = useUser()
   const isDemo = isLoggedIn && !!user && isDemoUser(user)
-  const [copiedEmail, setCopiedEmail] = useState(false)
-  const [copiedPhone, setCopiedPhone] = useState(false)
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null)
+  const [copiedContactValue, setCopiedContactValue] = useState<string | null>(null)
+  const [isSocialTypeListOpen, setIsSocialTypeListOpen] = useState(false)
+  const [isOtherTypeListOpen, setIsOtherTypeListOpen] = useState(false)
+  const socialSectionRef = useRef<HTMLDivElement>(null)
+  const otherSectionRef = useRef<HTMLDivElement>(null)
+  const emailListCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const contactListCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const queryClient = useQueryClient()
+  const companyUiKey = <T extends string>(suffix: T) =>
+    ["ui", "companyDetail", companyId, suffix] as const
+  const setUiString = <T extends readonly unknown[]>(key: T, value: string) =>
+    queryClient.setQueryData<string>(key, value)
+  const setUiBool = <T extends readonly unknown[]>(
+    key: T,
+    value: boolean | ((prev: boolean | undefined) => boolean)
+  ) => queryClient.setQueryData<boolean>(key, value)
+
+  const industriesExpandedQueryKey = companyUiKey("industriesExpanded")
+  const industriesExpanded = usePersistentBooleanQuery(industriesExpandedQueryKey)
+  const selectedEmailQueryKey = companyUiKey("selectedEmail")
+  const selectedContactKeyQueryKey = companyUiKey("selectedContactKey")
+  const selectedSocialTypeQueryKey = companyUiKey("selectedSocialType")
+  const selectedOtherTypeQueryKey = companyUiKey("selectedOtherType")
+  const emailListOpenQueryKey = companyUiKey("isEmailListOpen")
+  const contactListOpenQueryKey = companyUiKey("isContactListOpen")
+  const selectedEmail = usePersistentStringQuery(selectedEmailQueryKey)
+  const selectedContactKey = usePersistentStringQuery(selectedContactKeyQueryKey)
+  const selectedSocialType = usePersistentStringQuery(selectedSocialTypeQueryKey)
+  const selectedOtherType = usePersistentStringQuery(selectedOtherTypeQueryKey)
+  const isEmailListOpen = usePersistentBooleanQuery(emailListOpenQueryKey)
+  const isContactListOpen = usePersistentBooleanQuery(contactListOpenQueryKey)
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [companyId])
+
+  useEffect(() => {
+    return () => {
+      clearCloseTimer(emailListCloseTimerRef)
+      clearCloseTimer(contactListCloseTimerRef)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleOutsidePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node | null
+      if (!target) return
+
+      if (isSocialTypeListOpen && !socialSectionRef.current?.contains(target)) {
+        setIsSocialTypeListOpen(false)
+      }
+      if (isOtherTypeListOpen && !otherSectionRef.current?.contains(target)) {
+        setIsOtherTypeListOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsidePointerDown)
+    return () => {
+      document.removeEventListener("mousedown", handleOutsidePointerDown)
+    }
+  }, [isSocialTypeListOpen, isOtherTypeListOpen])
 
   const {
     data: apiCompany,
@@ -71,6 +295,10 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   } = useTierInfo(isLoggedIn && !isAdmin)
 
   const relatedIndustry = apiCompany?.industry
+  const hasRelatedIndustryQuery =
+    relatedIndustry != null &&
+    relatedIndustry !== "" &&
+    (!Array.isArray(relatedIndustry) || relatedIndustry.length > 0)
 
   const { data: relatedDirectoryData } = useCompanyDirectory(
     {
@@ -80,7 +308,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
       sortBy: "name",
       sortOrder: "asc",
     },
-    Boolean(relatedIndustry)
+    hasRelatedIndustryQuery
   )
 
   const relatedCompanies = useMemo<
@@ -102,6 +330,12 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
       }))
   }, [companyId, relatedDirectoryData])
 
+  const channelContacts: CompanyChannelContact[] = useMemo(() => {
+    if (isDemo) return []
+    const raw = apiCompany?.channelContacts ?? []
+    return raw.filter((c) => c && typeof c.value === "string" && c.value.trim().length > 0)
+  }, [isDemo, apiCompany])
+
   if (!isDemo && isCompanyLoading) {
     return (
       <div className="bg-body-bg-dark py-16 text-center">
@@ -111,12 +345,13 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   }
 
   // Check if error is 403 industry access denied
+  const companyError = apiCompanyError as { status?: number; message?: string } | null
   const isIndustryAccessDenied =
     !isDemo &&
     isCompanyError &&
-    apiCompanyError &&
-    (apiCompanyError as any).status === 403 &&
-    (apiCompanyError as any).message?.includes("do not have access to companies in this industry")
+    companyError &&
+    companyError.status === 403 &&
+    companyError.message?.includes("do not have access to companies in this industry")
 
   // Show industry access denied error UI
   if (isIndustryAccessDenied) {
@@ -177,33 +412,73 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     )
   }
 
-  const company = isDemo
-    ? getCompanyData(companyId)
-    : {
-        id: apiCompany!.id,
-        nameCn: apiCompany!.companyNameCn ?? apiCompany!.companyNameVi ?? "",
-        nameEn: apiCompany!.companyNameVi ?? apiCompany!.companyNameCn ?? "",
-        logo: apiCompany!.logoUrl ?? "/placeholder.svg",
-        category: apiCompany!.industry,
-        categoryTags: [],
-        address: apiCompany!.address,
-        phone: apiCompany!.phone,
-        email: apiCompany!.email,
-        website: apiCompany!.website ?? "",
-        contactPerson: apiCompany!.contactName,
-        region: apiCompany!.region ?? "",
-        taxId: apiCompany!.taxId ?? "",
-        introduction: apiCompany!.description,
-        services: [],
-        products: [],
-      }
+  const demoCompany = isDemo ? getCompanyData(companyId) : null
+  const detailAddresses = isDemo || !apiCompany ? [] : getCompanyAddressesFromApi(apiCompany)
+  const detailWebsites = isDemo || !apiCompany ? [] : getCompanyWebsitesFromApi(apiCompany)
+  const socialContacts = isDemo || !apiCompany ? [] : getSocialContactsFromApi(apiCompany)
+  const otherContacts = isDemo || !apiCompany ? [] : getOtherContactsFromApi(apiCompany)
 
-  const companyNameCn = t(`companyDetail.companies.${companyId}.nameCn`, {
-    defaultValue: company.nameCn,
-  })
-  const companyNameEn = t(`companyDetail.companies.${companyId}.nameEn`, {
-    defaultValue: company.nameEn,
-  })
+  const company =
+    isDemo && demoCompany
+      ? {
+          ...demoCompany,
+          addresses: demoCompany.address ? [demoCompany.address] : [],
+          websites: normalizeAddressList([demoCompany.website ?? ""]),
+        }
+      : {
+          id: apiCompany!.id,
+          nameCn: apiCompany!.companyNameZh ?? apiCompany!.companyNameVi ?? "",
+          nameEn: apiCompany!.companyNameEn ?? "",
+          logo: apiCompany!.logoUrl ?? "/placeholder.svg",
+          category: apiCompany!.industry,
+          categoryTags: [],
+          addresses: detailAddresses,
+          phone: apiCompany!.phone ?? "",
+          email: apiCompany!.email ?? "",
+          emails: apiCompany!.emails ?? [],
+          contactPhonesByName: apiCompany!.contactPhonesByName ?? [],
+          websites: detailWebsites,
+          contactPerson: apiCompany!.contactName ?? "",
+          region: apiCompany!.region ?? "",
+          taxId: apiCompany!.taxId ?? "",
+          introduction: apiCompany!.description,
+          services: [],
+          products: [],
+        }
+
+  const companyEmails = isDemo
+    ? normalizeEmails([company.email])
+    : normalizeEmails([...(apiCompany?.emails ?? []), apiCompany?.email ?? ""])
+
+  const contactsByName = isDemo
+    ? [
+        {
+          contactName: company.contactPerson,
+          contactPhones: normalizeEmails([company.phone]),
+        },
+      ]
+    : normalizeContactGroups((apiCompany?.contactPhonesByName ?? []) as ContactGroup[])
+
+  const effectiveSelectedEmail = companyEmails.includes(selectedEmail)
+    ? selectedEmail
+    : (companyEmails[0] ?? "")
+  const effectiveSelectedContactKey = contactsByName[Number(selectedContactKey)]
+    ? selectedContactKey
+    : "0"
+  const selectedContact = contactsByName[Number(effectiveSelectedContactKey)] ?? contactsByName[0]
+  const selectedSocialContact = pickSelectedByType(socialContacts, selectedSocialType)
+  const selectedOtherContact = pickSelectedByType(otherContacts, selectedOtherType)
+
+  const companyNameZh = String(
+    isDemo ? company.nameCn : (apiCompany?.companyNameZh ?? company.nameCn ?? "")
+  ).trim()
+  const companyNameEn = String(
+    isDemo ? company.nameEn : (apiCompany?.companyNameEn ?? company.nameEn ?? "")
+  ).trim()
+  const companyNameVi =
+    String(isDemo ? company.nameEn : (apiCompany?.companyNameVi ?? "")).trim() ||
+    companyNameZh ||
+    companyNameEn
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
   const fallbackBackToDirectory = fromCategory
     ? `/directory?category=${encodeURIComponent(fromCategory)}`
@@ -212,8 +487,21 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     backParam && backParam.startsWith("/directory") ? backParam : fallbackBackToDirectory
   const encodedBackToDirectory = encodeURIComponent(backToDirectoryHref)
 
-  const categoryId = categoryNameToIdMap[company.category] || ""
-  const translatedCategory = categoryId ? t(`directory.categories.${categoryId}`) : company.category
+  const industryTags = [...new Set(industryFromUnknown(company.category as unknown))].map(
+    (entry) => {
+      const slug = categoryNameToIdMap[entry] ?? entry
+      return {
+        key: `${slug}-${entry}`,
+        label: t(`directory.categories.${slug}`, { defaultValue: entry }),
+      }
+    }
+  )
+
+  const industryTagsOverflow = industryTags.length > INDUSTRY_TAG_VISIBLE_DEFAULT
+  const visibleIndustryTags = industriesExpanded
+    ? industryTags
+    : industryTags.slice(0, INDUSTRY_TAG_VISIBLE_DEFAULT)
+  const hiddenIndustryCount = Math.max(0, industryTags.length - INDUSTRY_TAG_VISIBLE_DEFAULT)
 
   const effectiveTier = isAdmin
     ? MembershipTier.DIAMOND
@@ -269,30 +557,54 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     )
   }
 
-  const handleCopyEmail = async () => {
-    const copied = await copyTextSafely(company.email)
+  const handleCopyWithFeedback = async (
+    value: string,
+    setter: Dispatch<SetStateAction<string | null>>
+  ) => {
+    const copied = await copyTextSafely(value)
     if (!copied) return
-    setCopiedEmail(true)
-    setTimeout(() => setCopiedEmail(false), 2000)
+    setter(value)
+    setTimeout(() => setter((prev) => (prev === value ? null : prev)), COPY_FEEDBACK_MS)
   }
-
-  const handleCopyPhone = async () => {
-    const copied = await copyTextSafely(company.phone)
-    if (!copied) return
-    setCopiedPhone(true)
-    setTimeout(() => setCopiedPhone(false), 2000)
-  }
+  const handleCopyEmail = (email: string) => handleCopyWithFeedback(email, setCopiedEmail)
+  const handleCopyPhone = (phone: string) => handleCopyWithFeedback(phone, setCopiedPhone)
 
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: companyNameCn,
-        text: `查看 ${companyNameCn} 的企業資訊`,
+        title: companyNameZh,
+        text: `查看 ${companyNameZh} 的企業資訊`,
         url: window.location.href,
       })
     } else {
       await copyTextSafely(window.location.href)
     }
+  }
+
+  const openEmailList = () => {
+    clearCloseTimer(emailListCloseTimerRef)
+    setUiBool(emailListOpenQueryKey, true)
+  }
+
+  const scheduleCloseEmailList = () => {
+    clearCloseTimer(emailListCloseTimerRef)
+    emailListCloseTimerRef.current = setTimeout(() => {
+      setUiBool(emailListOpenQueryKey, false)
+      clearCloseTimer(emailListCloseTimerRef)
+    }, EMAIL_LIST_CLOSE_DELAY_MS)
+  }
+
+  const openContactList = () => {
+    clearCloseTimer(contactListCloseTimerRef)
+    setUiBool(contactListOpenQueryKey, true)
+  }
+
+  const scheduleCloseContactList = () => {
+    clearCloseTimer(contactListCloseTimerRef)
+    contactListCloseTimerRef.current = setTimeout(() => {
+      setUiBool(contactListOpenQueryKey, false)
+      clearCloseTimer(contactListCloseTimerRef)
+    }, EMAIL_LIST_CLOSE_DELAY_MS)
   }
 
   return (
@@ -346,7 +658,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <div className="border-border/50 relative aspect-square w-full max-w-[280px] overflow-hidden rounded-lg border bg-white">
                   <Image
                     src={company.logo || "/placeholder.svg"}
-                    alt={companyNameCn}
+                    alt={companyNameZh}
                     fill
                     className={`object-contain p-4 ${shouldBlurLogo ? "blur-sm" : ""}`}
                   />
@@ -354,31 +666,118 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
               </div>
 
               <div className="lg:w-2/3 lg:p-8">
-                <div className="mb-6">
+                <div className="group relative mb-6">
                   <h1 key={i18n.language} className="text-foreground mb-2 text-3xl font-bold">
-                    {companyNameCn}
+                    {companyNameZh}
                   </h1>
-                  <p key={`${i18n.language}-en`} className="text-muted-foreground mb-1 text-lg">
-                    {companyNameEn}
+                  <p key={`${i18n.language}-vi`} className="text-muted-foreground mb-1 text-lg">
+                    {companyNameVi || companyNameEn || "-"}
                   </p>
+                  <div className="border-destructive/40 bg-body-bg-dark pointer-events-none absolute top-full left-0 z-20 mt-1 hidden min-w-[240px] rounded-md border px-3 py-2 text-sm shadow-lg group-hover:block">
+                    <p className="text-destructive font-medium">
+                      Vietnamese: {companyNameVi || "-"}
+                    </p>
+                    <p className="text-destructive font-medium">Taiwan: {companyNameZh || "-"}</p>
+                    <p className="text-destructive font-medium">English: {companyNameEn || "-"}</p>
+                  </div>
                 </div>
 
-                <div className="mb-6 flex flex-wrap gap-2">
-                  <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-                    {translatedCategory}
-                  </span>
-                  {company.categoryTags.map((tag) => {
-                    const translatedTag = t(`directory.categoryTags.${tag}`, { defaultValue: tag })
-                    return (
-                      <span
-                        key={tag}
-                        className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-sm"
-                      >
-                        {translatedTag}
-                      </span>
-                    )
-                  })}
-                </div>
+                {(industryTags.length > 0 || company.categoryTags.length > 0) && (
+                  <div className="mb-6 space-y-4">
+                    {industryTags.length > 0 && (
+                      <div className="border-border/50 bg-muted/15 rounded-xl border p-3">
+                        <div className="mb-2.5 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-primary/15 flex h-7 w-7 shrink-0 items-center justify-center rounded-md">
+                              <Building2 className="text-primary h-3.5 w-3.5" aria-hidden />
+                            </div>
+                            <span className="text-foreground text-xs font-semibold tracking-tight sm:text-sm">
+                              {t("directory.industryCategory")}
+                            </span>
+                          </div>
+                          <span className="text-primary bg-primary/10 rounded-full px-2 py-0.5 text-[10px] font-semibold sm:text-[11px]">
+                            {industryTags.length}
+                          </span>
+                        </div>
+                        <ul className="m-0 flex w-full list-none flex-col gap-1.5 p-0">
+                          {visibleIndustryTags.map(({ key, label }) => (
+                            <li key={key} className="w-full min-w-0">
+                              <span className="border-primary/20 bg-primary/[0.06] text-primary flex w-full min-w-0 items-center justify-start rounded-md border px-2.5 py-1.5 text-left text-[11px] leading-snug font-medium break-words sm:text-xs">
+                                {label}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        {industryTagsOverflow && (
+                          <div className="border-border/40 mt-2.5 border-t pt-2">
+                            <button
+                              type="button"
+                              className="text-primary hover:bg-primary/10 flex w-full items-center justify-center gap-1 rounded-md py-1 text-center transition-colors"
+                              onClick={() =>
+                                setUiBool(industriesExpandedQueryKey, (prev) => !(prev ?? false))
+                              }
+                              aria-expanded={industriesExpanded}
+                              aria-label={
+                                industriesExpanded
+                                  ? t("companyDetail.industriesShowLess")
+                                  : t("companyDetail.industriesSeeMoreAria", {
+                                      count: hiddenIndustryCount,
+                                    })
+                              }
+                            >
+                              {industriesExpanded ? (
+                                <>
+                                  <ChevronsUp className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+                                  <span className="text-[11px] font-semibold">
+                                    {t("companyDetail.industriesShowLess")}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronsDown
+                                    className="h-4 w-4 shrink-0 opacity-90"
+                                    aria-hidden
+                                  />
+                                  <span className="text-[11px] font-semibold">
+                                    {t("companyDetail.industriesSeeMore")}
+                                  </span>
+                                  <span className="text-muted-foreground text-[10px] font-normal">
+                                    {t("companyDetail.industriesShowMore", {
+                                      count: hiddenIndustryCount,
+                                    })}
+                                  </span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {company.categoryTags.length > 0 && (
+                      <div className="rounded-lg border border-white/5 bg-black/10 p-2.5">
+                        <p className="text-muted-foreground mb-1.5 text-[11px] font-medium">
+                          {t("companyDetail.keywordTags")}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {company.categoryTags.map((tag) => {
+                            const translatedTag = t(`directory.categoryTags.${tag}`, {
+                              defaultValue: tag,
+                            })
+                            return (
+                              <span
+                                key={tag}
+                                className="bg-body-bg-dark/45 border-border/50 text-muted-foreground inline-flex max-w-full items-center rounded-md border px-2 py-0.5 text-[11px] font-medium break-words"
+                              >
+                                {translatedTag}
+                              </span>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="flex items-start gap-3">
@@ -389,57 +788,23 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       <p className="text-muted-foreground text-sm">
                         {t("companyDetail.address") || "地址"}
                       </p>
-                      <p className="text-sm font-medium">{company.address}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
-                      <Phone className="text-primary h-5 w-5" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-muted-foreground text-sm">
-                        {t("companyDetail.phone") || "電話"}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium">{company.phone}</p>
-                        <button
-                          onClick={handleCopyPhone}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          {copiedPhone ? (
-                            <Check className="h-4 w-4" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </button>
+                      <div className="space-y-1">
+                        {company.addresses.length > 0 ? (
+                          <ul className="list-disc space-y-1 pl-5">
+                            {company.addresses.map((addr, idx) => (
+                              <li key={`${addr}-${idx}`} className="text-sm font-medium">
+                                {addr}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-sm font-medium">-</p>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
-                      <Mail className="text-primary h-5 w-5" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-muted-foreground text-sm">Email</p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium">{company.email}</p>
-                        <button
-                          onClick={handleCopyEmail}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          {copiedEmail ? (
-                            <Check className="h-4 w-4" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {company.website && (
+                  {company.websites.length > 0 && (
                     <div className="flex items-start gap-3">
                       <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
                         <Globe className="text-primary h-5 w-5" />
@@ -448,30 +813,38 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                         <p className="text-muted-foreground text-sm">
                           {t("companyDetail.website") || "官網"}
                         </p>
-                        <a
-                          href={`https://${company.website}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
-                        >
-                          {company.website}
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <div className="space-y-1">
+                          {company.websites.length > 1 ? (
+                            <ul className="list-disc space-y-1 pl-5">
+                              {company.websites.map((website: string, idx: number) => (
+                                <li key={`${website}-${idx}`} className="text-sm font-medium">
+                                  <a
+                                    href={toWebsiteHref(website)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary inline-flex items-center gap-1 hover:underline"
+                                  >
+                                    {website}
+                                    <ExternalLink className="h-3 w-3" />
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <a
+                              href={toWebsiteHref(company.websites[0])}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
+                            >
+                              {company.websites[0]}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
-
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
-                      <User className="text-primary h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-sm">
-                        {t("companyDetail.contactPerson") || "聯絡人"}
-                      </p>
-                      <p className="text-sm font-medium">{company.contactPerson}</p>
-                    </div>
-                  </div>
 
                   <div className="flex items-start gap-3">
                     <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
@@ -500,27 +873,289 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                   )}
                 </div>
 
+                <ChannelContactsBlock
+                  companyId={companyId}
+                  contacts={channelContacts}
+                  copiedValue={copiedPhone}
+                  onCopyValue={(value) => void handleCopyPhone(value)}
+                  t={t}
+                />
+
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                    <Mail className="text-primary h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-muted-foreground text-sm">Email</p>
+                    <div className="mt-1 space-y-1.5">
+                      {companyEmails.length > 0 ? (
+                        <div
+                          className="relative"
+                          onMouseEnter={openEmailList}
+                          onMouseLeave={scheduleCloseEmailList}
+                        >
+                          {companyEmails.length === 1 ? (
+                            <button
+                              type="button"
+                              onClick={() => void handleCopyEmail(effectiveSelectedEmail)}
+                              className="from-primary/[0.08] via-muted/25 to-body-bg-dark/45 border-primary/20 hover:border-primary/35 focus-visible:ring-ring flex w-full items-center gap-2 rounded-lg border bg-gradient-to-br px-2.5 py-1.5 text-left shadow-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                              aria-label={t("companyDetail.channelContactCopyRow", {
+                                defaultValue: "Copy {{value}}",
+                                value: effectiveSelectedEmail,
+                              })}
+                            >
+                              <p className="min-w-0 flex-1 text-sm font-medium break-all">
+                                {effectiveSelectedEmail}
+                              </p>
+                              <span
+                                className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                                aria-hidden
+                              >
+                                {copiedEmail === effectiveSelectedEmail ? (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </span>
+                            </button>
+                          ) : (
+                            <div className="from-primary/[0.08] via-muted/25 to-body-bg-dark/45 border-primary/20 flex items-center gap-2 rounded-lg border bg-gradient-to-br px-2.5 py-1.5 shadow-sm">
+                              <p className="min-w-0 flex-1 text-sm font-medium break-all">
+                                {effectiveSelectedEmail}
+                              </p>
+                              <span
+                                className="text-muted-foreground rounded p-0.5 transition-colors"
+                                aria-hidden
+                              >
+                                {copiedEmail === effectiveSelectedEmail ? (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          {companyEmails.length > 1 && isEmailListOpen && (
+                            <div
+                              className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]"
+                              onMouseEnter={openEmailList}
+                              onMouseLeave={scheduleCloseEmailList}
+                            >
+                              {companyEmails.map((email) => (
+                                <button
+                                  key={`email-hover-${email}`}
+                                  type="button"
+                                  className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center gap-2 rounded px-2 py-1 text-left transition-colors"
+                                  onClick={() => {
+                                    setUiString(selectedEmailQueryKey, email)
+                                    if (emailListCloseTimerRef.current) {
+                                      clearTimeout(emailListCloseTimerRef.current)
+                                      emailListCloseTimerRef.current = null
+                                    }
+                                    setUiBool(emailListOpenQueryKey, false)
+                                    void handleCopyEmail(email)
+                                  }}
+                                >
+                                  <span className="min-w-0 flex-1 truncate text-xs font-medium">
+                                    {email}
+                                  </span>
+                                  <span className="text-muted-foreground hover:text-primary inline-flex h-5 w-5 items-center justify-center rounded transition-colors">
+                                    {copiedEmail === email ? (
+                                      <Check className="h-3.5 w-3.5 text-green-600" />
+                                    ) : (
+                                      <Copy className="h-3.5 w-3.5" />
+                                    )}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm font-medium">-</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2"> </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                    <User className="text-primary h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-muted-foreground text-sm">
+                      {t("companyDetail.contactPerson") || "聯絡人"}
+                    </p>
+                    <div className="mt-2 space-y-2">
+                      {contactsByName.length > 0 ? (
+                        <>
+                          {contactsByName.length > 1 && (
+                            <div
+                              className="relative"
+                              onMouseEnter={openContactList}
+                              onMouseLeave={scheduleCloseContactList}
+                            >
+                              <div className="border-border bg-body-bg-dark/40 text-foreground h-8 w-full rounded-md border px-2 text-xs">
+                                <div className="flex h-full items-center justify-between gap-2">
+                                  <span className="min-w-0 truncate">
+                                    {contactsByName[Number(effectiveSelectedContactKey)]
+                                      ?.contactName ||
+                                      t("companyDetail.contactPerson", {
+                                        defaultValue: "Contact Person",
+                                      })}
+                                  </span>
+                                  <ChevronDown
+                                    className={`h-4 w-4 shrink-0 transition-transform ${isContactListOpen ? "rotate-180" : ""}`}
+                                  />
+                                </div>
+                              </div>
+                              {isContactListOpen && (
+                                <div
+                                  className="border-border/70 bg-body-bg-dark/95 absolute top-full right-0 left-2 z-20 mt-1 max-h-44 overflow-y-auto rounded-md border p-1 shadow-lg backdrop-blur-[2px]"
+                                  onMouseEnter={openContactList}
+                                  onMouseLeave={scheduleCloseContactList}
+                                >
+                                  {contactsByName.map((contact, idx) => (
+                                    <button
+                                      key={`contact-hover-${contact.contactName}-${idx}`}
+                                      type="button"
+                                      className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center rounded px-2 py-1 text-left text-xs font-medium transition-colors"
+                                      onClick={() => {
+                                        setUiString(selectedContactKeyQueryKey, String(idx))
+                                        if (contactListCloseTimerRef.current) {
+                                          clearTimeout(contactListCloseTimerRef.current)
+                                          contactListCloseTimerRef.current = null
+                                        }
+                                        setUiBool(contactListOpenQueryKey, false)
+                                      }}
+                                    >
+                                      {contact.contactName ||
+                                        t("companyDetail.contactPerson", {
+                                          defaultValue: "Contact Person",
+                                        })}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {selectedContact && (
+                            <div className="from-primary/[0.08] via-muted/25 to-body-bg-dark/40 border-primary/20 rounded-lg border bg-gradient-to-br p-2.5 shadow-sm">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+                                  <User className="text-primary h-4 w-4 shrink-0" />
+                                  <span className="truncate">
+                                    {selectedContact.contactName ||
+                                      t("companyDetail.contactPerson", {
+                                        defaultValue: "Contact Person",
+                                      })}
+                                  </span>
+                                </p>
+                                <span className="text-primary bg-primary/15 border-primary/30 rounded-full border px-2 py-0.5 text-[11px] font-semibold">
+                                  {selectedContact.contactPhones.length}
+                                </span>
+                              </div>
+                              <div className="mt-1.5 space-y-1">
+                                {selectedContact.contactPhones.map((phone) => (
+                                  <button
+                                    key={`${selectedContact.contactName}-${phone}`}
+                                    type="button"
+                                    onClick={() => void handleCopyPhone(phone)}
+                                    className="bg-body-bg-dark/55 border-border/60 hover:border-primary/30 hover:bg-body-bg-dark/70 focus-visible:ring-ring flex w-full items-center gap-2 rounded-md border px-2 py-1 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                                    aria-label={t("companyDetail.channelContactCopyRow", {
+                                      defaultValue: "Copy {{value}}",
+                                      value: phone,
+                                    })}
+                                  >
+                                    <Phone className="text-primary/80 h-3.5 w-3.5" />
+                                    <p className="min-w-0 flex-1 text-sm font-medium break-words">
+                                      {phone}
+                                    </p>
+                                    <span
+                                      className="text-muted-foreground hover:text-primary rounded p-0.5 transition-colors"
+                                      aria-hidden
+                                    >
+                                      {copiedPhone === phone ? (
+                                        <Check className="h-4 w-4 text-green-600" />
+                                      ) : (
+                                        <Copy className="h-4 w-4" />
+                                      )}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm font-medium">-</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <ContactTypeValueSection
+                  icon={Globe}
+                  label={t("admin.companies.contactGroups.social", {
+                    defaultValue: "Social & Messaging",
+                  })}
+                  items={socialContacts}
+                  containerRef={socialSectionRef}
+                  selectedItem={selectedSocialContact}
+                  isListOpen={isSocialTypeListOpen}
+                  onToggleList={() => setIsSocialTypeListOpen((prev) => !prev)}
+                  onSelectType={(type) => {
+                    setUiString(selectedSocialTypeQueryKey, type)
+                    setIsSocialTypeListOpen(false)
+                  }}
+                  copiedValue={copiedContactValue}
+                  onCopy={(value) => void handleCopyWithFeedback(value, setCopiedContactValue)}
+                  copyAriaLabel={(value) =>
+                    t("companyDetail.channelContactCopyRow", {
+                      defaultValue: "Copy {{value}}",
+                      value,
+                    })
+                  }
+                />
+
+                <ContactTypeValueSection
+                  icon={Phone}
+                  label={t("admin.companies.contactGroups.otherContact", {
+                    defaultValue: "Other Contact",
+                  })}
+                  items={otherContacts}
+                  containerRef={otherSectionRef}
+                  selectedItem={selectedOtherContact}
+                  isListOpen={isOtherTypeListOpen}
+                  onToggleList={() => setIsOtherTypeListOpen((prev) => !prev)}
+                  onSelectType={(type) => {
+                    setUiString(selectedOtherTypeQueryKey, type)
+                    setIsOtherTypeListOpen(false)
+                  }}
+                  copiedValue={copiedContactValue}
+                  onCopy={(value) => void handleCopyWithFeedback(value, setCopiedContactValue)}
+                  copyAriaLabel={(value) =>
+                    t("companyDetail.channelContactCopyRow", {
+                      defaultValue: "Copy {{value}}",
+                      value,
+                    })
+                  }
+                />
+
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2"></div>
+
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="primary" asChild>
-                    <a href={`mailto:${company.email}`}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      {t("companyDetail.contactCompany") || "聯絡公司"}
-                    </a>
-                  </Button>
-                  {/* <Button
-                      variant="outline"
-                      onClick={() => setIsFavorite(!isFavorite)}
-                      className={
-                        isFavorite
-                          ? "text-primary !bg-body-bg-dark hover:!bg-header-red-dark/80 border-primary hover:!text-white"
-                          : "hover:!bg-header-red-dark border !border-gray-400 bg-transparent hover:!text-white"
-                      }
-                    >
-                      <Heart className={`mr-2 h-4 w-4 ${isFavorite ? "fill-primary" : ""}`} />
-                      {isFavorite
-                        ? t("companyDetail.favorited") || "已收藏"
-                        : t("companyDetail.addToFavorites") || "加入收藏"}
-                    </Button> */}
+                  {effectiveSelectedEmail && (
+                    <Button variant="primary" asChild>
+                      <a href={`mailto:${effectiveSelectedEmail}`}>
+                        <Mail className="mr-2 h-4 w-4" />
+                        {t("companyDetail.contactCompany") || "聯絡公司"}
+                      </a>
+                    </Button>
+                  )}
+
                   <Button
                     variant="outline"
                     onClick={handleShare}

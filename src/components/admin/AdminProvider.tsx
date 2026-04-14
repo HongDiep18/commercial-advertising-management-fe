@@ -2,6 +2,7 @@
 
 import { adminCompanyRequestsKeys } from "@/api/admin/hooks"
 import { deleteCompany, patchUserActive, updateProfileRequestStatus } from "@/api/admin"
+import { archiveAdminCompany } from "@/api/admin-companies/service"
 import { mockAdSubmissions } from "@/contexts/user-context"
 import * as fallbackData from "@/data/adminMockData"
 import { useQueryClient } from "@tanstack/react-query"
@@ -33,8 +34,18 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   )
 
   const deleteCompanyApi = useCallback(
-    async (userId: string) => {
-      await deleteCompany(userId)
+    async ({ userId, companyId }: { userId?: string; companyId?: string }) => {
+      const safeUserId = userId?.trim()
+      const safeCompanyId = companyId?.trim()
+
+      if (safeUserId) {
+        await deleteCompany(safeUserId)
+      } else if (safeCompanyId) {
+        await archiveAdminCompany(safeCompanyId)
+      } else {
+        throw new Error("No deletable target")
+      }
+
       refetchCompanyRequests()
     },
     [refetchCompanyRequests]
