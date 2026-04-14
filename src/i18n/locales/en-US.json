@@ -1395,6 +1395,7 @@
         "facebook": "Facebook",
         "viber": "Viber"
       },
+      "registeredEmailNote": "Registered email — cannot be changed here",
       "emailConflict409": "This email is already in use.",
       "companyNotFound404": "Company or linked user was not found.",
       "forbidden403": "You are not allowed to update this company.",

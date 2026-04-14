@@ -231,6 +231,17 @@ function getEmailFromContacts(contacts: ContactRowInput[]): string {
   return ""
 }
 
+function getRegisteredEmailFromItem(p: ProfileRequestInput): string {
+  return cleanString(p.email)
+}
+
+function getCompanyEmailFromItem(p: ProfileRequestInput): string {
+  const direct = firstString(p as Record<string, unknown>, ["companyEmail", "company_email"])
+  if (direct) return direct
+
+  return getEmailFromContacts(getContactsFromItem(p))
+}
+
 function getUserIdFromItem(p: ProfileRequestInput): string | undefined {
   return p.user?.id ?? p.userId ?? undefined
 }
@@ -245,23 +256,17 @@ function getDeletedAtFromItem(p: ProfileRequestInput): string | null | undefined
   return p.deletedAt ?? undefined
 }
 
-function getEmailFromItem(p: ProfileRequestInput): string {
-  const direct = cleanString(p.email)
-  if (direct) return direct
-
-  const fallback = firstString(p as Record<string, unknown>, ["companyEmail", "company_email"])
-  if (fallback) return fallback
-
-  return getEmailFromContacts(getContactsFromItem(p))
-}
-
 export function mapProfileRequestToCompanyRequest(p: ProfileRequestInput): ProfileRequestRow {
   const statusRaw = p.status ?? p.registrationStatus ?? ""
   const contacts = getContactsFromItem(p)
+  const registeredEmail = getRegisteredEmailFromItem(p)
+  const companyEmail = getCompanyEmailFromItem(p)
   return {
     id: p.id,
     companyName: getCompanyNameFromItem(p),
-    email: getEmailFromItem(p),
+    email: registeredEmail || companyEmail,
+    registeredEmail,
+    companyEmail,
     contactName:
       firstString(p as Record<string, unknown>, ["contactName", "contact_person", "contactPerson"]) ||
       getContactNameFromContacts(contacts),
