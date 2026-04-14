@@ -27,6 +27,7 @@ export type LoginResponse = {
 }
 
 export type RegisterPayload = {
+  register_email: string
   company_name_vi: string
   company_name_zh: string
   phone: string
@@ -83,6 +84,7 @@ export function formDataToRegisterPayload(form: {
   captcha: string
 }): RegisterPayload {
   return {
+    register_email: form.email.trim(),
     company_name_vi: form.companyNameVi,
     company_name_zh: form.companyNameCn,
     phone: (form.contactPhone || form.phone).trim(),

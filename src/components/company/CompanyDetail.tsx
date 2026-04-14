@@ -333,7 +333,15 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const channelContacts: CompanyChannelContact[] = useMemo(() => {
     if (isDemo) return []
     const raw = apiCompany?.channelContacts ?? []
-    return raw.filter((c) => c && typeof c.value === "string" && c.value.trim().length > 0)
+    return raw.filter(
+      (c) =>
+        c &&
+        String(c.type ?? "")
+          .trim()
+          .toLowerCase() !== "register_email" &&
+        typeof c.value === "string" &&
+        c.value.trim().length > 0
+    )
   }, [isDemo, apiCompany])
 
   if (!isDemo && isCompanyLoading) {

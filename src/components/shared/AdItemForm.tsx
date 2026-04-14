@@ -192,6 +192,7 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
   const [openCalendar, setOpenCalendar] = useState(false)
   const [openEndCalendar, setOpenEndCalendar] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof OrderItemValues, string>>>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const slotErrorRef = useRef<HTMLDivElement>(null)
 
@@ -278,7 +279,15 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
       return
     }
     setFieldErrors({})
-    await onSubmit?.(validation.result)
+    setSubmitError(null)
+    try {
+      await onSubmit?.(validation.result)
+    } catch (err) {
+      const apiErr = err as { data?: { message?: string }; message?: string }
+      setSubmitError(
+        apiErr?.data?.message ?? apiErr?.message ?? t("common.unknownError", "An error occurred.")
+      )
+    }
   }
 
   console.log(
@@ -593,6 +602,10 @@ const AdItemForm = forwardRef<AdItemFormHandle, AdItemFormProps>(function AdItem
             </Field>
           )}
         />
+      )}
+
+      {submitError && (
+        <p className="text-destructive mt-4 text-sm">{submitError}</p>
       )}
 
       {mode === "standalone" && (

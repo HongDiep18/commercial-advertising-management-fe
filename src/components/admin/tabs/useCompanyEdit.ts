@@ -530,7 +530,9 @@ export function useCompanyEdit({
       editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, editForm.contacts),
     })
 
-    const payload = adminCompanyFormToUpdatePayload(editForm)
+    const payload = adminCompanyFormToUpdatePayload(editForm, {
+      registeredEmail: editAccountSummary.registeredEmail,
+    })
 
     updateCompanyMutation.mutate(
       {
