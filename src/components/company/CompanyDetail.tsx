@@ -733,7 +733,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     {companyTitle}
                   </h1>
                   <p key={`${i18n.language}-vi`} className="text-muted-foreground mb-1 text-lg">
-                    {companyNameVi}
+                    {companyNameVi || companyNameEn}
                   </p>
                   <div className="border-destructive/40 bg-body-bg-dark pointer-events-none absolute top-full left-0 z-20 mt-1 hidden min-w-[240px] rounded-md border px-3 py-2 text-sm shadow-lg group-hover:block">
                     <p className="text-destructive font-medium">
