@@ -10,7 +10,8 @@
     "save": "Lưu",
     "saving": "Đang lưu...",
     "required": "Bắt buộc",
-    "active": "Hoạt động"
+    "active": "Hoạt động",
+    "emptyField": "Chưa có"
   },
   "header": {
     "aboutUs": "Về chúng tôi",
