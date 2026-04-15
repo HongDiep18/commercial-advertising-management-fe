@@ -72,3 +72,40 @@ export type AdminCompanyUpdatePayload = {
   note?: string | null
   contacts?: AdminCompanyContact[]
 }
+
+export type AdminCompanyListSortBy = "createdAt" | "updatedAt" | "companyNameVi"
+
+export type AdminCompanyListItem = {
+  id: string
+  userId?: string | null
+  companyNameVi?: string | null
+  companyNameEn?: string | null
+  companyNameZh?: string | null
+  industry?: string[] | null
+  status?: string | null
+  isActive?: boolean
+  primaryEmail?: string | null
+  primaryPhone?: string | null
+  createdAt?: string | null
+  updatedAt?: string | null
+}
+
+export type AdminCompanyListQuery = {
+  search?: string
+  page?: number
+  limit?: number
+  sortBy?: AdminCompanyListSortBy
+  sortOrder?: "asc" | "desc"
+}
+
+export type AdminCompanyListPagination = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export type AdminCompanyListResponse = {
+  companies: AdminCompanyListItem[]
+  pagination: AdminCompanyListPagination
+}
