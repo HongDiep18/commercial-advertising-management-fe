@@ -39,21 +39,30 @@ countries.registerLocale(en)
 countries.registerLocale(vi)
 countries.registerLocale(zh)
 
-export function getCountryOptions(language: string): Array<{ value: string; label: string }> {
+function resolveIsoCountryLanguage(language: string): "en" | "vi" | "zh" {
   const lang = language.toLowerCase()
-  const isoLang = lang.startsWith("vi") ? "vi" : lang.startsWith("zh") ? "zh" : "en"
+  return lang.startsWith("vi") ? "vi" : lang.startsWith("zh") ? "zh" : "en"
+}
+
+export function getCountryOptions(language: string): Array<{ value: string; label: string }> {
+  const isoLang = resolveIsoCountryLanguage(language)
   const names = countries.getNames(isoLang, { select: "official" }) as Record<string, string>
   return Object.entries(names)
     .map(([code, label]) => ({ value: code, label }))
     .sort((a, b) => a.label.localeCompare(b.label))
 }
 
-/** Stored country value when the user picks "Other" (not an ISO alpha-2 code). */
+export function getCountryLabel(code: string, language: string): string {
+  const trimmed = String(code ?? "").trim()
+  if (!trimmed) return ""
+  const upper = trimmed.toUpperCase()
+  if (!/^[A-Z]{2}$/.test(upper)) return trimmed
+  const isoLang = resolveIsoCountryLanguage(language)
+  return countries.getName(upper, isoLang) ?? trimmed
+}
+
 export const REGISTER_COUNTRY_OTHER_VALUE = "other"
 
-/**
- * ISO country list from `i18n-iso-countries` plus a final **Other** row (translated label).
- */
 export function getRegisterCountryOptions(
   language: string,
   otherCountryLabel: string

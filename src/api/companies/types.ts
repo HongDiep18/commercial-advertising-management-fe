@@ -96,6 +96,7 @@ export type CompanyDetail = {
   address?: string | null
   description: string
   taxId?: string | null
+  origin?: string | null
   country?: string | null
   region?: string | null
   website?: string | null
