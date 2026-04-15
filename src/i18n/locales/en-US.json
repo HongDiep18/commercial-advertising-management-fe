@@ -10,7 +10,8 @@
     "save": "Save",
     "saving": "Saving...",
     "required": "Required",
-    "active": "Active"
+    "active": "Active",
+    "emptyField": "Not provided"
   },
   "header": {
     "aboutUs": "About Us",

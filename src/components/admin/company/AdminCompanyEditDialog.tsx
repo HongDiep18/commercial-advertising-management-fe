@@ -6,6 +6,7 @@ import { Edit3, ImageIcon, Plus, Save, Trash2, Upload, X } from "lucide-react"
 import { type AdminCompanyForm, isCompanyLevelContactType } from "@/api/admin-companies/mapper"
 import type { AdminCompanyContact, AdminCompanyContactType } from "@/api/admin-companies/types"
 import { CompanyBasicInfoSection } from "@/components/company/CompanyBasicInfoSection"
+import { ReadOnlyFieldBox } from "@/components/ui/ReadOnlyFieldValue"
 import { REGISTER_CATEGORIES } from "@/components/register/registerCategories"
 import Button from "@/components/ui/Button"
 import { Field, FieldLabel } from "@/components/ui/field"
@@ -217,6 +218,8 @@ export function AdminCompanyEditDialog({
 
   if (!open) return null
 
+  const emptyFieldLabel = t("common.emptyField", { defaultValue: "Not provided" })
+
   const title =
     form.companyNameZh.trim() || form.companyNameEn.trim() || form.companyNameVi.trim() || "-"
 
@@ -355,6 +358,7 @@ export function AdminCompanyEditDialog({
               allRegions={allRegions}
               industryOptions={industryCategories}
               disabled={readOnly}
+              readOnlyView={readOnly}
               allowIndustryPreviewWhenDisabled={allowReadOnlyIndustryPreview}
               includeEnglishName
               t={t}
@@ -463,23 +467,37 @@ export function AdminCompanyEditDialog({
                             key={`contact-${index}`}
                             className="grid grid-cols-1 items-start gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_36px]"
                           >
-                            <Input
-                              value={contact.contactName ?? ""}
-                              onChange={(e) =>
-                                onContactChange(index, "contactName", e.target.value)
-                              }
-                              disabled={readOnly}
-                              placeholder={t("admin.companies.contactNameExample", {
-                                defaultValue: "Nguyen Van A",
-                              })}
-                            />
-                            <FieldWithError error={error.value}>
-                              <Input
-                                value={contact.value}
-                                onChange={(e) => onContactChange(index, "value", e.target.value)}
-                                disabled={readOnly}
-                                placeholder={CONTACT_TYPE_EXAMPLES["contact_person"] || ""}
+                            {readOnly ? (
+                              <ReadOnlyFieldBox
+                                value={contact.contactName ?? ""}
+                                emptyLabel={emptyFieldLabel}
                               />
+                            ) : (
+                              <Input
+                                value={contact.contactName ?? ""}
+                                onChange={(e) =>
+                                  onContactChange(index, "contactName", e.target.value)
+                                }
+                                disabled={readOnly}
+                                placeholder={t("admin.companies.contactNameExample", {
+                                  defaultValue: "Nguyen Van A",
+                                })}
+                              />
+                            )}
+                            <FieldWithError error={error.value}>
+                              {readOnly ? (
+                                <ReadOnlyFieldBox
+                                  value={contact.value}
+                                  emptyLabel={emptyFieldLabel}
+                                />
+                              ) : (
+                                <Input
+                                  value={contact.value}
+                                  onChange={(e) => onContactChange(index, "value", e.target.value)}
+                                  disabled={readOnly}
+                                  placeholder={CONTACT_TYPE_EXAMPLES["contact_person"] || ""}
+                                />
+                              )}
                             </FieldWithError>
                             {renderRemoveButton(index)}
                           </div>
@@ -507,12 +525,19 @@ export function AdminCompanyEditDialog({
                             className="grid grid-cols-1 items-start gap-2 md:grid-cols-[minmax(0,1fr)_36px]"
                           >
                             <FieldWithError error={isRegisteredEmail ? undefined : error.value}>
-                              <Input
-                                value={contact.value}
-                                onChange={(e) => onContactChange(index, "value", e.target.value)}
-                                disabled={isDisabled}
-                                placeholder={example || ""}
-                              />
+                              {readOnly ? (
+                                <ReadOnlyFieldBox
+                                  value={contact.value}
+                                  emptyLabel={emptyFieldLabel}
+                                />
+                              ) : (
+                                <Input
+                                  value={contact.value}
+                                  onChange={(e) => onContactChange(index, "value", e.target.value)}
+                                  disabled={isDisabled}
+                                  placeholder={example || ""}
+                                />
+                              )}
                               {isRegisteredEmail && (
                                 <p className="text-muted-foreground mt-0.5 text-[11px]">
                                   {t("admin.companies.registeredEmailNote", {
@@ -554,38 +579,62 @@ export function AdminCompanyEditDialog({
                             className={`grid grid-cols-1 items-start gap-2 ${group.showContactName ? "md:grid-cols-[130px_minmax(0,1fr)_minmax(0,1fr)_36px]" : "md:grid-cols-[130px_minmax(0,1fr)_36px]"}`}
                           >
                             <FieldWithError error={error.type}>
-                              <SearchableSelect
-                                value={String(contact.type || "")}
-                                onValueChange={(value) => onContactChange(index, "type", value)}
-                                disabled={readOnly}
-                                options={groupTypeOptions}
-                                placeholder={t("admin.companies.contactType", {
-                                  defaultValue: "Type",
-                                })}
-                                searchPlaceholder={t("common.search", { defaultValue: "Search" })}
-                                emptyText={t("common.noResults", { defaultValue: "No results." })}
-                              />
+                              {readOnly ? (
+                                <ReadOnlyFieldBox
+                                  value={
+                                    groupTypeOptions.find(
+                                      (o) => o.value === String(contact.type || "")
+                                    )?.label ?? String(contact.type || "")
+                                  }
+                                  emptyLabel={emptyFieldLabel}
+                                />
+                              ) : (
+                                <SearchableSelect
+                                  value={String(contact.type || "")}
+                                  onValueChange={(value) => onContactChange(index, "type", value)}
+                                  disabled={readOnly}
+                                  options={groupTypeOptions}
+                                  placeholder={t("admin.companies.contactType", {
+                                    defaultValue: "Type",
+                                  })}
+                                  searchPlaceholder={t("common.search", { defaultValue: "Search" })}
+                                  emptyText={t("common.noResults", { defaultValue: "No results." })}
+                                />
+                              )}
                             </FieldWithError>
                             <FieldWithError error={error.value}>
-                              <Input
-                                value={contact.value}
-                                onChange={(e) => onContactChange(index, "value", e.target.value)}
-                                disabled={readOnly}
-                                placeholder={example || ""}
-                              />
+                              {readOnly ? (
+                                <ReadOnlyFieldBox
+                                  value={contact.value}
+                                  emptyLabel={emptyFieldLabel}
+                                />
+                              ) : (
+                                <Input
+                                  value={contact.value}
+                                  onChange={(e) => onContactChange(index, "value", e.target.value)}
+                                  disabled={readOnly}
+                                  placeholder={example || ""}
+                                />
+                              )}
                             </FieldWithError>
-                            {group.showContactName && (
-                              <Input
-                                value={contact.contactName ?? ""}
-                                onChange={(e) =>
-                                  onContactChange(index, "contactName", e.target.value)
-                                }
-                                disabled={readOnly}
-                                placeholder={t("admin.companies.contactNameExample", {
-                                  defaultValue: "Nguyen Van A",
-                                })}
-                              />
-                            )}
+                            {group.showContactName &&
+                              (readOnly ? (
+                                <ReadOnlyFieldBox
+                                  value={contact.contactName ?? ""}
+                                  emptyLabel={emptyFieldLabel}
+                                />
+                              ) : (
+                                <Input
+                                  value={contact.contactName ?? ""}
+                                  onChange={(e) =>
+                                    onContactChange(index, "contactName", e.target.value)
+                                  }
+                                  disabled={readOnly}
+                                  placeholder={t("admin.companies.contactNameExample", {
+                                    defaultValue: "Nguyen Van A",
+                                  })}
+                                />
+                              ))}
                             {renderRemoveButton(index)}
                           </div>
                         )
@@ -617,15 +666,23 @@ export function AdminCompanyEditDialog({
                 <FieldLabel className="text-foreground text-sm font-medium">
                   {t("admin.companies.fieldLabels.note", { defaultValue: "Internal note" })}
                 </FieldLabel>
-                <Textarea
-                  value={form.note}
-                  onChange={(e) => onFieldChange("note", e.target.value)}
-                  placeholder={t("admin.companies.fieldExamples.note", {
-                    defaultValue: "Optional notes for this company (admin only)",
-                  })}
-                  rows={3}
-                  disabled={readOnly}
-                />
+                {readOnly ? (
+                  <ReadOnlyFieldBox
+                    value={form.note}
+                    emptyLabel={emptyFieldLabel}
+                    multiline
+                  />
+                ) : (
+                  <Textarea
+                    value={form.note}
+                    onChange={(e) => onFieldChange("note", e.target.value)}
+                    placeholder={t("admin.companies.fieldExamples.note", {
+                      defaultValue: "Optional notes for this company (admin only)",
+                    })}
+                    rows={3}
+                    disabled={readOnly}
+                  />
+                )}
               </Field>
             </div>
           )}
