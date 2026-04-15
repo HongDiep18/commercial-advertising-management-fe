@@ -30,6 +30,7 @@ import {
   Lock,
   Crown,
   FileText,
+  Flag,
   ChevronsDown,
   ChevronsUp,
   ChevronDown,
@@ -46,6 +47,7 @@ import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import { truncateIntroduction, categoryNameToIdMap } from "../../utils/companyHelpers"
 import { translateRegionLabel } from "@/utils/regionSearch"
+import { getCountryLabel } from "@/components/register/registerOptions"
 import {
   COPY_FEEDBACK_MS,
   EMAIL_LIST_CLOSE_DELAY_MS,
@@ -469,6 +471,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
           ...demoCompany,
           addresses: demoCompany.address ? [demoCompany.address] : [],
           websites: normalizeAddressList([demoCompany.website ?? ""]),
+          origin: demoCompany.origin ?? "",
         }
       : {
           id: apiCompany!.id,
@@ -485,6 +488,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
           websites: detailWebsites,
           contactPerson: "",
           region: apiCompany!.region ?? "",
+          origin: String(apiCompany!.country ?? "").trim(),
           taxId: apiCompany!.taxId ?? "",
           introduction: apiCompany!.description,
           services: [],
@@ -537,6 +541,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const companyNameVi = String(isDemo ? company.nameEn : (apiCompany?.companyNameVi ?? "")).trim()
   const companyTitle = companyNameZh || companyNameVi || companyNameEn
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
+  const translatedOrigin = getCountryLabel(company.origin, i18n.language)
   const fallbackBackToDirectory = fromCategory
     ? `/directory?category=${encodeURIComponent(fromCategory)}`
     : "/directory"
@@ -872,6 +877,20 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       <p className="text-sm font-medium">{translatedRegion}</p>
                     </div>
                   </div>
+
+                  {company.origin && (
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                        <Flag className="text-primary h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-sm">
+                          {t("companyDetail.origin") || "來源地"}
+                        </p>
+                        <p className="text-sm font-medium">{translatedOrigin}</p>
+                      </div>
+                    </div>
+                  )}
 
                   {company.websites.length > 0 && (
                     <div className="flex items-start gap-3">
