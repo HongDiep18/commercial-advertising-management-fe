@@ -345,10 +345,7 @@ export function CompaniesTab() {
                     const companyNames = [
                       { label: "ZH", value: cached?.companyNameZh?.trim() || "" },
                       { label: "EN", value: cached?.companyNameEn?.trim() || "" },
-                      {
-                        label: "VI",
-                        value: cached?.companyNameVi?.trim() || row.companyName || "",
-                      },
+                      { label: "VI", value: cached?.companyNameVi?.trim() || "" },
                     ].filter((item) => item.value)
                     const showCompanyTooltip = companyNames.length > 1
 
