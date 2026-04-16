@@ -97,16 +97,6 @@ function normalizeCompanyName(value: unknown): string {
   return text
 }
 
-function normalizeCompanyName(value: unknown): string {
-  const text = String(value ?? "").trim()
-  if (!text) return ""
-  const normalized = text.toLowerCase()
-  if (normalized === "null" || normalized === "undefined" || normalized === "n/a" || text === "-") {
-    return ""
-  }
-  return text
-}
-
 function ContactTypeValueSection({
   icon: Icon,
   label,
