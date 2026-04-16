@@ -969,6 +969,7 @@
     },
     "website": "Website",
     "contactPerson": "Contact Person",
+    "contactNameUnknown": "Unknown",
     "region": "Region",
     "origin": "Origin",
     "taxId": "Tax ID",
