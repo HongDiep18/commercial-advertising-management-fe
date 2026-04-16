@@ -972,6 +972,7 @@
     "contactNameUnknown": "Unknown",
     "region": "Region",
     "origin": "Origin",
+    "originCountryOther": "Other",
     "taxId": "Tax ID",
     "contactCompany": "Contact Company",
     "favorited": "Favorited",
