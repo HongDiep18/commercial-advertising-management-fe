@@ -170,12 +170,10 @@ export function getPrimaryAdminCompanyContact(
   contacts: AdminCompanyContact[]
 ): AdminCompanyPrimaryContact {
   const normalized = normalizeAdminCompanyContacts(contacts)
-  const preferred =
-    normalized.find((contact) =>
-      ["contact_person", "tel", "hotline"].includes(String(contact.type))
-    ) ??
-    normalized.find((contact) => contact.type === "email") ??
-    normalized.find((contact) => Boolean(clean(contact.value)))
+  const preferredTypeOrder = ["contact_person", "tel", "hotline", "fax"] as const
+  const preferred = preferredTypeOrder
+    .map((type) => normalized.find((contact) => contactTypeKey(contact.type) === type))
+    .find(Boolean)
 
   return {
     value: clean(preferred?.value),
@@ -299,7 +297,7 @@ export function adminCompanyDetailToRequestsTableCache(
     companyNameEn: names.companyNameEn,
     companyNameZh: names.companyNameZh,
     displayCompanyName,
-    contactValue: primaryContact.value || fallback.companyEmail || "",
+    contactValue: primaryContact.value || "",
     contactName: primaryContact.contactName || detail.contactName || fallback.contactName || "",
     industry,
   }

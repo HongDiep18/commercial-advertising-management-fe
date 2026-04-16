@@ -139,17 +139,29 @@ export function getDirectorySearchAndRegionParams(
 }
 
 export function translateRegionLabel(region: string, t: TFunction, i18n: i18n): string {
-  const normalizedRegion = normalizeRegionKey(region)
-  if (!normalizedRegion) return region
-  return (
-    (i18n.exists(`companyDetail.regions.${normalizedRegion}`)
-      ? t(`companyDetail.regions.${normalizedRegion}`)
-      : "") ||
-    (i18n.exists(`register.regions.${normalizedRegion}`)
-      ? t(`register.regions.${normalizedRegion}`)
-      : "") ||
-    region
-  )
+  const trimmed = String(region ?? "").trim()
+  if (!trimmed) return region
+
+  const canonical = resolveCanonicalRegionKey(trimmed, i18n)
+  const normalizedRegion = normalizeRegionKey(trimmed)
+  if (!canonical && !normalizedRegion) return region
+
+  const tryKeys: string[] = []
+  if (canonical) tryKeys.push(canonical)
+  if (
+    normalizedRegion &&
+    (!canonical || normalizeRegionKey(canonical) !== normalizedRegion)
+  ) {
+    tryKeys.push(normalizedRegion)
+  }
+
+  for (const key of tryKeys) {
+    const detailKey = `companyDetail.regions.${key}`
+    if (i18n.exists(detailKey)) return t(detailKey)
+    const registerKey = `register.regions.${key}`
+    if (i18n.exists(registerKey)) return t(registerKey)
+  }
+  return region
 }
 
 export function companyRegionMatchesSearch(
