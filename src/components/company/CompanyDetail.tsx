@@ -47,7 +47,10 @@ import { useTierInfo } from "@/api/loyalty"
 import { getCompanyData } from "../../data/mockCompanies"
 import { truncateIntroduction, categoryNameToIdMap } from "../../utils/companyHelpers"
 import { translateRegionLabel } from "@/utils/regionSearch"
-import { getCountryLabel } from "@/components/register/registerOptions"
+import {
+  getCountryLabel,
+  REGISTER_COUNTRY_OTHER_VALUE,
+} from "@/components/register/registerOptions"
 import {
   COPY_FEEDBACK_MS,
   EMAIL_LIST_CLOSE_DELAY_MS,
@@ -81,6 +84,7 @@ type ContactTypeValueSectionProps = {
   copiedValue: string | null
   onCopy: (value: string) => void
   copyAriaLabel: (value: string) => string
+  formatTypeLabel: (type: string) => string
 }
 
 function normalizeCompanyName(value: unknown): string {
@@ -105,6 +109,7 @@ function ContactTypeValueSection({
   copiedValue,
   onCopy,
   copyAriaLabel,
+  formatTypeLabel,
 }: ContactTypeValueSectionProps) {
   if (items.length === 0) return null
 
@@ -126,7 +131,7 @@ function ContactTypeValueSection({
               onClick={onToggleList}
               className="border-primary/20 from-primary/[0.08] via-muted/25 to-body-bg-dark/45 text-foreground flex h-9 w-full items-center justify-between rounded-md border bg-gradient-to-br px-2 text-sm font-medium shadow-sm"
             >
-              <span>{(selectedItem?.type ?? "").toUpperCase()}</span>
+              <span>{formatTypeLabel(selectedItem?.type ?? "")}</span>
               <ChevronDown
                 className={`h-4 w-4 transition-transform ${isListOpen ? "rotate-180" : ""}`}
               />
@@ -140,7 +145,7 @@ function ContactTypeValueSection({
                     className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center rounded px-2 py-1 text-left text-xs font-medium transition-colors"
                     onClick={() => onSelectType(type)}
                   >
-                    {type.toUpperCase()}
+                    {formatTypeLabel(type)}
                   </button>
                 ))}
               </div>
@@ -498,7 +503,11 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
           websites: detailWebsites,
           contactPerson: "",
           region: apiCompany!.region ?? "",
-          origin: String(apiCompany!.country ?? "").trim(),
+          origin: (() => {
+            const raw = apiCompany!.country
+            const s = raw == null ? "" : String(raw).trim()
+            return s || REGISTER_COUNTRY_OTHER_VALUE
+          })(),
           taxId: apiCompany!.taxId ?? "",
           introduction: apiCompany!.description,
           services: [],
@@ -559,7 +568,21 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const companyNameVi = normalizeCompanyName(isDemo ? company.nameEn : apiCompany?.companyNameVi)
   const companyTitle = companyNameZh || companyNameVi || companyNameEn || "-"
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
-  const translatedOrigin = getCountryLabel(company.origin, i18n.language)
+  const translatedOrigin =
+    company.origin === REGISTER_COUNTRY_OTHER_VALUE
+      ? t("companyDetail.originCountryOther", { defaultValue: "Other" })
+      : getCountryLabel(company.origin, i18n.language)
+  const formatChannelContactTypeLabel = (type: string): string => {
+    const normalized = String(type ?? "")
+      .trim()
+      .toLowerCase()
+    if (!normalized) return "-"
+    return t(`admin.companies.contactTypes.${normalized}`, {
+      defaultValue: t(`companyDetail.channelContactTypes.${normalized}`, {
+        defaultValue: normalized.toUpperCase(),
+      }),
+    })
+  }
   const fallbackBackToDirectory = fromCategory
     ? `/directory?category=${encodeURIComponent(fromCategory)}`
     : "/directory"
@@ -910,6 +933,20 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                     </div>
                   )}
 
+                  {company.taxId && (
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                        <FileText className="text-primary h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-sm">
+                          {t("companyDetail.taxId") || "稅號"}
+                        </p>
+                        <p className="text-sm font-medium">{company.taxId}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {company.websites.length > 0 && (
                     <div className="flex items-start gap-3">
                       <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
@@ -948,20 +985,6 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                             </a>
                           )}
                         </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {company.taxId && (
-                    <div className="flex items-start gap-3">
-                      <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
-                        <FileText className="text-primary h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground text-sm">
-                          {t("companyDetail.taxId") || "稅號"}
-                        </p>
-                        <p className="text-sm font-medium">{company.taxId}</p>
                       </div>
                     </div>
                   )}
@@ -1208,6 +1231,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       value,
                     })
                   }
+                  formatTypeLabel={formatChannelContactTypeLabel}
                 />
 
                 <ContactTypeValueSection
@@ -1232,6 +1256,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                       value,
                     })
                   }
+                  formatTypeLabel={formatChannelContactTypeLabel}
                 />
 
                 <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2"></div>
