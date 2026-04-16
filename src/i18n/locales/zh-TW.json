@@ -955,6 +955,7 @@
     },
     "website": "官網",
     "contactPerson": "聯絡人",
+    "contactNameUnknown": "未知",
     "region": "地區",
     "origin": "來源地",
     "taxId": "稅號",

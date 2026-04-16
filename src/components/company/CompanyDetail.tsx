@@ -83,6 +83,16 @@ type ContactTypeValueSectionProps = {
   copyAriaLabel: (value: string) => string
 }
 
+function normalizeCompanyName(value: unknown): string {
+  const text = String(value ?? "").trim()
+  if (!text) return ""
+  const normalized = text.toLowerCase()
+  if (normalized === "null" || normalized === "undefined" || normalized === "n/a" || text === "-") {
+    return ""
+  }
+  return text
+}
+
 function ContactTypeValueSection({
   icon: Icon,
   label,
@@ -533,13 +543,21 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
     ? selectedContactKey
     : "0"
   const selectedContact = contactsByName[Number(effectiveSelectedContactKey)] ?? contactsByName[0]
+  const contactPersonDisplayName = (contact: { contactName: string; contactPhones: string[] }) => {
+    const name = contact.contactName.trim()
+    if (name) return name
+    if (contact.contactPhones.length > 0) {
+      return t("companyDetail.contactNameUnknown", { defaultValue: "Unknown" })
+    }
+    return t("companyDetail.contactPerson", { defaultValue: "Contact Person" })
+  }
   const selectedSocialContact = pickSelectedByType(socialContacts, selectedSocialType)
   const selectedOtherContact = pickSelectedByType(otherContacts, selectedOtherType)
 
-  const companyNameZh = String(isDemo ? company.nameCn : (apiCompany?.companyNameZh ?? "")).trim()
-  const companyNameEn = String(isDemo ? company.nameEn : (apiCompany?.companyNameEn ?? "")).trim()
-  const companyNameVi = String(isDemo ? company.nameEn : (apiCompany?.companyNameVi ?? "")).trim()
-  const companyTitle = companyNameZh || companyNameVi || companyNameEn
+  const companyNameZh = normalizeCompanyName(isDemo ? company.nameCn : apiCompany?.companyNameZh)
+  const companyNameEn = normalizeCompanyName(isDemo ? company.nameEn : apiCompany?.companyNameEn)
+  const companyNameVi = normalizeCompanyName(isDemo ? company.nameEn : apiCompany?.companyNameVi)
+  const companyTitle = companyNameZh || companyNameVi || companyNameEn || "-"
   const translatedRegion = translateRegionLabel(company.region, t, i18n)
   const translatedOrigin = getCountryLabel(company.origin, i18n.language)
   const fallbackBackToDirectory = fromCategory
@@ -634,8 +652,8 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
   const handleShare = async () => {
     if (navigator.share) {
       await navigator.share({
-        title: companyNameZh,
-        text: `查看 ${companyNameZh} 的企業資訊`,
+        title: companyTitle,
+        text: `查看 ${companyTitle} 的企業資訊`,
         url: window.location.href,
       })
     } else {
@@ -720,7 +738,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                 <div className="border-border/50 relative aspect-square w-full max-w-[280px] overflow-hidden rounded-lg border bg-white">
                   <Image
                     src={company.logo || "/placeholder.svg"}
-                    alt={companyNameZh}
+                    alt={companyTitle}
                     fill
                     className={`object-contain p-4 ${shouldBlurLogo ? "blur-sm" : ""}`}
                   />
@@ -1077,10 +1095,12 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                                 <div className="flex h-full items-center justify-between gap-2">
                                   <span className="min-w-0 truncate">
                                     {contactsByName[Number(effectiveSelectedContactKey)]
-                                      ?.contactName ||
-                                      t("companyDetail.contactPerson", {
-                                        defaultValue: "Contact Person",
-                                      })}
+                                      ? contactPersonDisplayName(
+                                          contactsByName[Number(effectiveSelectedContactKey)]!
+                                        )
+                                      : t("companyDetail.contactPerson", {
+                                          defaultValue: "Contact Person",
+                                        })}
                                   </span>
                                   <ChevronDown
                                     className={`h-4 w-4 shrink-0 transition-transform ${isContactListOpen ? "rotate-180" : ""}`}
@@ -1095,7 +1115,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                                 >
                                   {contactsByName.map((contact, idx) => (
                                     <button
-                                      key={`contact-hover-${contact.contactName}-${idx}`}
+                                      key={`contact-hover-${idx}-${contact.contactPhones[0] ?? "none"}`}
                                       type="button"
                                       className="hover:bg-primary/10 focus:bg-primary/10 flex w-full items-center rounded px-2 py-1 text-left text-xs font-medium transition-colors"
                                       onClick={() => {
@@ -1107,10 +1127,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                                         setUiBool(contactListOpenQueryKey, false)
                                       }}
                                     >
-                                      {contact.contactName ||
-                                        t("companyDetail.contactPerson", {
-                                          defaultValue: "Contact Person",
-                                        })}
+                                      {contactPersonDisplayName(contact)}
                                     </button>
                                   ))}
                                 </div>
@@ -1123,10 +1140,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                                 <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
                                   <User className="text-primary h-4 w-4 shrink-0" />
                                   <span className="truncate">
-                                    {selectedContact.contactName ||
-                                      t("companyDetail.contactPerson", {
-                                        defaultValue: "Contact Person",
-                                      })}
+                                    {contactPersonDisplayName(selectedContact)}
                                   </span>
                                 </p>
                                 <span className="text-primary bg-primary/15 border-primary/30 rounded-full border px-2 py-0.5 text-[11px] font-semibold">
@@ -1136,7 +1150,7 @@ export default function CompanyDetail({ companyId }: CompanyDetailProps) {
                               <div className="mt-1.5 space-y-1">
                                 {selectedContact.contactPhones.map((phone) => (
                                   <button
-                                    key={`${selectedContact.contactName}-${phone}`}
+                                    key={`${selectedContact.contactPhones[0] ?? "none"}-${phone}`}
                                     type="button"
                                     onClick={() => void handleCopyPhone(phone)}
                                     className="bg-body-bg-dark/55 border-border/60 hover:border-primary/30 hover:bg-body-bg-dark/70 focus-visible:ring-ring flex w-full items-center gap-2 rounded-md border px-2 py-1 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
