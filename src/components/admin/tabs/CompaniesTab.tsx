@@ -316,37 +316,36 @@ export function CompaniesTab() {
             </div>
 
             {accountFilterApplies && (
-
               <div className="flex items-center gap-1">
-              <Popover open={companyActiveFilterOpen} onOpenChange={setCompanyActiveFilterOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size={accountActiveFilter !== "all" ? "sm" : "icon"}
-                    aria-label={t("admin.companies.companyFilterTooltip", {
-                      defaultValue: "Filter by account state",
-                    })}
-                    aria-expanded={companyActiveFilterOpen}
-                    aria-haspopup="dialog"
-                    className={`border-border bg-body-bg-dark h-10 shrink-0 border ${
-                      accountActiveFilter !== "all"
-                        ? "border-primary ring-primary/35 text-primary gap-1.5 px-3 ring-2"
-                        : "w-10 text-muted-foreground hover:bg-muted/50"
-                    }`}
-                  >
-                    <Filter className="h-4 w-4 shrink-0" aria-hidden />
-                    {accountActiveFilter !== "all" && (
-                      <>
-                        <span className="text-sm font-medium">
-                          {t(ADMIN_COMPANY_ACCOUNT_FILTERS.find((o) => o.id === accountActiveFilter)?.labelKey ?? "")}
-                        </span>
-                        <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-                      </>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent
+                <Popover open={companyActiveFilterOpen} onOpenChange={setCompanyActiveFilterOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size={accountActiveFilter !== "all" ? "sm" : "icon"}
+                      aria-label={t("admin.companies.companyFilterTooltip", {
+                        defaultValue: "Filter by account state",
+                      })}
+                      aria-expanded={companyActiveFilterOpen}
+                      aria-haspopup="dialog"
+                      className={`border-border bg-body-bg-dark h-10 shrink-0 border ${
+                        accountActiveFilter !== "all"
+                          ? "border-primary ring-primary/35 text-primary gap-1.5 px-3 ring-2"
+                          : "w-10 text-muted-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <Filter className="h-4 w-4 shrink-0" aria-hidden />
+                      {accountActiveFilter !== "all" && (
+                        <>
+                          <span className="text-sm font-medium">
+                            {t(ADMIN_COMPANY_ACCOUNT_FILTERS.find((o) => o.id === accountActiveFilter)?.labelKey ?? "")}
+                          </span>
+                          <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                        </>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
                   align="start"
                   side="bottom"
                   sideOffset={8}
