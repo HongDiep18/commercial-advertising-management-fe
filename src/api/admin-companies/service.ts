@@ -17,7 +17,7 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v)
 }
 
-function buildListQuery(params: Record<string, string | number | undefined>): string {
+function buildListQuery(params: Record<string, string | number | boolean | undefined>): string {
   const searchParams = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null || value === "") return
@@ -71,6 +71,8 @@ export async function listAdminCompanies(
   const limit = query.limit ?? 20
   const qs = buildListQuery({
     search: query.search?.trim() || undefined,
+    status: query.status,
+    isActive: query.isActive,
     page,
     limit,
     sortBy: query.sortBy,
@@ -126,9 +128,7 @@ export async function updateAdminCompanyWithLogo(
   })
 }
 
-export async function archiveAdminCompany(
-  companyId: string
-): Promise<AdminCompanyArchiveResponse> {
+export async function archiveAdminCompany(companyId: string): Promise<AdminCompanyArchiveResponse> {
   return api.request<AdminCompanyArchiveResponse>(
     `/admin/companies/${encodeURIComponent(companyId)}/archive`,
     {

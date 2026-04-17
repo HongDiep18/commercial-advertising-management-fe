@@ -5,25 +5,29 @@ import { useTranslation } from "react-i18next"
 import { Building2, Clock, Megaphone } from "lucide-react"
 import Card, { CardContent } from "@/components/ui/Card"
 
-import { getAllProfileRequests } from "@/api/admin"
-import { adminCompanyRequestsKeys } from "@/api/admin/hooks"
-import { useAdminCompaniesStats } from "@/api/admin-companies/hooks"
+import { adminCompaniesKeys, useAdminCompaniesStats } from "@/api/admin-companies/hooks"
+import { listAdminCompanies } from "@/api/admin-companies/service"
+import type { AdminCompanyListQuery } from "@/api/admin-companies/types"
 import { useAdminOrders } from "@/api/ad-orders-admin/hooks"
 import { ProfileRequestStatus } from "@/types/admin"
 import { useQuery } from "@tanstack/react-query"
 import { DashboardNotificationsCard } from "./DashboardNotificationsCard"
 
+const PENDING_COMPANIES_TAB_COUNT_QUERY = {
+  page: 1,
+  limit: 1,
+  sortBy: "createdAt",
+  sortOrder: "desc",
+  status: ProfileRequestStatus.PENDING,
+} satisfies AdminCompanyListQuery
+
 export function DashboardTab() {
   const { t } = useTranslation()
 
   const { data: pendingCount = 0 } = useQuery({
-    queryKey: adminCompanyRequestsKeys.count(ProfileRequestStatus.PENDING),
+    queryKey: [...adminCompaniesKeys.all, "tabCount", ProfileRequestStatus.PENDING],
     queryFn: async () => {
-      const r = await getAllProfileRequests({
-        page: 1,
-        limit: 1,
-        status: ProfileRequestStatus.PENDING,
-      })
+      const r = await listAdminCompanies(PENDING_COMPANIES_TAB_COUNT_QUERY)
       return r.pagination?.total ?? 0
     },
   })
