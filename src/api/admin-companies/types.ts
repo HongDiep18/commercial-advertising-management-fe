@@ -1,3 +1,5 @@
+import { ProfileRequestStatus, type ProfileRequestFilterId } from "@/types/admin"
+
 export type AdminCompaniesStatsResponse = {
   activeCount: number
 }
@@ -93,10 +95,29 @@ export type AdminCompanyListItem = {
 
 export type AdminCompanyListQuery = {
   search?: string
+  status?: ProfileRequestStatus
+  isActive?: boolean
   page?: number
   limit?: number
   sortBy?: AdminCompanyListSortBy
   sortOrder?: "asc" | "desc"
+}
+
+export type AdminCompanyAccountFilter = "all" | "active" | "inactive"
+
+export function adminCompanyListSupportsAccountFilter(
+  statusFilter: ProfileRequestFilterId
+): boolean {
+  return statusFilter === "all" || statusFilter === ProfileRequestStatus.APPROVED
+}
+
+export function adminCompanyListIsActiveFromAccountFilter(
+  statusFilter: ProfileRequestFilterId,
+  accountFilter: AdminCompanyAccountFilter
+): boolean | undefined {
+  if (!adminCompanyListSupportsAccountFilter(statusFilter)) return undefined
+  if (accountFilter === "all") return undefined
+  return accountFilter === "active"
 }
 
 export type AdminCompanyListPagination = {
