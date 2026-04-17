@@ -1310,7 +1310,7 @@
       "closed": "Đã đóng"
     },
     "dashboard": {
-      "totalCompanies": "Tổng doanh nghiệp",
+      "totalCompanies": "Tổng doanh nghiệp đang hoạt động",
       "pendingApplications": "Đơn đăng ký chờ duyệt",
       "newsCount": "Số tin tức",
       "propertyViews": "Lượt xem bất động sản",
@@ -1421,6 +1421,7 @@
       "deleteUnavailable": "Không thể xóa",
       "cannotEnableDeleted": "Công ty đã bị xóa, không thể kích hoạt lại.",
       "accountFilterLabel": "CÔNG TY",
+      "companyFilterTooltip": "Lọc theo trạng thái kích hoạt công ty",
       "accountFilterAria": "Lọc theo trạng thái kích hoạt công ty",
       "accountFilterAll": "Tất cả",
       "accountFilterActive": "Đang bật",

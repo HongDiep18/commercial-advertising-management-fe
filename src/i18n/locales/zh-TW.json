@@ -1227,7 +1227,7 @@
       "closed": "已結案"
     },
     "dashboard": {
-      "totalCompanies": "企業總數",
+      "totalCompanies": "活躍企業總數",
       "pendingApplications": "待審核申請",
       "newsCount": "新聞數量",
       "propertyViews": "物業瀏覽",
@@ -1338,6 +1338,7 @@
       "deleteUnavailable": "無法刪除",
       "cannotEnableDeleted": "該公司已被刪除，無法啟用。",
       "accountFilterLabel": "公司",
+      "companyFilterTooltip": "依公司啟用狀態篩選",
       "accountFilterAria": "依公司啟用狀態篩選",
       "accountFilterAll": "全部",
       "accountFilterActive": "啟用",
