@@ -295,11 +295,11 @@ export function CompaniesTab() {
                 className="flex flex-wrap items-center gap-2 lg:gap-3"
                 role="group"
                 aria-label={t("admin.companies.accountFilterAria", {
-                  defaultValue: "Filter by account active state",
+                  defaultValue: "Filter by company active state",
                 })}
               >
                 <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  {t("admin.companies.accountFilterLabel", { defaultValue: "Account" })}
+                  {t("admin.companies.accountFilterLabel", { defaultValue: "COMPANY" })}
                 </span>
                 <div className="flex flex-wrap items-center gap-1.5">
                   {ADMIN_COMPANY_ACCOUNT_FILTERS.map((opt) => (
