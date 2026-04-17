@@ -107,7 +107,7 @@ const CONTACT_GROUPS: ContactGroupDef[] = [
     key: "email",
     labelKey: "admin.companies.contactGroups.email",
     fallbackLabel: "Email",
-    types: new Set(["email"]),
+    types: new Set(["email", "register_email"]),
     defaultType: "email",
     layout: "simple",
     rowGroup: "rg_email_website",
@@ -512,12 +512,8 @@ export function AdminCompanyEditDialog({
                           CONTACT_TYPE_EXAMPLES[
                             String(contact.type || "") as AdminCompanyContactType
                           ]
-                        const registeredEmailNorm = accountSummary.registeredEmail.trim().toLowerCase()
                         const isRegisteredEmail =
-                          String(contact.type || "") === "register_email" ||
-                          (String(contact.type || "") === "email" &&
-                            Boolean(registeredEmailNorm) &&
-                            contact.value.trim().toLowerCase() === registeredEmailNorm)
+                          String(contact.type || "") === "register_email"
                         const isDisabled = readOnly || isRegisteredEmail
                         return (
                           <div
