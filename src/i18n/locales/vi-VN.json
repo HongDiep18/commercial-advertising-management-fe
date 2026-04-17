@@ -1427,6 +1427,7 @@
       "archiveCompanyError": "Lưu trữ công ty thất bại",
       "deleteUnavailable": "Không thể xóa",
       "cannotEnableDeleted": "Công ty đã bị xóa, không thể kích hoạt lại.",
+
       "accountFilterLabel": "Trạng thái tài khoản",
       "companyFilterTooltip": "Lọc theo trạng thái tài khoản",
       "accountFilterAria": "Lọc theo trạng thái tài khoản",

@@ -316,6 +316,7 @@ export function CompaniesTab() {
             </div>
 
             {accountFilterApplies && (
+
               <div className="flex items-center gap-1">
               <Popover open={companyActiveFilterOpen} onOpenChange={setCompanyActiveFilterOpen}>
                 <PopoverTrigger asChild>
