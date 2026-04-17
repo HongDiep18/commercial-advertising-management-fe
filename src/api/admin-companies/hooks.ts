@@ -22,7 +22,8 @@ import type {
   AdminCompanyUpdatePayload,
 } from "./types"
 import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
-import type { ProfileRequestRow } from "@/types/admin"
+import type { ProfileRequestRow, ProfileRequestStatusCounts } from "@/types/admin"
+import { ProfileRequestStatus } from "@/types/admin"
 
 export const adminCompaniesKeys = {
   all: ["admin", "companies"] as const,
@@ -100,6 +101,57 @@ export function useAdminCompaniesList(query: AdminCompanyListQuery): {
   }
 }
 
+const TAB_COUNT_BASE: AdminCompanyListQuery = {
+  page: 1,
+  limit: 1,
+  sortBy: "createdAt",
+  sortOrder: "desc",
+}
+
+const ADMIN_COMPANIES_TAB_COUNT_QUERIES: Array<{
+  segment: "all" | ProfileRequestStatus
+  query: AdminCompanyListQuery
+}> = [
+  { segment: "all", query: { ...TAB_COUNT_BASE } },
+  {
+    segment: ProfileRequestStatus.PENDING,
+    query: { ...TAB_COUNT_BASE, status: ProfileRequestStatus.PENDING },
+  },
+  {
+    segment: ProfileRequestStatus.APPROVED,
+    query: { ...TAB_COUNT_BASE, status: ProfileRequestStatus.APPROVED },
+  },
+  {
+    segment: ProfileRequestStatus.REJECTED,
+    query: { ...TAB_COUNT_BASE, status: ProfileRequestStatus.REJECTED },
+  },
+]
+
+export function useAdminCompaniesTabCounts(): {
+  statusCounts: ProfileRequestStatusCounts
+  isLoading: boolean
+} {
+  const results = useQueries({
+    queries: ADMIN_COMPANIES_TAB_COUNT_QUERIES.map(({ segment, query }) => ({
+      queryKey: [...adminCompaniesKeys.all, "tabCount", segment] as const,
+      queryFn: () => listAdminCompanies(query),
+      select: (res: AdminCompanyListResponse) => res.pagination?.total ?? 0,
+    })),
+  })
+
+  const [all, pending, approved, rejected] = results.map((r) => r.data ?? 0)
+  const statusCounts: ProfileRequestStatusCounts = {
+    all,
+    [ProfileRequestStatus.PENDING]: pending,
+    [ProfileRequestStatus.APPROVED]: approved,
+    [ProfileRequestStatus.REJECTED]: rejected,
+  }
+
+  const isLoading = results.some((r) => r.isLoading)
+
+  return { statusCounts, isLoading }
+}
+
 export function useAdminCompanyDetailsByIds(companyIds: string[]): {
   sortedUniqueIds: string[]
   detailsById: Record<string, AdminCompanyDetail>
@@ -131,7 +183,6 @@ export function useAdminCompanyDetailsByIds(companyIds: string[]): {
   return { sortedUniqueIds, detailsById }
 }
 
-/** Loads a single company for the admin edit dialog; refetch when opening (staleTime 0). */
 export function useAdminCompanyDetail(companyId: string | null, enabled: boolean) {
   return useQuery({
     queryKey: adminCompaniesKeys.detail(companyId ?? ""),
@@ -167,6 +218,7 @@ export function useUpdateAdminCompanyMutation() {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.detail(variables.companyId) })
       queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.stats() })
+      queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.all })
     },
   })
 }

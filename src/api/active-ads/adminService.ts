@@ -1,5 +1,6 @@
 import { AdPackageFormConfig } from "@/api/ads-pricing/types"
 import { api } from "@/lib/api"
+import type { ActiveAdsSlotStatusResponse } from "./types"
 
 export enum AdPackageType {
   POPUP_PRIORITY_SLOT = "POPUP_PRIORITY_SLOT",
@@ -80,5 +81,11 @@ export async function createCompanyPopupAddon(
   await api.request(`/admin/active-ads/company/popup-addon`, {
     method: "POST",
     body: payload,
+  })
+}
+
+export async function getAdminActiveAdsSlotStatus(): Promise<ActiveAdsSlotStatusResponse> {
+  return api.request<ActiveAdsSlotStatusResponse>("admin/active-ads/slot-status", {
+    method: "GET",
   })
 }
