@@ -1241,7 +1241,7 @@
       "closed": "Closed"
     },
     "dashboard": {
-      "totalCompanies": "Total Companies",
+      "totalCompanies": "Total Active Companies",
       "pendingApplications": "Pending Applications",
       "newsCount": "News Count",
       "propertyViews": "Property Views",
@@ -1352,6 +1352,7 @@
       "deleteUnavailable": "Delete unavailable",
       "cannotEnableDeleted": "The company had been deleted, cannot enable it.",
       "accountFilterLabel": "COMPANY",
+      "companyFilterTooltip": "Filter by company active state",
       "accountFilterAria": "Filter by company active state",
       "accountFilterAll": "All",
       "accountFilterActive": "Active",
