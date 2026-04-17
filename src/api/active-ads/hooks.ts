@@ -4,6 +4,7 @@ import { toast } from "sonner"
 import {
   createCompanyPopupAddon,
   deleteActiveAd,
+  getAdminActiveAdsSlotStatus,
   getCompanyActiveAds,
   saveActiveAd,
   type CompanyActiveAdsResponse,
@@ -12,7 +13,7 @@ import {
 } from "./adminService"
 import { getBookedDates, isSlotPackageType, type BookedDatesResponse } from "./bookedDates"
 import { getPopupPriorityCompanies, getPopupRotationalCompanies } from "./service"
-import type { PopupCompaniesResponse } from "./types"
+import type { ActiveAdsSlotStatusResponse, PopupCompaniesResponse } from "./types"
 
 const activeAdsKeys = {
   all: ["active-ads"] as const,
@@ -20,6 +21,7 @@ const activeAdsKeys = {
   popupRotational: () => [...activeAdsKeys.all, "popup-rotational"] as const,
   bookedDates: (packageType: string) => ["ads", "booked-dates", packageType] as const,
   companyActiveAds: (companyId: string) => ["admin", "active-ads", "company", companyId] as const,
+  adminSlotStatus: () => ["admin", "active-ads", "slot-status"] as const,
 }
 
 export function usePopupPriorityCompanies(): {
@@ -58,6 +60,19 @@ export function useCompanyActiveAds(companyId: string | null): {
     queryFn: () => getCompanyActiveAds(companyId!),
     enabled: !!companyId,
   })
+  return { data, isLoading, isError }
+}
+
+export function useAdminActiveAdsSlotStatus(): {
+  data?: ActiveAdsSlotStatusResponse
+  isLoading: boolean
+  isError: boolean
+} {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: activeAdsKeys.adminSlotStatus(),
+    queryFn: () => getAdminActiveAdsSlotStatus(),
+  })
+
   return { data, isLoading, isError }
 }
 
