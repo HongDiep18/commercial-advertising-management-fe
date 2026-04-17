@@ -1358,7 +1358,6 @@
       "archiveCompanyError": "Failed to archive company",
       "deleteUnavailable": "Delete unavailable",
       "cannotEnableDeleted": "The company had been deleted, cannot enable it.",
-
       "accountFilterLabel": "Account State",
       "companyFilterTooltip": "Filter by account state",
       "accountFilterAria": "Filter by account state",
