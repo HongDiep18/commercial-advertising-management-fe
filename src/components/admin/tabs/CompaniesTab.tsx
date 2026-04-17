@@ -25,6 +25,7 @@ import { CompanyDeleteDialog } from "@/components/admin/company/CompanyDeleteDia
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useUser } from "@/contexts/user-context"
@@ -38,6 +39,7 @@ import { isAdminRole } from "@/utils/adminRole"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 import {
   CheckCircle2,
+  Filter,
   Megaphone,
   Pencil,
   Search,
@@ -64,6 +66,7 @@ export function CompaniesTab() {
     useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
   const [accountActiveFilter, setAccountActiveFilter] = useState<AdminCompanyAccountFilter>("all")
+  const [companyActiveFilterOpen, setCompanyActiveFilterOpen] = useState(false)
   const [page, setPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -291,36 +294,74 @@ export function CompaniesTab() {
             </div>
 
             {accountFilterApplies && (
-              <div
-                className="flex flex-wrap items-center gap-2 lg:gap-3"
-                role="group"
-                aria-label={t("admin.companies.accountFilterAria", {
-                  defaultValue: "Filter by company active state",
-                })}
-              >
-                <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-                  {t("admin.companies.accountFilterLabel", { defaultValue: "COMPANY" })}
-                </span>
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {ADMIN_COMPANY_ACCOUNT_FILTERS.map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => {
-                        setAccountActiveFilter(opt.id)
-                        setPage(1)
-                      }}
-                      className={`!body-bg-dark-foreground rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
-                        accountActiveFilter === opt.id
-                          ? "bg-primary text-primary-foreground"
-                          : "!bg-body-bg-dark-foreground text-muted-foreground hover:bg-muted/80"
-                      }`}
-                    >
-                      {t(opt.labelKey)}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <Popover open={companyActiveFilterOpen} onOpenChange={setCompanyActiveFilterOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    title={t("admin.companies.companyFilterTooltip", {
+                      defaultValue: "Filter by company active state",
+                    })}
+                    aria-label={t("admin.companies.companyFilterTooltip", {
+                      defaultValue: "Filter by company active state",
+                    })}
+                    aria-expanded={companyActiveFilterOpen}
+                    aria-haspopup="dialog"
+                    className={`border-border bg-body-bg-dark relative h-10 w-10 shrink-0 border ${
+                      accountActiveFilter !== "all"
+                        ? "border-primary ring-primary/35 text-primary ring-2"
+                        : "text-muted-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    <Filter className="h-4 w-4" aria-hidden />
+                    {accountActiveFilter !== "all" ? (
+                      <span
+                        className="bg-primary absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full"
+                        aria-hidden
+                      />
+                    ) : null}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  side="bottom"
+                  sideOffset={8}
+                  className="border-border bg-card/95 min-w-[220px] p-0 shadow-none backdrop-blur-sm"
+                >
+                  <div
+                    className="border-border border-b px-3 py-2"
+                    role="group"
+                    aria-label={t("admin.companies.accountFilterAria", {
+                      defaultValue: "Filter by company active state",
+                    })}
+                  >
+                    <p className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
+                      {t("admin.companies.accountFilterLabel", { defaultValue: "COMPANY" })}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-0.5 p-1.5">
+                    {ADMIN_COMPANY_ACCOUNT_FILTERS.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setAccountActiveFilter(opt.id)
+                          setPage(1)
+                          setCompanyActiveFilterOpen(false)
+                        }}
+                        className={`hover:bg-muted/50 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+                          accountActiveFilter === opt.id
+                            ? "bg-primary/10 text-primary"
+                            : "text-foreground"
+                        }`}
+                      >
+                        {t(opt.labelKey)}
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             )}
 
             <div className="relative w-full min-w-[200px] sm:max-w-sm lg:ml-auto lg:w-auto lg:max-w-md lg:flex-1">
