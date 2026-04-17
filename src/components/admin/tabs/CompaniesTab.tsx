@@ -22,6 +22,7 @@ import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { AdminCompanyEditDialog } from "@/components/admin/company/AdminCompanyEditDialog"
 import { CompanyActiveAdsDialog } from "@/components/admin/company/CompanyActiveAdsDialog"
 import { CompanyDeleteDialog } from "@/components/admin/company/CompanyDeleteDialog"
+import { CompanyDisableDialog } from "@/components/admin/company/CompanyDisableDialog"
 import Button from "@/components/ui/Button"
 import Card, { CardContent } from "@/components/ui/Card"
 import Input from "@/components/ui/Input"
@@ -39,7 +40,10 @@ import { isAdminRole } from "@/utils/adminRole"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 import {
   CheckCircle2,
+  ChevronDown,
   Filter,
+  Loader2,
+  X,
   Megaphone,
   Pencil,
   Search,
@@ -71,6 +75,8 @@ export function CompaniesTab() {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [optimisticActiveById, setOptimisticActiveById] = useState<Record<string, boolean>>({})
+  const [confirmDisableRow, setConfirmDisableRow] = useState<ProfileRequestRow | null>(null)
   const [activeAdsRow, setActiveAdsRow] = useState<ProfileRequestRow | null>(null)
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: "",
@@ -98,7 +104,7 @@ export function CompaniesTab() {
     },
   })
 
-  const handleToggleActive = (row: ProfileRequestRow, nextActive: boolean) => {
+  const doToggleActive = (row: ProfileRequestRow, nextActive: boolean) => {
     const userId = row.userId?.trim()
     const companyId = row.companyId?.trim()
 
@@ -117,6 +123,7 @@ export function CompaniesTab() {
     }
 
     setUpdatingId(row.id)
+    setOptimisticActiveById((prev) => ({ ...prev, [row.id]: nextActive }))
     doToggle()
       .then(() => {
         invalidateAdminCompanies()
@@ -127,8 +134,23 @@ export function CompaniesTab() {
           "success"
         )
       })
-      .catch(() => showToast(t("admin.companies.updateError"), "error"))
+      .catch(() => {
+        setOptimisticActiveById((prev) => {
+          const next = { ...prev }
+          delete next[row.id]
+          return next
+        })
+        showToast(t("admin.companies.updateError"), "error")
+      })
       .finally(() => setUpdatingId(null))
+  }
+
+  const handleToggleActive = (row: ProfileRequestRow, nextActive: boolean) => {
+    if (!nextActive) {
+      setConfirmDisableRow(row)
+    } else {
+      doToggleActive(row, true)
+    }
   }
 
   const handleApprove = (row: ProfileRequestRow) => {
@@ -294,33 +316,33 @@ export function CompaniesTab() {
             </div>
 
             {accountFilterApplies && (
+              <div className="flex items-center gap-1">
               <Popover open={companyActiveFilterOpen} onOpenChange={setCompanyActiveFilterOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon"
-                    title={t("admin.companies.companyFilterTooltip", {
-                      defaultValue: "Filter by company active state",
-                    })}
+                    size={accountActiveFilter !== "all" ? "sm" : "icon"}
                     aria-label={t("admin.companies.companyFilterTooltip", {
-                      defaultValue: "Filter by company active state",
+                      defaultValue: "Filter by account state",
                     })}
                     aria-expanded={companyActiveFilterOpen}
                     aria-haspopup="dialog"
-                    className={`border-border bg-body-bg-dark relative h-10 w-10 shrink-0 border ${
+                    className={`border-border bg-body-bg-dark h-10 shrink-0 border ${
                       accountActiveFilter !== "all"
-                        ? "border-primary ring-primary/35 text-primary ring-2"
-                        : "text-muted-foreground hover:bg-muted/50"
+                        ? "border-primary ring-primary/35 text-primary gap-1.5 px-3 ring-2"
+                        : "w-10 text-muted-foreground hover:bg-muted/50"
                     }`}
                   >
-                    <Filter className="h-4 w-4" aria-hidden />
-                    {accountActiveFilter !== "all" ? (
-                      <span
-                        className="bg-primary absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full"
-                        aria-hidden
-                      />
-                    ) : null}
+                    <Filter className="h-4 w-4 shrink-0" aria-hidden />
+                    {accountActiveFilter !== "all" && (
+                      <>
+                        <span className="text-sm font-medium">
+                          {t(ADMIN_COMPANY_ACCOUNT_FILTERS.find((o) => o.id === accountActiveFilter)?.labelKey ?? "")}
+                        </span>
+                        <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                      </>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
@@ -333,11 +355,11 @@ export function CompaniesTab() {
                     className="border-border border-b px-3 py-2"
                     role="group"
                     aria-label={t("admin.companies.accountFilterAria", {
-                      defaultValue: "Filter by company active state",
+                      defaultValue: "Filter by account state",
                     })}
                   >
                     <p className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
-                      {t("admin.companies.accountFilterLabel", { defaultValue: "COMPANY" })}
+                      {t("admin.companies.accountFilterLabel", { defaultValue: "Account State" })}
                     </p>
                   </div>
                   <div className="flex flex-col gap-0.5 p-1.5">
@@ -351,9 +373,7 @@ export function CompaniesTab() {
                           setCompanyActiveFilterOpen(false)
                         }}
                         className={`hover:bg-muted/50 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
-                          accountActiveFilter === opt.id
-                            ? "bg-primary/10 text-primary"
-                            : "text-foreground"
+                          accountActiveFilter === opt.id ? "bg-primary/10 text-primary" : "text-foreground"
                         }`}
                       >
                         {t(opt.labelKey)}
@@ -362,6 +382,22 @@ export function CompaniesTab() {
                   </div>
                 </PopoverContent>
               </Popover>
+              {accountActiveFilter !== "all" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountActiveFilter("all")
+                    setPage(1)
+                  }}
+                  aria-label={t("admin.companies.clearAccountFilter", {
+                    defaultValue: "Clear filter",
+                  })}
+                  className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              )}
+              </div>
             )}
 
             <div className="relative w-full min-w-[200px] sm:max-w-sm lg:ml-auto lg:w-auto lg:max-w-md lg:flex-1">
@@ -531,7 +567,7 @@ export function CompaniesTab() {
                               )}
                               {row.status === ProfileRequestStatus.APPROVED &&
                                 (() => {
-                                  const active = isCompanyActive(row)
+                                  const active = row.id in optimisticActiveById ? optimisticActiveById[row.id] : isCompanyActive(row)
                                   const hasToggleTarget = Boolean(
                                     row.userId?.trim() || row.companyId?.trim()
                                   )
@@ -544,21 +580,27 @@ export function CompaniesTab() {
                                       ? t("admin.companies.disableAccount", "Disable account")
                                       : t("admin.companies.enableAccount", "Enable account")
                                   return (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className={`h-8 ${active ? "!text-green-600 hover:!bg-green-700 hover:!text-white" : "!text-red-600 hover:!bg-red-700 hover:!text-white"}`}
-                                      aria-label={toggleLabel}
-                                      title={toggleLabel}
-                                      disabled={!!updatingId || !hasToggleTarget}
-                                      onClick={() => handleToggleActive(row, !active)}
-                                    >
-                                      {active ? (
-                                        <ToggleRight className="h-4 w-4" />
-                                      ) : (
-                                        <ToggleLeft className="h-4 w-4" />
-                                      )}
-                                    </Button>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={`h-8 ${active ? "!text-green-600 hover:!bg-red-700 hover:!text-white" : "!text-red-600 hover:!bg-green-700 hover:!text-white"}`}
+                                          aria-label={toggleLabel}
+                                          disabled={!!updatingId || !hasToggleTarget}
+                                          onClick={() => handleToggleActive(row, !active)}
+                                        >
+                                          {updatingId === row.id ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                          ) : active ? (
+                                            <ToggleRight className="h-4 w-4" />
+                                          ) : (
+                                            <ToggleLeft className="h-4 w-4" />
+                                          )}
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>{toggleLabel}</TooltipContent>
+                                    </Tooltip>
                                   )
                                 })()}
                               {row.status === ProfileRequestStatus.APPROVED &&
@@ -661,6 +703,15 @@ export function CompaniesTab() {
           onClose={() => setDeleteCandidate(null)}
           onConfirm={handleDeleteConfirm}
           isDeleting={!!updatingId}
+        />
+        <CompanyDisableDialog
+          candidate={confirmDisableRow}
+          onClose={() => setConfirmDisableRow(null)}
+          onConfirm={() => {
+            if (confirmDisableRow) doToggleActive(confirmDisableRow, false)
+            setConfirmDisableRow(null)
+          }}
+          isUpdating={updatingId === confirmDisableRow?.id}
         />
       </div>
     </TooltipProvider>
