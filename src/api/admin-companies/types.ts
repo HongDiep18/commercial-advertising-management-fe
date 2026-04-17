@@ -31,6 +31,7 @@ export type AdminCompanyContactPhoneGroup = {
 export type AdminCompanyMember = {
   userName?: string | null
   registeredEmail?: string | null
+  registerEmail?: string | null
   memberSince?: string | null
   membershipTier?: string | null
 }

@@ -35,7 +35,7 @@ const CONTACT_PLACEHOLDER_GROUPS: Array<{
   defaultType: AdminCompanyContact["type"]
 }> = [
   { types: new Set(["contact_person"]), defaultType: "contact_person" },
-  { types: new Set(["email"]), defaultType: "email" },
+  { types: new Set(["email", "register_email"]), defaultType: "email" },
   { types: new Set(["website"]), defaultType: "website" },
   { types: new Set(["tel", "hotline", "fax"]), defaultType: "tel" },
   { types: new Set(["zalo", "wechat", "line", "skype", "facebook", "viber"]), defaultType: "zalo" },
@@ -188,7 +188,7 @@ export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompa
       .filter((c) => contactTypeKey(c.type) === "note")
       .map((c) => clean(String(c.value ?? "")))
       .find((v) => v.length > 0) ?? ""
-  const listContacts = excludeCompanyLevelContactRows(normalized)
+  const listContacts = normalized.filter((c) => contactTypeKey(c.type) !== "note")
 
   return {
     logoUrl: pickLogoUrlFromApiResponse(detail),
@@ -206,23 +206,10 @@ export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompa
 }
 
 export function adminCompanyFormToUpdatePayload(
-  form: AdminCompanyForm,
-  options?: { registeredEmail?: string }
+  form: AdminCompanyForm
 ): AdminCompanyUpdatePayload {
-  const registeredEmailNorm = options?.registeredEmail?.trim().toLowerCase() ?? ""
-
   const contacts = dedupeContacts(
     excludeCompanyLevelContactRows(form.contacts)
-      .filter((contact) => {
-        if (
-          registeredEmailNorm &&
-          clean(String(contact.type)) === "email" &&
-          clean(contact.value).toLowerCase() === registeredEmailNorm
-        ) {
-          return false
-        }
-        return true
-      })
       .map((contact) => {
         const type = clean(String(contact.type))
         const value = clean(contact.value)

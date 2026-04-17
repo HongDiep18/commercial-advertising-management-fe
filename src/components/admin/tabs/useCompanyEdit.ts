@@ -268,7 +268,7 @@ function mapMemberToAccountSummary(
 
   return {
     userName: String(member.userName ?? "").trim(),
-    registeredEmail: String(member.registeredEmail ?? "").trim(),
+    registeredEmail: String(member.registeredEmail ?? member.registerEmail ?? "").trim(),
     memberSince: member.memberSince?.trim() ? formatDate(member.memberSince, language) : "",
     memberRange: String(member.membershipTier ?? "").trim(),
   }
@@ -577,9 +577,7 @@ export function useCompanyEdit({
       editFieldErrors: normalizeErrorsLength(EMPTY_ERRORS, editForm.contacts),
     })
 
-    const payload = adminCompanyFormToUpdatePayload(editForm, {
-      registeredEmail: editAccountSummary.registeredEmail,
-    })
+    const payload = adminCompanyFormToUpdatePayload(editForm)
 
     updateCompanyMutation.mutate(
       {
