@@ -1,15 +1,20 @@
 "use client"
 
 import { patchCompanyActive } from "@/api/admin"
-import { useCompanyRequestsTabCounts } from "@/api/admin/hooks"
 import {
   adminCompanyDetailToRequestsTableCache,
   type AdminCompanyRequestsTableRowCache,
 } from "@/api/admin-companies/mapper"
-import type { AdminCompanyListQuery } from "@/api/admin-companies/types"
+import {
+  adminCompanyListIsActiveFromAccountFilter,
+  adminCompanyListSupportsAccountFilter,
+  type AdminCompanyAccountFilter,
+  type AdminCompanyListQuery,
+} from "@/api/admin-companies/types"
 import {
   adminCompaniesKeys,
   useAdminCompaniesList,
+  useAdminCompaniesTabCounts,
   useAdminCompanyDetailsByIds,
 } from "@/api/admin-companies/hooks"
 import { formatIndustryForDisplay } from "@/api/companies/adminCompany.mapper"
@@ -46,7 +51,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAdminData } from "../AdminDataContext"
-import { PROFILE_REQUEST_FILTERS } from "../constants"
+import { ADMIN_COMPANY_ACCOUNT_FILTERS, PROFILE_REQUEST_FILTERS } from "../constants"
 import { StatusBadge } from "../StatusBadge"
 import { useCompanyEdit } from "./useCompanyEdit"
 
@@ -58,6 +63,7 @@ export function CompaniesTab() {
   const { updateCompanyRequestStatus, updateUserActive, deleteCompany, refetchCompanyRequests } =
     useAdminData()
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
+  const [accountActiveFilter, setAccountActiveFilter] = useState<AdminCompanyAccountFilter>("all")
   const [page, setPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -73,6 +79,10 @@ export function CompaniesTab() {
     setToast({ message, variant, visible: true })
   const hideToast = () => setToast((prev) => ({ ...prev, visible: false }))
 
+  const invalidateAdminCompanies = () => {
+    void queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.all })
+  }
+
   const companyEdit = useCompanyEdit({
     canEditCompanyProfile,
     language: i18n.language,
@@ -81,6 +91,7 @@ export function CompaniesTab() {
     onRefetchCompanyRequests: refetchCompanyRequests,
     onCompanyDataChanged: (companyId) => {
       void queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.detail(companyId) })
+      void queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.all })
     },
   })
 
@@ -94,21 +105,25 @@ export function CompaniesTab() {
         return updateUserActive(userId, nextActive)
       }
       if (companyId) {
-        return patchCompanyActive(companyId, nextActive).then(() => refetchCompanyRequests?.())
+        return patchCompanyActive(companyId, nextActive).then(() => {
+          refetchCompanyRequests?.()
+          invalidateAdminCompanies()
+        })
       }
       return Promise.reject(new Error("No target"))
     }
 
     setUpdatingId(row.id)
     doToggle()
-      .then(() =>
+      .then(() => {
+        invalidateAdminCompanies()
         showToast(
           nextActive
             ? t("admin.companies.enabledSuccess", "Account enabled")
             : t("admin.companies.disabledSuccess", "Account disabled"),
           "success"
         )
-      )
+      })
       .catch(() => showToast(t("admin.companies.updateError"), "error"))
       .finally(() => setUpdatingId(null))
   }
@@ -117,7 +132,10 @@ export function CompaniesTab() {
     if (!updateCompanyRequestStatus) return
     setUpdatingId(row.id)
     updateCompanyRequestStatus(row.id, ProfileRequestStatus.APPROVED)
-      .then(() => showToast(t("admin.companies.approvedSuccess"), "success"))
+      .then(() => {
+        invalidateAdminCompanies()
+        showToast(t("admin.companies.approvedSuccess"), "success")
+      })
       .catch(() => showToast(t("admin.companies.updateError"), "error"))
       .finally(() => setUpdatingId(null))
   }
@@ -126,7 +144,10 @@ export function CompaniesTab() {
     if (!updateCompanyRequestStatus) return
     setUpdatingId(row.id)
     updateCompanyRequestStatus(row.id, ProfileRequestStatus.REJECTED)
-      .then(() => showToast(t("admin.companies.rejectedSuccess"), "info"))
+      .then(() => {
+        invalidateAdminCompanies()
+        showToast(t("admin.companies.rejectedSuccess"), "info")
+      })
       .catch(() => showToast(t("admin.companies.updateError"), "error"))
       .finally(() => setUpdatingId(null))
   }
@@ -151,14 +172,15 @@ export function CompaniesTab() {
     setUpdatingId(deleteCandidate.id)
     setDeleteCandidate(null)
     deleteCompany({ userId, companyId })
-      .then(() =>
+      .then(() => {
+        invalidateAdminCompanies()
         showToast(
           userId
             ? t("admin.companies.deleteCompanySuccess", "Company deleted")
             : t("admin.companies.archiveCompanySuccess", "Company archived"),
           "success"
         )
-      )
+      })
       .catch(() =>
         showToast(
           userId
@@ -170,6 +192,8 @@ export function CompaniesTab() {
       .finally(() => setUpdatingId(null))
   }
 
+  const accountFilterApplies = adminCompanyListSupportsAccountFilter(filter)
+
   const listQueryParams = useMemo((): AdminCompanyListQuery => {
     return {
       search: debouncedSearchQuery.trim() || undefined,
@@ -177,8 +201,10 @@ export function CompaniesTab() {
       limit: 20,
       sortBy: "createdAt",
       sortOrder: "desc",
+      status: filter === "all" ? undefined : filter,
+      isActive: adminCompanyListIsActiveFromAccountFilter(filter, accountActiveFilter),
     }
-  }, [page, debouncedSearchQuery])
+  }, [page, debouncedSearchQuery, filter, accountActiveFilter])
 
   const {
     rows,
@@ -188,22 +214,17 @@ export function CompaniesTab() {
     error: listError,
   } = useAdminCompaniesList(listQueryParams)
 
-  const displayRows = useMemo(() => {
-    if (filter === "all") return rows
-    return rows.filter((r) => r.status === filter)
-  }, [rows, filter])
-
-  const { statusCounts } = useCompanyRequestsTabCounts()
+  const { statusCounts } = useAdminCompaniesTabCounts()
 
   const companyRowsById = useMemo(() => {
     const byId: Record<string, ProfileRequestRow> = {}
-    for (const r of displayRows) {
+    for (const r of rows) {
       const id = r.companyId?.trim()
       if (!id) continue
       if (!byId[id]) byId[id] = r
     }
     return byId
-  }, [displayRows])
+  }, [rows])
 
   const companyIdsOnPage = useMemo(() => Object.keys(companyRowsById), [companyRowsById])
 
@@ -244,45 +265,85 @@ export function CompaniesTab() {
           visible={toast.visible}
           onClose={hideToast}
         />
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div className="border-rounded-lg flex flex-wrap items-center gap-2">
-            {PROFILE_REQUEST_FILTERS.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => {
-                  setFilter(f.id)
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between lg:gap-4">
+            <div className="border-rounded-lg flex flex-wrap items-center gap-2">
+              {PROFILE_REQUEST_FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => {
+                    setFilter(f.id)
+                    setPage(1)
+                    if (!adminCompanyListSupportsAccountFilter(f.id)) {
+                      setAccountActiveFilter("all")
+                    }
+                  }}
+                  className={`!body-bg-dark-foreground rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                    filter === f.id
+                      ? "bg-primary text-primary-foreground"
+                      : "!bg-body-bg-dark-foreground text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {f.useCount ? t(f.labelKey, { count: statusCounts[f.id] }) : t(f.labelKey)}
+                </button>
+              ))}
+            </div>
+
+            {accountFilterApplies && (
+              <div
+                className="flex flex-wrap items-center gap-2 lg:gap-3"
+                role="group"
+                aria-label={t("admin.companies.accountFilterAria", {
+                  defaultValue: "Filter by account active state",
+                })}
+              >
+                <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+                  {t("admin.companies.accountFilterLabel", { defaultValue: "Account" })}
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {ADMIN_COMPANY_ACCOUNT_FILTERS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setAccountActiveFilter(opt.id)
+                        setPage(1)
+                      }}
+                      className={`!body-bg-dark-foreground rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+                        accountActiveFilter === opt.id
+                          ? "bg-primary text-primary-foreground"
+                          : "!bg-body-bg-dark-foreground text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {t(opt.labelKey)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="relative w-full min-w-[200px] sm:max-w-sm lg:ml-auto lg:w-auto lg:max-w-md lg:flex-1">
+              <Search
+                className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+                aria-hidden
+              />
+              <Input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
                   setPage(1)
                 }}
-                className={`!body-bg-dark-foreground rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                  filter === f.id
-                    ? "bg-primary text-primary-foreground"
-                    : "!bg-body-bg-dark-foreground text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
-                {f.useCount ? t(f.labelKey, { count: statusCounts[f.id] }) : t(f.labelKey)}
-              </button>
-            ))}
-          </div>
-          <div className="relative w-full sm:max-w-sm">
-            <Search
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
-              aria-hidden
-            />
-            <Input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setPage(1)
-              }}
-              placeholder={t("admin.companies.searchPlaceholder", {
-                defaultValue: "Search by name, tax id, industry, contact…",
-              })}
-              className="bg-body-bg-dark border-border h-10 w-full pl-9"
-              aria-label={t("admin.companies.searchPlaceholder", {
-                defaultValue: "Search companies",
-              })}
-            />
+                placeholder={t("admin.companies.searchPlaceholder", {
+                  defaultValue: "Search by name, tax id, industry, contact…",
+                })}
+                className="bg-body-bg-dark border-border h-10 w-full pl-9"
+                aria-label={t("admin.companies.searchPlaceholder", {
+                  defaultValue: "Search companies",
+                })}
+              />
+            </div>
           </div>
         </div>
 
@@ -313,204 +374,205 @@ export function CompaniesTab() {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayRows.length === 0 ? (
+                  {rows.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-muted-foreground px-4 py-10 text-center text-sm">
-                        {rows.length === 0
-                          ? t("admin.companies.emptyList", { defaultValue: "No companies to display." })
-                          : t("admin.companies.filterNoMatchesOnPage", {
-                              defaultValue: "No companies match this status on this page.",
-                            })}
+                      <td
+                        colSpan={6}
+                        className="text-muted-foreground px-4 py-10 text-center text-sm"
+                      >
+                        {t("admin.companies.emptyList", {
+                          defaultValue: "No companies to display.",
+                        })}
                       </td>
                     </tr>
                   ) : (
-                    displayRows.map((row, rowIndex) => {
-                    const companyIdKey = row.companyId?.trim()
-                    const cached = companyIdKey ? companyInfoById[companyIdKey] : undefined
-                    const displayCompanyName = cached?.displayCompanyName?.trim()
-                      ? cached.displayCompanyName
-                      : row.companyName
-                    const displayRegisteredEmail =
-                      row.registeredEmail?.trim() || row.email?.trim() || ""
-                    const displayContactValue = cached?.contactValue?.trim()
-                      ? cached.contactValue
-                      : row.companyEmail?.trim() || row.email
-                    const displayContactName = cached?.contactName?.trim()
-                      ? cached.contactName
-                      : row.contactName
-                    const industryFromCache = formatIndustryForDisplay(cached?.industry)
-                    const industryFromRow = formatIndustryForDisplay(row.industry)
-                    const displayIndustry =
-                      (industryFromCache.trim() ? industryFromCache : industryFromRow) || ""
-                    const companyNames = [
-                      { label: "ZH", value: cached?.companyNameZh?.trim() || "" },
-                      { label: "EN", value: cached?.companyNameEn?.trim() || "" },
-                      { label: "VI", value: cached?.companyNameVi?.trim() || "" },
-                    ].filter((item) => item.value)
-                    const showCompanyTooltip = companyNames.length > 1
+                    rows.map((row, rowIndex) => {
+                      const companyIdKey = row.companyId?.trim()
+                      const cached = companyIdKey ? companyInfoById[companyIdKey] : undefined
+                      const displayCompanyName = cached?.displayCompanyName?.trim()
+                        ? cached.displayCompanyName
+                        : row.companyName
+                      const displayRegisteredEmail =
+                        row.registeredEmail?.trim() || row.email?.trim() || ""
+                      const displayContactValue = cached?.contactValue?.trim()
+                        ? cached.contactValue
+                        : row.companyEmail?.trim() || row.email
+                      const displayContactName = cached?.contactName?.trim()
+                        ? cached.contactName
+                        : row.contactName
+                      const industryFromCache = formatIndustryForDisplay(cached?.industry)
+                      const industryFromRow = formatIndustryForDisplay(row.industry)
+                      const displayIndustry =
+                        (industryFromCache.trim() ? industryFromCache : industryFromRow) || ""
+                      const companyNames = [
+                        { label: "ZH", value: cached?.companyNameZh?.trim() || "" },
+                        { label: "EN", value: cached?.companyNameEn?.trim() || "" },
+                        { label: "VI", value: cached?.companyNameVi?.trim() || "" },
+                      ].filter((item) => item.value)
+                      const showCompanyTooltip = companyNames.length > 1
 
-                    return (
-                      <tr
-                        key={row.id ? `${row.id}-${rowIndex}` : `row-${rowIndex}`}
-                        className="border-border hover:bg-body-table-dark-hover border-b"
-                      >
-                        <td className="px-4 py-3">
-                          <div className="min-w-0 space-y-0.5">
-                            {showCompanyTooltip ? (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <p className="text-foreground truncate text-sm font-medium">
-                                    {displayCompanyName}
-                                  </p>
-                                </TooltipTrigger>
-                                <TooltipContent
-                                  side="top"
-                                  sideOffset={6}
-                                  className="max-w-sm whitespace-pre-line"
-                                >
-                                  {companyNames
-                                    .map((item) => `${item.label}: ${item.value}`)
-                                    .join("\n")}
-                                </TooltipContent>
-                              </Tooltip>
-                            ) : (
-                              <p className="text-foreground truncate text-sm font-medium">
-                                {displayCompanyName}
-                              </p>
-                            )}
-                            {displayRegisteredEmail ? (
-                              <p className="text-muted-foreground truncate text-xs">
-                                {displayRegisteredEmail}
-                              </p>
+                      return (
+                        <tr
+                          key={row.id ? `${row.id}-${rowIndex}` : `row-${rowIndex}`}
+                          className="border-border hover:bg-body-table-dark-hover border-b"
+                        >
+                          <td className="px-4 py-3">
+                            <div className="min-w-0 space-y-0.5">
+                              {showCompanyTooltip ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <p className="text-foreground truncate text-sm font-medium">
+                                      {displayCompanyName}
+                                    </p>
+                                  </TooltipTrigger>
+                                  <TooltipContent
+                                    side="top"
+                                    sideOffset={6}
+                                    className="max-w-sm whitespace-pre-line"
+                                  >
+                                    {companyNames
+                                      .map((item) => `${item.label}: ${item.value}`)
+                                      .join("\n")}
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                <p className="text-foreground truncate text-sm font-medium">
+                                  {displayCompanyName}
+                                </p>
+                              )}
+                              {displayRegisteredEmail ? (
+                                <p className="text-muted-foreground truncate text-xs">
+                                  {displayRegisteredEmail}
+                                </p>
+                              ) : null}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            <p className="text-foreground text-sm">{displayContactValue || "-"}</p>
+                            {displayContactName ? (
+                              <p className="text-muted-foreground text-xs">{displayContactName}</p>
                             ) : null}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm">
-                          <p className="text-foreground text-sm">{displayContactValue || "-"}</p>
-                          {displayContactName ? (
-                            <p className="text-muted-foreground text-xs">{displayContactName}</p>
-                          ) : null}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 text-sm">
-                          {displayIndustry}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 text-sm">
-                          {formatDateTimeForLocale(row.submittedAt, i18n.language)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <StatusBadge status={row.status} />
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
-                            {row.status === ProfileRequestStatus.PENDING && (
-                              <>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 !text-green-600 hover:!bg-green-700 hover:!text-white"
-                                  aria-label={t("admin.status.approved")}
-                                  disabled={!!updatingId}
-                                  onClick={() => handleApprove(row)}
-                                >
-                                  <CheckCircle2 className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-white"
-                                  aria-label={t("admin.status.rejected")}
-                                  disabled={!!updatingId}
-                                  onClick={() => handleReject(row)}
-                                >
-                                  <XCircle className="h-4 w-4" />
-                                </Button>
-                              </>
-                            )}
-                            {row.status === ProfileRequestStatus.APPROVED &&
-                              (() => {
-                                const active = isCompanyActive(row)
-                                const hasToggleTarget = Boolean(
-                                  row.userId?.trim() || row.companyId?.trim()
-                                )
-                                const toggleLabel = !hasToggleTarget
-                                  ? t(
-                                      "admin.companies.noLinkedUserAccount",
-                                      "No linked user account"
-                                    )
-                                  : active
-                                    ? t("admin.companies.disableAccount", "Disable account")
-                                    : t("admin.companies.enableAccount", "Enable account")
-                                return (
+                          </td>
+                          <td className="text-muted-foreground px-4 py-3 text-sm">
+                            {displayIndustry}
+                          </td>
+                          <td className="text-muted-foreground px-4 py-3 text-sm">
+                            {formatDateTimeForLocale(row.submittedAt, i18n.language)}
+                          </td>
+                          <td className="px-4 py-3">
+                            <StatusBadge status={row.status} />
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1">
+                              {row.status === ProfileRequestStatus.PENDING && (
+                                <>
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className={`h-8 ${active ? "!text-green-600 hover:!bg-green-700 hover:!text-white" : "!text-red-600 hover:!bg-red-700 hover:!text-white"}`}
-                                    aria-label={toggleLabel}
-                                    title={toggleLabel}
-                                    disabled={!!updatingId || !hasToggleTarget}
-                                    onClick={() => handleToggleActive(row, !active)}
+                                    className="h-8 !text-green-600 hover:!bg-green-700 hover:!text-white"
+                                    aria-label={t("admin.status.approved")}
+                                    disabled={!!updatingId}
+                                    onClick={() => handleApprove(row)}
                                   >
-                                    {active ? (
-                                      <ToggleRight className="h-4 w-4" />
-                                    ) : (
-                                      <ToggleLeft className="h-4 w-4" />
-                                    )}
+                                    <CheckCircle2 className="h-4 w-4" />
                                   </Button>
-                                )
-                              })()}
-                            {row.status === ProfileRequestStatus.APPROVED &&
-                              deleteCompany &&
-                              (() => {
-                                const hasDeleteTarget = Boolean(
-                                  row.userId?.trim() || row.companyId?.trim()
-                                )
-                                const deleteLabel = row.userId?.trim()
-                                  ? t("admin.companies.deleteCompany", "Delete company")
-                                  : row.companyId?.trim()
-                                    ? t("admin.companies.archiveCompany", "Archive company")
-                                    : t("admin.companies.deleteUnavailable", "Delete unavailable")
-                                return (
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-white"
-                                    aria-label={deleteLabel}
-                                    title={deleteLabel}
-                                    disabled={!!updatingId || !hasDeleteTarget}
-                                    onClick={() => handleDeleteCompanyClick(row)}
+                                    aria-label={t("admin.status.rejected")}
+                                    disabled={!!updatingId}
+                                    onClick={() => handleReject(row)}
                                   >
-                                    <Trash2 className="h-4 w-4" />
+                                    <XCircle className="h-4 w-4" />
                                   </Button>
-                                )
-                              })()}
-                            {row.status === ProfileRequestStatus.APPROVED && row.companyId && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="hover:bg-primary! h-8 hover:text-white!"
-                                aria-label={t("admin.activeAds.dialogDescription", "Active ads")}
-                                disabled={!!updatingId}
-                                onClick={() => setActiveAdsRow(row)}
-                              >
-                                <Megaphone className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {row.status === ProfileRequestStatus.APPROVED && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="hover:!bg-primary h-8 hover:!text-white"
-                                aria-label={t("admin.companies.edit", "Edit")}
-                                disabled={!!updatingId || companyEdit.state.editOpening}
-                                onClick={() => companyEdit.actions.openCompanyEdit(row)}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
+                                </>
+                              )}
+                              {row.status === ProfileRequestStatus.APPROVED &&
+                                (() => {
+                                  const active = isCompanyActive(row)
+                                  const hasToggleTarget = Boolean(
+                                    row.userId?.trim() || row.companyId?.trim()
+                                  )
+                                  const toggleLabel = !hasToggleTarget
+                                    ? t(
+                                        "admin.companies.noLinkedUserAccount",
+                                        "No linked user account"
+                                      )
+                                    : active
+                                      ? t("admin.companies.disableAccount", "Disable account")
+                                      : t("admin.companies.enableAccount", "Enable account")
+                                  return (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className={`h-8 ${active ? "!text-green-600 hover:!bg-green-700 hover:!text-white" : "!text-red-600 hover:!bg-red-700 hover:!text-white"}`}
+                                      aria-label={toggleLabel}
+                                      title={toggleLabel}
+                                      disabled={!!updatingId || !hasToggleTarget}
+                                      onClick={() => handleToggleActive(row, !active)}
+                                    >
+                                      {active ? (
+                                        <ToggleRight className="h-4 w-4" />
+                                      ) : (
+                                        <ToggleLeft className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  )
+                                })()}
+                              {row.status === ProfileRequestStatus.APPROVED &&
+                                deleteCompany &&
+                                (() => {
+                                  const hasDeleteTarget = Boolean(
+                                    row.userId?.trim() || row.companyId?.trim()
+                                  )
+                                  const deleteLabel = row.userId?.trim()
+                                    ? t("admin.companies.deleteCompany", "Delete company")
+                                    : row.companyId?.trim()
+                                      ? t("admin.companies.archiveCompany", "Archive company")
+                                      : t("admin.companies.deleteUnavailable", "Delete unavailable")
+                                  return (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 !text-red-600 hover:!bg-red-700 hover:!text-white"
+                                      aria-label={deleteLabel}
+                                      title={deleteLabel}
+                                      disabled={!!updatingId || !hasDeleteTarget}
+                                      onClick={() => handleDeleteCompanyClick(row)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  )
+                                })()}
+                              {row.status === ProfileRequestStatus.APPROVED && row.companyId && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="hover:bg-primary! h-8 hover:text-white!"
+                                  aria-label={t("admin.activeAds.dialogDescription", "Active ads")}
+                                  disabled={!!updatingId}
+                                  onClick={() => setActiveAdsRow(row)}
+                                >
+                                  <Megaphone className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {row.status === ProfileRequestStatus.APPROVED && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="hover:!bg-primary h-8 hover:!text-white"
+                                  aria-label={t("admin.companies.edit", "Edit")}
+                                  disabled={!!updatingId || companyEdit.state.editOpening}
+                                  onClick={() => companyEdit.actions.openCompanyEdit(row)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
                     })
                   )}
                 </tbody>
