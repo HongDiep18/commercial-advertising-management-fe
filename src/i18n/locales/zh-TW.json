@@ -1208,6 +1208,12 @@
       "property": "物業地產",
       "users": "用戶管理"
     },
+    "pagination": {
+      "rangeOf": "第 {{from}}–{{to}} 筆，共 {{total}} 筆",
+      "pageOfTotal": "{{page}} / {{totalPages}}",
+      "previous": "上一頁",
+      "next": "下一頁"
+    },
     "status": {
       "pending": "待審核",
       "approved": "已通過",
@@ -1306,7 +1312,8 @@
         "set_password_completed": "密碼設定已完成",
         "user_password_changed": "使用者密碼已變更",
         "loyalty_points_awarded": "已發放忠誠點數",
-        "loyalty_tier_recalculated": "忠誠等級已重新計算"
+        "loyalty_tier_recalculated": "忠誠等級已重新計算",
+        "property_contact_inquiry_created": "物件聯絡諮詢"
       }
     },
     "companies": {
