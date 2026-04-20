@@ -1291,6 +1291,12 @@
       "property": "Bất động sản",
       "users": "Quản lý người dùng"
     },
+    "pagination": {
+      "rangeOf": "{{from}}–{{to}} trong tổng số {{total}}",
+      "pageOfTotal": "{{page}} / {{totalPages}}",
+      "previous": "Trước",
+      "next": "Tiếp"
+    },
     "status": {
       "pending": "Chờ duyệt",
       "approved": "Đã duyệt",
@@ -1389,7 +1395,8 @@
         "set_password_completed": "Thiết lập mật khẩu hoàn tất",
         "user_password_changed": "Mật khẩu người dùng đã đổi",
         "loyalty_points_awarded": "Đã cộng điểm loyalty",
-        "loyalty_tier_recalculated": "Đã tính lại hạng loyalty"
+        "loyalty_tier_recalculated": "Đã tính lại hạng loyalty",
+        "property_contact_inquiry_created": "Liên hệ tư vấn bất động sản"
       }
     },
     "companies": {
