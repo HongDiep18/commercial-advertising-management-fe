@@ -77,10 +77,6 @@ export function AdPackagePricingDialog({
       value: PricingModelType.ONE_TIME,
       label: t("admin.advertising.pricingDialog.pricingModelOneTime") || "One-time",
     },
-    {
-      value: PricingModelType.PER_ACTION,
-      label: t("admin.advertising.pricingDialog.pricingModelPerAction") || "Per action",
-    },
   ]
 
   const durationUnitOptions: ReadonlyArray<{ value: DurationUnitType; label: string }> = [
@@ -184,6 +180,12 @@ export function AdPackagePricingDialog({
                           />
                         </SelectTrigger>
                         <SelectContent>
+                          {row.pricingModel === PricingModelType.PER_ACTION ? (
+                            <SelectItem value={PricingModelType.PER_ACTION} disabled>
+                              {t("admin.advertising.pricingDialog.pricingModelPerAction") ||
+                                "Per action"}
+                            </SelectItem>
+                          ) : null}
                           {pricingModelOptions.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>
                               {opt.label}
