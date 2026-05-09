@@ -1222,6 +1222,12 @@
       "property": "Property",
       "users": "User Management"
     },
+    "pagination": {
+      "rangeOf": "{{from}}–{{to}} of {{total}}",
+      "pageOfTotal": "{{page}} / {{totalPages}}",
+      "previous": "Previous",
+      "next": "Next"
+    },
     "status": {
       "pending": "Pending",
       "approved": "Approved",
@@ -1320,7 +1326,8 @@
         "set_password_completed": "Password setup completed",
         "user_password_changed": "User password changed",
         "loyalty_points_awarded": "Loyalty points awarded",
-        "loyalty_tier_recalculated": "Loyalty tier recalculated"
+        "loyalty_tier_recalculated": "Loyalty tier recalculated",
+        "property_contact_inquiry_created": "Property contact inquiry"
       }
     },
     "companies": {
@@ -1344,7 +1351,7 @@
       "archiveCompanyConfirm": "This will archive the company and mark it as rejected.",
       "archiveConfirm": "Archive",
       "deleteConfirm": "Delete",
-      "deleting":"Deleting…",
+      "deleting": "Deleting…",
       "deleteCompanySuccess": "Company deleted",
       "deleteCompanyError": "Failed to delete company",
       "archiveCompanySuccess": "Company archived",
