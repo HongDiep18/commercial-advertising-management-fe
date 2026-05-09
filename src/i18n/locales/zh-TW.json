@@ -1448,6 +1448,7 @@
       "adOrders": "本月廣告訂單（所有狀態）",
       "monthlyGrowth": "月增長率",
       "orderHistory": "廣告訂單紀錄",
+      "slotStatusTab": "廣告版位狀態",
       "packageManagementTab": "廣告方案管理",
       "packageManagementTitle": "廣告方案價格管理",
       "superAdminOnly": "此區僅限 super admin 使用。",
@@ -1598,6 +1599,24 @@
         "AD_ORDER_INVALID_PRICING": "一個或多個附加方案價格選項無效或已停用。",
         "AD_ORDER_CANNOT_BE_EMPTY": "無法移除訂單中的所有項目。",
         "AD_ORDER_NOT_FOUND": "找不到此訂單。"
+      },
+      "slotStatus": {
+        "loading": "正在載入廣告版位狀態...",
+        "error": "無法載入廣告版位狀態。",
+        "empty": "目前沒有廣告版位資料。",
+        "activeAds": "進行中廣告",
+        "waitingAds": "等待中廣告",
+        "expiredAds": "已到期廣告",
+        "companyName": "公司",
+        "startDate": "開始日期",
+        "endDate": "結束日期",
+        "adLinkUrl": "廣告連結",
+        "source": "來源",
+        "expiresAt": "到期時間",
+        "occupied": "已占用",
+        "available": "可用",
+        "emptySection": "此區段尚無資料。",
+        "notAvailable": "N/A"
       },
       "previewOrder": "預覽"
     },
