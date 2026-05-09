@@ -1462,6 +1462,7 @@
       "adOrders": "Monthly Ad Orders (All status)",
       "monthlyGrowth": "Monthly growth",
       "orderHistory": "Ad order history",
+      "slotStatusTab": "Ad slot status",
       "packageManagementTab": "Ad package management",
       "packageManagementTitle": "Ad package pricing management",
       "superAdminOnly": "This section is only available to super admins.",
@@ -1612,6 +1613,24 @@
         "AD_ORDER_INVALID_PRICING": "One or more add-on pricing options are invalid or inactive.",
         "AD_ORDER_CANNOT_BE_EMPTY": "Cannot remove all items from the order.",
         "AD_ORDER_NOT_FOUND": "Order not found."
+      },
+      "slotStatus": {
+        "loading": "Loading ad slot status...",
+        "error": "Failed to load ad slot status.",
+        "empty": "No ad slot data found.",
+        "activeAds": "Active ads",
+        "waitingAds": "Waiting ads",
+        "expiredAds": "Expired ads",
+        "companyName": "Company",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "adLinkUrl": "Ad link",
+        "source": "Source",
+        "expiresAt": "Expires at",
+        "occupied": "Occupied",
+        "available": "Available",
+        "emptySection": "No records in this section.",
+        "notAvailable": "N/A"
       },
       "previewOrder": "Preview"
     },

@@ -11,13 +11,14 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { AdOrdersManagement } from "../ad-orders-management/AdOrdersManagement"
 import { AdPackageManagement } from "../ad-package-management"
+import { AdSlotStatusManagement } from "../ad-slot-status-management/AdSlotStatusManagement"
 import { useAdminData } from "../AdminDataContext"
 
 export function AdvertisingTab() {
   const { t } = useTranslation()
   const { canUseFeature } = useUser()
   const { adSubmissions } = useAdminData()
-  const [viewMode, setViewMode] = useState<"orders" | "packages">("orders")
+  const [viewMode, setViewMode] = useState<"orders" | "packages" | "slot-status">("orders")
   const canUseAdPackageManagement = canUseFeature(FeatureKey.AdPackageManagement)
   const { data: metrics } = useAdminOrdersMetrics()
 
@@ -58,12 +59,15 @@ export function AdvertisingTab() {
 
       <Tabs
         value={viewMode}
-        onValueChange={(val) => setViewMode(val as "orders" | "packages")}
+        onValueChange={(val) => setViewMode(val as "orders" | "packages" | "slot-status")}
         className="mt-2"
       >
         <TabsList variant="line">
           <TabsTrigger value="orders">
             {t("admin.advertising.orderHistory") || "Ad order history"}
+          </TabsTrigger>
+          <TabsTrigger value="slot-status">
+            {t("admin.advertising.slotStatusTab") || "Ad slot status"}
           </TabsTrigger>
           {canUseAdPackageManagement && (
             <TabsTrigger value="packages">
@@ -75,6 +79,7 @@ export function AdvertisingTab() {
 
       {viewMode === "packages" && canUseAdPackageManagement && <AdPackageManagement />}
       {viewMode === "orders" && <AdOrdersManagement />}
+      {viewMode === "slot-status" && <AdSlotStatusManagement />}
     </div>
   )
 }

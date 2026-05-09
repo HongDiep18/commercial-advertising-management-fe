@@ -31,3 +31,30 @@ export type PopupCompanyItem = {
 
 export type PopupCompaniesResponse = PopupCompanyItem[]
 
+export type ActiveAdsSlotStatusAdId = string | number | Record<string, unknown> | null
+
+export type ActiveAdsSlotStatusAdItem = {
+  source: string
+  activeAdId: ActiveAdsSlotStatusAdId
+  orderId: ActiveAdsSlotStatusAdId
+  orderItemId: ActiveAdsSlotStatusAdId
+  companyId: ActiveAdsSlotStatusAdId
+  companyName: string
+  startDate: string
+  endDate: string | null
+  adLinkUrl?: string | null
+}
+
+export type ActiveAdsSlotStatusItem = {
+  packageType: string
+  packageName: string
+  packageNameZh?: string | null
+  hasActiveAds: boolean
+  expiresAt: string | null
+  activeAds: ActiveAdsSlotStatusAdItem[]
+  expiredAds: ActiveAdsSlotStatusAdItem[]
+  waitingAds: ActiveAdsSlotStatusAdItem[]
+}
+
+export type ActiveAdsSlotStatusResponse = ActiveAdsSlotStatusItem[]
+

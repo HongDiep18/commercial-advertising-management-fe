@@ -1531,6 +1531,7 @@
       "adOrders": "Đơn đặt hàng quảng cáo hàng tháng (Tất cả trạng thái)",
       "monthlyGrowth": "Tăng trưởng tháng",
       "orderHistory": "Lịch sử đơn quảng cáo",
+      "slotStatusTab": "Trạng thái slot quảng cáo",
       "packageManagementTab": "Quản lý gói quảng cáo",
       "packageManagementTitle": "Quản lý giá gói quảng cáo",
       "superAdminOnly": "Khu vực này chỉ dành cho tài khoản super admin.",
@@ -1681,6 +1682,24 @@
         "AD_ORDER_INVALID_PRICING": "Một hoặc nhiều tuỳ chọn giá bổ sung không hợp lệ hoặc không còn hoạt động.",
         "AD_ORDER_CANNOT_BE_EMPTY": "Không thể xóa tất cả các mục khỏi đơn hàng.",
         "AD_ORDER_NOT_FOUND": "Không tìm thấy đơn hàng."
+      },
+      "slotStatus": {
+        "loading": "Đang tải trạng thái slot quảng cáo...",
+        "error": "Không tải được trạng thái slot quảng cáo.",
+        "empty": "Không có dữ liệu slot quảng cáo.",
+        "activeAds": "Quảng cáo đang hoạt động",
+        "waitingAds": "Quảng cáo chờ hiển thị",
+        "expiredAds": "Quảng cáo đã hết hạn",
+        "companyName": "Công ty",
+        "startDate": "Ngày bắt đầu",
+        "endDate": "Ngày kết thúc",
+        "adLinkUrl": "Liên kết quảng cáo",
+        "source": "Nguồn",
+        "expiresAt": "Hết hạn lúc",
+        "occupied": "Đang có quảng cáo",
+        "available": "Đang trống",
+        "emptySection": "Không có dữ liệu trong mục này.",
+        "notAvailable": "N/A"
       },
       "previewOrder": "Xem trước"
     },
