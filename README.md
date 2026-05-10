@@ -34,6 +34,12 @@ This frontend includes:
 - **Data Layer:** API module pattern with typed services and hooks
 - **State Strategy:** server state through query hooks, local state only for UI concerns
 
+## Architecture Overview
+
+High-level sketch of how the browser talks to this app and how the app talks to backend services (hand-drawn style for quick orientation).
+
+![Architecture Overview](./public/readme/architecture-overview.png)
+
 ## Backend Integration
 
 - Connects to VN Buyer Guide backend APIs
