@@ -19,6 +19,35 @@ This frontend includes:
 - User account and authentication-related screens
 - Admin-facing management pages
 
+## Features
+
+### Public & discovery
+
+- **Home & about** — Landing and informational content for the platform
+- **Business directory** — Search and browse companies; detailed company profiles with multilingual labels and metadata
+- **Property listings** — Property-focused browsing experience
+- **News** — News feed backed by the backend translation pipeline
+- **Contact & advertising** — Contact flows for inquiries and commercial advertising (orders, scheduling, asset uploads)
+- **Ad preview** — Preview advertising placements by order where supported (`/ad-preview/[orderId]`)
+
+### Accounts & auth
+
+- **Registration & login** — Sign-up and sign-in flows
+- **Password lifecycle** — Forgot password, email-based set-password / verification after admin approval
+- **Account area** — Signed-in user profile and account management
+- **Legal pages** — Terms of use and privacy policy under the login area
+
+### Admin
+
+- **Admin console** — Management workspace for platform operators (dashboard, company/account workflows, notifications, and related tabs per backend capabilities)
+- **Demo / internal tools** — Optional admin demo routes for testing or showcases
+
+### Platform qualities
+
+- **Multilingual UI** — End-user and admin copy in `zh-TW`, `en-US`, and `vi-VN`
+- **Responsive layout** — Tailwind-based layouts for desktop and mobile
+- **Typed API integration** — Feature modules use shared request/response types, service functions, and React Query hooks
+
 ## Tech Stack
 
 - Next.js 16 (App Router)
