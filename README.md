@@ -22,8 +22,12 @@ This frontend includes:
 ## Features
 
 ### Public & discovery
-
-
+- **Home & about** — Landing and informational content for the platform
+- **Business directory** — Search and browse companies; detailed company profiles with multilingual labels and metadata
+- **Property listings** — Property-focused browsing experience
+- **News** — News feed backed by the backend translation pipeline
+- **Contact & advertising** — Contact flows for inquiries and commercial advertising (orders, scheduling, asset uploads)
+- **Ad preview** — Preview advertising placements by order where supported (`/ad-preview/[orderId]`)
 
 ### Accounts & auth
 
