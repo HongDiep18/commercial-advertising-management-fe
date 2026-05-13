@@ -8,7 +8,7 @@ It provides directory browsing, news consumption, account flows, and admin inter
 - Developed with Next.js App Router and TypeScript for modern SSR/CSR hybrid rendering
 - Implemented multilingual UX (`zh-TW`, `en-US`, `vi-VN`) for cross-market accessibility
 - Structured frontend APIs with service + hook layers for maintainable data access
-- Built responsive UI with Tailwind CSS and reusable component patterns
+- Built responsive UI with Tailwind CSS and reusable component patterns.
 
 ## Product Scope
 
