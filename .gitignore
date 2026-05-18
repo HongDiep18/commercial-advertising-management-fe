@@ -30,3 +30,8 @@ dist-ssr
 
 instruction/
 tsconfig.tsbuildinfo
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

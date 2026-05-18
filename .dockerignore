@@ -8,3 +8,8 @@ docs
 Dockerfile
 docker-compose*.yml
 .dockerignore
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
