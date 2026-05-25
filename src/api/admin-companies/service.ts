@@ -2,6 +2,8 @@ import { api } from "@/lib/api"
 import type {
   AdminCompaniesStatsResponse,
   AdminCompanyDetail,
+  AdminCompanyExportQuery,
+  AdminCompanyExportResult,
   AdminCompanyListItem,
   AdminCompanyListQuery,
   AdminCompanyListResponse,
@@ -62,6 +64,19 @@ function parseAdminCompanyListResponse(
       totalPages: Number(paginationRaw.totalPages) || 0,
     },
   }
+}
+
+export async function exportAdminCompanies(
+  query: AdminCompanyExportQuery
+): Promise<AdminCompanyExportResult> {
+  const qs = buildListQuery({
+    type: query.type,
+    locale: query.locale,
+    search: query.search?.trim() || undefined,
+    status: query.status,
+    isActive: query.isActive,
+  })
+  return api.requestBlob(`/admin/companies/export${qs}`, { method: "GET" })
 }
 
 export async function listAdminCompanies(

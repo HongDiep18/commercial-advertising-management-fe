@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query"
 import { useMemo } from "react"
 import {
+  exportAdminCompanies,
   getAdminCompaniesStats,
   getAdminCompanyDetail,
   listAdminCompanies,
@@ -16,6 +17,8 @@ import {
 import type {
   AdminCompaniesStatsResponse,
   AdminCompanyDetail,
+  AdminCompanyExportQuery,
+  AdminCompanyExportResult,
   AdminCompanyListItem,
   AdminCompanyListQuery,
   AdminCompanyListResponse,
@@ -198,6 +201,14 @@ export type UpdateAdminCompanyMutationVariables = {
   payload: AdminCompanyUpdatePayload
   logoChanged: boolean
   logoFile: File | null
+}
+
+export function useExportAdminCompanies() {
+  return useMutation<AdminCompanyExportResult, Error & { status?: number }, AdminCompanyExportQuery>(
+    {
+      mutationFn: exportAdminCompanies,
+    }
+  )
 }
 
 export function useUpdateAdminCompanyMutation() {

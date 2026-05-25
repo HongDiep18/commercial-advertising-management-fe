@@ -45,11 +45,24 @@ async function forward(request: NextRequest) {
 
   const res = await fetch(backendUrl, fetchOpts)
 
-  const data = await res.json().catch(() => ({}))
+  const contentType = res.headers.get("content-type") ?? ""
+  const isJson =
+    contentType.includes("application/json") || contentType.includes("+json")
 
-  // Forward Set-Cookie headers from backend to client
-  const response = NextResponse.json(data, { status: res.status })
   const setCookie = res.headers.get("set-cookie")
+
+  if (!isJson) {
+    const buffer = await res.arrayBuffer()
+    const response = new NextResponse(buffer, { status: res.status })
+    if (contentType) response.headers.set("content-type", contentType)
+    const disposition = res.headers.get("content-disposition")
+    if (disposition) response.headers.set("content-disposition", disposition)
+    if (setCookie) response.headers.set("set-cookie", setCookie)
+    return response
+  }
+
+  const data = await res.json().catch(() => ({}))
+  const response = NextResponse.json(data, { status: res.status })
   if (setCookie) {
     response.headers.set("set-cookie", setCookie)
   }

@@ -11,12 +11,16 @@ import {
   type AdminCompanyAccountFilter,
   type AdminCompanyListQuery,
 } from "@/api/admin-companies/types"
+import { triggerBrowserDownload } from "@/api/admin-companies/downloadBlob"
+import { i18nLanguageToAdminCompanyExportLocale } from "@/api/admin-companies/exportLocale"
 import {
   adminCompaniesKeys,
   useAdminCompaniesList,
   useAdminCompaniesTabCounts,
   useAdminCompanyDetailsByIds,
+  useExportAdminCompanies,
 } from "@/api/admin-companies/hooks"
+import type { AdminCompanyExportFormat, AdminCompanyExportQuery } from "@/api/admin-companies/types"
 import { formatIndustryForDisplay } from "@/api/companies/adminCompany.mapper"
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import { AdminCompanyEditDialog } from "@/components/admin/company/AdminCompanyEditDialog"
@@ -41,6 +45,7 @@ import { formatDateTimeForLocale } from "@/utils/datetime"
 import {
   CheckCircle2,
   ChevronDown,
+  Download,
   Filter,
   Loader2,
   X,
@@ -71,6 +76,7 @@ export function CompaniesTab() {
   const [filter, setFilter] = useState<ProfileRequestFilterId>("all")
   const [accountActiveFilter, setAccountActiveFilter] = useState<AdminCompanyAccountFilter>("all")
   const [companyActiveFilterOpen, setCompanyActiveFilterOpen] = useState(false)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [page, setPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
@@ -231,6 +237,61 @@ export function CompaniesTab() {
     }
   }, [page, debouncedSearchQuery, filter, accountActiveFilter])
 
+  const exportFilters = useMemo(
+    (): Omit<AdminCompanyExportQuery, "type"> => ({
+      locale: i18nLanguageToAdminCompanyExportLocale(i18n.language),
+      search: debouncedSearchQuery.trim() || undefined,
+      status: filter === "all" ? undefined : filter,
+      isActive: adminCompanyListIsActiveFromAccountFilter(filter, accountActiveFilter),
+    }),
+    [debouncedSearchQuery, filter, accountActiveFilter, i18n.language]
+  )
+
+  const exportCompanies = useExportAdminCompanies()
+
+  const handleExportCompanies = (type: AdminCompanyExportFormat) => {
+    setExportMenuOpen(false)
+    exportCompanies.mutate(
+      { ...exportFilters, type },
+      {
+        onSuccess: ({ blob, filename }) => {
+          triggerBrowserDownload(blob, filename)
+          showToast(
+            t("admin.companies.exportSuccess", { defaultValue: "Export downloaded successfully." }),
+            "success"
+          )
+        },
+        onError: (err) => {
+          const status = err.status
+          if (status === 400) {
+            showToast(
+              t("admin.companies.exportTooMany", {
+                defaultValue:
+                  "Too many companies match. Narrow your search or filters (max 10,000).",
+              }),
+              "error"
+            )
+            return
+          }
+          if (status === 403) {
+            showToast(
+              t("admin.companies.exportForbidden", {
+                defaultValue: "You do not have permission to export companies.",
+              }),
+              "error"
+            )
+            return
+          }
+          showToast(
+            err.message ||
+              t("admin.companies.exportError", { defaultValue: "Failed to export companies." }),
+            "error"
+          )
+        },
+      }
+    )
+  }
+
   const {
     rows,
     pagination,
@@ -331,14 +392,18 @@ export function CompaniesTab() {
                       className={`border-border bg-body-bg-dark h-10 shrink-0 border ${
                         accountActiveFilter !== "all"
                           ? "border-primary ring-primary/35 text-primary gap-1.5 px-3 ring-2"
-                          : "w-10 text-muted-foreground hover:bg-muted/50"
+                          : "text-muted-foreground hover:bg-muted/50 w-10"
                       }`}
                     >
                       <Filter className="h-4 w-4 shrink-0" aria-hidden />
                       {accountActiveFilter !== "all" && (
                         <>
                           <span className="text-sm font-medium">
-                            {t(ADMIN_COMPANY_ACCOUNT_FILTERS.find((o) => o.id === accountActiveFilter)?.labelKey ?? "")}
+                            {t(
+                              ADMIN_COMPANY_ACCOUNT_FILTERS.find(
+                                (o) => o.id === accountActiveFilter
+                              )?.labelKey ?? ""
+                            )}
                           </span>
                           <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
                         </>
@@ -346,80 +411,136 @@ export function CompaniesTab() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                  align="start"
-                  side="bottom"
-                  sideOffset={8}
-                  className="border-border bg-card/95 min-w-[220px] p-0 shadow-none backdrop-blur-sm"
-                >
-                  <div
-                    className="border-border border-b px-3 py-2"
-                    role="group"
-                    aria-label={t("admin.companies.accountFilterAria", {
-                      defaultValue: "Filter by account state",
-                    })}
+                    align="start"
+                    side="bottom"
+                    sideOffset={8}
+                    className="border-border bg-card/95 min-w-[220px] p-0 shadow-none backdrop-blur-sm"
                   >
-                    <p className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
-                      {t("admin.companies.accountFilterLabel", { defaultValue: "Account State" })}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-0.5 p-1.5">
-                    {ADMIN_COMPANY_ACCOUNT_FILTERS.map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => {
-                          setAccountActiveFilter(opt.id)
-                          setPage(1)
-                          setCompanyActiveFilterOpen(false)
-                        }}
-                        className={`hover:bg-muted/50 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
-                          accountActiveFilter === opt.id ? "bg-primary/10 text-primary" : "text-foreground"
-                        }`}
-                      >
-                        {t(opt.labelKey)}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-              {accountActiveFilter !== "all" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccountActiveFilter("all")
-                    setPage(1)
-                  }}
-                  aria-label={t("admin.companies.clearAccountFilter", {
-                    defaultValue: "Clear filter",
-                  })}
-                  className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
-                >
-                  <X className="h-4 w-4" aria-hidden />
-                </button>
-              )}
+                    <div
+                      className="border-border border-b px-3 py-2"
+                      role="group"
+                      aria-label={t("admin.companies.accountFilterAria", {
+                        defaultValue: "Filter by account state",
+                      })}
+                    >
+                      <p className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
+                        {t("admin.companies.accountFilterLabel", { defaultValue: "Account State" })}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-0.5 p-1.5">
+                      {ADMIN_COMPANY_ACCOUNT_FILTERS.map((opt) => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setAccountActiveFilter(opt.id)
+                            setPage(1)
+                            setCompanyActiveFilterOpen(false)
+                          }}
+                          className={`hover:bg-muted/50 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+                            accountActiveFilter === opt.id
+                              ? "bg-primary/10 text-primary"
+                              : "text-foreground"
+                          }`}
+                        >
+                          {t(opt.labelKey)}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                {accountActiveFilter !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountActiveFilter("all")
+                      setPage(1)
+                    }}
+                    aria-label={t("admin.companies.clearAccountFilter", {
+                      defaultValue: "Clear filter",
+                    })}
+                    className="text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
+                  >
+                    <X className="h-4 w-4" aria-hidden />
+                  </button>
+                )}
               </div>
             )}
 
-            <div className="relative w-full min-w-[200px] sm:max-w-sm lg:ml-auto lg:w-auto lg:max-w-md lg:flex-1">
-              <Search
-                className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
-                aria-hidden
-              />
-              <Input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value)
-                  setPage(1)
-                }}
-                placeholder={t("admin.companies.searchPlaceholder", {
-                  defaultValue: "Search by name, tax id, industry, contact…",
-                })}
-                className="bg-body-bg-dark border-border h-10 w-full pl-9"
-                aria-label={t("admin.companies.searchPlaceholder", {
-                  defaultValue: "Search companies",
-                })}
-              />
+            <div className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-center lg:ml-auto lg:w-auto lg:max-w-xl lg:flex-1">
+              <div className="relative min-w-[200px] flex-1 sm:max-w-md">
+                <Search
+                  className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+                  aria-hidden
+                />
+                <Input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    setPage(1)
+                  }}
+                  placeholder={t("admin.companies.searchPlaceholder", {
+                    defaultValue: "Search by name, tax id, industry, contact…",
+                  })}
+                  className="bg-body-bg-dark border-border h-10 w-full pl-9"
+                  aria-label={t("admin.companies.searchPlaceholder", {
+                    defaultValue: "Search companies",
+                  })}
+                />
+              </div>
+              {isAdminRole(user?.role) && (
+                <Popover open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={exportCompanies.isPending}
+                      className="border-border text-foreground hover:bg-muted/50 h-10 shrink-0 gap-2 rounded-full border bg-white px-4 font-medium"
+                      aria-label={t("admin.companies.export", { defaultValue: "Export" })}
+                      aria-haspopup="menu"
+                      aria-expanded={exportMenuOpen}
+                      aria-busy={exportCompanies.isPending}
+                    >
+                      {exportCompanies.isPending ? (
+                        <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+                      ) : (
+                        <Download className="h-4 w-4 shrink-0" aria-hidden />
+                      )}
+                      {t("admin.companies.export", { defaultValue: "Export" })}
+                      <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="end"
+                    side="bottom"
+                    sideOffset={8}
+                    className="border-border bg-card/95 min-w-[200px] p-1 shadow-none backdrop-blur-sm"
+                  >
+                    <button
+                      type="button"
+                      disabled={exportCompanies.isPending}
+                      onClick={() => handleExportCompanies("excel")}
+                      className="hover:bg-muted/50 flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors disabled:opacity-50"
+                    >
+                      {t("admin.companies.exportExcel", {
+                        defaultValue: "Excel (.xlsx)",
+                      })}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={exportCompanies.isPending}
+                      onClick={() => handleExportCompanies("csv")}
+                      className="hover:bg-muted/50 flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors disabled:opacity-50"
+                    >
+                      {t("admin.companies.exportCsv", {
+                        defaultValue: "CSV (.csv)",
+                      })}
+                    </button>
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
           </div>
         </div>
@@ -567,7 +688,10 @@ export function CompaniesTab() {
                               )}
                               {row.status === ProfileRequestStatus.APPROVED &&
                                 (() => {
-                                  const active = row.id in optimisticActiveById ? optimisticActiveById[row.id] : isCompanyActive(row)
+                                  const active =
+                                    row.id in optimisticActiveById
+                                      ? optimisticActiveById[row.id]
+                                      : isCompanyActive(row)
                                   const hasToggleTarget = Boolean(
                                     row.userId?.trim() || row.companyId?.trim()
                                   )

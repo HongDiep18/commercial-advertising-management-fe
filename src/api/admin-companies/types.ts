@@ -131,3 +131,20 @@ export type AdminCompanyListResponse = {
   companies: AdminCompanyListItem[]
   pagination: AdminCompanyListPagination
 }
+
+export type AdminCompanyExportLocale = "en" | "vi" | "zh"
+
+export type AdminCompanyExportFormat = "excel" | "csv"
+
+export type AdminCompanyExportQuery = {
+  type: AdminCompanyExportFormat
+  locale: AdminCompanyExportLocale
+  search?: string
+  status?: ProfileRequestStatus
+  isActive?: boolean
+}
+
+export type AdminCompanyExportResult = {
+  blob: Blob
+  filename: string
+}
