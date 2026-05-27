@@ -1286,6 +1286,16 @@
         }
       },
       "recentActivityLoadError": "目前無法載入近期活動。",
+      "noRecentActivity": "尚無近期活動。",
+      "recentActivitySortNewest": "最新優先",
+      "recentActivitySortOldest": "最舊優先",
+      "recentActivitySearchPlaceholder": "電子郵件、活動標題或變更內容…",
+      "recentActivitySearchHint": "可搜尋使用者或公司電子郵件、活動標題，以及儲存的變更值；每則活動下方的說明文字不會直接搜尋。",
+      "recentActivityClearSearch": "清除",
+      "recentActivityNoSearchResults": "沒有符合搜尋條件的活動。",
+      "activitySummary": "摘要",
+      "activityTotal": "活動總數",
+      "activityThisPage": "本頁",
       "notificationsTitle": "管理通知",
       "notificationsDescription": "您有 {{count}} 則未讀通知。",
       "notificationsUnreadOnly": "未讀篩選",
@@ -1779,7 +1789,18 @@
       "disabledSuccess": "已停用帳號。",
       "enabledSuccess": "已啟用帳號。",
       "updateError": "更新帳號狀態失敗。",
-      "recentLogins": "最近登入紀錄"
+      "recentLogins": "最近登入紀錄",
+      "recentLoginsEmpty": "尚無最近登入紀錄。",
+      "searchPlaceholder": "搜尋電子郵件、公司、聯絡人…",
+      "roleFilter": "角色篩選",
+      "roleAll": "全部使用者",
+      "roleStaff": "後台人員",
+      "rolePlatform": "平台使用者",
+      "clearFilters": "清除篩選",
+      "statusFilter": "狀態篩選",
+      "statusAll": "全部狀態",
+      "loadError": "目前無法載入使用者列表。",
+      "empty": "找不到使用者。"
     }
   },
   "property": {
