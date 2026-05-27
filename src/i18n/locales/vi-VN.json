@@ -1369,6 +1369,16 @@
         }
       },
       "recentActivityLoadError": "Hiện không thể tải hoạt động gần đây.",
+      "noRecentActivity": "Chưa có hoạt động gần đây.",
+      "recentActivitySortNewest": "Mới nhất trước",
+      "recentActivitySortOldest": "Cũ nhất trước",
+      "recentActivitySearchPlaceholder": "Email, tiêu đề hoạt động hoặc thay đổi…",
+      "recentActivitySearchHint": "Tìm theo email (người dùng hoặc công ty), tiêu đề hoạt động và giá trị thay đổi đã lưu, dòng mô tả chi tiết bên dưới mỗi mục không được tìm trực tiếp.",
+      "recentActivityClearSearch": "Xóa",
+      "recentActivityNoSearchResults": "Không có hoạt động nào khớp với tìm kiếm.",
+      "activitySummary": "Tóm tắt",
+      "activityTotal": "Tổng hoạt động",
+      "activityThisPage": "Trang này",
       "notificationsTitle": "Thông báo quản trị",
       "notificationsDescription": "Bạn có {{count}} thông báo chưa đọc.",
       "notificationsUnreadOnly": "Bộ lọc chưa đọc",
@@ -1862,7 +1872,18 @@
       "disabledSuccess": "Đã vô hiệu hóa tài khoản.",
       "enabledSuccess": "Đã kích hoạt tài khoản.",
       "updateError": "Không thể cập nhật trạng thái tài khoản.",
-      "recentLogins": "Đăng nhập gần đây"
+      "recentLogins": "Đăng nhập gần đây",
+      "recentLoginsEmpty": "Chưa có lần đăng nhập gần đây.",
+      "searchPlaceholder": "Tìm email, công ty, liên hệ…",
+      "roleFilter": "Lọc vai trò",
+      "roleAll": "Tất cả người dùng",
+      "roleStaff": "Nhân viên (admin)",
+      "rolePlatform": "Người dùng nền tảng",
+      "clearFilters": "Xóa bộ lọc",
+      "statusFilter": "Lọc trạng thái",
+      "statusAll": "Tất cả trạng thái",
+      "loadError": "Hiện không thể tải danh sách người dùng.",
+      "empty": "Không tìm thấy người dùng."
     }
   },
   "property": {

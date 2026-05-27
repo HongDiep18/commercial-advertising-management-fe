@@ -3,11 +3,9 @@ export type RecentActivityItem = {
   time: string
   title: string
   content: string
-  action: string
-  entityType?: string
-  entityId?: string
-  actorId?: string
 }
+
+export type RecentActivitiesSortOrder = "asc" | "desc"
 
 export type RecentActivitiesPagination = {
   page: number
@@ -19,10 +17,16 @@ export type RecentActivitiesPagination = {
 export type RecentActivitiesQuery = {
   page?: number
   limit?: number
+  sortOrder?: RecentActivitiesSortOrder
+  search?: string
 }
 
 export type RecentActivitiesResponse = {
-  data?: RecentActivityItem[]
-  activities?: RecentActivityItem[]
+  activities: RecentActivityItem[]
   pagination: RecentActivitiesPagination
 }
+
+export const RECENT_ACTIVITIES_DEFAULT_PAGE = 1
+export const RECENT_ACTIVITIES_DEFAULT_LIMIT = 15
+export const RECENT_ACTIVITIES_MAX_LIMIT = 100
+export const RECENT_ACTIVITIES_DEFAULT_SORT_ORDER: RecentActivitiesSortOrder = "desc"

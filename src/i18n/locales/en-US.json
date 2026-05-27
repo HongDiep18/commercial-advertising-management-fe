@@ -1300,6 +1300,16 @@
         }
       },
       "recentActivityLoadError": "Unable to load recent activity right now.",
+      "noRecentActivity": "No recent activity.",
+      "recentActivitySortNewest": "Newest first",
+      "recentActivitySortOldest": "Oldest first",
+      "recentActivitySearchPlaceholder": "Email, activity title, or what changed…",
+      "recentActivitySearchHint": "Matches email (user or company), activity title, and stored change values. The detail line under each entry is not searched directly.",
+      "recentActivityClearSearch": "Clear",
+      "recentActivityNoSearchResults": "No activities match your search.",
+      "activitySummary": "Summary",
+      "activityTotal": "Total activities",
+      "activityThisPage": "This page",
       "notificationsTitle": "Admin Notifications",
       "notificationsDescription": "You have {{count}} unread notifications.",
       "notificationsUnreadOnly": "Unread filter",
@@ -1793,7 +1803,18 @@
       "disabledSuccess": "Account disabled.",
       "enabledSuccess": "Account enabled.",
       "updateError": "Failed to update account status.",
-      "recentLogins": "Recent logins"
+      "recentLogins": "Recent logins",
+      "recentLoginsEmpty": "No recent logins.",
+      "searchPlaceholder": "Search email, company, contact…",
+      "roleFilter": "Role filter",
+      "roleAll": "All users",
+      "roleStaff": "Staff (admin)",
+      "rolePlatform": "Platform users",
+      "clearFilters": "Clear filters",
+      "statusFilter": "Status filter",
+      "statusAll": "All statuses",
+      "loadError": "Unable to load users right now.",
+      "empty": "No users found."
     }
   },
   "property": {

@@ -5,6 +5,8 @@ function buildQuery(query: RecentActivitiesQuery): string {
   const params = new URLSearchParams()
   if (typeof query.page === "number") params.set("page", String(query.page))
   if (typeof query.limit === "number") params.set("limit", String(query.limit))
+  if (query.sortOrder) params.set("sortOrder", query.sortOrder)
+  if (query.search?.trim()) params.set("search", query.search.trim())
   const qs = params.toString()
   return qs ? `?${qs}` : ""
 }
