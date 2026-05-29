@@ -2,8 +2,17 @@ import {
   industryFromUnknown,
   pickLogoUrlFromApiResponse,
 } from "@/api/companies/adminCompany.mapper"
+import {
+  INITIAL_REGISTER_FORM,
+  type RegisterFormData,
+} from "@/components/register/registerConstants"
 import { normalizeWebsiteHttpScheme } from "@/types/auth"
-import type { AdminCompanyContact, AdminCompanyDetail, AdminCompanyUpdatePayload } from "./types"
+import type {
+  AdminCompanyContact,
+  AdminCompanyDetail,
+  AdminCompanyUpdatePayload,
+  AdminUnlinkedCompanyItem,
+} from "./types"
 
 export type AdminCompanyForm = {
   logoUrl: string | null
@@ -181,6 +190,67 @@ export function getPrimaryAdminCompanyContact(
   }
 }
 
+function contactValueByType(contacts: AdminCompanyContact[], type: string): string {
+  const row = contacts.find((c) => contactTypeKey(c.type) === type)
+  return clean(row?.value)
+}
+
+export function unlinkedCompanyToAdminCompanyDetail(
+  item: AdminUnlinkedCompanyItem
+): AdminCompanyDetail {
+  return {
+    id: item.id,
+    logoUrl: item.logoUrl ?? null,
+    companyNameVi: item.companyNameVi,
+    companyNameEn: item.companyNameEn,
+    companyNameZh: item.companyNameZh,
+    taxId: item.taxId,
+    country: item.country,
+    region: item.region,
+    industry: item.industry,
+    description: item.description,
+    contacts: (item.contacts ?? []).map((c) => ({
+      type: c.type,
+      value: c.value,
+      contactName: c.contactName ?? null,
+    })),
+  }
+}
+
+export function adminCompanyDetailToRegisterFormData(detail: AdminCompanyDetail): RegisterFormData {
+  const companyForm = adminCompanyDetailToForm(detail)
+  const contacts = normalizeAdminCompanyContacts(detail.contacts ?? [])
+  const primary = getPrimaryAdminCompanyContact(contacts)
+  const phoneFromContacts =
+    contactValueByType(contacts, "tel") ||
+    contactValueByType(contacts, "hotline") ||
+    contactValueByType(contacts, "fax") ||
+    primary.value
+
+  const companyEmail =
+    detail.emails?.map((e) => clean(e)).find(Boolean) ||
+    contactValueByType(contacts, "email") ||
+    clean(detail.email)
+
+  return {
+    ...INITIAL_REGISTER_FORM,
+    companyNameVi: companyForm.companyNameVi,
+    companyNameCn: companyForm.companyNameZh,
+    phone: clean(detail.phone) || phoneFromContacts,
+    taxId: companyForm.taxId,
+    contactPerson: clean(detail.contactName) || primary.contactName,
+    contactPhone: clean(detail.contactPhone) || primary.value || phoneFromContacts,
+    companyAddress: clean(detail.address) || contactValueByType(contacts, "address"),
+    email: "",
+    companyEmail,
+    country: companyForm.country,
+    industry: companyForm.industry,
+    website: clean(detail.website) || contactValueByType(contacts, "website"),
+    introduction: companyForm.description,
+    note: companyForm.note,
+  }
+}
+
 export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompanyForm {
   const normalized = normalizeAdminCompanyContacts(detail.contacts)
   const noteFromContactRows =
@@ -205,32 +275,29 @@ export function adminCompanyDetailToForm(detail: AdminCompanyDetail): AdminCompa
   }
 }
 
-export function adminCompanyFormToUpdatePayload(
-  form: AdminCompanyForm
-): AdminCompanyUpdatePayload {
+export function adminCompanyFormToUpdatePayload(form: AdminCompanyForm): AdminCompanyUpdatePayload {
   const contacts = dedupeContacts(
-    excludeCompanyLevelContactRows(form.contacts)
-      .map((contact) => {
-        const type = clean(String(contact.type))
-        const value = clean(contact.value)
-        const contactName = clean(contact.contactName ?? "")
+    excludeCompanyLevelContactRows(form.contacts).map((contact) => {
+      const type = clean(String(contact.type))
+      const value = clean(contact.value)
+      const contactName = clean(contact.contactName ?? "")
 
-        if (type === "website" && value) {
-          return {
-            type,
-            value: /^https?:\/\//i.test(value)
-              ? normalizeWebsiteHttpScheme(value)
-              : `https://${value}`,
-            contactName: contactName || null,
-          }
-        }
-
+      if (type === "website" && value) {
         return {
           type,
-          value: type === "email" ? value.toLowerCase() : value,
+          value: /^https?:\/\//i.test(value)
+            ? normalizeWebsiteHttpScheme(value)
+            : `https://${value}`,
           contactName: contactName || null,
         }
-      })
+      }
+
+      return {
+        type,
+        value: type === "email" ? value.toLowerCase() : value,
+        contactName: contactName || null,
+      }
+    })
   )
 
   return {

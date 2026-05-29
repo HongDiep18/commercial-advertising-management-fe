@@ -103,6 +103,68 @@ export function formDataToRegisterPayload(form: {
   }
 }
 
+export type AdminCreateCompanyPayload = {
+  company_name_vi: string
+  company_name_zh: string
+  company_name_en?: string
+  phone: string
+  tax_id: string
+  contact_person: string
+  company_address: string
+  register_email: string
+  company_email: string
+  country: string
+  region?: string
+  industry: string[]
+  website: string
+  introduction: string
+  note?: string
+  fax?: string
+  skype?: string
+}
+
+export type AdminCreateCompanyResponse = {
+  companyId: string
+  userId: string
+  email: string
+  role: string
+  companyStatus: string
+  setPasswordEmailSent: boolean
+}
+
+export function formDataToAdminCreatePayload(form: {
+  companyNameVi: string
+  companyNameCn: string
+  phone: string
+  taxId: string
+  contactPerson: string
+  contactPhone: string
+  companyAddress: string
+  email: string
+  companyEmail: string
+  country: string
+  industry: string[]
+  website: string
+  introduction: string
+  note?: string
+}): AdminCreateCompanyPayload {
+  return {
+    register_email: form.email.trim(),
+    company_name_vi: form.companyNameVi,
+    company_name_zh: form.companyNameCn,
+    phone: (form.contactPhone || form.phone).trim(),
+    tax_id: form.taxId,
+    contact_person: form.contactPerson,
+    company_address: form.companyAddress,
+    company_email: form.companyEmail,
+    country: form.country,
+    industry: form.industry,
+    website: normalizeWebsiteForPayload(form.website),
+    introduction: form.introduction,
+    note: form.note ?? "",
+  }
+}
+
 export type UpdateProfilePayload = {
   upload_logo?: string
   company_name_vi: string

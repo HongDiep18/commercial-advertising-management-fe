@@ -7,10 +7,13 @@ import {
 } from "@tanstack/react-query"
 import { useMemo } from "react"
 import {
+  adminCreateCompany,
+  assignUserToCompany,
   exportAdminCompanies,
   getAdminCompaniesStats,
   getAdminCompanyDetail,
   listAdminCompanies,
+  listAdminCompaniesNoUser,
   updateAdminCompany,
   updateAdminCompanyWithLogo,
 } from "./service"
@@ -23,7 +26,10 @@ import type {
   AdminCompanyListQuery,
   AdminCompanyListResponse,
   AdminCompanyUpdatePayload,
+  AssignUserPayload,
+  AssignUserResponse,
 } from "./types"
+import type { AdminCreateCompanyPayload, AdminCreateCompanyResponse } from "@/types/auth"
 import { industryFromUnknown } from "@/api/companies/adminCompany.mapper"
 import type { ProfileRequestRow, ProfileRequestStatusCounts } from "@/types/admin"
 import { ProfileRequestStatus } from "@/types/admin"
@@ -31,6 +37,7 @@ import { ProfileRequestStatus } from "@/types/admin"
 export const adminCompaniesKeys = {
   all: ["admin", "companies"] as const,
   stats: () => [...adminCompaniesKeys.all, "stats"] as const,
+  noUser: () => [...adminCompaniesKeys.all, "no-user"] as const,
   detail: (id: string) => [...adminCompaniesKeys.all, "detail", id] as const,
   list: (q: AdminCompanyListQuery) => [...adminCompaniesKeys.all, "list", q] as const,
 }
@@ -64,6 +71,15 @@ function mapListItemToRow(item: AdminCompanyListItem): ProfileRequestRow {
     phone: phone || undefined,
     isActive: item.isActive === true,
   }
+}
+
+export function useAdminCompaniesNoUser(enabled: boolean = true) {
+  return useQuery({
+    queryKey: adminCompaniesKeys.noUser(),
+    queryFn: listAdminCompaniesNoUser,
+    enabled,
+    staleTime: 5 * 60 * 1000,
+  })
 }
 
 export function useAdminCompaniesStats(enabled: boolean = true): {
@@ -209,6 +225,35 @@ export function useExportAdminCompanies() {
       mutationFn: exportAdminCompanies,
     }
   )
+}
+
+export function useAdminCreateCompanyMutation() {
+  const queryClient = useQueryClient()
+  return useMutation<
+    AdminCreateCompanyResponse,
+    Error & { status?: number; data?: { message?: string } },
+    AdminCreateCompanyPayload
+  >({
+    mutationFn: adminCreateCompany,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.all })
+    },
+  })
+}
+
+export function useAssignUserToCompanyMutation() {
+  const queryClient = useQueryClient()
+  return useMutation<
+    AssignUserResponse,
+    Error & { status?: number; data?: { message?: string } },
+    { companyId: string; payload: AssignUserPayload }
+  >({
+    mutationFn: ({ companyId, payload }) => assignUserToCompany(companyId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.noUser() })
+      queryClient.invalidateQueries({ queryKey: adminCompaniesKeys.all })
+    },
+  })
 }
 
 export function useUpdateAdminCompanyMutation() {

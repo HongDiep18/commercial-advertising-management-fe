@@ -1,6 +1,7 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { listAdminUserRows } from "./service"
+import { createAdminUser, listAdminUserRows } from "./service"
+import type { CreateAdminUserPayload } from "./service"
 import type { AdminListUsersQuery, AdminUserRow, AdminUsersPagination } from "./types"
 import {
   ADMIN_USERS_DEFAULT_LIMIT,
@@ -37,6 +38,16 @@ export function useAdminUsersList(
     enabled,
     placeholderData: keepPreviousData,
     meta: { errorMessage: t("error.failedToLoadUsers") },
+  })
+}
+
+export function useCreateAdminUser() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: CreateAdminUserPayload) => createAdminUser(payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminUsersKeys.all })
+    },
   })
 }
 

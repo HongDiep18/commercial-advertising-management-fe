@@ -77,3 +77,26 @@ export async function listAdminUserRows(query: AdminListUsersQuery = {}): Promis
     pagination: res.pagination,
   }
 }
+
+export type CreateAdminUserPayload = {
+  email: string
+  password: string
+  name: string
+}
+
+export type CreateAdminUserResponse = {
+  id: string
+  email: string
+  name: string
+  role: string
+  status: string
+}
+
+export async function createAdminUser(
+  payload: CreateAdminUserPayload
+): Promise<CreateAdminUserResponse> {
+  return api.request<CreateAdminUserResponse>("/admin/users", {
+    method: "POST",
+    body: payload,
+  })
+}
