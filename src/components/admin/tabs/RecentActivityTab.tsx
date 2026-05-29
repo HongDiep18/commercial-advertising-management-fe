@@ -206,7 +206,9 @@ export function RecentActivityTab() {
               <div className="bg-muted/30 sticky top-24 rounded-xl border p-4">
                 <div className="mb-4 flex items-center gap-2">
                   <Activity className="text-muted-foreground h-4 w-4" />
-                  <h3 className="text-sm font-semibold">{t("admin.dashboard.activitySummary")}</h3>
+                  <h3 className="text-sm font-semibold">
+                    {t("admin.dashboard.activitySummary")}
+                  </h3>
                 </div>
 
                 {pagination && (

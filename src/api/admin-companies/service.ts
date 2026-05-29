@@ -8,7 +8,12 @@ import type {
   AdminCompanyListQuery,
   AdminCompanyListResponse,
   AdminCompanyUpdatePayload,
+  AdminUnlinkedCompaniesResponse,
+  AdminUnlinkedCompanyItem,
+  AssignUserPayload,
+  AssignUserResponse,
 } from "./types"
+import type { AdminCreateCompanyPayload, AdminCreateCompanyResponse } from "@/types/auth"
 
 export type AdminCompanyArchiveResponse = {
   id: string
@@ -103,6 +108,24 @@ export async function getAdminCompaniesStats(): Promise<AdminCompaniesStatsRespo
   })
 }
 
+function parseAdminUnlinkedCompaniesResponse(raw: unknown): AdminUnlinkedCompaniesResponse {
+  if (!isRecord(raw)) return { companies: [] }
+
+  const root = isRecord(raw.data) ? raw.data : raw
+  const listRaw =
+    (Array.isArray(root.companies) && root.companies) ||
+    (Array.isArray(raw.companies) && raw.companies) ||
+    (Array.isArray(raw.items) && raw.items) ||
+    []
+
+  return { companies: listRaw as AdminUnlinkedCompanyItem[] }
+}
+
+export async function listAdminCompaniesNoUser(): Promise<AdminUnlinkedCompaniesResponse> {
+  const raw = await api.request<unknown>("/admin/companies/no-user", { method: "GET" })
+  return parseAdminUnlinkedCompaniesResponse(raw)
+}
+
 export async function getAdminCompanyDetail(companyId: string): Promise<AdminCompanyDetail> {
   return api.request<AdminCompanyDetail>(`/admin/companies/${encodeURIComponent(companyId)}`, {
     method: "GET",
@@ -150,4 +173,26 @@ export async function archiveAdminCompany(companyId: string): Promise<AdminCompa
       method: "PATCH",
     }
   )
+}
+
+export async function assignUserToCompany(
+  companyId: string,
+  payload: AssignUserPayload
+): Promise<AssignUserResponse> {
+  return api.request<AssignUserResponse>(
+    `/admin/companies/${encodeURIComponent(companyId)}/assign-user`,
+    {
+      method: "POST",
+      body: payload,
+    }
+  )
+}
+
+export async function adminCreateCompany(
+  payload: AdminCreateCompanyPayload
+): Promise<AdminCreateCompanyResponse> {
+  return api.request<AdminCreateCompanyResponse>("/admin/companies", {
+    method: "POST",
+    body: payload,
+  })
 }

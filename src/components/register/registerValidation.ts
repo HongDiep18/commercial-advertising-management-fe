@@ -23,6 +23,28 @@ const REQUIRED_KEYS: (keyof RegisterFormData)[] = [
   "website",
   "introduction",
 ]
+
+/** Fields prefilled / read-only when admin picks an existing company (select-from-list). */
+export const REGISTER_COMPANY_SELECT_READONLY_FIELDS: (keyof RegisterFormData)[] = [
+  "companyNameVi",
+  "companyNameCn",
+  "phone",
+  "taxId",
+  "contactPerson",
+  "contactPhone",
+  "companyAddress",
+  "companyEmail",
+  "country",
+  "industry",
+  "website",
+  "introduction",
+  "note",
+]
+
+export type ValidateRegisterFormOptions = {
+  excludeFields?: (keyof RegisterFormData)[]
+}
+
 const PROFILE_REQUIRED_KEYS: (keyof ProfileFormData)[] = [
   "companyNameVi",
   "companyNameCn",
@@ -82,28 +104,35 @@ export const PROFILE_ERROR_KEYS = REGISTER_ERROR_KEYS
 
 function runValidation(
   data: Record<string, unknown>,
-  requiredKeys: string[]
+  requiredKeys: string[],
+  excludeFields: Set<string> = new Set()
 ): Array<{ field: string; kind: RegisterErrorKind }> {
   const errors: Array<{ field: string; kind: RegisterErrorKind }> = []
   for (const key of requiredKeys) {
+    if (excludeFields.has(key)) continue
     if (!filled(data[key])) errors.push({ field: key, kind: "required" })
   }
   const emailVal = data[EMAIL_FIELD]
-  if (filled(emailVal) && !isEmail(String(emailVal))) {
+  if (!excludeFields.has(EMAIL_FIELD) && filled(emailVal) && !isEmail(String(emailVal))) {
     errors.push({ field: EMAIL_FIELD, kind: "invalidEmail" })
   }
   const companyEmailVal = data[COMPANY_EMAIL_FIELD]
-  if (filled(companyEmailVal) && !isEmail(String(companyEmailVal))) {
+  if (
+    !excludeFields.has(COMPANY_EMAIL_FIELD) &&
+    filled(companyEmailVal) &&
+    !isEmail(String(companyEmailVal))
+  ) {
     errors.push({ field: COMPANY_EMAIL_FIELD, kind: "invalidEmail" })
   }
   for (const key of PHONE_FIELDS) {
+    if (excludeFields.has(key)) continue
     const val = data[key]
     if (filled(val) && !isValidPhone(String(val))) {
       errors.push({ field: key, kind: "invalidPhone" })
     }
   }
   const websiteVal = data[WEBSITE_FIELD]
-  if (filled(websiteVal)) {
+  if (!excludeFields.has(WEBSITE_FIELD) && filled(websiteVal)) {
     const raw = String(websiteVal).trim()
     let isValid = false
     try {
@@ -127,12 +156,18 @@ function runValidation(
     }
   }
   const taxIdVal = data[TAX_ID_FIELD]
-  if (filled(taxIdVal) && !/^\d+$/.test(String(taxIdVal).trim())) {
+  if (
+    !excludeFields.has(TAX_ID_FIELD) &&
+    filled(taxIdVal) &&
+    !/^\d+$/.test(String(taxIdVal).trim())
+  ) {
     errors.push({ field: TAX_ID_FIELD, kind: "invalidTaxId" })
   }
   const phoneVal = data["phone"]
   const contactPhoneVal = data["contactPhone"]
   if (
+    !excludeFields.has("phone") &&
+    !excludeFields.has("contactPhone") &&
     filled(phoneVal) &&
     filled(contactPhoneVal) &&
     String(phoneVal).trim() === String(contactPhoneVal).trim()
@@ -142,8 +177,16 @@ function runValidation(
   return errors
 }
 
-export function validateRegisterForm(data: RegisterFormData): RegisterValidationResult {
-  const errors = runValidation(data as unknown as Record<string, unknown>, REQUIRED_KEYS) as Array<{
+export function validateRegisterForm(
+  data: RegisterFormData,
+  options?: ValidateRegisterFormOptions
+): RegisterValidationResult {
+  const excludeFields = new Set((options?.excludeFields ?? []).map((f) => String(f)))
+  const errors = runValidation(
+    data as unknown as Record<string, unknown>,
+    REQUIRED_KEYS,
+    excludeFields
+  ) as Array<{
     field: keyof RegisterFormData
     kind: RegisterErrorKind
   }>

@@ -39,16 +39,34 @@ countries.registerLocale(en)
 countries.registerLocale(vi)
 countries.registerLocale(zh)
 
-function resolveIsoCountryLanguage(language: string): "en" | "vi" | "zh" {
+type IsoLang = "en" | "vi" | "zh"
+
+function resolveIsoCountryLanguage(language: string): IsoLang {
   const lang = language.toLowerCase()
   return lang.startsWith("vi") ? "vi" : lang.startsWith("zh") ? "zh" : "en"
+}
+
+/**
+ * Override TW -> 台灣 for product-preferred wording.
+ */
+const COUNTRY_NAME_OVERRIDES: Partial<Record<string, Partial<Record<IsoLang, string>>>> = {
+  TW: { zh: "台灣", en: "Taiwan", vi: "Đài Loan" },
+}
+
+function countryLabelFromIso(codeUpper: string, isoLang: IsoLang): string {
+  const custom = COUNTRY_NAME_OVERRIDES[codeUpper]?.[isoLang]
+  if (custom) return custom
+  return countries.getName(codeUpper, isoLang) ?? codeUpper
 }
 
 export function getCountryOptions(language: string): Array<{ value: string; label: string }> {
   const isoLang = resolveIsoCountryLanguage(language)
   const names = countries.getNames(isoLang, { select: "official" }) as Record<string, string>
   return Object.entries(names)
-    .map(([code, label]) => ({ value: code, label }))
+    .map(([code, label]) => ({
+      value: code,
+      label: countryLabelFromIso(code.toUpperCase(), isoLang) || label,
+    }))
     .sort((a, b) => a.label.localeCompare(b.label))
 }
 
@@ -58,7 +76,7 @@ export function getCountryLabel(code: string, language: string): string {
   const upper = trimmed.toUpperCase()
   if (!/^[A-Z]{2}$/.test(upper)) return trimmed
   const isoLang = resolveIsoCountryLanguage(language)
-  return countries.getName(upper, isoLang) ?? trimmed
+  return countryLabelFromIso(upper, isoLang)
 }
 
 export const REGISTER_COUNTRY_OTHER_VALUE = "other"

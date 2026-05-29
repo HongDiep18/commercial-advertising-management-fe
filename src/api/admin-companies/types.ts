@@ -148,3 +148,79 @@ export type AdminCompanyExportResult = {
   blob: Blob
   filename: string
 }
+
+export type AdminUnlinkedCompanyStatus = "PENDING" | "APPROVED" | "REJECTED" | "DELETED"
+
+export type AdminUnlinkedCompanyContact = {
+  id: string
+  type: string
+  value: string
+  contactName?: string | null
+  createdAt: string
+}
+
+export type AdminUnlinkedCompanyItem = {
+  id: string
+  companyNameVi?: string | null
+  companyNameEn?: string | null
+  companyNameZh?: string | null
+  taxId?: string | null
+  industry?: string[]
+  description: string
+  logoUrl?: string | null
+  country?: string | null
+  region?: string | null
+  status: AdminUnlinkedCompanyStatus
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  contacts: AdminUnlinkedCompanyContact[]
+}
+
+export type AdminUnlinkedCompaniesResponse = {
+  companies: AdminUnlinkedCompanyItem[]
+}
+
+export type AssignUserPayload = {
+  email: string
+  name?: string
+}
+
+export type AssignUserResponse = {
+  userId: string
+  email: string
+  name: string
+  role: string
+  companyId: string
+  action: "created" | "linked"
+  setPasswordEmailSent: boolean
+}
+
+export type AdminCreateCompanyPayload = {
+  company_name_vi: string
+  company_name_zh: string
+  company_name_en?: string
+  phone: string
+  tax_id: string
+  contact_person: string
+  company_address: string
+  register_email: string
+  company_email: string
+  country: string
+  region?: string
+  industry: string[]
+  website: string
+  introduction: string
+  note?: string
+  fax?: string
+  skype?: string
+}
+
+export type AdminCreateCompanyResponse = {
+  companyId: string
+  userId: string
+  email: string
+  role: string
+  companyStatus: string
+  setPasswordEmailSent: boolean
+}

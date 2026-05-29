@@ -1,12 +1,17 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Ban, CheckCircle2, Search, X } from "lucide-react"
+import { Ban, CheckCircle2, Eye, EyeOff, Search, UserPlus, X } from "lucide-react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 
 import { patchUserActive } from "@/api/admin"
-import { defaultAdminUsersQuery, useAdminUsersList } from "@/api/admin-users/hooks"
+import {
+  defaultAdminUsersQuery,
+  useAdminUsersList,
+  useCreateAdminUser,
+} from "@/api/admin-users/hooks"
+import { validateSetPassword } from "@/lib/passwordValidation"
 import type {
   AdminListUserRoleFilter,
   AdminListUsersQuery,
@@ -15,14 +20,19 @@ import type {
 import { AdminPaginationBar } from "@/components/admin/AdminPaginationBar"
 import Button from "@/components/ui/Button"
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/Dialog"
+import Input from "@/components/ui/Input"
+import { Label } from "@/components/ui/Label"
 import { Toast, type ToastVariant } from "@/components/ui/Toast"
 import { useUser } from "@/contexts/user-context"
 import { useDebounce } from "@/hooks/useDebounce"
 import { FeatureKey } from "@/types"
+import { cn } from "@/lib/utils"
 import { formatDateTimeForLocale } from "@/utils/datetime"
 
 import { useAdminData } from "../AdminDataContext"
 import { StatusBadge } from "../StatusBadge"
+import { AddMemberForm } from "./AddMemberForm"
 
 type StatusFilter = "all" | AdminUserStatus
 type RoleFilter = "all" | AdminListUserRoleFilter
@@ -35,10 +45,9 @@ function matchesDemoRoleFilter(role: string, roleFilter: RoleFilter): boolean {
 
 const RECENT_LOGINS_QUERY: AdminListUsersQuery = {
   page: 1,
-  limit: 4,
+  limit: 5,
   sortBy: "lastLoginAt",
   sortOrder: "desc",
-  status: "active",
 }
 
 export function UsersTab() {
@@ -108,6 +117,58 @@ export function UsersTab() {
     visible: false,
   })
 
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false)
+  const [newUserRole, setNewUserRole] = useState<"admin" | "user">("admin")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [addUserForm, setAddUserForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
+
+  const handleAddUserClose = () => {
+    setIsAddUserOpen(false)
+    setNewUserRole("admin")
+    setShowPassword(false)
+    setShowConfirmPassword(false)
+    setAddUserForm({ fullName: "", email: "", password: "", confirmPassword: "" })
+  }
+
+  const createAdminUserMutation = useCreateAdminUser()
+
+  const handleAdminSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const { fullName, email, password, confirmPassword } = addUserForm
+    if (!fullName.trim() || !email.trim()) {
+      showToast(t("admin.users.formValidationRequired"), "error")
+      return
+    }
+    const passwordCheck = validateSetPassword(password, confirmPassword)
+    if (!passwordCheck.valid) {
+      showToast(t(passwordCheck.errorKey), "error")
+      return
+    }
+    createAdminUserMutation.mutate(
+      { email: email.trim(), password, name: fullName.trim() },
+      {
+        onSuccess: () => {
+          handleAddUserClose()
+          showToast(t("admin.users.createSuccess"), "success")
+        },
+        onError: (err: unknown) => {
+          const status = (err as { status?: number })?.status
+          if (status === 409) {
+            showToast(t("admin.users.createErrorDuplicate"), "error")
+          } else {
+            showToast(t("admin.users.createError"), "error")
+          }
+        },
+      }
+    )
+  }
+
   useEffect(() => {
     if (page > totalPages) {
       setPage(totalPages)
@@ -166,9 +227,23 @@ export function UsersTab() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <p className="text-muted-foreground text-sm">
-          {t("admin.users.usersCount", { count: userCount })}
-        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-muted-foreground text-sm">
+            {t("admin.users.usersCount", { count: userCount })}
+          </p>
+          {isRealAdmin && (
+            <Button
+              type="button"
+              size="sm"
+              variant="primary"
+              className="h-8 gap-1.5 text-xs"
+              onClick={() => setIsAddUserOpen(true)}
+            >
+              <UserPlus className="h-3.5 w-3.5" aria-hidden />
+              {t("admin.users.addUser")}
+            </Button>
+          )}
+        </div>
         {isRealAdmin && (
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative min-w-[20rem] flex-1 sm:max-w-xs">
@@ -381,6 +456,149 @@ export function UsersTab() {
         onClose={hideToast}
         duration={4500}
       />
+
+      <Dialog
+        open={isAddUserOpen}
+        onOpenChange={(open) => {
+          if (!open) handleAddUserClose()
+        }}
+      >
+        <DialogContent
+          className={cn(
+            "flex flex-col overflow-hidden p-0",
+            newUserRole === "user" ? "sm:max-w-3xl" : "max-w-md"
+          )}
+        >
+          <DialogHeader className="bg-background relative shrink-0 border-b">
+            <DialogTitle className="pr-12">{t("admin.users.addUserTitle")}</DialogTitle>
+            <button
+              type="button"
+              onClick={handleAddUserClose}
+              className="text-muted-foreground hover:text-foreground absolute top-4 right-4 rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              aria-label={t("common.close", { defaultValue: "Close" })}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </DialogHeader>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="space-y-1.5 px-6 pt-6">
+              <Label htmlFor="new-user-role">{t("admin.users.role")}</Label>
+              <select
+                id="new-user-role"
+                value={newUserRole}
+                onChange={(e) => setNewUserRole(e.target.value as "admin" | "user")}
+                className="border-input bg-background focus-visible:ring-primary h-10 w-full rounded-md border border-gray-300 px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
+              >
+                <option value="admin">{t("admin.users.roleAdmin")}</option>
+                <option value="user">{t("admin.users.formRoleUser")}</option>
+              </select>
+            </div>
+
+            {newUserRole === "admin" && (
+              <form className="space-y-5 px-6 pt-4 pb-6" onSubmit={handleAdminSubmit}>
+                <div className="space-y-1.5">
+                  <Label htmlFor="new-user-name">{t("admin.users.formFullName")}</Label>
+                  <Input
+                    id="new-user-name"
+                    placeholder={t("admin.users.formFullNamePlaceholder")}
+                    value={addUserForm.fullName}
+                    onChange={(e) => setAddUserForm((f) => ({ ...f, fullName: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="new-user-email">{t("admin.users.formEmail")}</Label>
+                  <Input
+                    id="new-user-email"
+                    type="email"
+                    placeholder={t("admin.users.formEmailPlaceholder")}
+                    value={addUserForm.email}
+                    onChange={(e) => setAddUserForm((f) => ({ ...f, email: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="new-user-password">{t("admin.users.formPassword")}</Label>
+                  <div className="relative">
+                    <Input
+                      id="new-user-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={t("admin.users.formPasswordPlaceholder")}
+                      value={addUserForm.password}
+                      onChange={(e) => setAddUserForm((f) => ({ ...f, password: e.target.value }))}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                      onClick={() => setShowPassword((v) => !v)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="new-user-confirm-password">
+                    {t("admin.users.formConfirmPassword")}
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="new-user-confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder={t("admin.users.formConfirmPasswordPlaceholder")}
+                      value={addUserForm.confirmPassword}
+                      onChange={(e) =>
+                        setAddUserForm((f) => ({ ...f, confirmPassword: e.target.value }))
+                      }
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="outline" size="sm" onClick={handleAddUserClose}>
+                    {t("common.cancel")}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    disabled={createAdminUserMutation.isPending}
+                  >
+                    {createAdminUserMutation.isPending
+                      ? t("common.saving")
+                      : t("admin.users.formCreate")}
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {newUserRole === "user" && (
+              <AddMemberForm
+                onSuccess={() => {
+                  handleAddUserClose()
+                  showToast(t("admin.users.createSuccess"), "success")
+                }}
+                onCancel={handleAddUserClose}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

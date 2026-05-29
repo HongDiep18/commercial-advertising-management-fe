@@ -57,5 +57,5 @@ export type AdminUserRow = {
 export const ADMIN_USERS_DEFAULT_PAGE = 1
 export const ADMIN_USERS_DEFAULT_LIMIT = 10
 export const ADMIN_USERS_MAX_LIMIT = 100
-export const ADMIN_USERS_DEFAULT_SORT_BY: AdminListUsersSortBy = "createdAt"
+export const ADMIN_USERS_DEFAULT_SORT_BY: AdminListUsersSortBy = "lastLoginAt"
 export const ADMIN_USERS_DEFAULT_SORT_ORDER: AdminListUsersSortOrder = "desc"

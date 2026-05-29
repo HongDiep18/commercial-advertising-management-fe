@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react"
 import { createPortal } from "react-dom"
+import { cn } from "@/lib/utils"
 
 type DialogContextValue = {
   open: boolean
@@ -89,7 +90,10 @@ export function DialogContent({ className, children, ...props }: DialogContentPr
           aria-modal="true"
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
-          className={`bg-background border-border mt-12 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-xl border shadow-xl ${className || ""}`}
+          className={cn(
+            "bg-background border-border mt-12 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-xl border shadow-xl",
+            className
+          )}
           {...props}
         >
           {children}

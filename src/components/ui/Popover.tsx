@@ -1,7 +1,18 @@
-'use client'
+"use client"
 
-import React, { useState, useRef, useEffect, useCallback, ReactNode, cloneElement, isValidElement, createContext, useContext } from 'react'
-import { createPortal } from 'react-dom'
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  ReactNode,
+  cloneElement,
+  isValidElement,
+  createContext,
+  useContext,
+} from "react"
+import { createPortal } from "react-dom"
+import { cn } from "@/lib/utils"
 
 export interface PopoverProps {
   open?: boolean
@@ -16,8 +27,8 @@ export interface PopoverTriggerProps {
 
 export interface PopoverContentProps {
   children: ReactNode
-  align?: 'start' | 'center' | 'end'
-  side?: 'top' | 'bottom' | 'left' | 'right'
+  align?: "start" | "center" | "end"
+  side?: "top" | "bottom" | "left" | "right"
   sideOffset?: number
   collisionPadding?: number
   className?: string
@@ -36,7 +47,7 @@ const PopoverContext = createContext<PopoverContextType | null>(null)
 export function Popover({ open: controlledOpen, onOpenChange, children }: PopoverProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const triggerRef = useRef<HTMLElement | null>(null)
-  
+
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const setOpen = (newOpen: boolean) => {
     if (controlledOpen === undefined) {
@@ -54,7 +65,7 @@ export function Popover({ open: controlledOpen, onOpenChange, children }: Popove
 
 export function PopoverTrigger({ asChild, children }: PopoverTriggerProps) {
   const context = useContext(PopoverContext)
-  if (!context) throw new Error('PopoverTrigger must be used within Popover')
+  if (!context) throw new Error("PopoverTrigger must be used within Popover")
 
   const { open, setOpen, triggerRef } = context
 
@@ -62,49 +73,55 @@ export function PopoverTrigger({ asChild, children }: PopoverTriggerProps) {
     setOpen(!open)
   }, [open, setOpen])
 
-  
-  
-  const createRefCallback = useCallback((originalRef: any) => {
-    return (el: HTMLElement | null) => {
-      
-      if (triggerRef) {
-        (triggerRef as React.MutableRefObject<HTMLElement | null>).current = el
+  const createRefCallback = useCallback(
+    (originalRef: any) => {
+      return (el: HTMLElement | null) => {
+        if (triggerRef) {
+          ;(triggerRef as React.MutableRefObject<HTMLElement | null>).current = el
+        }
+
+        if (typeof originalRef === "function") {
+          originalRef(el)
+        }
       }
-      
-      if (typeof originalRef === 'function') {
-        originalRef(el)
-      }
-    }
-  }, [triggerRef])
+    },
+    [triggerRef]
+  )
 
   if (asChild && isValidElement(children)) {
     const childElement = children as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>
-    
+
     const originalRef = (childElement as any).ref
-    
-    const childProps: { onClick: (e: React.MouseEvent) => void; ref?: (el: HTMLElement | null) => void } = {
+
+    const childProps: {
+      onClick: (e: React.MouseEvent) => void
+      ref?: (el: HTMLElement | null) => void
+    } = {
       onClick: (e: React.MouseEvent) => {
         handleClick()
         childElement.props.onClick?.(e)
       },
     }
-    
-    
+
     if (originalRef) {
       childProps.ref = createRefCallback(originalRef)
     } else {
       childProps.ref = (el: HTMLElement | null) => {
         if (triggerRef) {
-          (triggerRef as React.MutableRefObject<HTMLElement | null>).current = el
+          ;(triggerRef as React.MutableRefObject<HTMLElement | null>).current = el
         }
       }
     }
-    
+
     return cloneElement(childElement, childProps)
   }
 
   return (
-    <div ref={triggerRef as React.RefObject<HTMLDivElement>} onClick={handleClick} className="inline-block">
+    <div
+      ref={triggerRef as React.RefObject<HTMLDivElement>}
+      onClick={handleClick}
+      className="inline-block"
+    >
       {children}
     </div>
   )
@@ -112,16 +129,16 @@ export function PopoverTrigger({ asChild, children }: PopoverTriggerProps) {
 
 export function PopoverContent({
   children,
-  align = 'center',
-  side = 'bottom',
+  align = "center",
+  side = "bottom",
   sideOffset = 4,
   collisionPadding = 8,
-  className = '',
+  className = "",
   onMouseEnter,
   onMouseLeave,
 }: PopoverContentProps) {
   const context = useContext(PopoverContext)
-  if (!context) throw new Error('PopoverContent must be used within Popover')
+  if (!context) throw new Error("PopoverContent must be used within Popover")
 
   const { open, triggerRef, setOpen } = context
   const [position, setPosition] = useState({ top: 0, left: 0 })
@@ -139,45 +156,44 @@ export function PopoverContent({
       let top = 0
       let left = 0
 
-      if (side === 'bottom') {
+      if (side === "bottom") {
         top = triggerRect.bottom + sideOffset
-        if (align === 'start') {
+        if (align === "start") {
           left = triggerRect.left
-        } else if (align === 'end') {
+        } else if (align === "end") {
           left = triggerRect.right - contentRect.width
         } else {
           left = triggerRect.left + (triggerRect.width - contentRect.width) / 2
         }
-      } else if (side === 'top') {
+      } else if (side === "top") {
         top = triggerRect.top - contentRect.height - sideOffset
-        if (align === 'start') {
+        if (align === "start") {
           left = triggerRect.left
-        } else if (align === 'end') {
+        } else if (align === "end") {
           left = triggerRect.right - contentRect.width
         } else {
           left = triggerRect.left + (triggerRect.width - contentRect.width) / 2
         }
-      } else if (side === 'right') {
+      } else if (side === "right") {
         left = triggerRect.right + sideOffset
-        if (align === 'start') {
+        if (align === "start") {
           top = triggerRect.top
-        } else if (align === 'end') {
+        } else if (align === "end") {
           top = triggerRect.bottom - contentRect.height
         } else {
           top = triggerRect.top + (triggerRect.height - contentRect.height) / 2
         }
       } else {
         left = triggerRect.left - contentRect.width - sideOffset
-        if (align === 'start') {
+        if (align === "start") {
           top = triggerRect.top
-        } else if (align === 'end') {
+        } else if (align === "end") {
           top = triggerRect.bottom - contentRect.height
         } else {
           top = triggerRect.top + (triggerRect.height - contentRect.height) / 2
         }
       }
 
-      
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
 
@@ -194,31 +210,26 @@ export function PopoverContent({
     }
 
     updatePosition()
-    window.addEventListener('resize', updatePosition)
-    window.addEventListener('scroll', updatePosition, true)
+    window.addEventListener("resize", updatePosition)
+    window.addEventListener("scroll", updatePosition, true)
 
-    
     const handleClickOutside = (event: MouseEvent) => {
       if (!contentRef.current || !triggerRef.current) return
-      
+
       const target = event.target as Node
-      if (
-        !contentRef.current.contains(target) &&
-        !triggerRef.current.contains(target)
-      ) {
+      if (!contentRef.current.contains(target) && !triggerRef.current.contains(target)) {
         setOpen(false)
       }
     }
 
-    
     setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside)
     }, 0)
 
     return () => {
-      window.removeEventListener('resize', updatePosition)
-      window.removeEventListener('scroll', updatePosition, true)
-      document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener("resize", updatePosition)
+      window.removeEventListener("scroll", updatePosition, true)
+      document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [open, align, side, sideOffset, collisionPadding, triggerRef, setOpen])
 
@@ -227,7 +238,10 @@ export function PopoverContent({
   return createPortal(
     <div
       ref={contentRef}
-      className={`fixed z-50 bg-background border border-border rounded-md shadow-lg p-1 ${className}`}
+      className={cn(
+        "border-border bg-background fixed z-[90] rounded-md border p-1 shadow-lg",
+        className
+      )}
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
